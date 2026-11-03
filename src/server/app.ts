@@ -178,11 +178,12 @@ export async function buildServer(d: ServerDeps): Promise<FastifyInstance> {
   app.get('/api/export/cases.csv', async (_req, reply) => reply.type('text/csv; charset=utf-8').header('content-disposition', 'attachment; filename="cases.csv"').send(await casesCsv(d)))
 
   // ---------- admin ----------
-  app.post<{ Params: { kind: string }; Querystring: { deal?: string }; Body: string }>('/api/directory/:kind', { preHandler: need('admin') }, async (req, reply) => {
+  app.post<{ Params: { kind: string }; Querystring: { deal?: string; clear?: string }; Body: string }>('/api/directory/:kind', { preHandler: need('admin') }, async (req, reply) => {
     const kind = req.params.kind as DirectoryKind
     if (!['deals', 'contacts', 'commitments', 'bank', 'ledger'].includes(kind)) return reply.code(404).send({ error: 'unknown directory kind' })
     if (typeof req.body !== 'string') return reply.code(400).send({ error: 'send the CSV as text/csv' })
-    const r = await importDirectory(d.db, d.k, { kind, csv: req.body, userId: req.user!.id, deal: req.query.deal, currencies: d.config.deployment.currencies })
+    // PRD R-DIR-04 v0.7.24: only `clear=yes` (exactly) asks for an empty list
+    const r = await importDirectory(d.db, d.k, { kind, csv: req.body, userId: req.user!.id, deal: req.query.deal, currencies: d.config.deployment.currencies, clear: req.query.clear === 'yes' })
     return r.ok ? r : reply.code(422).send(r)
   })
   app.post<{ Body: { username?: string; role?: Role; password?: string } }>('/api/users', { preHandler: need('admin') }, async (req, reply) => {

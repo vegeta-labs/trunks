@@ -5,6 +5,19 @@ import Papa from 'papaparse'
 import { isoFromParts } from './dates.ts'
 import { normAddress } from './signals.ts'
 
+export const NO_DATA_ROWS = 'no data rows: the list would become empty (nothing was imported)'
+
+/**
+ * PRD R-DIR-04 v0.7.24: emptying a list is an explicit request (`clear`), never the result of a file that lost its rows.
+ * With `clear`: a file whose only problem is having no data rows becomes an empty list; a file with data rows is
+ * refused (a clear request must not import anything). Without `clear`: the result as it is.
+ */
+export function applyClear<T>(r: Imported<T>, clear: boolean): Imported<T> {
+  if (!clear) return r
+  if (r.ok) return { ok: false, errors: [{ where: 'file', message: 'clear=yes needs a file with the header only (it has data rows)' }] }
+  return r.errors.length === 1 && r.errors[0]!.where === 'file' && r.errors[0]!.message === NO_DATA_ROWS ? { ok: true, rows: [], ignoredColumns: [] } : r
+}
+
 export interface ImportError {
   where: string
   message: string
@@ -135,6 +148,9 @@ function readTable(text: string, kind: Kind, currency: Currency | null): { table
     },
   })
   const [headerRec, ...body] = records
+  // PRD R-DIR-04 v0.7.24: a file without data rows would replace the list with an empty one (e.g. curl --data, which
+  // drops the line breaks): refused, the current version stays
+  if (headerRec && body.length === 0) errors.push({ where: 'file', message: NO_DATA_ROWS })
   const header = headerRec?.cells ?? []
   const spec: FieldSpec[] = SCHEMAS[kind]
   const colOf: Record<string, number> = {}

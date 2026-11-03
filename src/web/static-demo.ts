@@ -1,6 +1,7 @@
 // The static read-only demo (PRD R-DEMO-02, tech design v0.7.11; site interface T1–T4): built with STATIC_DEMO=1, the
 // review UI reads the snapshot that `data/snapshot.js` puts on globalThis (loaded by a classic <script src> before the
-// app, so the site's CSP `connect-src 'none'` holds: no fetch, no XHR). Every change is refused here.
+// app, so the site's CSP `connect-src 'none'` holds: no fetch, no XHR). The page renders no change control (PRD R-DEMO-02
+// v0.7.25); a change that reached the API layer anyway is still refused here, without a request.
 export const DEMO_REFUSAL = 'Demo: not available. This is a read-only snapshot of the demo; nothing can be changed here.'
 export const STATIC_DEMO = import.meta.env.VITE_STATIC_DEMO === '1'
 
@@ -36,18 +37,4 @@ export function staticAnswer(method: string, url: string): { status: number; dat
   const one = /^\/api\/cases\/([A-Za-z0-9-]+)$/.exec(path)
   if (one && s.details[one[1]!]) return { status: 200, data: s.details[one[1]!] }
   return { status: 404, data: { error: 'not in the demo snapshot' } }
-}
-
-/**
- * T3: every button that would change something is announced as unavailable (still focusable; a click shows the
- * reason). Navigation buttons carry data-nav.
- */
-export function markChangeButtons(root: HTMLElement): () => void {
-  const mark = () => {
-    for (const b of root.querySelectorAll<HTMLButtonElement>('button:not([data-nav])')) b.setAttribute('aria-disabled', 'true')
-  }
-  mark()
-  const o = new MutationObserver(mark)
-  o.observe(root, { childList: true, subtree: true })
-  return () => o.disconnect()
 }

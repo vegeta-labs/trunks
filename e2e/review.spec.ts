@@ -365,6 +365,64 @@ test('TC-REV-09 wording and display (D8): class floor, subject note, monospace a
   await expect(actions).toHaveText('No action needed')
 })
 
+test('TC-REV-10 display (R-REV-02 v0.7.25, 界面规则 v0.3.4): signals fired or folded, two columns from 1024px, one at 375px, room for the select arrow in both themes', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await signInAs(page, 'rita')
+  await openCase(page, 'New bank details')
+  // the folded full list and the visible tags tell the same story
+  const all = page.locator('details:has(summary:text-matches("^All signals")) ul.signals li')
+  const on = await all.evaluateAll((ls) => ls.filter((l) => l.classList.contains('on')).length)
+  const unknown = await all.evaluateAll((ls) => ls.filter((l) => l.classList.contains('unknown')).length)
+  expect(await all.count()).toBeGreaterThan(0)
+  await expect(page.locator('.tag.sig-on')).toHaveCount(on)
+  await expect(page.locator('.tag.sig-unknown')).toHaveCount(unknown)
+  await expect(page.getByText(/^No warning signals/)).toHaveCount(on === 0 ? 1 : 0)
+  await expect(all.first()).toBeHidden()
+  // two columns: the mail on the left, risk / links / reply / task on the right
+  const main = await page.locator('.case-main').boundingBox()
+  const side = await page.locator('.case-side').boundingBox()
+  expect(main!.x + main!.width).toBeLessThanOrEqual(side!.x)
+  expect(Math.abs(main!.y - side!.y)).toBeLessThan(2)
+  for (const h of ['Risk', 'Links', 'Reply', 'Check the bank details request']) await expect(page.locator('.case-side').getByRole('heading', { name: h })).toBeVisible()
+  for (const h of ['Message (plain text)', 'Classes']) await expect(page.locator('.case-main').getByRole('heading', { name: h })).toBeVisible()
+  // the select arrow keeps its distance from the edge, light and dark
+  for (const scheme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme: scheme })
+    const pad = await page.getByLabel('Set risk').evaluate((s) => parseFloat(getComputedStyle(s).paddingRight))
+    expect(pad, scheme).toBeGreaterThanOrEqual(32)
+  }
+  await page.emulateMedia({ colorScheme: 'light' })
+  // Real nested controls with long directory candidates and a recipient (round-1 F3).
+  const candidate = 'Northwind Robotics Secondary Investment Vehicle 2026::001'
+  const recipient = 'investment.operations.secondary.vehicle.2026@northwind-robotics-investments.example'
+  await page.route('**/api/cases/*', async (route) => {
+    const response = await route.fetch()
+    const body = await response.json()
+    if (body.e3?.links) {
+      body.e3.links.commitmentCandidates = [candidate]
+      body.e3.allowedRecipients = [recipient]
+      for (const reply of body.e3.replies) reply.recipient = recipient
+    }
+    await route.fulfill({ response, json: body })
+  })
+  await page.reload()
+  await expect(page.getByLabel('Choose the commitment').locator('option').last()).toHaveText(candidate)
+  await expect(page.getByTestId('reply').first()).toContainText(recipient)
+  for (const width of [1024, 375]) {
+    await page.setViewportSize({ width, height: 900 })
+    expect(await page.evaluate(() => document.documentElement.scrollWidth), `long values at ${width}`).toBeLessThanOrEqual(width)
+    const select = await page.getByLabel('Choose the commitment').boundingBox()
+    const column = await page.locator('.case-side').boundingBox()
+    expect(select!.x + select!.width).toBeLessThanOrEqual(column!.x + column!.width + 1)
+  }
+  // narrow: one column, signals and risk above the mail, no sideways scroll
+  await page.setViewportSize({ width: 375, height: 740 })
+  const m = await page.locator('.case-main').boundingBox()
+  const s = await page.locator('.case-side').boundingBox()
+  expect(s!.y + s!.height).toBeLessThanOrEqual(m!.y + 1)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375)
+})
+
 test('E2E-05 after importing the Toolkit CSV, a new mail is linked automatically', async ({ page }) => {
   await signIn(page) // the admin imports the directory
   const csv = 'investor_id,name,email,reference,cash_due\n001,Amelia Hart,amelia@hartfamily.example,NW-001,"10,000.00"\n002,Ben Okafor,ben@okafor.example,NW-002,"7,500.00"\n'

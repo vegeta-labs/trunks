@@ -294,10 +294,13 @@ console.log(s.warnings.join(' '))`)).toMatch(/the evaluation set's fictional one
     expect(doc).not.toMatch(/first-password-/)
     const out = execFileSync('bash', ['-e', '-c', script], { cwd: work, input: `admin\n${pw}\nsam.reviewer\nreviewer\nfirst-password-sam-1\nalex.approver\napprover\nfirst-password-alex-1\n`, encoding: 'utf8' })
     expect(out.match(/\{"id":"[0-9a-f-]{36}"\}/g)).toHaveLength(2)
-    expect(out.match(/"ok":true/g)).toHaveLength(5)
+    expect(out.match(/"ok":true/g)).toHaveLength(6) // five imports and the page's example clear of the ledger
     expect(readdirSync(work)).not.toContain('doi-cookies.txt')
     expect(sql(s, "SELECT string_agg(role || '', ',' ORDER BY role) FROM app_user")).toBe('admin,approver,reviewer')
-    expect(sql(s, "SELECT string_agg(kind, ',' ORDER BY kind) FROM directory_version")).toBe('bank,commitments,contacts,deals,ledger')
+    expect(sql(s, "SELECT string_agg(DISTINCT kind, ',' ORDER BY kind) FROM directory_version")).toBe('bank,commitments,contacts,deals,ledger')
+    // the page's clear example: the newest ledger version is empty, and the audit says it was a clear
+    expect(sql(s, "SELECT count(*) FROM ledger_line WHERE directory_version = (SELECT id FROM directory_version WHERE kind = 'ledger' ORDER BY imported_at DESC, id DESC LIMIT 1)")).toBe('0')
+    expect(sql(s, "SELECT count(*) FROM audit WHERE type = 'directory.imported' AND payload->>'cleared' = 'true'")).toBe('1')
     expect(sql(s, 'SELECT count(*) FROM commitment')).toBe('2')
     expect(sql(s, 'SELECT count(*) FROM contact')).toBe('2')
     // the new user signs in and must choose a password first

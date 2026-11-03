@@ -26,6 +26,11 @@ const E5S = 'npx vitest run src/server/app.test.ts --reporter=dot'
 const E5R = 'npx vitest run src/maintenance/round.test.ts --reporter=dot'
 const E5P = 'npx vitest run scripts/public-curate.test.ts --reporter=dot'
 const E5C = 'npx vitest run src/pipeline/classify.test.ts -t TC-OPS-09 --reporter=dot'
+// v0.1.1 demo page (PRD v0.7.25): the web unit tests, the review UI browser test and the static demo test. DEMO needs a
+// running, processed local demo at 127.0.0.1:8080 (deploy/compose.demo.yml) to rebuild the snapshot
+const W = 'npx vitest run src/web --reporter=dot'
+const WE = 'npx playwright test -g TC-REV-10 --reporter=dot'
+const DEMO = 'npm run demo:snapshot --silent -- http://127.0.0.1:8080 && npx playwright test -c playwright.demo.config.ts --reporter=dot'
 const MUTANTS = [
   ['src/lib/uetr.ts', "hex[12] === '4'", "hex[12] !== '0'", 'UETR version digit not checked'],
   ['src/lib/uetr.ts', "'89ab'.includes(hex[16]!)", "'89abc'.includes(hex[16]!)", 'UETR variant c accepted'],
@@ -346,12 +351,26 @@ const MUTANTS = [
   ['src/web/static-demo.ts', "if (method !== 'GET') return null", '', 'the static demo answers a change instead of refusing it (E5 TC-DEMO-04)', 'npx vitest run src/web --reporter=dot'],
   ['scripts/public-export.ts', ".replace(/负责人：[^·（\\n]+（产品）/g, '负责人：项目负责人（产品）')", '', "the owner's name left in the public documents (E5 TC-OPS-05)", E5P],
   ['scripts/public-export.ts', "if (/(?:^|[\\s`'\"(（=:])(?:~\\/(?:Documents|\\.config|Library)|\\/Users\\/[a-z]|\\/home\\/[a-z])/m.test(text)) problems.push(`${rel}: a local path`)", 'if (false) problems.push(`${rel}: a local path`)', 'a local path published (E5 TC-OPS-05)', E5P],
+  ['src/store/directory.ts', '!!v.ledger && !clearedVersions.has(v.ledger)', '!!v.ledger', 'a cleared ledger counts as an empty ledger, not as none (C-DRF-6 v0.7.24, TC-DIR-09)', E5S],
+  ['src/store/directory.ts', 'fileSha, o.clear === true])', 'fileSha, true])', 'every import marked as a clear (Codex D9 round 2 F2)', E5S],
+  ['src/lib/directory.ts', "if (r.ok) return { ok: false, errors: [{ where: 'file', message: 'clear=yes needs", "if (false) return { ok: false, errors: [{ where: 'file', message: 'clear=yes needs", 'clear=yes with data rows imports them (PRD R-DIR-04 v0.7.24, TC-DIR-09)'],
+  ['src/lib/directory.ts', "return r.errors.length === 1 && r.errors[0]!.where === 'file'", "return true || r.errors.length === 1 && r.errors[0]!.where === 'file'", 'clear=yes turns any broken file into an empty list (TC-DIR-09)'],
+  ['src/lib/directory.ts', 'if (headerRec && body.length === 0) errors.push', 'if (false) errors.push', 'a header-only file replaces the list with an empty one (PRD R-DIR-04 v0.7.24, TC-DIR-09)'],
   ['src/pipeline/restart.ts', "if (!row || row.status !== 'failed' || ", 'if (!row || ', 'rerun-failed restarts a Case that is not failed (E5 acceptance G3, TC-OPS-09)', E5C],
   ['src/pipeline/restart.ts', "caseId, start, 'system')", "caseId, start, 'person')", "a re-run counted as a person's change (E5 acceptance G3, TC-OPS-09)", E5C],
   ['src/pipeline/restart.ts', "await appendAudit(c, k, [{ actor: 'system', type: 'case.rerun_failed'", "if (0) await appendAudit(c, k, [{ actor: 'system', type: 'case.rerun_failed'", 'a re-run not audited (E5 acceptance G3, TC-OPS-09)', E5C],
   ['src/pipeline/restart.ts', "> STAGES.indexOf('reply') ? 'reply' : row.failed_stage", "> STAGES.indexOf('reply') ? row.failed_stage : row.failed_stage", 'a re-run after route keeps the old generation\'s draft, which cannot be approved (Codex E5 round 5 F1)', E5C],
   ['src/server/app.ts', '({ oidc: !!d.oidc })', '({ oidc: true })', 'the organisation sign-in offered without OIDC (E5 acceptance G4)', E5S],
   ['scripts/public-export.ts', "(^|[^a-z0-9])${n.replace", "${n.replace", 'a forbidden name inside an ordinary word reported, hiding real hits (E5)', E5P],
+  ['src/web/App.tsx', '{on.length === 0 && <p className="meta">', '{true && <p className="meta">', '«No warning signals» beside fired signals (R-REV-02 v0.7.25)', W],
+  ['src/web/App.tsx', '{unknown.length > 0 && <ul', '{false && <ul', 'unchecked signals hidden (R-REV-02 v0.7.25)', W],
+  ['src/web/App.tsx', '`No warning signals; ${unknown.length} could not be checked`', "'No warning signals'", 'unchecked signals not counted (R-REV-02 v0.7.25)', W],
+  ['src/web/styles.css', "grid-template-areas: 'main side'", "grid-template-areas: 'side main'", 'the mail on the right (界面规则 v0.3.4)', WE],
+  ['src/web/styles.css', 'appearance: none; -webkit-appearance: none; padding-right: 36px;', 'appearance: none; -webkit-appearance: none; padding-right: 12px;', 'the select arrow against the edge (界面规则 v0.3.4)', WE],
+  ['src/web/CaseE3.tsx', '(STATIC_DEMO ? null : <>{children}</>)', '(<>{children}</>)', 'change controls in the static demo (R-DEMO-02 v0.7.25)', DEMO],
+  ['src/web/CaseE3.tsx', "{STATIC_DEMO ? <><span aria-label={c.checked ? 'done' : 'not done'}>", "{false ? <><span aria-label={c.checked ? 'done' : 'not done'}>", 'checklist boxes in the static demo (R-DEMO-02 v0.7.25)', DEMO],
+  ['src/web/App.tsx', '...Object.keys(SIGNAL_TEXT).filter((k) => !known.has(k))', '...([] as string[]).filter((k) => !known.has(k))', 'a signal without a row counted as clean (self-test F1)', W],
+  ['src/web/App.tsx', '      {STATIC_DEMO ? (\n', '      {false ? (\n', 'user, role and Sign out in the static demo (R-DEMO-02 v0.7.25)', DEMO],
 ]
 
 // the parity test with the Python oracle is a separate CI step; its result must not count as a catch here

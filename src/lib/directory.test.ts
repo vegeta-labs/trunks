@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
-import { importBank, importCommitments, importContacts, importDeals, importLedger } from './directory.ts'
+import { applyClear, importBank, importCommitments, importContacts, importDeals, importLedger } from './directory.ts'
 
 const ok = <T>(r: { ok: true; rows: T[] } | { ok: false; errors: unknown[] }) => {
   if (!r.ok) throw new Error(JSON.stringify(r.errors))
@@ -9,6 +9,24 @@ const ok = <T>(r: { ok: true; rows: T[] } | { ok: false; errors: unknown[] }) =>
 const errs = (r: { ok: boolean; errors?: Array<{ where: string; message: string }> }) => (r.ok ? [] : r.errors!.map((e) => `${e.where}: ${e.message}`))
 
 describe('C-DIR directory imports', () => {
+  it('TC-DIR-09 a file with a header and no data rows is refused, for every kind (PRD R-DIR-04 v0.7.24)', () => {
+    const empty = 'no data rows: the list would become empty (nothing was imported)'
+    const cases: Array<[string, () => { ok: boolean; errors?: Array<{ where: string; message: string }> }]> = [
+      ['deals', () => importDeals('name,currency\n', ['GBP'])],
+      ['contacts', () => importContacts('contact_id,name,email,phone,role,deal,investor_id,authorised_for\r\n\r\n', 'v1')],
+      ['commitments', () => importCommitments('investor_id,name,email,reference,cash_due,scheme', 'GBP', 'v1')],
+      ['bank', () => importBank('transaction_id,date,amount,payer,reference\n\n  \n', 'GBP', 'v1')],
+      ['ledger', () => importLedger('transaction_id,date,amount,payer,reference,status,investor_id,investor_name,decided_by,withdrawn_on,currency\n', 'GBP')],
+    ]
+    for (const [kind, run] of cases) expect(errs(run()), kind).toContain(`file: ${empty}`)
+    // one data row is enough
+    expect(errs(importDeals('name,currency\nNorthwind Robotics,GBP\n', ['GBP']))).toEqual([])
+    // clearing is explicit: header only + clear → an empty list; clear with data rows, or with another error → refused
+    expect(applyClear(importDeals('name,currency\n', ['GBP']), true)).toEqual({ ok: true, rows: [], ignoredColumns: [] })
+    expect(errs(applyClear(importDeals('name,currency\nNorthwind Robotics,GBP\n', ['GBP']), true))).toEqual(['file: clear=yes needs a file with the header only (it has data rows)'])
+    expect(applyClear(importDeals('name\n', ['GBP']), true).ok).toBe(false) // header-only but missing a required column
+    expect(applyClear(importDeals('name,currency\n', ['GBP']), false).ok).toBe(false)
+  })
   it('TC-DIR-01 the Toolkit sample commitments and bank lines import with the same amounts', () => {
     const c = ok(importCommitments(readFileSync('fixtures/toolkit/commitments.csv', 'utf8'), 'GBP', 'v1'))
     expect(c.map((r) => [r.investorId, r.name, r.reference, r.cashDue, r.scheme])).toEqual([

@@ -3,6 +3,10 @@
 // copies the approved reply into their own mail client (decision 5).
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
 import { api, ApiError, type SessionUser } from './api.ts'
+import { STATIC_DEMO } from './static-demo.ts'
+
+/** The static demo is read-only: change controls are not rendered at all (PRD R-DEMO-02 v0.7.25). */
+const Change = ({ children }: { children: ReactNode }) => (STATIC_DEMO ? null : <>{children}</>)
 
 export interface Meta {
   classes: Array<{ id: string; riskFloor: string }>
@@ -116,7 +120,6 @@ export function E3Panels({ caseId, e3, user, meta, reload }: { caseId: string; e
       {!e3.complete && <p className="banner" role="status">Reprocessing after a change… approving and copying wait until it finishes.</p>}
       <RiskPanel caseId={caseId} e3={e3} user={user} reload={reload} />
       <LinksPanel caseId={caseId} e3={e3} reload={reload} />
-      <LabelsPanel caseId={caseId} e3={e3} meta={meta} reload={reload} />
       <Panel title="Suggested actions">
         <ul className="actions">
           {e3.actions.map((a) => (
@@ -140,7 +143,7 @@ export function HoldPanel({ caseId, hold, reason, user, reload }: { caseId: stri
   return (
     <Panel title="Hold">
       {hold ? <p><span className="tag warn">On hold</span> <span className="meta">{reason}</span></p> : <p className="meta">Not on hold. A hold keeps this Case and the earlier Cases of its thread past the retention period.</p>}
-      {user.role !== 'reviewer' && (
+      {user.role !== 'reviewer' && !STATIC_DEMO && (
         <div className="inline-form">
           <input aria-label={hold ? 'Reason for removing the hold' : 'Reason for the hold'} placeholder="Reason" value={why} onChange={(e) => setWhy(e.target.value)} />
           <button className="secondary" disabled={!why.trim() || a.busy} onClick={() => void a.run(() => api('POST', `/api/cases/${caseId}/hold`, { hold: !hold, reason: why }))}>{hold ? 'Remove the hold' : 'Put on hold'}</button>
@@ -165,7 +168,7 @@ function RiskPanel({ caseId, e3, user, reload }: { caseId: string; e3: E3; user:
       {e3.risk.held && (
         <div className="banner" role="status">
           <p>A change by a person would lower the risk to {e3.risk.applied}. It stays {e3.risk.held} until an approver confirms the lower risk.</p>
-          {user.role !== 'reviewer' && (
+          {user.role !== 'reviewer' && !STATIC_DEMO && (
             <div className="inline-form">
               <input aria-label="Reason for accepting the lower risk" placeholder="Reason" value={reason} onChange={(e) => setReason(e.target.value)} />
               <button className="secondary" disabled={!reason.trim() || a.busy} onClick={() => void a.run(() => api('POST', `/api/cases/${caseId}/risk/confirm-lower`, { reason, level: e3.risk!.applied }))}>Accept the lower risk</button>
@@ -179,6 +182,7 @@ function RiskPanel({ caseId, e3, user, reload }: { caseId: string; e3: E3; user:
           {e3.risk.clauses.map((c) => <li key={c} className="on">{CLAUSE_TEXT[c] ?? c}</li>)}
         </ul>
       )}
+      <Change>
       <div className="inline-form">
         <label className="inline">
           Set risk
@@ -190,6 +194,7 @@ function RiskPanel({ caseId, e3, user, reload }: { caseId: string; e3: E3; user:
         <input aria-label="Reason for the risk change" placeholder={user.role === 'reviewer' ? 'Lowering needs an approver' : 'Reason (needed to lower)'} value={reason} onChange={(e) => setReason(e.target.value)} />
         <button className="secondary" disabled={!level || a.busy} onClick={() => void a.run(() => api('POST', `/api/cases/${caseId}/risk`, { level, reason }))}>Apply</button>
       </div>
+      </Change>
       <Err text={a.error} />
     </Panel>
   )
@@ -201,7 +206,10 @@ function LinksPanel({ caseId, e3, reload }: { caseId: string; e3: E3; reload: ()
   if (!l) return null
   const set = (kind: string, target: string | null) => void a.run(() => api('PUT', `/api/cases/${caseId}/links/${kind}`, { target }))
   const Pick = ({ kind, current, candidates }: { kind: string; current: string | null; candidates: string[] }) =>
-    candidates.length > 0 ? (
+    candidates.length > 0 && STATIC_DEMO ? (
+      // the demo shows what the system found, as text (self-test F5)
+      <span className="meta">candidates: {candidates.join(', ')}</span>
+    ) : candidates.length > 0 ? (
       <select aria-label={`Choose the ${kind}`} value="" onChange={(e) => e.target.value && set(kind, e.target.value)}>
         <option value="">{current ? 'Change…' : 'Not linked — choose…'}</option>
         {candidates.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -224,13 +232,15 @@ function LinksPanel({ caseId, e3, reload }: { caseId: string; e3: E3; reload: ()
         <dd>{l.mayDisclose ? 'allowed' : 'not allowed (generic replies only)'}</dd>
       </dl>
       {e3.signalsFromEarlierSnapshot && <p className="meta">Signals are based on the directory at the time the mail arrived.</p>}
-      <button className="secondary" disabled={a.busy} onClick={() => void a.run(() => api('POST', `/api/cases/${caseId}/relink`))}>Relink with the latest directory</button>
+      <Change>
+        <button className="secondary" disabled={a.busy} onClick={() => void a.run(() => api('POST', `/api/cases/${caseId}/relink`))}>Relink with the latest directory</button>
+      </Change>
       <Err text={a.error} />
     </Panel>
   )
 }
 
-function LabelsPanel({ caseId, e3, meta, reload }: { caseId: string; e3: E3; meta: Meta | null; reload: () => void }) {
+export function LabelsPanel({ caseId, e3, meta, reload }: { caseId: string; e3: E3; meta: Meta | null; reload: () => void }) {
   const [add, setAdd] = useState('')
   const [reason, setReason] = useState('')
   const a = useAction(reload)
@@ -241,7 +251,7 @@ function LabelsPanel({ caseId, e3, meta, reload }: { caseId: string; e3: E3; met
         {e3.adopted.map((c) => (
           <li key={c} className="tag">
             {c}
-            {e3.ruleLabels.includes(c) ? <span className="meta"> (rule)</span> : <button className="link" aria-label={`Remove ${c}`} onClick={() => change({ remove: [c] })}> ×</button>}
+            {e3.ruleLabels.includes(c) ? <span className="meta"> (rule)</span> : STATIC_DEMO ? null : <button className="link" aria-label={`Remove ${c}`} onClick={() => change({ remove: [c] })}> ×</button>}
           </li>
         ))}
         {e3.low.map((c) => <li key={c} className="tag confirm">{c} (low, counts for risk)</li>)}
@@ -252,6 +262,7 @@ function LabelsPanel({ caseId, e3, meta, reload }: { caseId: string; e3: E3; met
         </ul>
       )}
       {e3.pendingAdopted && <p className="meta" role="status">After the re-run: {e3.pendingAdopted.join(', ') || 'no class'}</p>}
+      <Change>
       <div className="inline-form">
         <select aria-label="Add a class" value={add} onChange={(e) => setAdd(e.target.value)}>
           <option value="">Add a class…</option>
@@ -260,6 +271,7 @@ function LabelsPanel({ caseId, e3, meta, reload }: { caseId: string; e3: E3; met
         <button className="secondary" disabled={!add || a.busy} onClick={() => change({ add: [add] })}>Add</button>
         <input aria-label="Reason for the class change" placeholder="Reason (needed when it lowers the risk)" value={reason} onChange={(e) => setReason(e.target.value)} />
       </div>
+      </Change>
       <Err text={a.error} />
     </Panel>
   )
@@ -273,6 +285,7 @@ export function FieldActions({ caseId, field, confirmed, reload }: { caseId: str
     reload()
   })
   if (confirmed) return <span className="tag ok">confirmed</span>
+  if (STATIC_DEMO) return null
   return (
     <span className="field-actions">
       <button className="link" onClick={() => void a.run(() => api('PUT', `/api/cases/${caseId}/fields/${field}`, { confirm: true }))}>Confirm</button>{' '}
@@ -288,11 +301,14 @@ export function FieldActions({ caseId, field, confirmed, reload }: { caseId: str
   )
 }
 
+// PRD R-DEMO-02 v0.7.25: the demo shows no approval controls, so it says how a reply leaves a real deployment
+export const DEMO_REPLY_NOTE = 'In a real deployment a reviewer approves this reply and sends it from their own mail client; the app cannot send.'
+
 function RepliesPanel({ caseId, e3, reload }: { caseId: string; e3: E3; reload: () => void }) {
-  if (e3.replies.length === 0) return <Panel title="Reply"><p className="meta">No reply is drafted for this Case.</p></Panel>
+  if (e3.replies.length === 0) return <Panel title="Reply">{STATIC_DEMO && <p className="meta">{DEMO_REPLY_NOTE}</p>}<p className="meta">No reply is drafted for this Case.</p></Panel>
   return (
     <Panel title="Reply">
-      <p className="meta">Templates are chosen by the rules{e3.autoTemplate ? ` (now: ${e3.autoTemplate})` : ''}. Nothing is sent from here: copy the approved reply into your mail client, then mark it as sent.</p>
+      <p className="meta">Templates are chosen by the rules{e3.autoTemplate ? ` (now: ${e3.autoTemplate})` : ''}. {STATIC_DEMO ? DEMO_REPLY_NOTE : 'Nothing is sent from here: copy the approved reply into your mail client, then mark it as sent.'}</p>
       {e3.replies.map((r) => <ReplyCard key={r.id} caseId={caseId} r={r} e3={e3} reload={reload} />)}
     </Panel>
   )
@@ -372,7 +388,7 @@ function ReplyCard({ caseId, r, e3, reload }: { caseId: string; r: E3['replies']
       <dl className="facts">
         <dt>To</dt>
         <dd>
-          {r.status === 'draft' && e3.allowedRecipients.length > 1 ? (
+          {r.status === 'draft' && e3.allowedRecipients.length > 1 && !STATIC_DEMO ? (
             <select aria-label="Recipient" value={r.recipient ?? ''} onChange={(e) => void a.run(() => api('POST', `${url}/revise`, { recipient: e.target.value }))}>
               {e3.allowedRecipients.map((x) => <option key={x} value={x}>{x}</option>)}
             </select>
@@ -381,7 +397,7 @@ function ReplyCard({ caseId, r, e3, reload }: { caseId: string; r: E3['replies']
         <dt>Subject</dt>
         <dd>{r.subject} <span className="meta">(set by the template; the subject of the sender's mail is never repeated)</span></dd>
       </dl>
-      {r.status === 'draft' && r.bodyEditable && !r.outOfDate ? (
+      {r.status === 'draft' && r.bodyEditable && !r.outOfDate && !STATIC_DEMO ? (
         <textarea aria-label="Reply text" value={text} rows={Math.min(14, text.split('\n').length + 2)} onChange={(e) => setText(e.target.value)} />
       ) : (
         <pre className="body">{r.text}</pre>
@@ -389,6 +405,7 @@ function ReplyCard({ caseId, r, e3, reload }: { caseId: string; r: E3['replies']
       {!r.bodyEditable && r.status === 'draft' && <p className="meta">This reply's text is fixed and cannot be edited.</p>}
       {r.removed > 0 && <p className="meta">{r.removed} sentence{r.removed > 1 ? 's were' : ' was'} left out because a value is missing.</p>}
       {r.problems.length > 0 && <ul className="flags">{r.problems.map((p) => <li key={p}>{PROBLEM_TEXT(p)}</li>)}</ul>}
+      <Change>
       <div className="inline-form">
         {r.status === 'draft' && r.bodyEditable && text !== r.text && <button className="secondary" disabled={a.busy} onClick={() => void a.run(() => api('POST', `${url}/revise`, { text }))}>Save text</button>}
         {r.status === 'draft' && !r.outOfDate && e3.allowedTemplates.length > 0 && (
@@ -403,7 +420,8 @@ function ReplyCard({ caseId, r, e3, reload }: { caseId: string; r: E3['replies']
         {(r.status === 'draft' || r.status === 'approved') && !(r.outOfDate && r.status === 'draft' && r.source === 'auto' && !r.edited) && <button className="secondary" disabled={a.busy} onClick={() => void a.run(() => api('POST', `${url}/reject`))}>Reject</button>}
         {r.status === 'approved' && !r.outOfDate && <button className="secondary" disabled={a.busy} onClick={() => void a.run(() => api('POST', `${url}/sent`))}>Mark as sent</button>}
       </div>
-      {(r.status === 'approved' || r.status === 'sent') && !r.outOfDate && (
+      </Change>
+      {(r.status === 'approved' || r.status === 'sent') && !r.outOfDate && !STATIC_DEMO && (
         <div className="copy">
           <button className="secondary" disabled={!e3.complete} onClick={() => void copy('recipient')}>Copy recipient</button>
           <button className="secondary" disabled={!e3.complete} onClick={() => void copy('subject')}>Copy subject</button>
@@ -440,10 +458,10 @@ function VerificationPanel({ task, user, reload }: { caseId: string; task: E3['v
       <ul className="checklist">
         {task.checklist.map((c) => (
           <li key={c.id}>
-            <label className="inline">
+            {STATIC_DEMO ? <><span aria-label={c.checked ? 'done' : 'not done'}>{c.checked ? '✓' : '○'}</span> {c.text}</> : <label className="inline">
               <input type="checkbox" disabled={task.state !== 'open'} checked={ticked.includes(c.id)} onChange={(e) => setTicked(e.target.checked ? [...ticked, c.id] : ticked.filter((x) => x !== c.id))} />
               {c.text}
-            </label>
+            </label>}
           </li>
         ))}
       </ul>
@@ -455,10 +473,12 @@ function VerificationPanel({ task, user, reload }: { caseId: string; task: E3['v
           <pre className="body">{task.notifyText}</pre>
         </details>
       )}
+      <Change>
       <div className="inline-form">
         {task.state === 'open' && <button disabled={a.busy || ticked.length < task.checklist.length} onClick={() => void a.run(() => api('POST', `/api/verification/${task.id}/complete`, { items: ticked }))}>Checklist done</button>}
         {task.state === 'checklist_done' && user.role !== 'reviewer' && <button disabled={a.busy} onClick={() => void a.run(() => api('POST', `/api/verification/${task.id}/approve`))}>Approve as the second person</button>}
       </div>
+      </Change>
       <Err text={a.error} />
     </Panel>
   )
@@ -473,6 +493,12 @@ function RoutingPanel({ caseId, e3, meta, reload }: { caseId: string; e3: E3; me
       <dl className="facts">
         <dt>Due</dt>
         <dd>{e3.due.at ? `${when(e3.due.at)} (${DUE_TEXT[e3.due.state ?? ''] ?? 'closed'})` : '—'}</dd>
+        {STATIC_DEMO && (
+          <>
+            <dt>Owner</dt>
+            <dd>{users.find((u) => u.id === e3.assignee)?.username ?? (e3.assignee ? 'assigned' : 'No owner')}</dd>
+          </>
+        )}
         {e3.due.followUpAt && (
           <Fragment>
             <dt>Follow up</dt>
@@ -480,6 +506,7 @@ function RoutingPanel({ caseId, e3, meta, reload }: { caseId: string; e3: E3; me
           </Fragment>
         )}
       </dl>
+      <Change>
       <div className="inline-form">
         <select aria-label="Queue" value="" onChange={(e) => e.target.value && void a.run(() => api('PUT', `/api/cases/${caseId}/assignment`, { queue: e.target.value }))}>
           <option value="">Move to queue…</option>
@@ -490,9 +517,10 @@ function RoutingPanel({ caseId, e3, meta, reload }: { caseId: string; e3: E3; me
           {users.map((u) => <option key={u.id} value={u.id}>{u.username}</option>)}
         </select>
       </div>
+      </Change>
       {e3.outcome ? (
         <p>Closed: {e3.outcome}</p>
-      ) : (
+      ) : STATIC_DEMO ? null : (
         <div className="inline-form">
           <select aria-label="Outcome" value={outcome} onChange={(e) => setOutcome(e.target.value)}>
             <option value="">Close with outcome…</option>

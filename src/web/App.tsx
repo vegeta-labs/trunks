@@ -1,8 +1,8 @@
 // Review UI (PRD R-REV-01 to R-REV-05). Mail content is shown as plain text only (tech design T9).
 import { Fragment, useCallback, useEffect, useState, type FormEvent } from 'react'
 import { api, ApiError, csrf, withoutRuleIds, type SessionUser } from './api.ts'
-import { markChangeButtons, snapshotInfo, STATIC_DEMO } from './static-demo.ts'
-import { E3Panels, FieldActions, HoldPanel, type E3, type Meta } from './CaseE3.tsx'
+import { snapshotInfo, STATIC_DEMO } from './static-demo.ts'
+import { E3Panels, FieldActions, HoldPanel, LabelsPanel, type E3, type Meta } from './CaseE3.tsx'
 
 interface CaseItem {
   id: string
@@ -259,17 +259,56 @@ function KycTransfer({ t, user, reload }: { t: { id: string; state: string; erro
   return (
     <>
       {' '}<span className={`tag ${t.state === 'failed' ? 'bad' : ''}`}>{text}</span>
-      {blocked && user.role === 'admin' && (
+      {blocked && user.role === 'admin' && !STATIC_DEMO && (
         <span className="inline-form">
           <input aria-label="How the blocked attachment was handled" placeholder="How it was handled" value={reason} onChange={(e) => setReason(e.target.value)} />
           <button className="link" disabled={!reason.trim()} onClick={() => void api('POST', `/api/kyc/deliveries/${t.id}/discard`, { reason }).then(reload, (e) => setError(e instanceof ApiError ? e.message : 'The action failed'))}>Mark as handled</button>
         </span>
       )}
-      {t.state === 'failed' && !blocked && user.role === 'admin' && (
+      {t.state === 'failed' && !blocked && user.role === 'admin' && !STATIC_DEMO && (
         <button className="link" onClick={() => void api('POST', `/api/kyc/deliveries/${t.id}/retry`, {}).then(reload, (e) => setError(e instanceof ApiError ? e.message : 'The retry failed'))}>Retry the transfer</button>
       )}
       {error && <span className="error" role="alert"> {error}</span>}
     </>
+  )
+}
+
+/**
+ * PRD R-REV-02 v0.7.25: the signals that fired and the ones that could not be checked are listed; the rest are in the
+ * folded full list. «No warning signals» only when none fired, and it says how many could not be checked: a signal
+ * that was not checked is not a clean one.
+ */
+export function Signals({ details }: { details: CaseDetail['signalDetails'] }) {
+  // every known signal is expected: one that has no row yet (a later batch that has not run, or a step that failed
+  // before it) counts as not checked, never as clean (self-test F1)
+  const known = new Set(details.map((s) => s.signal))
+  const all = [...details, ...Object.keys(SIGNAL_TEXT).filter((k) => !known.has(k)).map((signal) => ({ signal, value: null, batch: 'missing' }))]
+  const on = all.filter((s) => s.value === true)
+  const unknown = all.filter((s) => s.value === null)
+  const text = (s: { signal: string }) => SIGNAL_TEXT[s.signal] ?? s.signal
+  return (
+    <section aria-labelledby="signals-h">
+      <h3 id="signals-h">Signals</h3>
+      {details.length === 0 ? (
+        <p className="meta">No signals yet.</p>
+      ) : (
+        <>
+          {on.length > 0 && <ul className="plain signal-tags">{on.map((s) => <li key={s.signal} className="tag sig-on">{text(s)}</li>)}</ul>}
+          {unknown.length > 0 && <ul className="plain signal-tags">{unknown.map((s) => <li key={s.signal} className="tag sig-unknown">{text(s)}: could not be checked</li>)}</ul>}
+          {on.length === 0 && <p className="meta">{unknown.length ? `No warning signals; ${unknown.length} could not be checked` : 'No warning signals'}</p>}
+          <details>
+            <summary>All signals ({all.length})</summary>
+            <ul className="signals">
+              {all.map((s) => (
+                <li key={s.signal} className={s.value ? 'on' : s.value === null ? 'unknown' : 'off'}>
+                  {text(s)}: {s.value === null ? (s.batch === 'missing' ? 'not checked' : 'unknown') : s.value ? 'yes' : 'no'}
+                </li>
+              ))}
+            </ul>
+          </details>
+        </>
+      )}
+    </section>
   )
 }
 
@@ -303,6 +342,12 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
         <dd>{c.to}</dd>
         <dt>Received</dt>
         <dd>{when(c.receivedAt)} · {c.mailbox}</dd>
+        {STATIC_DEMO && c.queue && (
+          <>
+            <dt>Queue</dt>
+            <dd>{c.queue}</dd>
+          </>
+        )}
         <dt>Status</dt>
         <dd>
           {c.status}
@@ -318,16 +363,15 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
           {c.flags.map((f) => <li key={f}>{FLAG_TEXT[f] ?? f}</li>)}
         </ul>
       )}
-      <h3>Signals</h3>
-      <ul className="signals">
-        {c.signalDetails.map((s) => (
-          <li key={s.signal} className={s.value ? 'on' : s.value === null ? 'unknown' : 'off'}>
-            {SIGNAL_TEXT[s.signal] ?? s.signal}: {s.value === null ? 'unknown' : s.value ? 'yes' : 'no'}
-          </li>
-        ))}
-      </ul>
+      {/* B3 (界面规则 v0.3.4): two columns from 1024px — the side column (signals, risk, links, replies, tasks) comes
+          first in the page, so a narrow screen keeps it above the mail; the wide grid puts the mail on the left */}
+      <div className="case-grid">
+      <div className="case-side">
+      <Signals details={c.signalDetails} />
       <HoldPanel caseId={c.id} hold={c.hold} reason={c.holdReason} user={user} reload={reload} />
       {c.e3 && <E3Panels caseId={c.id} e3={c.e3} user={user} meta={meta} reload={reload} />}
+      </div>
+      <div className="case-main">
       <h3>Message (plain text)</h3>
       <pre className="body">{c.text}</pre>
       {c.htmlText !== null && (
@@ -364,6 +408,7 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
           </ul>
         </>
       )}
+      {c.e3 && <LabelsPanel caseId={c.id} e3={c.e3} meta={meta} reload={reload} />}
       {c.fields.length > 0 && (
         <>
           <h3>Fields</h3>
@@ -407,6 +452,8 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
           </dl>
         </>
       )}
+      </div>
+      </div>
     </article>
   )
 }
@@ -446,32 +493,41 @@ export function App() {
     setOpenId(id)
     location.hash = id ? `case=${id}` : ''
   }
-  // the static demo: change buttons announced as unavailable (site interface T3)
-  useEffect(() => (STATIC_DEMO && user ? markChangeButtons(document.body) : undefined), [user])
   if (user === undefined) return <p className="narrow">Loading…</p>
+  // the static demo has no sign-in: a snapshot that did not load is said so, never a sign-in form (self-test F4)
+  if (STATIC_DEMO && (user === null || user.mustChangePassword)) return <p className="narrow" role="alert">The demo snapshot could not be loaded. <a href="/inbox/">← Deal Ops Inbox</a></p>
   if (user === null) return <Login onDone={(u) => setUser(u)} />
   if (user.mustChangePassword) return <ChangePassword onDone={() => setUser({ ...user, mustChangePassword: false })} />
   return (
     <div className="shell">
-      {STATIC_DEMO && (
-        <div className="banner demo-bar">
+      {STATIC_DEMO ? (
+        // PRD R-DEMO-02 v0.7.25 (A1, A2): one thin bar; the notes and the build time fold into «About this demo»; no user,
+        // role or Sign out, since the snapshot has no sign-in
+        <div className="demo-bar">
           <p>
-            <a href="/inbox/">← Deal Ops Inbox</a> · Snapshot of v{snapshotInfo()?.version ?? '?'}
+            <a href="/inbox/">← Deal Ops Inbox</a> · Demo with fictional data · read-only · v{snapshotInfo()?.version ?? '?'}
           </p>
+          <details>
+            <summary>About this demo</summary>
+            {warnings.map((w) => <p key={w}>{w}</p>)}
+          </details>
         </div>
-      )}
-      <header>
-        <strong>Deal Ops Inbox</strong>
-        <span className="who">
-          {user.username} ({user.role}){' '}
-          <button className="link" onClick={() => void api('POST', '/api/logout').then(() => setUser(null), (e) => setSignOutError(e instanceof ApiError ? e.message : 'Sign-out failed'))}>Sign out</button>
-        </span>
-        {signOutError && <p className="error" role="alert">{signOutError}</p>}
-      </header>
-      {warnings.length > 0 && (
-        <div className="banner" role="alert">
-          {warnings.map((w) => <p key={w}>{w}</p>)}
-        </div>
+      ) : (
+        <>
+          <header>
+            <strong>Deal Ops Inbox</strong>
+            <span className="who">
+              {user.username} ({user.role}){' '}
+              <button className="link" onClick={() => void api('POST', '/api/logout').then(() => setUser(null), (e) => setSignOutError(e instanceof ApiError ? e.message : 'Sign-out failed'))}>Sign out</button>
+            </span>
+            {signOutError && <p className="error" role="alert">{signOutError}</p>}
+          </header>
+          {warnings.length > 0 && (
+            <div className="banner" role="alert">
+              {warnings.map((w) => <p key={w}>{w}</p>)}
+            </div>
+          )}
+        </>
       )}
       <main>{openId ? <Detail id={openId} back={() => open(null)} user={user} meta={meta} /> : <CaseList open={(id) => open(id)} meta={meta} />}</main>
     </div>

@@ -200,6 +200,78 @@ describe('route protection', () => {
   })
 })
 
+describe('directory import API', () => {
+  const HEADERS: Record<string, string> = {
+    deals: 'name,currency',
+    contacts: 'contact_id,name,email,phone,role,deal,investor_id,authorised_for',
+    commitments: 'investor_id,name,email,reference,cash_due,scheme',
+    bank: 'transaction_id,date,amount,payer,reference',
+    ledger: 'transaction_id,date,amount,payer,reference,status,investor_id,investor_name,decided_by,withdrawn_on,currency',
+  }
+  const DEAL = 'Header Only Ltd'
+  const counts = async () => (await k.db.query(`SELECT (SELECT count(*)::int FROM directory_version) AS v, (SELECT count(*)::int FROM audit WHERE type = 'directory.imported') AS a`)).rows[0]
+  const poster = async () => {
+    const admin = await adminSession()
+    return (kind: string, csv: string, query = '') =>
+      app.inject({ method: 'POST', url: `/api/directory/${kind}${query}`, cookies: { doi_session: admin.session! }, headers: { 'x-csrf-token': admin.csrf, 'content-type': 'text/csv' }, payload: csv })
+  }
+
+  it('TC-DIR-09 a header-only file is refused with 422 for every kind; the current version stays, no new version, no import audit', async () => {
+    const post = await poster()
+    expect((await post('deals', `name,currency\n${DEAL},GBP\n`)).statusCode).toBe(200)
+    for (const kind of Object.keys(HEADERS)) {
+      const before = await counts()
+      const query = ['commitments', 'bank', 'ledger'].includes(kind) ? `?deal=${encodeURIComponent(DEAL)}` : ''
+      // what curl --data makes of a file: the line breaks are gone, only the header line is left
+      for (const q of [query, `${query}${query ? '&' : '?'}clear=true`]) {
+        const res = await post(kind, HEADERS[kind]!, q)
+        expect(res.statusCode, `${kind} ${q}`).toBe(422)
+        expect(res.json().errors, kind).toContainEqual({ where: 'file', message: 'no data rows: the list would become empty (nothing was imported)' })
+      }
+      expect(await counts(), kind).toEqual(before)
+    }
+  })
+
+  it('TC-DIR-09 clear=yes with a header-only file empties the list (audited as a clear); clear=yes with data rows is refused', async () => {
+    const post = await poster()
+    const deal = `?deal=${encodeURIComponent(DEAL)}`
+    const ledger = `${HEADERS.ledger}\nT-1,2026-10-20,100.00,A PAYER,REF-1,auto,001,A Payer,system,,GBP\n`
+    expect((await post('ledger', ledger, deal)).statusCode).toBe(200)
+    const snapBefore = await (await import('../store/directory.ts')).takeSnapshot(k.db)
+    const before = await counts()
+    // a clear request with data rows: nothing written
+    const mixed = await post('ledger', ledger, `${deal}&clear=yes`)
+    expect(mixed.statusCode).toBe(422)
+    expect(mixed.json().errors).toEqual([{ where: 'file', message: 'clear=yes needs a file with the header only (it has data rows)' }])
+    expect(await counts()).toEqual(before)
+    // the explicit clear
+    const cleared = await post('ledger', `${HEADERS.ledger}\n`, `${deal}&clear=yes`)
+    expect(cleared.statusCode).toBe(200)
+    expect(cleared.json()).toMatchObject({ ok: true, rows: 0 })
+    expect(await counts()).toEqual({ v: before.v + 1, a: before.a + 1 })
+    const audit = (await k.db.query(`SELECT payload FROM audit WHERE type = 'directory.imported' ORDER BY seq DESC LIMIT 1`)).rows[0].payload
+    expect(audit).toMatchObject({ kind: 'ledger', rows: 0, cleared: true })
+    expect((await k.db.query('SELECT count(*)::int AS n FROM ledger_line WHERE directory_version = $1', [cleared.json().versionId])).rows[0].n).toBe(0)
+    // snapshots (G3 D9 Codex round 1 F1): the one taken before the clear keeps its ledger; a new one takes the empty
+    // version, which counts as no ledger (C-DRF-6 v0.7.24: «unknown», as before the mistaken import)
+    const { takeSnapshot, loadSnapshot, dealKey } = await import('../store/directory.ts')
+    const dk = dealKey(k.k, DEAL)
+    const view = async (id: string) => loadSnapshot(k.db, k.k, id)
+    expect((await view(snapBefore)).ledgerDeals).toContain(dk)
+    expect((await view(snapBefore)).ledger.filter((l) => l.dealKey === dk)).toHaveLength(1)
+    const snapAfter = await takeSnapshot(k.db)
+    const after = await k.db.query<{ per_deal: Record<string, { ledger: string | null }> }>('SELECT per_deal FROM directory_snapshot WHERE id = $1', [snapAfter])
+    expect(after.rows[0]!.per_deal[dk]!.ledger).toBe(cleared.json().versionId)
+    expect((await view(snapAfter)).ledgerDeals).not.toContain(dk)
+    expect((await view(snapAfter)).ledger.filter((l) => l.dealKey === dk)).toHaveLength(0)
+    // an empty ledger imported before D9 (no clear marker; then accepted without clear=yes) still counts as a ledger
+    // (Codex D9 round 2 F2): the deal stays in ledgerDeals, so its Cases keep «not received in full», not «unknown»
+    await k.t.owner.query('UPDATE directory_version SET cleared = false WHERE id = $1', [cleared.json().versionId])
+    expect((await view(snapAfter)).ledgerDeals).toContain(dk)
+    await k.t.owner.query('UPDATE directory_version SET cleared = true WHERE id = $1', [cleared.json().versionId])
+  })
+})
+
 describe('review API', () => {
   it('TC-REV-01 (API part) mail HTML is never sent to the page; strict CSP on every response', async () => {
     const admin = await adminSession()

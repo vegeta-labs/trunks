@@ -5,7 +5,7 @@ import { tx, type Db, type Tx } from './db.ts'
 import { getBlobs, putBlob, putJson, putOptional } from './blobs.ts'
 import { appendAudit } from './audit.ts'
 import {
-  importBank, importCommitments, importContacts, importDeals, importLedger,
+  applyClear, importBank, importCommitments, importContacts, importDeals, importLedger,
   type ImportError,
 } from '../lib/directory.ts'
 import { normAddress } from '../lib/signals.ts'
@@ -31,7 +31,7 @@ async function latestDeal(c: Pick<Tx, 'query'>, k: Keyring, name: string): Promi
 export async function importDirectory(
   db: Db,
   k: Keyring,
-  o: { kind: DirectoryKind; csv: string; userId: string; deal?: string; currencies: readonly string[] },
+  o: { kind: DirectoryKind; csv: string; userId: string; deal?: string; currencies: readonly string[]; clear?: boolean },
 ): Promise<ImportOutcome> {
   return tx(db, async (c) => {
     const versionId = randomUUID()
@@ -47,11 +47,11 @@ export async function importDirectory(
       dKey = dealKey(k, o.deal)
     }
     const insertVersion = () =>
-      c.query('INSERT INTO directory_version (id, kind, deal_key, imported_by, file_sha256) VALUES ($1, $2, $3, $4, $5)', [versionId, o.kind, dKey, o.userId, fileSha])
+      c.query('INSERT INTO directory_version (id, kind, deal_key, imported_by, file_sha256, cleared) VALUES ($1, $2, $3, $4, $5, $6)', [versionId, o.kind, dKey, o.userId, fileSha, o.clear === true])
     let count = 0
     switch (o.kind) {
       case 'deals': {
-        const r = importDeals(o.csv, o.currencies)
+        const r = applyClear(importDeals(o.csv, o.currencies), o.clear === true)
         if (!r.ok) return r
         await insertVersion()
         for (const d of r.rows) {
@@ -63,7 +63,7 @@ export async function importDirectory(
         break
       }
       case 'commitments': {
-        const r = importCommitments(o.csv, currency!, tag)
+        const r = applyClear(importCommitments(o.csv, currency!, tag), o.clear === true)
         if (!r.ok) return r
         await insertVersion()
         for (const m of r.rows) {
@@ -78,7 +78,7 @@ export async function importDirectory(
         break
       }
       case 'bank': {
-        const r = importBank(o.csv, currency!, tag)
+        const r = applyClear(importBank(o.csv, currency!, tag), o.clear === true)
         if (!r.ok) return r
         await insertVersion()
         for (const b of r.rows) {
@@ -90,7 +90,7 @@ export async function importDirectory(
         break
       }
       case 'ledger': {
-        const r = importLedger(o.csv, currency!)
+        const r = applyClear(importLedger(o.csv, currency!), o.clear === true)
         if (!r.ok) return r
         await insertVersion()
         for (const l of r.rows) {
@@ -105,7 +105,7 @@ export async function importDirectory(
         break
       }
       case 'contacts': {
-        const r = importContacts(o.csv, tag)
+        const r = applyClear(importContacts(o.csv, tag), o.clear === true)
         if (!r.ok) return r
         await insertVersion()
         for (const p of r.rows) {
@@ -122,7 +122,7 @@ export async function importDirectory(
         break
       }
     }
-    await appendAudit(c, k, [{ actor: o.userId, type: 'directory.imported', payload: { kind: o.kind, version_id: versionId, deal_key: dKey, file_sha256: fileSha, rows: count } }])
+    await appendAudit(c, k, [{ actor: o.userId, type: 'directory.imported', payload: { kind: o.kind, version_id: versionId, deal_key: dKey, file_sha256: fileSha, rows: count, ...(o.clear ? { cleared: true } : {}) } }])
     return { ok: true, versionId, rows: count }
   })
 }
@@ -177,6 +177,7 @@ export async function loadSnapshot(c: Pick<Tx, 'query'>, k: Keyring, snapshotId:
     ? (await c.query('SELECT deal_key, txn_id_blob, value_date, amount_minor, payer_blob, reference_blob FROM bank_line WHERE directory_version = ANY($1::uuid[]) ORDER BY directory_version, row_no', [bVersions])).rows
     : []
   const lVersions = Object.values(s.per_deal).map((v) => v.ledger).filter((v): v is string => !!v)
+  const clearedVersions = new Set(lVersions.length ? (await c.query<{ id: string }>('SELECT id FROM directory_version WHERE id = ANY($1::uuid[]) AND cleared', [lVersions])).rows.map((r) => r.id) : [])
   const ledger = lVersions.length
     ? (await c.query('SELECT deal_key, txn_id_blob, status, commitment_key_hmac, currency, amount_minor FROM ledger_line WHERE directory_version = ANY($1::uuid[]) ORDER BY directory_version, row_no', [lVersions])).rows
     : []
@@ -198,6 +199,8 @@ export async function loadSnapshot(c: Pick<Tx, 'query'>, k: Keyring, snapshotId:
     commitments: commitments.map((m) => ({ dealKey: m.deal_key, investorId: t(m.investor_id_blob)!, keyHmac: m.commitment_key_hmac, name: t(m.name_blob)!, reference: t(m.reference_blob)!, cashDue: Number(m.cash_due_minor) })),
     bankLines: bank.map((l) => ({ dealKey: l.deal_key, transactionId: t(l.txn_id_blob)!, date: iso(l.value_date)!, amount: Number(l.amount_minor), payer: t(l.payer_blob), reference: t(l.reference_blob) })),
     ledger: ledger.map((l) => ({ dealKey: l.deal_key, transactionId: t(l.txn_id_blob), status: l.status, commitmentKeyHmac: l.commitment_key_hmac, currency: l.currency, amount: Number(l.amount_minor) })),
-    ledgerDeals: Object.entries(s.per_deal).filter(([, v]) => !!v.ledger).map(([d]) => d),
+    // C-DRF-6 v0.7.24: a ledger version made by an explicit clear (R-DIR-04) counts as no ledger; an empty ledger
+    // imported before D9 (no marker) still counts as a ledger (Codex D9 round 2 F2)
+    ledgerDeals: Object.entries(s.per_deal).filter(([, v]) => !!v.ledger && !clearedVersions.has(v.ledger)).map(([d]) => d),
   }
 }

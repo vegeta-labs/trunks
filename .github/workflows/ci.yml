@@ -4,6 +4,12 @@ on:
     branches: [main]
   pull_request:
 
+# a new push to a pull request cancels that pull request's run still in progress (its result is superseded);
+# runs on main are never cancelled, so every main commit keeps its own result
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -82,12 +88,7 @@ jobs:
             e2e-report.json
           retention-days: 7
       - name: Evaluation, development set on recorded model replies (PRD §6 E2 metrics, test plan §4.3)
-        run: EVAL_ACTUAL_DIR=eval-actual npm run eval
-      - uses: actions/upload-artifact@v4
-        with:
-          name: eval-actual
-          path: eval-actual
-          retention-days: 7
+        run: npm run eval
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
@@ -137,9 +138,19 @@ jobs:
 
   # the compose stacks (tech design v0.7.11): the demo offline and against the evaluation, sign-in in WebKit and
   # Chromium, a real start, a failed migration, key rotation; then the static snapshot under the site CSP (TC-DEMO-04)
+  # runs next to `check`, not after it: it makes its own evaluation export for TC-DEMO-01 (replay, no model call)
   compose:
-    needs: [check]
     runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
     steps:
       - uses: actions/checkout@v4
         with:
@@ -156,10 +167,8 @@ jobs:
       - name: Install Playwright browsers (Chromium, WebKit)
         timeout-minutes: 14
         run: timeout 600 npx playwright install --with-deps chromium webkit || timeout 600 npx playwright install --with-deps chromium webkit
-      - uses: actions/download-artifact@v4
-        with:
-          name: eval-actual
-          path: eval-actual
+      - name: The evaluation's export of the demo samples (TC-DEMO-01 compares the demo with it)
+        run: EVAL_ACTUAL_DIR=eval-actual npm run eval
       - name: Compose tests
         env:
           EVAL_ACTUAL_DIR: eval-actual
@@ -184,6 +193,16 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
+      # check and compose run side by side now: green coverage requires every job to have succeeded, not only the
+      # reports it reads (a failed evaluation step in check, a cancelled job) (CI review CI-01)
+      - name: Every job succeeded
+        env:
+          CHECK: ${{ needs.check.result }}
+          PARSER: ${{ needs.parser.result }}
+          COMPOSE: ${{ needs.compose.result }}
+        run: |
+          echo "check=$CHECK parser=$PARSER compose=$COMPOSE"
+          test "$CHECK" = success && test "$PARSER" = success && test "$COMPOSE" = success
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # check-coverage.mjs: TC-OPS-07 is exempt only where the history truly lacks 8ad8e91

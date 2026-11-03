@@ -1,8 +1,10 @@
-// TC-DEMO-04 (PRD R-DEMO-02; site interface T1–T4): the static demo snapshot under the website's CSP shows the
-// processed demo, names cases by their sample, refuses every change, and makes no request but for its own files.
+// TC-DEMO-02, TC-DEMO-04 (PRD R-DEMO-02 v0.7.25; site interface T1–T4, §4): the static demo snapshot under the website's
+// CSP shows the processed demo, names cases by their sample, renders no change control, and makes no request but for
+// its own files.
+import { readFileSync } from 'node:fs'
 import { expect, test } from '@playwright/test'
 
-test('TC-DEMO-04 static demo: readable under the site CSP, sample IDs, changes refused, no fetch / XHR, nothing stored', async ({ page, baseURL }) => {
+test('TC-DEMO-04 / TC-DEMO-02 static demo: readable under the site CSP, thin bar with About, sample IDs, no change control, no fetch / XHR, nothing stored', async ({ page, baseURL }) => {
   const requests: Array<{ method: string; url: string; type: string }> = []
   page.on('request', (r) => requests.push({ method: r.method(), url: r.url(), type: r.resourceType() }))
   const csp: string[] = []
@@ -11,14 +13,30 @@ test('TC-DEMO-04 static demo: readable under the site CSP, sample IDs, changes r
   })
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Cases' })).toBeVisible()
-  await expect(page.getByText(/Read-only snapshot of the demo, built \d{4}-\d{2}-\d{2} \d{2}:\d{2} UTC/)).toBeVisible()
-  await expect(page.getByText(/Demo: fictional data only/)).toBeVisible()
-  // T3: version line, link back to the product page, not for search engines
-  await expect(page.getByText(/Snapshot of v\d+\.\d+\.\d+/)).toBeVisible()
+  // A2 (PRD R-DEMO-02 v0.7.25): one thin bar — back link, fictional data, read-only, the snapshot's version — and the
+  // notes folded into «About this demo» (TC-DEMO-02: still on the page, shown when opened)
+  const bar = page.locator('.demo-bar')
+  const version = JSON.parse(readFileSync('dist-demo/snapshot-info.json', 'utf8')).version as string
+  await expect(bar.locator('p').first()).toHaveText(`← Deal Ops Inbox · Demo with fictional data · read-only · v${version}`)
   await expect(page.getByRole('link', { name: '← Deal Ops Inbox' })).toHaveAttribute('href', '/inbox/')
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex')
+  const about = bar.locator('details')
+  await expect(about.getByText(/Demo: fictional data only/)).toBeHidden()
+  await about.locator('summary', { hasText: 'About this demo' }).click()
+  await expect(about.getByText(/Read-only snapshot of the demo, built \d{4}-\d{2}-\d{2} \d{2}:\d{2} UTC/)).toBeVisible()
+  await expect(about.getByText(/received at fixed past times \(deadlines may show as overdue\)/)).toBeVisible()
+  await expect(about.getByText(/The directory is the evaluation set's fictional one/)).toBeVisible()
+  await expect(about.getByText(/the stored email is not replaced/)).toBeVisible()
+  // A1: no user, role or Sign out; no warning banner outside the bar
+  await expect(page.getByRole('button', { name: 'Sign out' })).toHaveCount(0)
+  await expect(page.getByText('demo-reviewer')).toHaveCount(0)
+  await expect(page.locator('header')).toHaveCount(0)
+  await expect(page.locator('.banner[role="alert"]')).toHaveCount(0)
   // all 30 demo cases (test plan §2.12)
   await expect(page.locator('ul.cases > li > button.row')).toHaveCount(30)
+  // A3 on the list: only the read-only filters, nothing else to fill in
+  await expect(page.locator('main input, main textarea')).toHaveCount(0)
+  await expect(page.locator('main select')).toHaveCount(3)
   // T2: a deep link by sample ID (as from the website: a fresh page load) opens that case
   await page.goto('about:blank')
   await page.goto('/#case=E0225')
@@ -26,26 +44,32 @@ test('TC-DEMO-04 static demo: readable under the site CSP, sample IDs, changes r
   await expect(page.getByText('northwind-robotlcs.example').first()).toBeVisible()
   // every panel of the case is there (self-test F5)
   for (const h of ['Classification', 'Fields', 'Signals', 'Classes', 'Links', 'Risk', 'Reply', 'Suggested actions', 'Queue and owner', 'Check the bank details request']) await expect(page.getByRole('heading', { name: h })).toBeVisible()
-  // every change: announced as unavailable (T3), still focusable, refused in the page itself, no request (F5)
-  // the header's Sign out too (Codex E5 round 2 F3)
-  const changes = page.locator('button[aria-disabled="true"]')
-  const n = await changes.count()
-  expect(n).toBeGreaterThan(5)
+  // what the website quotes from this case (site request 2026-11-03) is still shown
+  for (const s of ['Call the phone number on file', 'Do not use any phone number or link from the email']) await expect(page.getByText(s)).toBeVisible()
+  await expect(page.getByText(/ending 4893/).first()).toBeVisible()
+  // A3: the reply says how it leaves a real deployment
+  await expect(page.getByText('In a real deployment a reviewer approves this reply and sends it from their own mail client; the app cannot send.')).toBeVisible()
+  // A3: every demo case, every fold opened — no change control at all: the only buttons are navigation, the only
+  // other interactive elements are the folds; no select, input or textarea
   const before = requests.length
-  for (let i = 0; i < n; i++) {
-    const b = changes.nth(i)
-    if (!(await b.isVisible())) continue
-    // a keyboard user reaches it and hears why (Playwright will not click an aria-disabled button)
-    await b.focus()
-    await page.keyboard.press('Enter')
+  await page.goto('about:blank')
+  await page.goto('/')
+  const ids = await page.evaluate(() => Object.keys((globalThis as unknown as { DOI_DEMO: { details: object } }).DOI_DEMO.details))
+  expect(ids.length).toBe(30)
+  for (const id of ids) {
+    await page.goto(`/#case=${id}`)
+    await page.reload()
+    await expect(page.getByRole('heading', { name: 'Signals' })).toBeVisible()
+    if (await page.getByRole('heading', { name: 'Reply', exact: true }).count()) {
+      await expect(page.getByText('In a real deployment a reviewer approves this reply and sends it from their own mail client; the app cannot send.')).toBeVisible()
+    }
+    for (const s of await page.locator('main summary').all()) await s.click()
+    expect(await page.locator('main select, main input, main textarea').count(), id).toBe(0)
+    const buttons = await page.locator('main button').allTextContents()
+    expect(buttons, id).toEqual(['← All cases'])
+    await expect(page.locator('[aria-disabled="true"]')).toHaveCount(0)
   }
-  expect(requests.length, 'no request for any change').toBe(before)
-  // Sign out explains itself as well
-  await page.getByRole('button', { name: 'Sign out' }).focus()
-  await page.keyboard.press('Enter')
-  await expect(page.locator('header').getByText(/Demo: not available/)).toBeVisible()
-  await expect(page.getByText(/Demo: not available\. This is a read-only snapshot/).first()).toBeVisible()
-  await expect(page.getByRole('button', { name: '← All cases' })).not.toHaveAttribute('aria-disabled', 'true')
+  expect(requests.slice(before).filter((r) => r.method !== 'GET' || r.type === 'fetch' || r.type === 'xhr'), 'no request for any change').toEqual([])
   // no link to a server export (F5)
   await page.goto('about:blank')
   await page.goto('/')

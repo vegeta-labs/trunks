@@ -68,6 +68,14 @@ input, select {
   font: inherit; height: var(--control-h); padding: 0 12px; border: 1px solid var(--border-strong);
   border-radius: var(--radius-field); background: var(--surface); color: var(--text);
 }
+/* 界面规则 v0.3.4 §4: room for the arrow on the right; the arrow is drawn in the text colour, so both themes follow */
+select {
+  appearance: none; -webkit-appearance: none; padding-right: 36px;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 19px) 50%, calc(100% - 14px) 50%; background-size: 5px 5px; background-repeat: no-repeat;
+}
+/* forced colours drop gradient images: the native arrow comes back (self-test F6) */
+@media (forced-colors: active) { select { appearance: auto; -webkit-appearance: auto; background-image: none; } }
 button {
   font: inherit; font-weight: 500; min-height: var(--control-h); padding: 0 16px; border-radius: var(--radius-btn);
   border: 1px solid var(--primary); background: var(--primary); color: var(--primary-text); cursor: pointer;
@@ -105,9 +113,9 @@ button.row:hover { background: var(--surface-3); text-decoration: none; }
 .confirm { background: var(--warn-bg); color: var(--text-strong); border-radius: 4px; padding: 0 4px; }
 
 /* ---------- detail ---------- */
-.facts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; }
+.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 0; }
 .facts dt { color: var(--muted); }
-.facts dd { margin: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.facts dd { min-width: 0; margin: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
 /* the mail is plain text (§5, tech design T9) */
 pre.body {
   white-space: pre-wrap; overflow-wrap: anywhere; margin: 0;
@@ -117,6 +125,23 @@ pre.body {
 ul.signals, ul.flags { margin: 0; padding-left: 18px; }
 ul.signals li.on, ul.flags li { color: var(--warn); }
 ul.signals li.unknown { color: var(--muted); }
+/* R-REV-02 v0.7.25, 界面规则 v0.3.4: fired signals as risk-coloured tags; unchecked ones muted and said so */
+ul.signal-tags { margin: 4px 0; }
+.tag.sig-on { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
+.tag.sig-unknown { color: var(--muted); }
+/* B3: the Case page in two columns from 1024px; the side column comes first in the page (narrow: above the mail) */
+.case-grid { display: grid; gap: 16px; margin-top: 16px; }
+.case-grid > div { display: grid; gap: 12px; align-content: start; min-width: 0; }
+@media (min-width: 1024px) {
+  .case-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-areas: 'main side'; gap: 24px; }
+  .case-main { grid-area: main; }
+  .case-side { grid-area: side; }
+}
+/* PRD R-DEMO-02 v0.7.25: the static demo's one thin bar */
+.demo-bar { padding: 6px 16px; font-size: 13px; color: var(--muted); border-bottom: 1px solid var(--border); background: var(--surface); }
+.demo-bar > p, .demo-bar > details { max-width: 1240px; margin: 0 auto; overflow-wrap: anywhere; }
+.demo-bar details p { margin: 6px 0 0; }
+@media (min-width: 1024px) { .demo-bar { padding: 6px 40px; } }
 .labels { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
 /* ---------- E3 panels ---------- */
 .panel { margin-top: 8px; }
@@ -125,6 +150,8 @@ ul.signals li.unknown { color: var(--muted); }
 .tag.risk-medium { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
 .tag.risk-low { background: var(--ok-bg); color: var(--ok); border-color: transparent; }
 .inline-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.case-grid select { min-width: 0; max-width: 100%; }
+.inline-form > * { min-width: 0; max-width: 100%; }
 .inline-form input { min-width: 0; flex: 1 1 200px; }
 .copy { display: flex; flex-wrap: wrap; gap: 8px; }
 ul.plain, ul.actions, ul.checklist { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }

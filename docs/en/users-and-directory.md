@@ -113,15 +113,17 @@ mind:
 ## 3. Directory
 
 The directory is what the app links emails to: your deals, the commitments of each deal, the bank lines and ledger
-of each deal, and your contacts. You import it as CSV files. Files exported by Deal Ops Toolkit import unchanged.
+of each deal, and your contacts. You import it as CSV files. Files exported by Deal Ops Toolkit import unchanged, except a file without data rows,
+which is refused (see below).
 
 - Each import is a **new version** of that list. It replaces the current version of the same kind (for commitments,
   bank lines and ledger: of the same deal). Nothing is merged, so always import the complete list.
 - A file with any error is refused as a whole, and the answer lists every error with its row number, for example
   `{"ok":false,"errors":[{"where":"row 3, currency","message":"\"CHF\" is not one of GBP, EUR, USD"}]}`.
-- A successful import answers `{"ok":true,"versionId":"…","rows":2}`. **Check `rows`.** A file with a header and no
-  data rows is accepted with `"rows":0` and replaces the current list with an empty one; the usual cause is `--data`
-  instead of `--data-binary` (see below). If that happens, import the right file again.
+- A successful import answers `{"ok":true,"versionId":"…","rows":2}`.
+- A file with a header and no data rows is refused (`no data rows`), and the current list stays as it was. The usual
+  cause is `--data` instead of `--data-binary` (see below). To empty a list on purpose, see
+  [Emptying a list](#emptying-a-list).
 - Each Case keeps the directory version it was linked with. An email that arrived before your import is linked to the
   new version only when a person clicks "Relink with the latest directory" on its Case page.
 - Import the deals first. Commitments, bank lines and ledger name their deal, and the deal must exist.
@@ -195,6 +197,22 @@ imp --url-query "deal=$DEAL" --data-binary @commitments.csv "$DOI_URL/api/direct
 imp --url-query "deal=$DEAL" --data-binary @bank.csv "$DOI_URL/api/directory/bank"
 imp --url-query "deal=$DEAL" --data-binary @ledger.csv "$DOI_URL/api/directory/ledger"
 ```
+
+### Emptying a list
+
+An import never empties a list by accident. To empty one on purpose, for example after importing a ledger into the
+wrong deal when the right deal has no ledger yet, send a file with the header only **and** `clear=yes`:
+
+<!-- tested: run -->
+```sh
+printf 'transaction_id,date,amount,payer,reference,status,investor_id,investor_name,decided_by,withdrawn_on,currency\n' > empty-ledger.csv
+imp --url-query "deal=$DEAL" --url-query clear=yes --data-binary @empty-ledger.csv "$DOI_URL/api/directory/ledger"
+```
+
+The answer is `{"ok":true,…,"rows":0}`; the audit chain records the import as a clear. A cleared ledger counts as
+no ledger: Cases show "No ledger imported for this deal", as before the mistaken import. `clear=yes` with a file that
+has data rows is refused, so it can never import anything by mistake. Cases that arrived before keep the version
+they were linked with (use "Relink with the latest directory" on a Case to move it to the emptied list).
 
 Use `--data-binary`, not `--data`: `--data` removes the line breaks and the file arrives as one line. For each further
 deal, set `DEAL` to its name exactly as in the deals file and import its three files.

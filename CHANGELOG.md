@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.1.1 (2026-11-03): clearer demo and review UI
+
+- **Static demo:** a compact read-only bar with the snapshot version and an “About this demo” fold; change
+  controls and account information are hidden. Every Reply panel, including cases without a draft, explains
+  that the app cannot send. Case contents and verification information remain readable.
+- **Review UI:** warning and unchecked signals stay visible, with the full list folded. Case details use two
+  columns from 1024px and one column on narrow screens; long candidates and recipient addresses fit at
+  1024px and 375px. Select arrows have room in both light and dark themes.
+- **Directory imports (D9):** header-only files are rejected without replacing the current directory. Clearing
+  requires an explicit `clear=yes` request. An explicitly cleared ledger is treated as no ledger imported;
+  existing ledgers retain their previous meaning.
+- **Validation:** development evaluation on recorded model replies passed; unit, integration, browser,
+  parser, Compose and coverage checks passed in CI. All 11 review-UI mutation checks were caught.
+
+**Evaluation:** the v0.1.0 holdout result applies (measured on v0.1.0; judgement code unchanged except D9,
+which acts only on header-only lists or `clear=yes`). The unchanged metric values are the table in the
+v0.1.0 section below. The independent runner confirmed that the held-out run met neither D9 condition.
+This release does not report a new holdout measurement. Version metadata, release/test tooling and
+UI/documentation changes do not alter the evaluation inputs, model or judgement pipeline; the PRD field
+table and evaluation thresholds are unchanged. Other changes require a newly written holdout under G3.
+
+The v0.1.0 limitations below still apply, including simulated Microsoft 365 and Gmail push tests and the
+single-account Gmail polling test. No real-production-volume or clean-machine start-up claim is added.
+
 ## v0.1.0 (2026-11-03): first public release
 
 Deal Ops Inbox is a self-hosted, **read-only** email agent for investment-operations inboxes. For each inbound email
