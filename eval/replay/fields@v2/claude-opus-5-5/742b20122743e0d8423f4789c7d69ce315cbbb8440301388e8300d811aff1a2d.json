@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"amount\":{\"value\":\"£6,000\",\"confidence\":\"high\",\"quote\":\"paid £6,000 for my Northwind Robotics commitment\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\"paid £6,000\"},\"payment_date\":{\"value\":\"3 November 2026\",\"confidence\":\"high\",\"quote\":\"on 3 November 2026\"},\"payer_name\":{\"value\":\"Piotr [NAME_2]\",\"confidence\":\"high\",\"quote\":\"My husband Piotr [NAME_2] paid £6,000\"},\"third_party_payer\":{\"value\":\"Piotr [NAME_2]\",\"confidence\":\"high\",\"quote\":\"My husband Piotr [NAME_2] paid £6,000 for my Northwind Robotics commitment on 3 November 2026 from his own account\"},\"reference\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"uetr\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 1755,
+  "outputTokens": 316
+ }
+}

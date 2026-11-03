@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"subtype\":{\"value\":\"rolling_close\",\"confidence\":\"high\",\"quote\":\"Can we hold a first close on 20 November with the current list and then a second close in January for the late group?\"}}}",
+ "usage": {
+  "inputTokens": 1519,
+  "outputTokens": 68
+ }
+}

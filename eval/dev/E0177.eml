@@ -1,0 +1,24 @@
+Received: from mail.oneill-home.example (mail.oneill-home.example
+ [192.0.2.197]) by mx.ops.example with ESMTPS id a2e4e35fa6; Wed, 04 Nov 2026
+ 12:29:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=oneill-home.example; dkim=pass header.d=oneill-home.example;
+ dmarc=pass header.from=oneill-home.example
+From: Margaret O'Neill <moneill@oneill-home.example>
+To: Investor Operations <investors@ops.example>
+Subject: Payment NW-011 still showing as unpaid
+Date: Wed, 04 Nov 2026 12:28:25 +0000
+Message-ID: <E0177.658655cf42f1@oneill-home.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear Sir or Madam,
+
+I paid =C2=A38,000.00 for my Northwind Robotics investment on 27 October 2026=
+, reference NW-011, and the portal still shows the commitment as unpaid. I ha=
+ve telephoned twice and nobody has called me back.
+
+I find this very poor. Please confirm whether you have my money.
+
+Margaret O'Neill

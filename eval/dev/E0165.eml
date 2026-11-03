@@ -1,0 +1,30 @@
+Received: from mail.northgate-search.example (mail.northgate-search.example
+ [192.0.2.224]) by mx.ops.example with ESMTPS id bd4739ab09; Tue, 10 Nov 2026
+ 15:18:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=northgate-search.example; dkim=pass
+ header.d=northgate-search.example; dmarc=pass
+ header.from=northgate-search.example
+From: Sam Okoro <sam.okoro@northgate-search.example>
+To: Investor Operations <investors@ops.example>
+Subject: Fund Operations Manager role - London
+Date: Tue, 10 Nov 2026 15:17:25 +0000
+Message-ID: <E0165.6942e1783c53@northgate-search.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi there,
+
+I hope you don't mind the direct approach. I'm working with a growth-equity f=
+irm in London that is building out its fund operations function and is lookin=
+g for a Fund Operations Manager to own investor onboarding, capital calls and=
+ reporting.
+
+It's a hybrid role, salary up to =C2=A385,000 plus bonus. If you or someone o=
+n your team might be interested, I'd be happy to share more on a confidential=
+ basis.
+
+Best,
+Sam Okoro
+Talent Partner, Northgate Search

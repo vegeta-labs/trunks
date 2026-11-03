@@ -1,0 +1,27 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=correo-fernandez.example; dkim=pass
+ header.d=correo-fernandez.example; dmarc=pass
+ header.from=correo-fernandez.example
+Received: from mail.correo-fernandez.example (mail.correo-fernandez.example
+ [192.0.2.68]) by mx.ops.example with ESMTPS id WICGOD3OQL for
+ <investors@ops.example>; Fri, 30 Oct 2026 15:00:00 +0000
+Date: Fri, 30 Oct 2026 14:58:51 +0000
+From: =?utf-8?q?Luc=C3=ADa_Fern=C3=A1ndez?=
+ <lucia.fernandez@correo-fernandez.example>
+To: investors@ops.example
+Subject: Certificado EIS
+Message-ID: <E0200.lxq9z4i350ur@correo-fernandez.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Buenas tardes:
+
+=C2=BFMe podr=C3=ADais enviar el certificado EIS de mi inversi=C3=B3n en Nort=
+hwind Robotics? Mi asesor fiscal lo necesita para preparar la declaraci=C3=B3=
+n de este a=C3=B1o.
+
+Si hace falta que rellene alg=C3=BAn formulario, dec=C3=ADdmelo.
+
+Muchas gracias,
+Luc=C3=ADa Fern=C3=A1ndez

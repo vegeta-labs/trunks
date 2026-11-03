@@ -1,0 +1,147 @@
+/*
+ * Review UI styles (docs/09_UI_DESIGN.md v0.2). Variables come from tokens.css, shared word for word with the Deal Ops
+ * Toolkit app and the website. Fonts are open-licensed (SIL OFL 1.1, texts in /licenses/) and bundled: nothing is
+ * fetched from a font service (CSP font-src 'self').
+ */
+@import './tokens.css';
+
+@font-face {
+  font-family: 'Inter Variable';
+  src: url('./fonts/inter-latin-wght.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('./fonts/plex-mono-latin-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('./fonts/plex-mono-latin-500.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 var(--sans);
+  font-feature-settings: 'cv11';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- type (§3) ---------- */
+h1 { font-size: 15px; font-weight: 600; color: var(--text-strong); margin: 0; }
+h2 { font-size: 32px; line-height: 40px; font-weight: 300; letter-spacing: -0.01em; color: var(--text-strong); margin: 4px 0 12px; overflow-wrap: anywhere; }
+h3 { font-size: 20px; line-height: 28px; font-weight: 400; color: var(--text-strong); margin: 32px 0 12px; }
+p { margin: 6px 0; }
+.eyebrow { font: 500 12px/1.4 var(--mono); text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); margin: 16px 0 0; }
+.mono, code { font-family: var(--mono); }
+
+/* ---------- layout ---------- */
+.narrow { max-width: 420px; margin: 48px auto; padding: 0 16px; }
+.shell header {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface);
+}
+.shell main { max-width: 1240px; margin: 0 auto; padding: 16px 16px 40px; }
+@media (min-width: 1024px) {
+  .shell main { padding: 24px 40px 40px; }
+}
+
+/* ---------- panels (§4) ---------- */
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-card);
+  padding: 24px; display: grid; gap: 12px; box-shadow: var(--card-glow);
+}
+
+/* ---------- controls (§4) ---------- */
+label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+label.inline { display: inline-flex; align-items: center; gap: 6px; }
+input, select {
+  font: inherit; height: var(--control-h); padding: 0 12px; border: 1px solid var(--border-strong);
+  border-radius: var(--radius-field); background: var(--surface); color: var(--text);
+}
+button {
+  font: inherit; font-weight: 500; min-height: var(--control-h); padding: 0 16px; border-radius: var(--radius-btn);
+  border: 1px solid var(--primary); background: var(--primary); color: var(--primary-text); cursor: pointer;
+  transition: background var(--ease), border-color var(--ease);
+}
+button.secondary { background: transparent; color: var(--text-strong); border-color: var(--border-strong); }
+button.link {
+  background: none; border: none; color: var(--link); padding: 0; min-height: 0; font-weight: 400;
+}
+button.link:hover, a:hover { text-decoration: underline; }
+a, a.secondary { color: var(--link); }
+a.secondary { font-size: 13px; }
+:focus-visible { outline: 2px solid var(--text-strong); outline-offset: 2px; }
+.error { color: var(--bad); margin: 0; }
+/* R-PRV-01 model provider warnings, under the header for as long as the setting stands */
+.banner { background: var(--warn-bg); color: var(--warn); padding: 8px 16px; font-size: 13px; }
+.banner p { max-width: 1240px; margin: 0 auto; overflow-wrap: anywhere; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* ---------- case list ---------- */
+ul.cases { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+button.row {
+  display: grid; gap: 4px; width: 100%; min-height: 0; text-align: left; font-weight: 400;
+  color: var(--text); background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-box); padding: 12px 16px;
+}
+button.row:hover { background: var(--surface-3); text-decoration: none; }
+.subject { font-weight: 600; color: var(--text-strong); overflow-wrap: anywhere; }
+.meta { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+
+/* ---------- tags and states (§2.1: never colour alone) ---------- */
+.tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.tag { font-size: 12px; padding: 2px 10px; border-radius: var(--radius-pill); border: 1px solid var(--border); }
+.tag.warn { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
+.confirm { background: var(--warn-bg); color: var(--text-strong); border-radius: 4px; padding: 0 4px; }
+
+/* ---------- detail ---------- */
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+/* the mail is plain text (§5, tech design T9) */
+pre.body {
+  white-space: pre-wrap; overflow-wrap: anywhere; margin: 0;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-box);
+  padding: 16px; font: 14px/1.5 var(--sans); color: var(--text);
+}
+ul.signals, ul.flags { margin: 0; padding-left: 18px; }
+ul.signals li.on, ul.flags li { color: var(--warn); }
+ul.signals li.unknown { color: var(--muted); }
+.labels { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+/* ---------- E3 panels ---------- */
+.panel { margin-top: 8px; }
+.tag.ok { background: var(--ok-bg); color: var(--ok); border-color: transparent; }
+.tag.bad, .tag.risk-high { background: var(--bad-bg); color: var(--bad); border-color: transparent; }
+.tag.risk-medium { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
+.tag.risk-low { background: var(--ok-bg); color: var(--ok); border-color: transparent; }
+.inline-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.inline-form input { min-width: 0; flex: 1 1 200px; }
+.copy { display: flex; flex-wrap: wrap; gap: 8px; }
+ul.plain, ul.actions, ul.checklist { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+ul.actions, ul.checklist { display: grid; }
+textarea {
+  font: inherit; width: 100%; padding: 12px; border: 1px solid var(--border-strong); border-radius: var(--radius-field);
+  background: var(--surface); color: var(--text); resize: vertical;
+}
+.card.reply { margin-top: 12px; }
+details summary { cursor: pointer; color: var(--link); }
+.banner[role='status'] { border-radius: var(--radius-box); }
+@media (max-width: 480px) {
+  .facts { grid-template-columns: 1fr; }
+  .facts dt { margin-top: 8px; }
+  h2 { font-size: 26px; line-height: 32px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+ul.removed { list-style: none; padding: 0; margin: 4px 0 0; }

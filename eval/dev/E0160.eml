@@ -1,0 +1,26 @@
+Received: from mail.northwind-robotics.example
+ (mail.northwind-robotics.example [192.0.2.164]) by mx.ops.example with ESMTPS
+ id 0c08604234; Wed, 21 Oct 2026 08:02:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=northwind-robotics.example; dkim=pass
+ header.d=northwind-robotics.example; dmarc=pass
+ header.from=northwind-robotics.example
+From: Ethan Clarke <ethan.clarke@northwind-robotics.example>
+To: Investor Operations <investors@ops.example>
+Subject: Automatic reply: Northwind Robotics - Q3 investor letter
+Date: Wed, 21 Oct 2026 08:01:25 +0000
+Message-ID: <E0160.fff1c81f7fc2@northwind-robotics.example>
+Auto-Submitted: auto-replied
+X-Auto-Response-Suppress: All
+In-Reply-To: <ops-nw-q3letter-2026-10-20@ops.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Thank you for your email. I am out of the office until Monday 26 October with=
+ limited access to email.
+
+For anything urgent please contact our office on 020 7946 0199.
+
+Ethan Clarke
+Northwind Robotics

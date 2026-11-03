@@ -1,0 +1,26 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=sign-requests@esign-example.example; dkim=pass
+ header.d=esign-example.example; dmarc=pass header.from=esign-example.example
+Received: from mail.esign-example.example (mail.esign-example.example
+ [192.0.2.31]) by mx.ops.example with ESMTPS; Thu, 22 Oct 2026 09:09:07 +0000
+From: Ethan Clarke <sign-requests@esign-example.example>
+To: investors@ops.example
+Subject: Ethan Clarke sent you a document to review and sign: Northwind
+ Robotics - Subscription Agreement
+Date: Thu, 22 Oct 2026 09:09:00 +0000
+Message-ID: <E0243.01gur1ajn8az@esign-example.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Ethan Clarke (Northwind Robotics) has sent you a document to review and sign.
+
+Document: Northwind Robotics Ltd - Subscription Agreement (SPV)
+Pages: 14
+
+REVIEW DOCUMENT
+https://esign-example.example/s/7Kq2Pz9WmA
+
+This link expires in 48 hours. Please do not forward this email; anyone with the link can open the document.
+
+esign-example notifications

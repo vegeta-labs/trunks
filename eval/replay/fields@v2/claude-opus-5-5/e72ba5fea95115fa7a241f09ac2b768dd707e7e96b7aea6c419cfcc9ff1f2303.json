@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"855df781-70c8-4285-82fe-032fc1ae5869\",\"confidence\":\"high\",\"quote\":\"{121:855df781-70c8-4285-82fe-032fc1ae5869}\"},\"amount\":{\"value\":\"£9,000.00\",\"confidence\":\"high\",\"quote\":\"second half of my Northwind subscription (£9,000.00)\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\":32A:261030GBP9000,00\"},\"value_date\":{\"value\":\"261030\",\"confidence\":\"high\",\"quote\":\":32A:261030GBP9000,00\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\":50K:[NAME_1] [NAME_2]\"},\"reference\":{\"value\":\"NW-016 SECOND HALF\",\"confidence\":\"medium\",\"quote\":\":70:NW-016 SECOND HALF\"},\"party_role\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"change_requested\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 1946,
+  "outputTokens": 363
+ }
+}

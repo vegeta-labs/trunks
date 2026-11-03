@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"amount\":{\"value\":\"20 000,00 €\",\"confidence\":\"high\",\"quote\":\"un virement de 20 000,00 €\"},\"currency\":{\"value\":\"EUR\",\"confidence\":\"high\",\"quote\":\"20 000,00 €\"},\"payment_date\":{\"value\":\"22/10/2026\",\"confidence\":\"high\",\"quote\":\"J'ai effectué le 22/10/2026 un virement\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"medium\",\"quote\":\"[NAME_1] [NAME_2]\"},\"reference\":{\"value\":\"NW-006\",\"confidence\":\"high\",\"quote\":\"avec la référence NW-006\"},\"uetr\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 1738,
+  "outputTokens": 249
+ }
+}

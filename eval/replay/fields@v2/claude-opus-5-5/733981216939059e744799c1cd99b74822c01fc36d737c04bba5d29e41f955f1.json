@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"document_types\":{\"value\":[\"certificate_of_incorporation\",\"register_of_members\"],\"confidence\":\"high\",\"quote\":\"a full-page certified copy of the certificate of incorporation, and the register of members certified by our company secretary yesterday\"},\"entity_type\":{\"value\":\"company\",\"confidence\":\"high\",\"quote\":\"corporate KYC documents\"}}}",
+ "usage": {
+  "inputTokens": 2436,
+  "outputTokens": 122
+ }
+}

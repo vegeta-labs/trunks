@@ -1,0 +1,25 @@
+Return-Path: <amelia@hartfamily.example>
+Received: from mail.hartfamily.example (mail.hartfamily.example [192.0.2.171])
+ by mx.ops.example with ESMTPS id 7dd66df9a2 for <investors@ops.example>; Mon,
+ 26 Oct 2026 09:14:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=hartfamily.example; dkim=pass header.d=hartfamily.example;
+ dmarc=pass header.from=hartfamily.example
+Message-ID: <E0001.44b58f59df6f@hartfamily.example>
+Date: Mon, 26 Oct 2026 09:11:16 +0000
+From: "Amelia Hart" <amelia@hartfamily.example>
+To: investors@ops.example
+Subject: Northwind Robotics payment - has it arrived?
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi there,
+
+Just checking in on my Northwind Robotics investment. I transferred =C2=A310,=
+000.00 from my own account on 20 October 2026 with the reference NW-001, exac=
+tly as set out in the closing pack. Could you let me know whether it has arri=
+ved?
+
+Many thanks,
+Amelia Hart

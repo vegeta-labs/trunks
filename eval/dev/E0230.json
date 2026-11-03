@@ -1,0 +1,60 @@
+{
+  "id": "E0230",
+  "family": "F051",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-29T16:20:00Z",
+  "prior_messages": [],
+  "description": "Display-name impersonation of an investor from a free-mail address asking for her distribution to go to a new account.",
+  "classes": [
+    "bank_details",
+    "exit_distribution"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "bank_change",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": true,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": true,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "party_role": "investor",
+    "account_last4": "4019",
+    "change_requested": true,
+    "deal": "Northwind Robotics",
+    "question_type": "other"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [
+      "NW-001"
+    ],
+    "account_last4": [
+      "4019"
+    ],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": null,
+    "investor_id": "Northwind Robotics::001",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0001"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "safe_ack",
+  "notes": "Display name equals C001 but the address is not hers -> display_name_mismatch; free-mail address not in the directory -> first_time_sender. Reference NW-001 links the commitment only as \"possibly related\" (C-LNK-5: not authenticated, no disclosure). question_type other: an instruction, not a question. IBAN checksum valid (fictional)."
+}

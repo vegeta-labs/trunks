@@ -1,0 +1,51 @@
+{
+  "id": "E0215",
+  "family": "F048",
+  "mailbox": "legal",
+  "mailbox_strips_auth_results": false,
+  "received_at": "2026-11-02T14:35:00Z",
+  "prior_messages": [],
+  "description": "Company sends a signing link to the legal mailbox; HTML carries a long template comment \"// Begin Template Header \\\\\".",
+  "classes": [
+    "legal_documents"
+  ],
+  "expected_risk": "high",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": null,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "platform": "esign.example",
+    "document_type": "shareholder_resolution",
+    "deal": "Solent Biotherapeutics"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C043",
+    "investor_id": null,
+    "deal": "Solent Biotherapeutics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "safe_ack",
+  "notes": "HTML comments are not hidden text (C-SIG-1.7, v0.7.1) and contain no injection phrase. legal mailbox does not strip auth headers -> auth_fail null, sender not authenticated. esign.example link -> legal_documents rule label; floor high -> safe_ack."
+}

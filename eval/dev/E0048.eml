@@ -1,0 +1,52 @@
+Return-Path: <jonas.becker@becker-post.example>
+Received: from mail.becker-post.example (mail.becker-post.example
+ [192.0.2.47]) by mx.ops.example with ESMTPS id ec6d40f931 for
+ <investors@ops.example>; Wed, 28 Oct 2026 16:20:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=becker-post.example; dkim=pass header.d=becker-post.example;
+ dmarc=pass header.from=becker-post.example
+Message-ID: <E0048.28a82d7ad5cb@becker-post.example>
+Date: Wed, 28 Oct 2026 16:17:35 +0000
+From: "Jonas Becker" <jonas.becker@becker-post.example>
+To: investors@ops.example
+Subject: Identity document
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============2681704147282849028=="
+
+--===============2681704147282849028==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear team,
+
+attached please find the scan of the front of my German identity card for you=
+r KYC check.
+
+Kind regards
+Jonas Becker
+
+--===============2681704147282849028==
+Content-Type: application/pdf
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="scan_0012.pdf"
+MIME-Version: 1.0
+
+JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4K
+ZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4K
+ZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAg
+MCA1OTUgODQyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA1IDAgUiA+PiA+PiAvQ29udGVu
+dHMgNCAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL0xlbmd0aCAyNjUgPj4Kc3RyZWFtCkJUCi9G
+MSAxMCBUZgoxMyBUTAo1MCA3OTAgVGQKKEJVTkRFU1JFUFVCTElLIERFVVRTQ0hMQU5EKSBUaiBU
+KgooU3VybmFtZSAvIE5hbWU6IEJFQ0tFUikgVGogVCoKKEdpdmVuIG5hbWVzIC8gVm9ybmFtZW46
+IEpPTkFTKSBUaiBUKgooRGF0ZSBvZiBiaXJ0aDogMDIuMDcuMTk3OSkgVGogVCoKKE5hdGlvbmFs
+aXR5OiBERVVUU0NIKSBUaiBUKgooQ2FyZCBhY2Nlc3MgbnVtYmVyOiA0ODI5MTMpIFRqIFQqCihW
+YWxpZCB1bnRpbDogMTEuMDMuMjAzMSkgVGogVCoKRVQKZW5kc3RyZWFtCmVuZG9iago1IDAgb2Jq
+Cjw8IC9UeXBlIC9Gb250IC9TdWJ0eXBlIC9UeXBlMSAvQmFzZUZvbnQgL0hlbHZldGljYSAvRW5j
+b2RpbmcgL1dpbkFuc2lFbmNvZGluZyA+PgplbmRvYmoKNiAwIG9iago8PCAvVGl0bGUgKHNjYW5f
+MDAxMikgL1Byb2R1Y2VyIChXMSBzYW1wbGUgd3JpdGVyKSA+PgplbmRvYmoKeHJlZgowIDcKMDAw
+MDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDE1IDAwMDAwIG4gCjAwMDAwMDAwNjQgMDAwMDAgbiAK
+MDAwMDAwMDEyMSAwMDAwMCBuIAowMDAwMDAwMjQ3IDAwMDAwIG4gCjAwMDAwMDA1NjMgMDAwMDAg
+biAKMDAwMDAwMDY2MCAwMDAwMCBuIAp0cmFpbGVyCjw8IC9TaXplIDcgL1Jvb3QgMSAwIFIgL0lu
+Zm8gNiAwIFIgPj4Kc3RhcnR4cmVmCjcyOQolJUVPRgo=
+
+--===============2681704147282849028==--

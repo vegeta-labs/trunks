@@ -1,0 +1,66 @@
+{
+  "id": "E0295",
+  "family": "F062",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-28T11:50:00Z",
+  "prior_messages": [],
+  "description": "Authenticated investor's payment query with 'asap' (medium -> high).",
+  "classes": [
+    "payment_query"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "pressure",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "amount": {
+      "minor": 5000000,
+      "currency": "USD"
+    },
+    "currency": "USD",
+    "payment_date": "2026-10-26",
+    "payer_name": "Olivia Grant",
+    "reference": "LK-003",
+    "uetr": null
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 5000000,
+        "currency": "USD"
+      }
+    ],
+    "references": [
+      "LK-003"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C032",
+    "investor_id": "Larkspur Energy Storage::003",
+    "deal": "Larkspur Energy Storage",
+    "transaction_ids": [
+      "T-LK-0002"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "Pressure word in subject and body (C-RSK-2a v0.7.8). T-LK-0002 by reference; its amount (25,000) differs from the claim."
+}

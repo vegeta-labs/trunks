@@ -1,0 +1,66 @@
+{
+  "id": "E0002",
+  "family": "F001",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-09T11:02:00Z",
+  "prior_messages": [],
+  "description": "Partial payer (15k of 25k received) asks about the balance sent 3 working days before receipt -> payment_wait.",
+  "classes": [
+    "payment_query"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "amount": {
+      "minor": 1000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "payment_date": "2026-11-04",
+    "payer_name": "Oliver Bennett",
+    "reference": "NW-002",
+    "uetr": null
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-002"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C002",
+    "investor_id": "Northwind Robotics::002",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0002"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_wait",
+  "notes": "Reference written in lower case with a space ('nw 002'); C-EXT-2 matches NW-002. Payment date 2026-11-04 is 3 working days before receipt (5, 6, 9 Nov)."
+}

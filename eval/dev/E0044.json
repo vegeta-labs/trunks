@@ -1,0 +1,62 @@
+{
+  "id": "E0044",
+  "family": "F010",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-04T08:35:00Z",
+  "prior_messages": [],
+  "description": "Screenshot with the amount in the body only; no date -> payment_need_evidence.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": null,
+    "amount": {
+      "minor": 5000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": null,
+    "payer_name": "Tomasz Wolski",
+    "reference": null
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 5000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C004",
+    "investor_id": "Northwind Robotics::004",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_need_evidence",
+  "notes": "No date -> C-LNK-4 uses only the reference rule, so the unmatched 50,000.00 line T-NW-0003 is not listed. The image is not parsed. payer_name is the sender (proof of his transfer, no other payer named; QUESTIONS W3-4)."
+}

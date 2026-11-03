@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"complaint\",\"confidence\":\"high\",\"reason\":\"Sender complains this is the third unanswered email and says they are disappointed with responsiveness.\"},{\"class\":\"tax_certificates\",\"confidence\":\"high\",\"reason\":\"The underlying request asks when SEIS compliance paperwork for Northwind Robotics will be issued.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2288,
+  "outputTokens": 123
+ }
+}

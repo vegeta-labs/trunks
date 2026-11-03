@@ -1,0 +1,195 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
+      greenmail:
+        image: greenmail/standalone:2.1.3
+        env:
+          GREENMAIL_OPTS: -Dgreenmail.setup.test.all -Dgreenmail.hostname=0.0.0.0 -Dgreenmail.auth.disabled -Dgreenmail.verbose
+        ports: ['3143:3143']
+      clamav:
+        image: clamav/clamav-debian:1.4
+        ports: ['3310:3310']
+    env:
+      TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+      TEST_IMAP_HOST: localhost
+      TEST_IMAP_PORT: '3143'
+      TEST_CLAMD_HOST: localhost
+      TEST_CLAMD_PORT: '3310'
+      TEST_S3_ENDPOINT: http://localhost:8333
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: No-send static check (TC-OUT-09)
+        run: npm run check:no-send
+      - name: Licence policy
+        run: npm run check:licences
+      - name: Shared design variables unchanged (docs/09_UI_DESIGN.md §11.2)
+        run: npm run check:tokens
+      - name: Released migrations unchanged (tech design §7)
+        run: |
+          if [ -n "$GITHUB_BASE_REF" ]; then git fetch --depth=1 origin "$GITHUB_BASE_REF"; elif [ -n "${BASE_SHA//0/}" ]; then git fetch --depth=1 origin "$BASE_SHA"; else git fetch --depth=2 origin "$GITHUB_SHA"; fi
+          npm run check:migrations
+        env:
+          BASE_SHA: ${{ github.event.before }}
+      - name: Dependency audit
+        run: npm audit --omit=dev --audit-level=high
+      - name: Oracle self-check (independent Python implementation)
+        run: npm run oracle:selfcheck
+      - name: Start SeaweedFS (S3-compatible test store with versioning; a service container cannot take the "server" argument)
+        run: |
+          docker run -d -p 8333:8333 chrislusf/seaweedfs:4.50 server -s3
+          for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:8333/ && exit 0; sleep 2; done; exit 1
+      - name: Wait for ClamAV
+        run: for i in $(seq 1 60); do (echo PING | nc -w 2 localhost 3310 | grep -q PONG) && exit 0; sleep 5; done; exit 1
+      - name: Install Playwright browser
+        timeout-minutes: 14
+        run: timeout 360 npx playwright install --with-deps chromium || timeout 360 npx playwright install --with-deps chromium
+      - name: Unit, integration, TS-vs-oracle and browser tests (the parser container runs in the parser job)
+        run: |
+          npx vitest run --exclude parser/container.test.ts --exclude parser/profiles.test.ts --reporter=default --reporter=json --outputFile=test-report.json
+          npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: report-check
+          path: |
+            test-report.json
+            e2e-report.json
+          retention-days: 7
+      - name: Evaluation, development set on recorded model replies (PRD §6 E2 metrics, test plan §4.3)
+        run: EVAL_ACTUAL_DIR=eval-actual npm run eval
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eval-actual
+          path: eval-actual
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: test-results
+          retention-days: 7
+
+  # the parser container under its dedicated profiles on a host with AppArmor (tech design T7, v0.7.11; TC-ING-10,
+  # TC-OPS-02). The user-namespace restriction of Ubuntu 24.04 is left on: the doi-parser profile allows bubblewrap.
+  parser:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: AppArmor is on, the user-namespace restriction unchanged
+        run: |
+          aa-enabled
+          sysctl kernel.apparmor_restrict_unprivileged_userns
+      - name: Build the parser image (bubblewrap)
+        run: docker build -t doi-parser-test -f parser/Dockerfile .
+      - name: What the parser needs beyond the profile (complain mode, logged only; the tests below run in enforce mode)
+        run: |
+          sudo apparmor_parser -r -W -C deploy/apparmor/doi-parser
+          npx vitest run parser/container.test.ts > /dev/null 2>&1 || true
+          sudo dmesg | grep 'apparmor="ALLOWED"' | grep 'profile="doi-parser' | sed -E 's/.* (operation=.*)/\1/' | sed -E 's/ pid=[0-9]+//' | sort | uniq -c || true
+      - name: Load the doi-parser profile (enforce)
+        run: |
+          sudo apparmor_parser -r -W deploy/apparmor/doi-parser
+          sudo aa-status | grep -E '^\s+doi-parser$'
+      - name: Parser container and profiles
+        env:
+          PARSER_APPARMOR: '1'
+        run: npx vitest run parser/container.test.ts parser/profiles.test.ts --reporter=default --reporter=json --outputFile=parser-report.json
+      - name: AppArmor denials (on failure)
+        if: failure()
+        run: sudo dmesg | grep -i apparmor | tail -50 || sudo journalctl -k | grep -i apparmor | tail -50
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: report-parser
+          path: parser-report.json
+          retention-days: 7
+
+  # the compose stacks (tech design v0.7.11): the demo offline and against the evaluation, sign-in in WebKit and
+  # Chromium, a real start, a failed migration, key rotation; then the static snapshot under the site CSP (TC-DEMO-04)
+  compose:
+    needs: [check]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # TC-OPS-07 upgrades from the code before E5 (8ad8e91); a shallow checkout fails the test
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install the doi-parser AppArmor profile as the quick start says
+        run: sudo cp deploy/apparmor/doi-parser /etc/apparmor.d/doi-parser && sudo apparmor_parser -r -W /etc/apparmor.d/doi-parser
+      - name: Build the images
+        run: docker compose build
+      - name: Install Playwright browsers (Chromium, WebKit)
+        timeout-minutes: 14
+        run: timeout 600 npx playwright install --with-deps chromium webkit || timeout 600 npx playwright install --with-deps chromium webkit
+      - uses: actions/download-artifact@v4
+        with:
+          name: eval-actual
+          path: eval-actual
+      - name: Compose tests
+        env:
+          EVAL_ACTUAL_DIR: eval-actual
+        run: npm run test:compose
+      - name: Static demo snapshot under the site CSP (TC-DEMO-04)
+        run: npx playwright test -c playwright.demo.config.ts
+      - name: Container logs (on failure)
+        if: failure()
+        run: for p in $(docker compose ls -aq); do docker compose -p "$p" logs --tail 80; done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: report-compose
+          path: |
+            compose-report.json
+            demo-e2e-report.json
+          retention-days: 7
+
+  # milestone coverage over every job's reports (rules D4, test plan §1; tech design v0.7.11)
+  coverage:
+    needs: [check, parser, compose]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # check-coverage.mjs: TC-OPS-07 is exempt only where the history truly lacks 8ad8e91
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: report-*
+          merge-multiple: true
+      - name: Every case due at this milestone ran and passed
+        run: node scripts/check-coverage.mjs test-report.json e2e-report.json parser-report.json compose-report.json demo-e2e-report.json

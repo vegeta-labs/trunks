@@ -1,0 +1,25 @@
+Received: from mail.kowalczyk-home.example (mail.kowalczyk-home.example
+ [192.0.2.107]) by mx.ops.example with ESMTPS id f312f53f6c; Fri, 23 Oct 2026
+ 12:19:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=kowalczyk-home.example; dkim=pass
+ header.d=kowalczyk-home.example; dmarc=pass
+ header.from=kowalczyk-home.example
+From: Hannah Kowalczyk <hannah.k@kowalczyk-home.example>
+To: Investor Operations <investors@ops.example>
+Subject: Confirmation of holding - NW 013
+Date: Fri, 23 Oct 2026 12:18:25 +0000
+Message-ID: <E0128.51ac50012549@kowalczyk-home.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello again,
+
+My wealth manager is putting together a consolidated statement of everything =
+I own and has asked for a confirmation of holding for my Northwind Robotics i=
+nvestment (ref NW 013). Is that something you can issue? It just needs to sho=
+w the company, the number of shares and the date of investment.
+
+Thank you,
+Hannah Kowalczyk

@@ -1,0 +1,78 @@
+{
+  "id": "E0289",
+  "family": "F060",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-06T10:20:00Z",
+  "prior_messages": [
+    {
+      "from": "oliver.bennett@bennettmail.example",
+      "message_id": "<E0289.0b7rk2m9qa1x@bennettmail.example>",
+      "sans_msgid_sha256": "f1075baf91487ac0d3d6e4289076172fd5666f9ed121100b321ccc1ef55dfc5a"
+    }
+  ],
+  "description": "Resend reusing the Message-ID of an earlier evidence email with the amount changed (message_id_collision).",
+  "classes": [
+    "payment_evidence",
+    "payment_query"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "forged_evidence",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": true
+  },
+  "fields": {
+    "uetr": "2adfbd0c-ce98-4860-8c29-cdb79a4d40fe",
+    "amount": {
+      "minor": 1500000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-11-03",
+    "payment_date": "2026-11-03",
+    "payer_name": "Oliver Bennett",
+    "reference": "NW-002"
+  },
+  "rule_output": {
+    "uetrs": [
+      "2adfbd0c-ce98-4860-8c29-cdb79a4d40fe"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1500000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-002"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": [
+      "2026-11-03"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C002",
+    "investor_id": "Northwind Robotics::002",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0002"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "Deliberate Message-ID collision: prior message (same Message-ID) has sans-Message-ID SHA-256 f1075baf91487ac0d3d6e4289076172fd5666f9ed121100b321ccc1ef55dfc5a; this message's is 2f3002be1785d1e66a271cc5f9e3d7b21781a644ad31f59a12e89ae08ea2a421 (different -> message_id_collision -> high)."
+}

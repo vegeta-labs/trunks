@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"unreferenced_payment\",\"confidence\":\"high\",\"reason\":\"Payment made by the investor's father from his own account without the payment reference.\"},{\"class\":\"payment_query\",\"confidence\":\"medium\",\"reason\":\"Sender states a GBP 7,500 transfer was made towards the commitment, without a payment confirmation.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1834,
+  "outputTokens": 120
+ }
+}

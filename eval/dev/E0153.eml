@@ -1,0 +1,31 @@
+Received: from mail.ramsay-capital.example (mail.ramsay-capital.example
+ [192.0.2.91]) by mx.ops.example with ESMTPS id 0fb011b545; Mon, 09 Nov 2026
+ 08:39:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramsay-capital.example; dkim=pass
+ header.d=ramsay-capital.example; dmarc=pass
+ header.from=ramsay-capital.example
+From: Fiona Ramsay <fiona@ramsay-capital.example>
+To: Investor Operations <investors@ops.example>
+Subject: Rolling close on Northwind Robotics?
+Date: Mon, 09 Nov 2026 08:38:25 +0000
+Message-ID: <E0153.c92bb3c8a409@ramsay-capital.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi team,
+
+Quick one. A couple of investors who were introduced late want to come into N=
+orthwind Robotics but won't have their KYC done by 20 November. Can we hold a=
+ first close on 20 November with the current list and then a second close in =
+January for the late group? The company is happy with that in principle.
+
+What would you need from me to set that up, and does it change anything for t=
+he investors already in?
+
+Thanks,
+Fiona
+
+Fiona Ramsay
+Ramsay Capital

@@ -1,0 +1,25 @@
+Return-Path: <oliver.bennett@bennettmail.example>
+Received: from mail.bennettmail.example (mail.bennettmail.example
+ [192.0.2.155]) by mx.ops.example with ESMTPS id 19120ec1ad for
+ <investors@ops.example>; Mon, 09 Nov 2026 11:02:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=bennettmail.example; dkim=pass header.d=bennettmail.example;
+ dmarc=pass header.from=bennettmail.example
+Message-ID: <E0002.f3977d438bdf@bennettmail.example>
+Date: Mon, 09 Nov 2026 10:59:41 +0000
+From: "Oliver Bennett" <oliver.bennett@bennettmail.example>
+To: investors@ops.example
+Subject: Second transfer for Northwind
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+I paid the first part of my commitment last month and sent the balance of 100=
+00 GBP on 4 November 2026 (ref nw 002). Has the second transfer come through =
+yet? I'd like to make sure I'm fully paid up before the round closes.
+
+Best,
+Oliver Bennett
+07700 900102

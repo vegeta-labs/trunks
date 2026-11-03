@@ -1,0 +1,66 @@
+{
+  "id": "E0004",
+  "family": "F001",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-03T10:20:00Z",
+  "prior_messages": [],
+  "description": "Investor writes from his second directory address; ledger partial; no payment date -> payment_need_evidence.",
+  "classes": [
+    "payment_query"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "amount": {
+      "minor": 1800000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "payment_date": null,
+    "payer_name": "Daniel Osei",
+    "reference": "NW-016",
+    "uetr": null
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1800000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-016"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C016",
+    "investor_id": "Northwind Robotics::016",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0012"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_need_evidence",
+  "notes": "d.osei@oseiconsulting.example is C016's second address in contacts.csv, so the sender is authenticated and linked. No payment date given -> payment date unknown."
+}

@@ -1,0 +1,5 @@
+investor_id,name,email,reference,cash_due,scheme
+c01,Amelia Hart,amelia@example.com,NW-001,"10,000.00",SEIS
+,Ben Okafor,ben@example.com,NW-002,5000,EIS
+c03,Chloe Martin,chloe@example.com,NW-003,20000.00,
+,David Kim,david@example.com,NW 004,£2500,seis

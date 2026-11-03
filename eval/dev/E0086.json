@@ -1,0 +1,50 @@
+{
+  "id": "E0086",
+  "family": "F020",
+  "mailbox": "legal",
+  "mailbox_strips_auth_results": false,
+  "received_at": "2026-11-18T09:12:00Z",
+  "prior_messages": [],
+  "description": "Lead sends her yes to the legal mailbox; authentication not adopted there, so she is not an authenticated sender.",
+  "classes": [
+    "closing_confirmation"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": null,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "confirms": "yes",
+    "deal": "Northwind Robotics"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C040",
+    "investor_id": null,
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "closing_ack",
+  "notes": "Mailbox legal does not strip foreign Authentication-Results -> auth_fail null, not authenticated (C-SIG-3). Contact link is still made by address (C-LNK-1)."
+}

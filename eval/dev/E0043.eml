@@ -1,0 +1,47 @@
+Return-Path: <jonas.becker@becker-post.example>
+Received: from mail.becker-post.example (mail.becker-post.example
+ [192.0.2.154]) by mx.ops.example with ESMTPS id 5be1b442e2 for
+ <investors@ops.example>; Fri, 30 Oct 2026 13:00:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=becker-post.example; dkim=pass header.d=becker-post.example;
+ dmarc=pass header.from=becker-post.example
+Message-ID: <E0043.d4db43d498b4@becker-post.example>
+Date: Fri, 30 Oct 2026 12:57:21 +0000
+From: "Jonas Becker" <jonas.becker@becker-post.example>
+To: investors@ops.example
+Subject: Northwind payment
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============0599791157626304045=="
+
+--===============0599791157626304045==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+See attached.
+
+Jonas Becker
+
+--===============0599791157626304045==
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="payment_screenshot.png"
+MIME-Version: 1.0
+
+iVBORw0KGgoAAAANSUhEUgAAALQAAAFoCAIAAABxJEaFAAADMUlEQVR42u3dsYmAQBRFUSsRwTaM
+LcLYOqzHokxsQwwMTAyGCURR5h+42bxo58CK7GLVTLOUrPIjEByCQ3AIDsEhOASH4BAcgkOCQ3AI
+DsEhOASH4BAcgkNwSHAIDsEhOASH4NDPcWzbLiWDQ3AIDsEhOASHysTRdb3eDg7BITgEBxxwwAEH
+HHDAAQcccMABBxxwwCE4BIfgEBxwwAEHHP4STHAIDsEhOASH4BAcgkMxcCzLKiWDQ3DoBg6/WeWB
+VHAIDsEhOASHYuGo6/Ysc2Tz+QYOGzhs4LCBwwYOGzhcBhxwwAEHHHDAAQcccNjAYQOHDRw2cNjA
+4cLggAMOOOCAAw444IDDBg4bOGzgsIHDBg4XBofLgAMOOOCAAw444LCBwwYOGzhs4LCBwwYOlwEH
+HHAoeHAIDsEhOASH4BAcgkNwCA4FxuG7y/K5cvlcuTxzCA7BITgEh+AQHILjgYZhvOY0cwqH09g4
+3HdJGuCAAw444IADDjjggAMOOLzncOolmOuHAw444IADDjjggAMOOLznoAEOOOCAAw6ncMABBxxw
+wAGH9xyswAEHHHDAAQcccMABBxxOveegwXsOOOCAAw444IADDjjggAMO7zlYgQOOYnGosOAQHIJD
+cAgOwSE4BIfgEBwKjMNHueVb9vIte3nmEByCQ3AIDsEhOASHBIfgEByCQ3AIDsEhOASH4JDgEByC
+Q3AIDsEhOASH4BAcEhyCQ3AIDsEhOASH4BAcgkNwSHAIDsEhOASH4BAcgkNwCA4JDsEhOASH4BAc
+gkNwCA7BIcEhOASH4BAcgkNwCA7BITgEhwSH4BAcgkNwCA7BITgEh+CQ4BAcgkNwCA7BITgEh+AQ
+HBIcgkNwCA7BITgEh+AQHIJDcEhwCA7BITgEh+AQHIJDcAgOCQ7BITgEh+AQHAqOo5lmvR0cgkNw
+CA444IADDjjggAMOOOCAAw444IBDcAgOwSE44IADDjjggAMOOOCAAw444BAcgkNwCA444IADDjjg
+gAMO/2UvOASH4BAcgkNwCA7BITgkOASH4BAcgkNwCA7BITgEhwSH4BAcgkNwCA7BITgEh+BQ3A7C
+V50izsCV2gAAAABJRU5ErkJggg==
+
+--===============0599791157626304045==--

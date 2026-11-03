@@ -1,0 +1,73 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=harbourlane.example; dkim=pass header.d=harbourlane.example;
+ dmarc=pass header.from=harbourlane.example
+Received: from mail.harbourlane.example (mail.harbourlane.example
+ [192.0.2.167]) by mx.ops.example with ESMTPS id 8UYUF6S1HR for
+ <investors@ops.example>; Fri, 06 Nov 2026 13:25:00 +0000
+Date: Fri, 06 Nov 2026 13:24:01 +0000
+From: Harbour Lane Holdings - Investments <investments@harbourlane.example>
+To: investors@ops.example
+Subject: Re: Harbour Lane Holdings - corporate KYC documents
+Message-ID: <E0189.94hs8442ilop@harbourlane.example>
+In-Reply-To: <f86877vk5bzdw55o@ops.example>
+References: <3pp6q2z0ybllixry@ops.example>
+ <e4fgfm5eda0h298x@harbourlane.example> <1oqjp53w4h1jo6o5@ops.example>
+ <1knoxd9awk4ezn4t@harbourlane.example> <f86877vk5bzdw55o@ops.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello,
+
+We've now uploaded both documents through the secure portal: a full-page certified copy of the certificate of incorporation, and the register of members certified by our company secretary yesterday.
+
+Please let us know if anything else is needed to complete the KYC review for our Northwind Robotics investment.
+
+Kind regards,
+Rachel Ng
+Finance Manager, Harbour Lane Holdings Ltd
+
+On Tue, 3 Nov 2026 at 12:10, Kestrel Syndicate Operations <investors@ops.example> wrote:
+> Dear Rachel,
+>
+> Thank you. Please use the secure document portal rather than email when you send them.
+>
+> Kind regards,
+> Investor Operations
+> Kestrel Syndicate Operations
+>
+> On Tue, 3 Nov 2026 at 08:55, Harbour Lane Holdings - Investments <investments@harbourlane.example> wrote:
+>> Understood. Our company secretary is arranging a certified register of members and we'll send both this week.
+>>
+>> Rachel
+>>
+>> On Thu, 29 Oct 2026 at 11:05, Kestrel Syndicate Operations <investors@ops.example> wrote:
+>>> Dear Rachel,
+>>>
+>>> The company number and the registrar's seal at the foot of the page are not visible.
+>>>
+>>> Kind regards,
+>>> Investor Operations
+>>> Kestrel Syndicate Operations
+>>>
+>>> On Thu, 29 Oct 2026 at 09:20, Harbour Lane Holdings - Investments <investments@harbourlane.example> wrote:
+>>>> Hello,
+>>>>
+>>>> Apologies - which part of the certificate is missing?
+>>>>
+>>>> Rachel Ng
+>>>> Finance Manager, Harbour Lane Holdings Ltd
+>>>>
+>>>> On Wed, 28 Oct 2026 at 10:00, Kestrel Syndicate Operations <investors@ops.example> wrote:
+>>>>> Dear Harbour Lane team,
+>>>>>
+>>>>> Thank you for the corporate documents. Unfortunately the scan of the certificate of incorporation is cut off at the bottom of the page, and the register of members is not certified. Could you resend both?
+>>>>>
+>>>>> Kind regards,
+>>>>> Investor Operations
+>>>>> Kestrel Syndicate Operations
+>>>>>
+>>>>
+>>>
+>>
+>

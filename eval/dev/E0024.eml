@@ -1,0 +1,55 @@
+Return-Path: <sophie.laurent@laurent-mail.example>
+Received: from mail.laurent-mail.example (mail.laurent-mail.example
+ [192.0.2.148]) by mx.ops.example with ESMTPS id 9d1ebe2b28 for
+ <investors@ops.example>; Fri, 06 Nov 2026 10:05:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=laurent-mail.example; dkim=pass header.d=laurent-mail.example;
+ dmarc=pass header.from=laurent-mail.example
+Message-ID: <E0024.c16a29d20386@laurent-mail.example>
+Date: Fri, 06 Nov 2026 10:02:43 +0000
+From: "Sophie Laurent" <sophie.laurent@laurent-mail.example>
+To: investors@ops.example
+Subject: Northwind Robotics - confirmation de virement
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============1529968644563144802=="
+
+--===============1529968644563144802==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Bonjour,
+
+My bank in Paris gave me this file as confirmation of my transfer for Northwi=
+nd Robotics. I hope this format is useful to you.
+
+Bien cordialement,
+Sophie Laurent
+
+--===============1529968644563144802==
+Content-Type: application/xml
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="pacs008_1.xml"
+MIME-Version: 1.0
+
+PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPERvY3VtZW50IHhtbG5zPSJ1
+cm46aXNvOnN0ZDppc286MjAwMjI6dGVjaDp4c2Q6cGFjcy4wMDguMDAxLjA4Ij4KICA8RklUb0ZJ
+Q3N0bXJDZHRUcmY+CiAgICA8R3JwSGRyPgogICAgICA8TXNnSWQ+UVpCSy1NU0ctTEFVLTA0NTE8
+L01zZ0lkPgogICAgICA8Q3JlRHRUbT4yMDI2LTExLTA1VDA4OjEyOjQ0WjwvQ3JlRHRUbT4KICAg
+ICAgPE5iT2ZUeHM+MTwvTmJPZlR4cz4KICAgICAgPFN0dGxtSW5mPgogICAgICAgIDxTdHRsbU10
+ZD5DTFJHPC9TdHRsbU10ZD4KICAgICAgPC9TdHRsbUluZj4KICAgIDwvR3JwSGRyPgogICAgPENk
+dFRyZlR4SW5mPgogICAgICA8UG10SWQ+CiAgICAgICAgPEluc3RySWQ+SU5TVFItMTwvSW5zdHJJ
+ZD4KICAgICAgICA8RW5kVG9FbmRJZD5MQVVSRU5ULU5XUi0wMTwvRW5kVG9FbmRJZD4KICAgICAg
+ICA8VUVUUj5iOTUyMjgwMi0yYTMzLTQ5NjMtOTQ2NS04NzhhOWU0YmY3MDk8L1VFVFI+CiAgICAg
+IDwvUG10SWQ+CiAgICAgIDxJbnRyQmtTdHRsbUFtdCBDY3k9IkdCUCI+MjAwMDAuMDA8L0ludHJC
+a1N0dGxtQW10PgogICAgICA8SW50ckJrU3R0bG1EdD4yMDI2LTExLTA1PC9JbnRyQmtTdHRsbUR0
+PgogICAgICA8Q2hyZ0JyPlNIQVI8L0NocmdCcj4KICAgICAgPERidHI+PE5tPlNPUEhJRSBMQVVS
+RU5UPC9ObT48L0RidHI+CiAgICAgIDxEYnRyQWd0PjxGaW5JbnN0bklkPjxCSUNGST5RWkJLRlJQ
+UFhYWDwvQklDRkk+PC9GaW5JbnN0bklkPjwvRGJ0ckFndD4KICAgICAgPENkdHJBZ3Q+PEZpbklu
+c3RuSWQ+PEJJQ0ZJPlFaQktHQjJMWFhYPC9CSUNGST48L0Zpbkluc3RuSWQ+PC9DZHRyQWd0Pgog
+ICAgICA8Q2R0cj48Tm0+Tk9SVEhXSU5EIFJPQk9USUNTIFNQViBMUDwvTm0+PC9DZHRyPgogICAg
+ICA8Q2R0ckFjY3Q+PElkPjxPdGhyPjxJZD5OV1ItU1BWLUNMSUVOVC1HQlA8L0lkPjwvT3Rocj48
+L0lkPjwvQ2R0ckFjY3Q+CiAgICAgIDxSbXRJbmY+PFVzdHJkPk5XLTAwNiBMQVVSRU5UPC9Vc3Ry
+ZD48L1JtdEluZj4KICAgIDwvQ2R0VHJmVHhJbmY+CiAgPC9GSVRvRklDc3RtckNkdFRyZj4KPC9E
+b2N1bWVudD4K
+
+--===============1529968644563144802==--

@@ -1,0 +1,56 @@
+{
+  "id": "E0043",
+  "family": "F010",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-30T13:00:00Z",
+  "prior_messages": [],
+  "description": "Banking-app screenshot only, body 'see attached'; image not parsed -> no rule fields; not received -> payment_need_evidence.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": null,
+    "amount": null,
+    "currency": null,
+    "value_date": null,
+    "payer_name": null,
+    "reference": null
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C007",
+    "investor_id": "Northwind Robotics::007",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0005"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_need_evidence",
+  "notes": "Image is possible-KYC (C-RED-0 3) and not OCR'd; class from the model (file name + subject). Commitment linked via the sender. Bank line T-NW-0005 listed by reference match although its ledger status is rejected."
+}

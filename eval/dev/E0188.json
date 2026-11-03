@@ -1,0 +1,71 @@
+{
+  "id": "E0188",
+  "family": "F044",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-30T10:10:00Z",
+  "prior_messages": [
+    {
+      "from": "amelia@hartfamily.example",
+      "message_id": "<ncbv3r3cmd2x6kck@hartfamily.example>",
+      "sans_msgid_sha256": "e0fadf765d321e477070e1473993af58609b26d3d2c8f2b71ebe31a556a64d1e"
+    },
+    {
+      "from": "amelia@hartfamily.example",
+      "message_id": "<co8dnjzz2p8l67r8@hartfamily.example>",
+      "sans_msgid_sha256": "471d5fd778ebc6e09bfe093a351c572e0b57a5b89c257fe9b20f40ab50d99458"
+    }
+  ],
+  "description": "Investor increases her commitment at the end of a 5-message thread about SEIS limits.",
+  "classes": [
+    "commitment_change"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "new_amount": {
+      "minor": 1500000,
+      "currency": "GBP"
+    },
+    "currency": "GBP"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1500000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C001",
+    "investor_id": "Northwind Robotics::001",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0001"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "commitment_change_ack",
+  "notes": "Only one amount token in the whole thread. Bank line T-NW-0001 listed because its reference matches the linked commitment (C-LNK-4)."
+}

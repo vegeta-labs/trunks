@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"bank_details\",\"confidence\":\"high\",\"reason\":\"Company secretary announces a new bank account (IBAN) where SPV investors should pay subscriptions.\"},{\"class\":\"other_known\",\"confidence\":\"low\",\"reason\":\"Move to a euro-denominated treasury structure may involve currency exchange considerations.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1918,
+  "outputTokens": 119
+ }
+}

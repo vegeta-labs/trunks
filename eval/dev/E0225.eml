@@ -1,0 +1,28 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=northwind-robotlcs.example; dkim=pass
+ header.d=northwind-robotlcs.example; dmarc=pass
+ header.from=northwind-robotlcs.example
+Received: from mail.northwind-robotlcs.example
+ (mail.northwind-robotlcs.example [192.0.2.15]) by mx.ops.example with ESMTPS
+ id FKZV7IU4H5 for <investors@ops.example>; Wed, 21 Oct 2026 09:30:00 +0000
+Date: Wed, 21 Oct 2026 09:28:55 +0000
+From: Ethan Clarke <ethan.clarke@northwind-robotlcs.example>
+To: investors@ops.example
+Subject: Northwind Robotics - change of bank account
+Message-ID: <E0225.qsm6ttqiyjom@northwind-robotlcs.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Dear Investor Operations team,
+
+Please note that our bank has changed. With immediate effect, all subscription monies for Northwind Robotics Ltd should be paid to our new account:
+
+Account name: Northwind Robotics Ltd
+IBAN: GB55 QZBK 8688 3125 8048 93
+
+Please update your records and pass this on to the investors who have not yet completed their payments, so that nothing is sent to the old account before close.
+
+Kind regards,
+Ethan Clarke
+Finance Director, Northwind Robotics

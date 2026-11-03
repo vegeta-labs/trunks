@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"deal\":{\"value\":\"Solent Biotherapeutics\",\"confidence\":\"high\",\"quote\":\"We hold an interest in Solent Biotherapeutics through your SPV\"},\"question_type\":{\"value\":\"amount\",\"confidence\":\"high\",\"quote\":\"need the expected distribution amount per share before close of business on Friday\"}}}",
+ "usage": {
+  "inputTokens": 1491,
+  "outputTokens": 112
+ }
+}

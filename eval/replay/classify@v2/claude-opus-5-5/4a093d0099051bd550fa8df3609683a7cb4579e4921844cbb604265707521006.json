@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"exit_distribution\",\"confidence\":\"high\",\"reason\":\"Sender asks for the expected distribution amount per share from their SPV interest in Solent Biotherapeutics.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1827,
+  "outputTokens": 76
+ }
+}

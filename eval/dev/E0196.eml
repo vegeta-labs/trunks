@@ -1,0 +1,28 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=dubois-famille.example; dkim=pass
+ header.d=dubois-famille.example; dmarc=pass
+ header.from=dubois-famille.example
+Received: from mail.dubois-famille.example (mail.dubois-famille.example
+ [192.0.2.44]) by mx.ops.example with ESMTPS id IZY98GKLAS for
+ <investors@ops.example>; Wed, 04 Nov 2026 13:10:00 +0000
+Date: Wed, 04 Nov 2026 14:09:14 +0100
+From: Claire Dubois <claire.dubois@dubois-famille.example>
+To: investors@ops.example
+Subject: Demande de retrait - Solent Biotherapeutics
+Message-ID: <E0196.ec0ewgp0k6l4@dubois-famille.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Madame, Monsieur,
+
+Pour des raisons familiales, je souhaite retirer ma participation =C3=A0 Sole=
+nt Biotherapeutics (r=C3=A9f=C3=A9rence SB-002) avant la cl=C3=B4ture de l'op=
+=C3=A9ration. Je n'ai encore effectu=C3=A9 aucun versement.
+
+Je vous remercie de bien vouloir me confirmer la prise en compte de ma demand=
+e et de m'indiquer s'il y a des documents =C3=A0 signer.
+
+Avec mes salutations distingu=C3=A9es,
+
+Claire Dubois

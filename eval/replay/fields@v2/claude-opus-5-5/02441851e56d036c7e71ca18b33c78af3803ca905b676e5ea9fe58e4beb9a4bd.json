@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"change_type\":{\"value\":\"valuation\",\"confidence\":\"high\",\"quote\":\"revise\\nthe pre-money valuation for this round from £12,000,000 to £10,500,000\"},\"from_payer\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"to_payer\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"consent_evidence\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"platform\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"document_type\":{\"value\":null,\"confidence\":\"medium\",\"quote\":\"\"},\"deal\":{\"value\":\"Northwind Robotics\",\"confidence\":\"medium\",\"quote\":\"Northwind Robotics [NAME_3]\"}}}",
+ "usage": {
+  "inputTokens": 1893,
+  "outputTokens": 240
+ }
+}

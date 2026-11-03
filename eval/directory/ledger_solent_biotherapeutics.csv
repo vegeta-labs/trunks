@@ -1,0 +1,6 @@
+transaction_id,date,amount,payer,reference,status,investor_id,investor_name,decided_by,withdrawn_on,currency
+T-SB-0001,2026-10-15,25000.00,R DUARTE,SB-001,auto,001,Rafael Duarte,system,,EUR
+T-SB-0002,2026-10-22,5000.00,M VOGEL,SB 003,auto,003,Matthias Vogel,system,,EUR
+T-SB-0003,2026-10-20,10000.00,E RUIZ,SB-004 Ruiz,auto,004,Elena Ruiz,system,,EUR
+T-SB-0004,2026-10-13,150000.00,NORDHAVEN FAMILY OFFICE,SB-007,confirmed,007,Nordhaven Family Office Ltd,ops.reviewer,,EUR
+T-SB-0005,2026-10-27,30000.00,VAN DIJK HOLDING BV,SUBSCRIPTION,unmatched,,,,,EUR

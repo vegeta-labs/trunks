@@ -1,0 +1,67 @@
+{
+  "id": "E0214",
+  "family": "F048",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-26T10:05:00Z",
+  "prior_messages": [],
+  "description": "HTML payment query whose preheader is hidden only inside @media (max-width:600px) - not hidden text.",
+  "classes": [
+    "payment_query"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "amount": {
+      "minor": 2000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "payment_date": "2026-10-21",
+    "payer_name": "Rafael Duarte",
+    "reference": "NW-012",
+    "uetr": null
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 2000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-012"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C012",
+    "investor_id": "Northwind Robotics::012",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0009",
+      "T-NW-0010"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_received",
+  "notes": "Conditional @media blocks are not evaluated (C-SIG-1.7) -> hidden_text false. Investor is in two deals; the reference NW-012 links the Northwind commitment. Both ledger rows confirmed (40,000 of 40,000) -> payment_received."
+}

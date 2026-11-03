@@ -1,0 +1,29 @@
+Return-Path: <fiona@ramsay-capital.example>
+Received: from mail.ramsay-capital.example (mail.ramsay-capital.example
+ [192.0.2.10]) by mx.ops.example with ESMTPS id 444a7aa276 for
+ <investors@ops.example>; Fri, 06 Nov 2026 16:45:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramsay-capital.example; dkim=pass
+ header.d=ramsay-capital.example; dmarc=pass
+ header.from=ramsay-capital.example
+Message-ID: <E0057.921fb43f1c4f@ramsay-capital.example>
+Date: Fri, 06 Nov 2026 16:42:44 +0000
+From: "Fiona Ramsay" <fiona@ramsay-capital.example>
+To: investors@ops.example
+Cc: Tomasz Wolski <t.wolski@wolski-family.example>
+Subject: Tomasz Wolski - withdrawing from Northwind
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi both,
+
+Tomasz has let me know he needs to pull out of the Northwind Robotics round f=
+or personal reasons. Please treat this as a request to withdraw his commitmen=
+t (NW-004). Tomasz is on copy and can confirm.
+
+Thanks,
+Fiona
+
+Fiona Ramsay
+Ramsay Capital

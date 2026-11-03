@@ -1,0 +1,29 @@
+Received: from mail.paperline-supplies.example
+ (mail.paperline-supplies.example [192.0.2.57]) by mx.ops.example with ESMTPS
+ id df5db21802; Thu, 29 Oct 2026 10:14:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=paperline-supplies.example; dkim=pass
+ header.d=paperline-supplies.example; dmarc=pass
+ header.from=paperline-supplies.example
+From: Paperline Office Supplies <orders@paperline-supplies.example>
+To: Investor Operations <investors@ops.example>
+Subject: Toner and paper - autumn offers for your office
+Date: Thu, 29 Oct 2026 10:13:25 +0000
+Message-ID: <E0162.8fd8a12c271b@paperline-supplies.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Autumn offers for business customers:
+
+- A4 copier paper, 5 reams: =C2=A324.99
+- Compatible toner cartridges from =C2=A339.00
+- Free next-day delivery on orders over =C2=A3150.
+
+Reply to this email or call 020 7946 0772 to order. Quote AUTUMN26 at checkou=
+t.
+
+Paperline Office Supplies
+Unit 4, Riverside Trading Estate

@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"withdrawal\",\"confidence\":\"high\",\"reason\":\"Investor explicitly asks to be withdrawn from the Northwind round before closing.\"},{\"class\":\"payment_query\",\"confidence\":\"low\",\"reason\":\"Mentions part payment already sent (£2,500) and asks how it will be returned.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2028,
+  "outputTokens": 114
+ }
+}

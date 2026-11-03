@@ -1,0 +1,25 @@
+Received: from mail.ramanfamily.example (mail.ramanfamily.example
+ [192.0.2.98]) by mx.ops.example with ESMTPS id 25c9edb927; Fri, 30 Oct 2026
+ 15:54:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramanfamily.example; dkim=pass header.d=ramanfamily.example;
+ dmarc=pass header.from=ramanfamily.example
+From: Priya Raman <priya@ramanfamily.example>
+To: Investor Operations <investors@ops.example>
+Subject: Withdrawing from Northwind Robotics
+Date: Fri, 30 Oct 2026 15:53:25 +0000
+Message-ID: <E0175.d007c18f517f@ramanfamily.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Please withdraw me from the Northwind Robotics round. I no longer wish to inv=
+est.
+
+I'll be honest, the way this deal has been handled has put me off: I've had t=
+o chase for weeks to get basic answers and the documents changed twice withou=
+t explanation. That's not how I expected to be treated.
+
+Priya Raman

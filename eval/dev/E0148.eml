@@ -1,0 +1,27 @@
+Received: from mail.pike-holdings.example (mail.pike-holdings.example
+ [192.0.2.118]) by mx.ops.example with ESMTPS id bed9f79c9d; Mon, 19 Oct 2026
+ 13:09:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=pike-holdings.example; dkim=pass
+ header.d=pike-holdings.example; dmarc=pass header.from=pike-holdings.example
+From: Graham Pike <graham.pike@pike-holdings.example>
+To: Investor Operations <investors@ops.example>
+Subject: Selling part of my Northwind Robotics shares
+Date: Mon, 19 Oct 2026 13:08:25 +0000
+Message-ID: <E0148.9c2d53b511e0@pike-holdings.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+As you know I'm one of the founding shareholders selling into the Northwind R=
+obotics round. A second party has approached me about buying a further 5% of =
+my remaining shares outside the round. Can the SPV act as the buyer for that =
+block too, or would it have to be a separate transfer between the buyer and m=
+e? I'd also like to understand whether the pre-emption waiver we signed cover=
+s it.
+
+Best regards,
+Graham Pike
+Pike Holdings

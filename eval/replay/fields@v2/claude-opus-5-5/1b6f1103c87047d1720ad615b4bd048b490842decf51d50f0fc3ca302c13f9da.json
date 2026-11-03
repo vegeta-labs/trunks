@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"subtype\":{\"value\":\"liquidation\",\"confidence\":\"high\",\"quote\":\"in connection with a members' voluntary liquidation\"},\"deal\":{\"value\":\"Northwind Robotics\",\"confidence\":\"medium\",\"quote\":\"Northwind Robotics Investments LLP, which I understand is the vehicle I invested through\"},\"question_type\":{\"value\":\"other\",\"confidence\":\"medium\",\"quote\":\"Is the SPV being wound up, and what does that mean for my investment? Is there anything I need to do?\"}}}",
+ "usage": {
+  "inputTokens": 1632,
+  "outputTokens": 172
+ }
+}

@@ -1,0 +1,73 @@
+{
+  "id": "E0174",
+  "family": "F042",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-06T09:50:00Z",
+  "prior_messages": [],
+  "description": "KYC passport image plus an MT103 text attachment in one email: kyc_documents floor high -> safe_ack; MT103 makes payment_evidence a rule label.",
+  "classes": [
+    "kyc_documents",
+    "payment_evidence"
+  ],
+  "expected_risk": "high",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "document_types": [
+      "passport"
+    ],
+    "entity_type": "individual",
+    "uetr": "29f90f33-942a-4723-a20a-233d120bd672",
+    "amount": {
+      "minor": 600000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-11-04",
+    "payer_name": "Hannah Kowalczyk",
+    "reference": "NW-013"
+  },
+  "rule_output": {
+    "uetrs": [
+      "29f90f33-942a-4723-a20a-233d120bd672"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 600000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-013"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": [
+      "2026-11-04"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C013",
+    "investor_id": "Northwind Robotics::013",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "passport_photo.png is an image (possible-KYC, not parsed). MT103 .txt uses CRLF; :32A: 261104GBP6000,00 is valid; body amount equals the :32A: amount, so there is no amount mismatch (the amounts set is the same whether or not the :32A: amount is counted as a token). :59: carries an account name only, no account number, so bank_details does not fire. UETR is a freshly generated v4 UUID. No bank line of 6000.00 near 2026-11-04 and none with reference NW-013."
+}

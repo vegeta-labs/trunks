@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"complaint\",\"confidence\":\"high\",\"reason\":\"Sender explicitly makes a formal complaint about two weeks without a real answer and asks for escalation.\"},{\"class\":\"payment_query\",\"confidence\":\"high\",\"reason\":\"Underlying issue: £15,000 transferred with reference NW 007 still shows as outstanding on the portal; no confirmation attached.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2649,
+  "outputTokens": 136
+ }
+}

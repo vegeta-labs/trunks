@@ -1,0 +1,283 @@
+# Evaluation configuration for Deal Ops Inbox (fictional data only).
+# Written by the independent evaluation-set author from PRD v0.7.7 and eval/SCHEMA.md.
+# The PRD fixes the content (classes, floors, queues, fields, templates, lists, time rules)
+# but not the exact key layout of the YAML file, which lives in the technical design that the
+# evaluation author does not read. Key names below are a proposal; see eval/QUESTIONS.md Q8.
+
+deployment:
+  name: "Kestrel Syndicate Operations"      # system placeholder {deployment_name}
+  timezone: "Europe/London"
+
+currencies: [GBP, EUR, USD]
+
+mailboxes:
+  # Per-sample truth is the annotation field `mailbox_strips_auth_results`;
+  # these defaults match what the evaluation set uses.
+  - name: ops
+    address: investors@ops.example
+    adapter: eval
+    strips_foreign_auth_results: true
+  - name: legal
+    address: legal@ops.example
+    adapter: eval
+    strips_foreign_auth_results: false
+
+trusted_authserv_id: "mx.ops.example"
+
+esign_platforms:
+  - name: "esign.example"
+    domains: ["esign.example"]
+
+working_time:
+  days: [mon, tue, wed, thu, fri]
+  start: "09:00"
+  end: "18:00"
+  hours_per_day: 9
+  holidays:   # England and Wales bank holidays
+    - 2026-01-01
+    - 2026-04-03
+    - 2026-04-06
+    - 2026-05-04
+    - 2026-05-25
+    - 2026-08-31
+    - 2026-12-25
+    - 2026-12-28
+    - 2027-01-01
+    - 2027-03-26
+    - 2027-03-29
+    - 2027-05-03
+    - 2027-05-31
+    - 2027-08-30
+    - 2027-12-27
+    - 2027-12-28
+
+queues:
+  ops:        {target_working_hours: 2}
+  compliance: {target_working_days: 1}
+  deal_ops:   {target_working_days: 1}
+  legal:      {target_working_days: 1}
+  ops_lead:   {target_working_days: 1}
+reminders:
+  near_due_fraction_remaining: 0.25
+  payment_follow_up_working_days: 10
+  payment_follow_up_enabled: true
+
+# PRD §3.1 (order matters: earlier rows win ties).
+classes:
+  - {id: payment_query,        risk_floor: medium, queue: ops,        fields: [amount, currency, payment_date, payer_name, reference, uetr]}
+  - {id: payment_evidence,     risk_floor: medium, queue: ops,        fields: [uetr, amount, currency, value_date, payer_name, reference]}
+  - {id: unreferenced_payment, risk_floor: medium, queue: ops,        fields: [amount, currency, payment_date, payer_name, third_party_payer]}
+  - {id: kyc_documents,        risk_floor: high,   queue: compliance, fields: [document_types, entity_type]}
+  - {id: withdrawal,           risk_floor: high,   queue: ops,        fields: [investor, consent_evidence]}
+  - {id: commitment_change,    risk_floor: medium, queue: ops,        fields: [new_amount, currency]}
+  - {id: fee_or_terms_change,  risk_floor: high,   queue: deal_ops,   fields: [change_type, from_payer, to_payer, consent_evidence]}
+  - {id: closing_confirmation, risk_floor: medium, queue: deal_ops,   fields: [confirms, deal]}
+  - {id: legal_documents,      risk_floor: high,   queue: legal,      fields: [platform, document_type, deal]}
+  - {id: bank_details,         risk_floor: high,   queue: compliance, fields: [party_role, account_last4, change_requested]}
+  - {id: identity_change,      risk_floor: high,   queue: compliance, fields: [change_fields]}
+  - {id: tax_certificates,     risk_floor: medium, queue: legal,      fields: [certificate_type, deal]}
+  - {id: exit_distribution,    risk_floor: medium, queue: deal_ops,   fields: [deal, question_type]}
+  - {id: bank_letter_request,  risk_floor: low,    queue: ops,        fields: [deal]}
+  - {id: account_access,       risk_floor: medium, queue: ops,        fields: [issue_type]}
+  - {id: complaint,            risk_floor: medium, queue: ops_lead,   fields: []}
+  - {id: other_known,          risk_floor: high,   queue: ops_lead,   fields: [subtype]}
+  - {id: unclassified,         risk_floor: medium, queue: ops,        fields: []}
+
+# Lists may be extended, never shortened (PRD C-SIG-1.8, C-RSK-2a, C-FRD-3). Defaults only.
+word_lists:
+  injection_markers: ["ignore previous", "ignore all", "ignore the above", "disregard", "system prompt", "you are an ai", "as an ai", "new instructions", "classify this as", "mark this as low", "do not flag"]
+  pressure: ["urgent", "urgently", "immediately", "today", "asap", "confidential", "do not tell", "don't tell", "keep this between us", "before close"]
+  internal_terms: ["fraud", "fraudulent", "suspicious", "suspect", "scam", "risk level", "high risk", "flagged", "flag", "verification task", "cooling-off", "cooling off", "two-person", "signal", "lookalike", "spoof", "spoofed", "injection", "money laundering", "sar", "tipping off"]
+
+verification:
+  cooling_off_hours: 24
+
+# Templates: fixed text + placeholders only (PRD C-DRF-1). Placeholder sources:
+#   system:    {deployment_name}, {case_id}
+#   directory: {contact_name}, {investor_name}, {deal}, {reference}, {cash_due}, {currency}
+#   ledger:    {amount_received}, {amount_outstanding}
+#   confirmed typed fields: {confirmed_amount}, {confirmed_date}, {confirmed_uetr}
+# discloses_record is derived by the loader from directory/ledger placeholders; the flags
+# below repeat PRD C-DRF-5 for readability.
+templates:
+  safe_ack:
+    subject: "Re: your message (case {case_id})"
+    body: |
+      Hello,
+
+      Thank you for your message. We have received it and will confirm the next steps with you through the contact details we hold on file.
+
+      Kind regards,
+      {deployment_name} (case {case_id})
+  payment_received:
+    asserts_receipt: true
+    discloses_record: true
+    subject: "Re: your payment for {deal}"
+    body: |
+      Dear {investor_name},
+
+      Thank you for your message. Our records show that your payment for {deal} (reference {reference}) has been received in full: {amount_received} {currency}.
+
+      Kind regards,
+      {deployment_name}
+  payment_wait:
+    discloses_record: true
+    subject: "Re: your payment for {deal}"
+    body: |
+      Dear {investor_name},
+
+      Thank you for letting us know. Bank transfers can take up to five working days to reach the account. We expect {cash_due} {currency} for {deal} under reference {reference}. If the payment has not been matched after that time we will contact you.
+
+      Kind regards,
+      {deployment_name}
+  payment_need_evidence:
+    discloses_record: true
+    subject: "Re: your payment for {deal}"
+    body: |
+      Dear {investor_name},
+
+      Thank you for your message. We have not yet been able to match your payment for {deal} (reference {reference}). Please send us the payment confirmation from your bank (MT103 or pacs.008) showing the UETR, so that we can trace it.
+
+      Kind regards,
+      {deployment_name}
+  payment_need_reference:
+    subject: "Re: your payment"
+    body: |
+      Hello,
+
+      Thank you for your message. To find your payment, please reply with the deal name and the payment reference you were given, together with the amount and the date of the transfer.
+
+      Kind regards,
+      {deployment_name}
+  unreferenced_ack:
+    subject: "Re: your payment"
+    body: |
+      Hello,
+
+      Thank you for telling us about this payment. We will match it with the details you gave and contact you if we need anything else.
+
+      Kind regards,
+      {deployment_name}
+  kyc_received:
+    subject: "Re: your documents"
+    body: |
+      Hello,
+
+      Thank you for sending your documents. Our team will review them and contact you if anything further is needed.
+
+      Kind regards,
+      {deployment_name}
+  withdrawal_ack:
+    discloses_record: true
+    subject: "Re: withdrawal from {deal}"
+    body: |
+      Dear {contact_name},
+
+      Thank you for your message about withdrawing {investor_name} from {deal}. Our team will review the request and confirm the next steps with you.
+
+      Kind regards,
+      {deployment_name}
+  commitment_change_ack:
+    discloses_record: true
+    subject: "Re: your commitment to {deal}"
+    body: |
+      Dear {investor_name},
+
+      Thank you for your message about your commitment to {deal} (currently {cash_due} {currency}). Our team will review the change and confirm it with you.
+
+      Kind regards,
+      {deployment_name}
+  closing_ack:
+    subject: "Re: final numbers"
+    body: |
+      Dear {contact_name},
+
+      Thank you for your reply on the final numbers. We will record it and come back to you if anything is unclear.
+
+      Kind regards,
+      {deployment_name}
+  legal_ack:
+    subject: "Re: documents for signature"
+    body: |
+      Hello,
+
+      Thank you. We have passed the documents to our legal team, who will respond.
+
+      Kind regards,
+      {deployment_name}
+  tax_cert_info:
+    subject: "Re: tax certificate"
+    body: |
+      Hello,
+
+      Thank you for your request. Our legal team handles SEIS and EIS certificates and will reply once the certificate is available.
+
+      Kind regards,
+      {deployment_name}
+  exit_info:
+    discloses_record: true
+    subject: "Re: {deal}"
+    body: |
+      Dear {investor_name},
+
+      Thank you for your question about {deal}. Our team will reply with the information we can share about exits and distributions.
+
+      Kind regards,
+      {deployment_name}
+  bank_letter_info:
+    subject: "Re: confirmation letter"
+    body: |
+      Hello,
+
+      Thank you for your request. We can provide a letter confirming an investment to the investor. Please confirm the name of the bank and the address the letter should be sent to.
+
+      Kind regards,
+      {deployment_name}
+  account_access_info:
+    subject: "Re: access to your account"
+    body: |
+      Hello,
+
+      Thank you for your message. Our team will help you with access to your account and will contact you shortly.
+
+      Kind regards,
+      {deployment_name}
+  complaint_ack:
+    subject: "Re: your message"
+    body: |
+      Hello,
+
+      Thank you for telling us about this, and we are sorry for the trouble. A member of our operations leadership will review your message and reply.
+
+      Kind regards,
+      {deployment_name}
+  notify_old_contact:
+    subject: "Change request on your account"
+    body: |
+      Dear {contact_name},
+
+      We have received a request to change details on your account. If you did not make this request, please contact us using the phone number you know for us.
+
+      Kind regards,
+      {deployment_name} (case {case_id})
+
+default_templates:
+  unreferenced_payment: unreferenced_ack
+  kyc_documents: kyc_received
+  withdrawal: withdrawal_ack
+  commitment_change: commitment_change_ack
+  fee_or_terms_change: safe_ack
+  closing_confirmation: closing_ack
+  legal_documents: legal_ack
+  bank_details: safe_ack
+  identity_change: safe_ack
+  tax_certificates: tax_cert_info
+  exit_distribution: exit_info
+  bank_letter_request: bank_letter_info
+  account_access: account_access_info
+  complaint: complaint_ack
+  other_known: safe_ack
+
+model:
+  provider: replay        # evaluation in CI uses recorded outputs (test plan §4.4)
+  location: local

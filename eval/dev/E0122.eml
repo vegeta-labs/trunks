@@ -1,0 +1,37 @@
+Received: from mail.bennettmail.example (mail.bennettmail.example
+ [192.0.2.88]) by mx.ops.example with ESMTPS id 484bfb1c28; Tue, 27 Oct 2026
+ 11:17:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=bennettmail.example; dkim=pass header.d=bennettmail.example;
+ dmarc=pass header.from=bennettmail.example
+From: Oliver Bennett <oliver.bennett@bennettmail.example>
+To: Investor Operations <investors@ops.example>
+Subject: Re: Northwind Robotics - offer received
+Date: Tue, 27 Oct 2026 11:16:25 +0000
+Message-ID: <E0122.7428f68563b7@bennettmail.example>
+In-Reply-To: <ops-nw-offer-2026-10-21@ops.example>
+References: <ops-nw-offer-2026-10-21@ops.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Thanks for this. One question before anything happens: my Northwind Robotics =
+shares were bought under EIS. If the sale completes inside the three-year hol=
+ding period, what happens to my income tax relief, and will the proceeds be s=
+ubject to capital gains tax? Do you send investors anything to help with the =
+tax return in that case?
+
+Best,
+Oliver Bennett
+
+> On 21 Oct 2026, at 16:02, Kestrel Syndicate Operations <investors@ops.examp=
+le> wrote:
+>
+> Dear investor,
+>
+> Northwind Robotics has informed shareholders that it has received a
+> non-binding offer for the whole of its share capital. No decision has
+> been taken. We will write again when there is more to share.
+>
+> Kind regards,
+> Kestrel Syndicate Operations

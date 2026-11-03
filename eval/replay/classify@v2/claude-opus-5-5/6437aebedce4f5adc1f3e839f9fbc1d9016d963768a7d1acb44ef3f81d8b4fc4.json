@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"unreferenced_payment\",\"confidence\":\"high\",\"reason\":\"Sender says the £50,000 subscription payment was sent without a reference and asks for it to be matched.\"},{\"class\":\"payment_query\",\"confidence\":\"medium\",\"reason\":\"Sender states they have paid, with no payment confirmation attached.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1839,
+  "outputTokens": 117
+ }
+}

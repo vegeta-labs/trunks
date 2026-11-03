@@ -1,0 +1,19 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=olivia.grant@grantmail.example; dkim=pass
+ header.d=grantmail.example; dmarc=pass header.from=grantmail.example
+Received: from mail.grantmail.example (mail.grantmail.example [192.0.2.27]) by
+ mx.ops.example with ESMTPS; Wed, 28 Oct 2026 11:46:07 +0000
+From: Olivia Grant <olivia.grant@grantmail.example>
+To: investors@ops.example
+Subject: Payment check - asap please
+Date: Wed, 28 Oct 2026 11:46:00 +0000
+Message-ID: <E0295.w720jgxmkwq0@grantmail.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+Can you confirm asap whether my US$50,000 for Larkspur Energy Storage has arrived? I sent it on 26 October 2026 with reference LK-003.
+
+Olivia Grant

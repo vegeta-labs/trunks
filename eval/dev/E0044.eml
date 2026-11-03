@@ -1,0 +1,47 @@
+Return-Path: <t.wolski@wolski-family.example>
+Received: from mail.wolski-family.example (mail.wolski-family.example
+ [192.0.2.168]) by mx.ops.example with ESMTPS id 20d6635281 for
+ <investors@ops.example>; Wed, 04 Nov 2026 08:35:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=wolski-family.example; dkim=pass
+ header.d=wolski-family.example; dmarc=pass header.from=wolski-family.example
+Message-ID: <E0044.e256cc0d72db@wolski-family.example>
+Date: Wed, 04 Nov 2026 08:32:55 +0000
+From: "Tomasz Wolski" <t.wolski@wolski-family.example>
+To: investors@ops.example
+Subject: Proof of transfer
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============4689647163059657305=="
+
+--===============4689647163059657305==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+See attached - =C2=A350,000.00 for Northwind.
+
+Tomasz
+
+--===============4689647163059657305==
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="payment_screenshot.png"
+MIME-Version: 1.0
+
+iVBORw0KGgoAAAANSUhEUgAAALQAAAFoCAIAAABxJEaFAAADMUlEQVR42u3dMY5AQBiGYSfRuMQU
+aodQO5ab0biGKBQaxUQhhMz/JG83X7XzJCuyG1UaJylb5UcgOASH4BAcgkNwCA7BITgEhwSH4BAc
+gkNwCA7BITgEh+CQ4BAcgkNwCA7BoZ/jWNdNygaH4BAcgkNwCA6ViaNtO70dHIJDcAgOOOCAAw44
+4IADDjjggAMOOOCAQ3AIDsEhOOCAAw44/CWY4BAcgkNwCA7BITgEh2LgmOdFygaH4NANHH6zygOp
+4BAcgkNwCA7FwlHXzdHFkc3nGzhs4LCBwwYOGzhs4HAZcMABBxxwwAEHHHDAYQOHDRw2cNjAYQOH
+C4MDDjjggAMOOOCAAw4bOGzgsIHDBg4bOFwYHC4DDjjggAMOOOCAwwYOGzhs4LCBwwYOGzhcBhxw
+wKHgwSE4BIfgEByCQ3AIDsEhOBQYh+8uy+fK5XPl8swhOASH4BAcgkNwCI4H6vvhnNOLUzicxsbh
+vkvSAAcccMABBxxwwAEHHHDA4T2HUy/BXD8ccMABBxxwwAEHHHDA4T0HDXDAAQcccDiFAw444IAD
+Dji852AFDjjggAMOOOCAAw444HDqPQcN3nPAAQcccMABBxxwwAEHHHB4z8EKHHAUi0OFBYfgEByC
+Q3AIDsEhOASH4FBgHD7KLd+yl2/ZyzOH4BAcgkNwCA7BITgkOASH4BAcgkNwCA7BITgEhwSH4BAc
+gkNwCA7BITgEh+CQ4BAcgkNwCA7BITgEh+AQHIJDgkNwCA7BITgEh+AQHIJDcEhwCA7BITgEh+AQ
+HIJDcAgOCQ7BITgEh+AQHIJDcAgOwSE4JDgEh+AQHIJDcAgOwSE4BIcEh+AQHIJDcAgOwSE4BIfg
+kOAQHIJDcAgOwSE4BIfgEByCQ4JDcAgOwSE4BIfgEByCQ3BIcAgOwSE4BIfgUHAcaZz0dnAIDsEh
+OOCAAw444IADDjjggAMOOOCAAw7BITgEh+CAAw444IADDjjggAMOOOCAQ3AIDsEhOOCAAw444IAD
+Djj8l73gEByCQ3AIDsEhOASH4JDgEByCQ3AIDsEhOASH4BAcEhyCQ3AIDsEhOASH4BAcgkNx2wGR
+iDiXkVYVnQAAAABJRU5ErkJggg==
+
+--===============4689647163059657305==--

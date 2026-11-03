@@ -1,0 +1,72 @@
+{
+  "id": "E0286",
+  "family": "F060",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-27T12:10:00Z",
+  "prior_messages": [],
+  "description": "MT103 whose UETR has a wrong version digit (uetr_candidate_invalid).",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "forged_evidence",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": {
+      "void": "UETR candidate is not UUID version 4 (C-EXT-1)"
+    },
+    "amount": {
+      "minor": 5000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-10-22",
+    "payer_name": "Tomasz Wolski",
+    "reference": "NW-004"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [
+      "8d3f61a2-5b7e-1c4a-9e2d-6f0b3a7c91e4"
+    ],
+    "amounts": [
+      {
+        "minor": 5000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-004"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": [
+      "2026-10-22"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C004",
+    "investor_id": "Northwind Robotics::004",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0003"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "Deliberately invalid UETR: 13th hex digit is 1, not 4. uetr field annotated void (see QUESTIONS W5). Valid :32A: -> rule payment_evidence and value date. T-NW-0003 matches amount 50,000 on the evidence date."
+}

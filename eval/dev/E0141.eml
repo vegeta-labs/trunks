@@ -1,0 +1,69 @@
+Received: from mail.ramanfamily.example (mail.ramanfamily.example
+ [192.0.2.229]) by mx.ops.example with ESMTPS id 0eb0b967cf; Wed, 21 Oct 2026
+ 16:49:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramanfamily.example; dkim=pass header.d=ramanfamily.example;
+ dmarc=pass header.from=ramanfamily.example
+From: Priya Raman <priya@ramanfamily.example>
+To: Investor Operations <investors@ops.example>
+Subject: Re: SEIS paperwork for Northwind Robotics
+Date: Wed, 21 Oct 2026 16:48:25 +0000
+Message-ID: <E0141.0a103082113b@ramanfamily.example>
+In-Reply-To: <CAPR7731.1007@ramanfamily.example>
+References: <CAPR7731.1007@ramanfamily.example>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============8220403246353279847=="
+
+--===============8220403246353279847==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+This is now the third time I have written about this. My first email was two =
+weeks ago (below), I sent a follow-up last Monday, and I have not had so much=
+ as an acknowledgement. I don't expect an instant answer but I do expect some=
+one to reply within a reasonable time.
+
+I'm disappointed - when I invested I was told the operations team would be re=
+sponsive.
+
+Priya Raman
+
+On 7 Oct 2026, at 09:10, Priya Raman <priya@ramanfamily.example> wrote:
+> Hello,
+>
+> Could you tell me when the SEIS compliance paperwork for Northwind Robotics=
+ will be issued? My accountant is asking.
+>
+> Thanks,
+> Priya Raman
+
+--===============8220403246353279847==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><head><meta charset=3D"utf-8"></head><body style=3D"font-family:Arial,s=
+ans-serif;font-size:14px;color:#222222;background:#ffffff">
+<p>Hello,</p>
+<p>This is now the third time I have written about this. My first email was t=
+wo weeks ago (below), I sent a follow-up last Monday, and I have not had so m=
+uch as an acknowledgement. I don&#x27;t expect an instant answer but I do exp=
+ect someone to reply within a reasonable time.</p>
+<p>I&#x27;m disappointed - when I invested I was told the operations team wou=
+ld be responsive.</p>
+<p>Priya Raman</p>
+<p>On 7 Oct 2026, at 09:10, Priya Raman &lt;priya@ramanfamily.example&gt; wro=
+te:<br>
+&gt; Hello,<br>
+&gt;<br>
+&gt; Could you tell me when the SEIS compliance paperwork for Northwind Robot=
+ics will be issued? My accountant is asking.<br>
+&gt;<br>
+&gt; Thanks,<br>
+&gt; Priya Raman</p>
+</body></html>
+
+--===============8220403246353279847==--

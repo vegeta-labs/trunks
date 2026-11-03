@@ -1,0 +1,26 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=laurent-mail.example; dkim=pass header.d=laurent-mail.example;
+ dmarc=pass header.from=laurent-mail.example
+Received: from mail.laurent-mail.example (mail.laurent-mail.example
+ [192.0.2.250]) by mx.ops.example with ESMTPS id 5DLAQ3D085 for
+ <investors@ops.example>; Tue, 27 Oct 2026 09:20:00 +0000
+Date: Tue, 27 Oct 2026 10:19:36 +0100
+From: Sophie Laurent <sophie.laurent@laurent-mail.example>
+To: investors@ops.example
+Subject: Virement Northwind Robotics
+Message-ID: <E0195.40lbs8u5439e@laurent-mail.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Bonjour,
+
+J'ai effectu=C3=A9 le 22/10/2026 un virement de 20 000,00 =E2=82=AC pour mon =
+investissement dans Northwind Robotics, avec la r=C3=A9f=C3=A9rence NW-006.
+
+Pourriez-vous me confirmer sa bonne r=C3=A9ception ? Je n'ai encore rien vu a=
+ppara=C3=AEtre dans mon espace investisseur.
+
+Bien cordialement,
+
+Sophie Laurent

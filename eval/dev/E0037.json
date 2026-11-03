@@ -1,0 +1,63 @@
+{
+  "id": "E0037",
+  "family": "F008",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-20T09:20:00Z",
+  "prior_messages": [],
+  "description": "Fund-administration note from a company investor: payment made by its parent company.",
+  "classes": [
+    "unreferenced_payment"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "amount": {
+      "minor": 10000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "payment_date": "2026-10-16",
+    "payer_name": "Harbour Lane Group plc",
+    "third_party_payer": "Harbour Lane Group plc"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 10000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C005",
+    "investor_id": "Northwind Robotics::005",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0004"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "unreferenced_ack",
+  "notes": "T-NW-0004 (payer HARBOUR LANE GROUP PLC, no reference; confirmed to 005 by ops) is listed by amount and date only (C-LNK-4: GBP 100,000.00, 2026-10-16). Display name differs from the contact name but the address is C005's, so no mismatch."
+}

@@ -1,0 +1,31 @@
+Return-Path: <grace@whitfield-wealth.example>
+Received: from mail.whitfield-wealth.example (mail.whitfield-wealth.example
+ [192.0.2.128]) by mx.ops.example with ESMTPS id 859656969a for
+ <investors@ops.example>; Mon, 02 Nov 2026 10:15:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=whitfield-wealth.example; dkim=pass
+ header.d=whitfield-wealth.example; dmarc=pass
+ header.from=whitfield-wealth.example
+Message-ID: <E0053.d9687cef3b74@whitfield-wealth.example>
+Date: Mon, 02 Nov 2026 10:12:22 +0000
+From: "Grace Whitfield" <grace@whitfield-wealth.example>
+To: investors@ops.example
+Cc: "Priya Raman" <priya@ramanfamily.example>
+Subject: Withdrawal - Priya Raman, Northwind Robotics (NW-003)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear Operations team,
+
+I am writing on behalf of my client Priya Raman, whom I advise, to ask that s=
+he be withdrawn from the Northwind Robotics round before closing (reference N=
+W-003). Priya is copied on this email.
+
+Please let me know what you need from us to process this.
+
+Kind regards,
+
+Grace Whitfield
+Whitfield Wealth
+020 7946 0145

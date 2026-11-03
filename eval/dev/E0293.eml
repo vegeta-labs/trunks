@@ -1,0 +1,21 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=grace@whitfield-wealth.example; dkim=pass
+ header.d=whitfield-wealth.example; dmarc=pass
+ header.from=whitfield-wealth.example
+Received: from mail.whitfield-wealth.example (mail.whitfield-wealth.example
+ [192.0.2.34]) by mx.ops.example with ESMTPS; Fri, 06 Nov 2026 16:01:07 +0000
+From: Grace Whitfield <grace@whitfield-wealth.example>
+To: investors@ops.example
+Subject: URGENT - withdrawal for Priya Raman
+Date: Fri, 06 Nov 2026 16:01:00 +0000
+Message-ID: <E0293.xujgfssw8a9r@whitfield-wealth.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+Urgent: please process Priya Raman's withdrawal from Northwind Robotics (NW-003) today. Please keep this between us for now; there's no need to involve the lead.
+
+Thanks,
+Grace

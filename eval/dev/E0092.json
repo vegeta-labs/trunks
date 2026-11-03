@@ -1,0 +1,51 @@
+{
+  "id": "E0092",
+  "family": "F022",
+  "mailbox": "legal",
+  "mailbox_strips_auth_results": false,
+  "received_at": "2026-11-04T15:58:00Z",
+  "prior_messages": [],
+  "description": "Company mentions esign.example only as plain text (no link, not the sender): no esign rule label, class from the model.",
+  "classes": [
+    "legal_documents"
+  ],
+  "expected_risk": "high",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": null,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "platform": "esign.example",
+    "document_type": "other",
+    "deal": "Solent Biotherapeutics"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C043",
+    "investor_id": null,
+    "deal": "Solent Biotherapeutics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "safe_ack",
+  "notes": "Plain-text domain mention without scheme is not a link, so esign_invite does not fire; legal_documents is a model label. platform annotated esign.example because the text names it; document_type other (deed of adherence is not in the enum)."
+}

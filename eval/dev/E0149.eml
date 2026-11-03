@@ -1,0 +1,27 @@
+Received: from mail.oneill-home.example (mail.oneill-home.example
+ [192.0.2.74]) by mx.ops.example with ESMTPS id f56c6b304a; Fri, 23 Oct 2026
+ 09:13:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=oneill-home.example; dkim=pass header.d=oneill-home.example;
+ dmarc=pass header.from=oneill-home.example
+From: Margaret O'Neill <moneill@oneill-home.example>
+To: Investor Operations <investors@ops.example>
+Subject: Letter about liquidation?
+Date: Fri, 23 Oct 2026 09:12:25 +0000
+Message-ID: <E0149.394b7e88fa15@oneill-home.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear Investor Operations,
+
+I received a letter this morning from a firm of insolvency practitioners sayi=
+ng it was "in connection with a members' voluntary liquidation" and mentionin=
+g Northwind Robotics Investments LLP, which I understand is the vehicle I inv=
+ested through.
+
+I'm rather alarmed. Is the SPV being wound up, and what does that mean for my=
+ investment? Is there anything I need to do?
+
+Yours sincerely,
+Margaret O'Neill

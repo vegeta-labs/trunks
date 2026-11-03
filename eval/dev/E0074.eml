@@ -1,0 +1,38 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramsay-capital.example; dkim=pass
+ header.d=ramsay-capital.example; dmarc=pass
+ header.from=ramsay-capital.example
+Received: from mail.ramsay-capital.example (mail.ramsay-capital.example
+ [192.0.2.27]) by mx.ops.example with ESMTPS id LPOKYFLVWASV; Wed, 28 Oct 2026
+ 16:40:00 +0000
+Message-ID: <E0074.tnip853du35y@ramsay-capital.example>
+Date: Wed, 28 Oct 2026 16:37:34 +0000
+From: Fiona Ramsay <fiona@ramsay-capital.example>
+To: Kestrel Syndicate Operations <investors@ops.example>,
+ Ethan Clarke <ethan.clarke@northwind-robotics.example>
+Subject: Fwd: Northwind SAFE -> equity
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hi both,
+
+As discussed, the Northwind Robotics SPV will now take ordinary shares in the
+priced round instead of holding the SAFE. Forwarding Rafael's written
+agreement below - he was the only SAFE holder who had to sign off.
+
+Fiona
+
+---------- Forwarded message ---------
+From: Rafael Duarte <rafael@duarte-invest.example>
+Date: Tue, 27 Oct 2026 at 18:02
+Subject: Re: Northwind SAFE -> equity
+To: Fiona Ramsay <fiona@ramsay-capital.example>
+
+Fiona,
+
+I agree to my SAFE (NW-012) being converted so that the SPV holds ordinary
+shares in the priced round on the terms you set out.
+
+Regards,
+Rafael

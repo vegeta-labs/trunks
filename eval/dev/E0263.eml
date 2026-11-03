@@ -1,0 +1,26 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=hello@finops-summit.example; dkim=pass
+ header.d=finops-summit.example; dmarc=pass header.from=finops-summit.example
+Received: from mail.finops-summit.example (mail.finops-summit.example
+ [192.0.2.31]) by mx.ops.example with ESMTPS; Tue, 10 Nov 2026 08:01:07 +0000
+From: FinOps Summit 2027 <hello@finops-summit.example>
+To: investors@ops.example
+Subject: Early-bird passes for FinOps Summit 2027
+Date: Tue, 10 Nov 2026 08:01:00 +0000
+Message-ID: <E0263.x6f5rg7k2hbp@finops-summit.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi there,
+
+FinOps Summit returns to London on 4-5 March 2027 with two days of talks on f=
+und administration, automation and investor reporting.
+
+Early-bird passes are =C2=A3395 until 30 November 2026. Reserve your place: h=
+ttps://finops-summit.example/register
+
+You are receiving this because you attended a previous event. Unsubscribe: ht=
+tps://finops-summit.example/u/8f2k
+
+FinOps Summit, 1 Example Street, London

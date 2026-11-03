@@ -1,0 +1,22 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=harbourlane.example; dkim=pass header.d=harbourlane.example;
+ dmarc=pass header.from=harbourlane.example
+Received: from mail.harbourlane.example (mail.harbourlane.example
+ [192.0.2.180]) by mx.ops.example with ESMTPS id 1QG2PYX80X for
+ <investors@ops.example>; Tue, 20 Oct 2026 10:15:00 +0000
+Date: Tue, 20 Oct 2026 10:14:42 +0000
+From: Harbour Lane Holdings Ltd <investments@harbourlane.example>
+To: investors@ops.example
+Subject: Portal access for our finance team
+Message-ID: <E0209.4l12k5h8nn2l@harbourlane.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello,
+
+Please renew accounting access to the investor portal for our finance team member, Tom Reyes (tom.reyes@harbourlane.example). His previous access lapsed at the end of September and he prepares our quarterly valuation pack.
+
+Kind regards,
+Rachel Ng
+Finance Manager, Harbour Lane Holdings Ltd

@@ -1,0 +1,502 @@
+# Deal Ops Inbox — 产品需求文档（PRD）
+
+版本 **v0.7.23**（2026-11-02，决定 7 加注：同一网站下的子页不算另做落地页；网站方案 N2，负责人：「N1–N30 按建议」；见 §9）· v0.7.22（2026-11-02，E5 开工评估：演示模式的账号和护栏、演示站是 Deal Ops 网站上的静态只读快照、维护任务单独容器、解析容器专用 profile、开源方式（决定 7）；负责人：「D1–D10 按建议」；见 §9）· v0.7.21（2026-11-02，D8：注入词表加四个短语；显示名冒用时核实任务用被冒用联系人的档案电话和档案邮箱；E3 验收后续，负责人：「按你的建议完成D8」；见 §9）· v0.7.20（2026-11-01，R-REV-04 复制要显示结果、失败时给出可手动复制的文字；M-05 实测，负责人：「建议 A：E4 还没合并，修完一并验收最干净。」；见 §9）· v0.7.19（2026-11-01，C-RED-0 ② 护照机读区放宽、病毒拦截的可能 KYC 附件不转交；E4 自测 F1、F2，负责人：「F1、F2 按建议」；见 §9）· v0.7.18（2026-10-31，E4 开工评估 D1、D2、D5、G2、G4、G5 和审查 E1–E5：Graph 只用 delta 轮询、Gmail 每个邮箱单独授权、收取范围、「保留」标记、KYC 转交时机 / 重试 / 成功的定义、会话里的保存期、名单当前版本不删；负责人：「D1–D8 按建议」「E1–E6 按建议」；见 §9）· v0.7.17（2026-10-31，I-05 组合附加符算前一个字母的一部分，比较时去掉；E2/E3 第 4 轮修复自审 T1，负责人：「修，T1 选 A」；见 §9）· v0.7.16（2026-10-30，C-FLD-0 引文的「逐字」容许空白差异、空引文作废；Codex E2 重跑 F4，负责人：「按建议」；编号接在 `e3` 分支的 v0.7.12–v0.7.15 之后；见 §9）· v0.7.15（2026-10-30，E3 自测关卡 D1–D3：多个 Reply-To、人工操作降风险需 approver 确认、回复绑定代数、asserts_receipt 模板、台账币种例外；负责人：「按你建议走」）· v0.7.14（2026-10-30，C-DIR-3 补上 Toolkit 原文漏抄的「空单元格按交易币种」；负责人选择 A）· v0.7.13（2026-10-30，§6「回复不越权」第 ② 条按事实判断；负责人：「按方案」）· v0.7.12（2026-10-30，E3 开工评估：成功标准拆成规则和端到端安全、C-RSK-2a 工作日数法、人工调整风险、C-LNK-2 第二步、C-OUT-3 当前模板；负责人授权：「请你评估一下，给出专业可执行建议，review全部通过后 按照建议执行」；见 §9）· v0.7.11（2026-10-30，C-RED-0 ① 英文证件词紧挨中日韩文字也算整词，E2 自测 P1，负责人批准：「按建议，继续」）· v0.7.10（2026-10-30，`payment_query` 与 `payment_evidence` 的界线，负责人选择「有凭证只算 evidence」）· v0.7.9（2026-10-30，字段校验失败即作废、金额字段的合并，负责人在选项中选择推荐做法）· v0.7.8（2026-10-30，评测集编写中的疑问 Q1、Q7、Q9–Q12，负责人批准：「按建议，继续」）· v0.7.7（2026-10-30，C-SIG-1.7 逐个列出 CSS 通用关键字，负责人批准：「按建议做」）· v0.7.6（2026-10-30，C-SIG-1.7 写明评估范围，负责人批准：「按建议划定边界」）· v0.7.5（2026-10-30，C-SIG-1.7 样式表里 `@layer` 的层叠顺序，负责人批准：「补上 @layer 层级」）· v0.7.4（2026-10-30，C-SIG-1.7 样式表里的 `@media` 和层叠，负责人批准：「只算无条件的」）· v0.7.3（2026-10-30，自测审查发现的 7 处措辞 P1–P7，负责人批准：「按建议」）· v0.7.2（2026-10-30，电话号码的切分，负责人批准：「按建议」）· v0.7.1（2026-10-30，12 处措辞澄清 D1–D12，负责人批准：「按修订后的建议」）· v0.7（2026-10-29）· 状态：**已批准**（负责人 2026-10-29 请 Claude 模拟审阅并批准：「请你模拟我对文档进行review，通过的话就批准」；审阅记录 （审查记录，未公开））· v0.1 → v0.2：按自测审查 30 条修改（（审查记录，未公开））· v0.2 → v0.3：按 Codex 第 1 轮 40 条修改（（审查记录，未公开））· v0.3 → v0.4：按 Codex 第 2 轮 31 条修改（（审查记录，未公开））· v0.4 → v0.5：按 Codex 第 3 轮 18 条修改（（审查记录，未公开））· v0.5 → v0.6：按 Codex 第 4 轮 12 条修改（（审查记录，未公开））· v0.6 → v0.7：按 Codex 第 5 轮 10 条修改（（审查记录，未公开））· 负责人：项目负责人（产品）· 开发：Claude Code
+依据：方案《邮件 Agent 方案》v0.1.1（负责人 2026-10-29 决定 A–M 全部同意）及其调研记录（三份原始调研：公开帮助中心、市场、监管和欺诈），未公开。
+
+**本文件的约束：** 实现严格按本文件；规则（§5）只能通过修改本文件改变，并在变更记录写明原因；行为变化要负责人同意。本仓库将公开：文中不出现任何参考平台的名字，示例数据全部虚构。
+
+---
+
+## 1. 问题
+
+### 1.1 背景
+SPV、syndicate、小基金和基金管理人的运营团队，大量工作靠一两个共享邮箱完成：投资人问「我付了款怎么还没到」、发来付款凭证和 KYC 文件、要求撤资或改信息；发起人确认最终数字、改费用付费方；公司发来签署邀请和收款账户。每封邮件都要人读、判断类型、去名单里找人、查款、回复、转给对的同事。
+
+公开资料能看到的情况（调研 A，一家英国 SPV 平台的公开帮助中心全量存档，193 篇）：
+- 运营只靠两个邮箱（客服、法务和交易运营）加站内聊天；帮助中心明说「投资人的问题大多是入驻审核和付款处理」。
+- 对账每个工作日早上人工做；付款 5 个工作日未到才追查，要求提供带 UETR 的付款确认；关闭的每一步靠邮件确认。
+- 不同文章对「交割后的问题发哪个邮箱」说法不一致，发错邮箱可以预见。
+- 没有任何防欺诈说明，而帮助中心同时写着「我们的银行信息可能会变」。
+
+市场（调研 B）：没有 SPV 平台公开宣称让 AI 自己回复投资人；投资运营 AI 产品的做法是「提取 + 例外队列 + 人审核」；收件箱产品都把起草和发送分开；没有宽松许可证、专做投资运营的开源邮件 agent。
+
+风险（调研 C）：改收款账户诈骗「常常是截获邮件或盗用邮箱」（UK Finance《Annual Fraud Report 2026》）；客户资金规则要求退款打到客户本人或按其指示（FCA CASS 7.11.34R）；邮件里本人发来的证件扫描件不能当作 KYC 核实（MLR 2017 reg 28(18)）。
+
+哪类邮件最多、每封要花多少人工时间，公开资料没有数字；这是待验证的假设（§6）。
+
+### 1.2 一句话定义
+**一个开源、自托管的运营邮箱 agent：每封来信自动分类、提取关键信息、对到交易和人、标出风险、按模板准备回复、分给对的人；人审核后复制回复，在自己的邮件客户端里发送。agent 只读邮箱，不发邮件、不动钱、不改任何业务记录。**
+
+---
+
+## 2. 目标与非目标
+
+### 2.1 目标
+- **G1 少花人工：** 运营打开一封邮件时，类别、关键字段、对应的人和交易、风险、建议动作和回复都已经准备好，人只需核对、修改、批准、复制发送。
+- **G2 不放过风险：** 涉及钱的去向、身份、法律效力的邮件一律标为高风险并交给有权限的人；改收款账户等诈骗套路被识别出来；agent 本身不能被邮件内容操纵去做任何事。
+- **G3 别的团队能用：** 自托管，邮箱、模型、存储可替换；投资场景的类别、字段、规则是默认配置，改配置不改代码；文档让外部团队照着就能部署。
+- **G4 可验证：** 每个结论能看到依据（原文出处、规则、模型版本）；每次处理留下不可改的记录；准确率用独立标注的虚构邮件集持续测量。
+
+### 2.2 非目标（v1 明确不做）
+- 不发送任何邮件，也不写草稿箱：所有邮箱只读，回复由人复制到自己的邮件客户端发送（决定 D、决定 5）。授权层面（R-ING-07）：Microsoft 365 只授予 `Mail.Read`；Gmail 只申请 `gmail.readonly`；IMAP 要求部署方使用关闭了 SMTP 的账号，并且 agent 只执行读取命令。文档如实写明 IMAP 的剩余风险。
+- 回复里没有模型写的文字，模板也不由模型选：回复是代码按类别和规则选定的固定模板加代码填入的值（决定 4、4a）。
+- 不动钱、不连银行、不跑 Confirmation of Payee（只提醒人去跑并记录结果）。
+- 不核实 KYC、不做 AML 风险打分、不对个人画像。
+- 不做任何对投资人有重大影响的决定（拒绝撤资、拒绝退款、判定 KYC 不通过、改分配）。
+- 不写入任何业务系统（Deal Ops Toolkit 或其他）；对业务系统只读导入、对外只输出事件和清单。
+- 不做 SaaS，不托管别人的数据；项目本身不收集任何数据、不接统计。
+- 不做个人邮箱助手；只处理配置好的运营邮箱。
+- 不处理邮件以外的渠道（站内聊天、WhatsApp 等）。
+- 不做 OCR：图片和扫描件的内容不识别，只按文件名和类型处理。
+- 银行到账 / 退汇通知的专门处理、二级转让 / 清算 / 滚动关闭等低频 case 的专门处理放 v2；v1 只识别和分派（§3 表）。
+
+---
+
+## 3. 用户与场景
+
+| 用户 | 场景 | 他们要什么 |
+|---|---|---|
+| U1 运营审核人 | 每天处理共享邮箱 | 打开就看到分好类、对好人、起好草稿的邮件；改完批准；不漏高风险 |
+| U2 运营负责人 / 管理员 | 配置 agent、看队列和时限 | 改类别、模板、时限、队列不用写代码；看到谁在处理什么、什么快超时 |
+| U3 合规 / 第二审批人 | 处理改账户等高风险请求 | 核实任务清单；两人批准；完整记录 |
+| U4 部署方的开发者 | 在自己的服务器上部署 | 一条命令起来；接自己的邮箱和模型；数据保护设置清楚 |
+| U5 第一次来的人 | 没有数据，想看效果 | 公开演示站：虚构邮箱、虚构交易，看 agent 怎么处理每一封 |
+
+### 3.1 默认 case 目录（v1 默认配置，部署方可改）
+
+编号即类别 ID 的前缀；「风险下限」是该类别最低的风险等级（C-RSK-1）。`payment_query` 与 `payment_evidence` 的界线（v0.7.10）：邮件附上或引用了付款凭证（MT103、pacs.008、银行回单）→ `payment_evidence`；只有在没有凭证、或明确问「到账了吗」时才是 `payment_query`。
+
+| ID | 类别 | 风险下限 | 默认队列 | 主要字段 |
+|---|---|---|---|---|
+| `payment_query` | 「我已付款」/ 款没到 | medium | ops | amount, currency, payment_date, payer_name, reference, uetr |
+| `payment_evidence` | 付款确认附件（MT103 / pacs.008 / 回单） | medium | ops | uetr, amount, currency, value_date, payer_name, reference |
+| `unreferenced_payment` | 没写备注 / 别人代付 | medium | ops | amount, currency, payment_date, payer_name, third_party_payer |
+| `kyc_documents` | KYC / 实体文件补交 | high | compliance | document_types[], entity_type |
+| `withdrawal` | 关闭前撤资 | high | ops | investor, consent_evidence |
+| `commitment_change` | 承诺额修改 / 补款 | medium | ops | new_amount, currency |
+| `fee_or_terms_change` | 换付费方 / 条款变更 | high | deal_ops | change_type, from_payer, to_payer, consent_evidence |
+| `closing_confirmation` | 发起人回复确认最终数字 | medium | deal_ops | confirms (yes/no/question), deal |
+| `legal_documents` | 签署邀请 / 法律文件 | high | legal | platform, document_type, deal |
+| `bank_details` | 收款账户信息（提供或修改） | high | compliance | party_role, account_last4, change_requested |
+| `identity_change` | 改姓名 / 邮箱 / 地址 | high | compliance | change_fields[] |
+| `tax_certificates` | S/EIS 证书 | medium | legal | certificate_type, deal |
+| `exit_distribution` | 退出 / 分配查询 | medium | deal_ops | deal, question_type |
+| `bank_letter_request` | 银行要投资证明 / 确认函 | low | ops | deal |
+| `account_access` | 账户问题（登录、权限） | medium | ops | issue_type |
+| `complaint` | 投诉 / 不满 | medium | ops_lead | — |
+| `other_known` | 二级转让、清算、提名人 KYC、美国投资人、换汇、滚动关闭 | high | ops_lead | subtype |
+| `unclassified` | 无法判断 | medium | ops | — |
+
+一封邮件可以属于多个类别（C-CLS-3）。
+
+---
+
+## 4. 功能需求
+
+### 4.1 接收（ING）
+- **R-ING-01** 邮箱适配器：Gmail（Google Workspace，OAuth 内部应用）、Microsoft 365（Graph，应用权限限定在指定邮箱）、通用 IMAP、`.eml` 文件导入。每个适配器实现同一接口（技术方案 §3）。
+- **R-ING-02** 新邮件通知 + 增量补漏：Gmail 用 watch + history（watch 的通知经 Pub/Sub pull 取得，不需要公网地址；部署方不配 Pub/Sub 时只按间隔轮询 history）；Graph 在 v1 只用 delta 轮询，不做订阅推送（决定 6）；IMAP 用 IDLE + UID 增量；补漏轮询间隔可配置（默认 5 分钟）。Gmail watch 到期前自动续订，续订失败写审计并在界面顶部提醒。
+- **R-ING-03** 去重：同一封邮件只处理一次（C-ING-1）。重复通知、重启、补漏都不产生第二个 Case。
+- **R-ING-04** 原始邮件存档：完整 MIME 原样保存，记录 SHA-256；存档后不可修改（C-AUD-2）。
+- **R-ING-05** 多个邮箱：一个部署可接多个邮箱（例如客服和法务），每个邮箱有名称；分派按类别，不按收件邮箱（解决发错邮箱，§3 表外）。
+- **R-ING-06** 附件：先病毒扫描，扫描通过后才在单独的受限容器里解析（无网络、无应用密钥、操作系统级资源上限）；主进程只做有上限的 MIME 解码（C-ING-2）。扫描不通过的附件不解析、不发给模型，Case 标「附件被拦截」并升为高风险。
+- **R-ING-07** 邮箱权限（按适配器，全部只读，决定 5）：Microsoft 365 只通过 Exchange「RBAC for Applications」授予指定邮箱的 `Application Mail.Read`，不授予任何写或发送权限，不在 Entra 做任何 `Mail.*` 全租户授权，启动时检查（C-ING-4）；Gmail 只用 `gmail.readonly`（决定 3），每个邮箱由该邮箱的用户单独授权一次（OAuth 内部应用，刷新令牌加密保存），不用服务账号的全域委派（决定 6）；IMAP 用部署方账号，只执行读取命令（SELECT 只读模式），文档要求关闭该账号的 SMTP 发送；`.eml` 不需要权限。
+
+### 4.2 预检和规则提取（SIG / EXT）
+- **R-SIG-01** 发件人和内容信号（C-SIG-1）：认证结果、显示名冒用、相似域名、Reply-To 不一致、首次来信、隐藏文字、注入用语、Message-ID 冲突。结果显示在审核界面，并参与风险规则。
+- **R-EXT-01** 用代码（不用模型）提取：UETR、付款备注号、金额和币种、IBAN / 英国账号、日期、电子签署平台的邀请（C-EXT-1 至 6）。
+- **R-EXT-02** 每个提取值记录出处（哪个部分：正文 / 附件名 / 附件文本；字符起止位置）。
+
+### 4.3 脱敏（RED）
+- **R-RED-01** 任何模型调用（本地或外部）之前，都按 C-RED-1 替换敏感值；没有「不脱敏」的选项。
+- **R-RED-02** 在任何模型调用之前，由代码判断哪些附件可能是 KYC（C-RED-0，检查全部文字、递归检查嵌套附件，无法判断的按可能是 KYC 处理）；这些附件的内容**永不**发给任何模型（本地或外部）。
+- **R-RED-03** 脱敏对照表只存在部署方数据库（加密）；账号和证件类占位符永不还原（C-RED-2）。
+
+### 4.4 分类和字段提取（CLS / FLD）
+- **R-CLS-01** 模型读脱敏后的文字，返回多标签分类、每类置信度（high / medium / low）和一句理由，格式按 C-CLS-1 的 JSON Schema；代码校验格式，不合格重试一次，仍不合格则该邮件归 `unclassified` 并记录。
+- **R-CLS-02** 模型调用**不带任何工具**，不能访问其他邮件、名单或网络。
+- **R-FLD-01** 按类别的字段表提取字段，每个字段带置信度和出处（原文片段）；代码校验（C-FLD-1）；规则提取（R-EXT）和模型提取冲突时以规则为准，并标出冲突。
+- **R-FLD-02** 低于阈值或校验不通过的字段在界面标黄，需人确认。
+
+### 4.5 关联（LNK）
+- **R-LNK-01** 把邮件对到名单里的人（投资人、发起人、公司联系人）和交易，对到承诺和银行流水（C-LNK-1 至 4）。名单来自导入（R-DIR）。
+- **R-LNK-02** 对不上就显示「没有对上」和候选，不猜；人可以手动关联。
+
+### 4.6 名单导入（DIR）
+- **R-DIR-01** 导入交易：交易名、币种、计划关闭日（可空）、付款备注号前缀（可空）。
+- **R-DIR-02** 导入 Deal Ops Toolkit 的 CSV（列名按 C-DIR-1，与 Toolkit 一致）：承诺名单、银行流水；可选导入 Toolkit 导出的对账台账（取每笔流水的入账状态）。
+- **R-DIR-03** 导入联系人 CSV（C-DIR-2）：姓名、邮箱、电话、角色、关联交易。电话是改账户核实时用的「档案电话」。
+- **R-DIR-04** 每次导入是一个版本；每个 Case 创建时保存名单快照清单（C-LNK-0）。重新导入不改旧 Case 的关联，只影响新 Case；旧 Case 可以一键「按最新名单重新关联」（写审计）。
+
+### 4.7 风险（RSK）和防欺诈（FRD）
+- **R-RSK-01** 风险等级 low / medium / high，由代码规则计算（C-RSK-1 至 3）；模型输出、人改类别都不能绕过 C-RSK-3 降低风险。
+- **R-FRD-01** 三条写死的规则（C-FRD-1 至 3），不能用配置关闭。
+- **R-FRD-02** `bank_details` 和 `identity_change` 自动生成核实任务（C-FRD-4、C-FRD-5）：档案电话、核实清单、两人批准、冷静期、通知旧联系方式的草稿；有明确的状态机。
+
+### 4.8 起草和建议动作（DRF / ACT）
+- **R-DRF-01** 每个类别有回复模板（配置），全部是固定文字加占位符，**没有模型写的文字**，模板也不由模型选（决定 4、4a）。代码按规则确定模板（C-DRF-3 至 C-DRF-5）；人可以按 C-DRF-7 手动换模板；所有值由代码填入（C-DRF-1、2）。
+- **R-DRF-02** 高风险类别只用「已收到，会通过档案联系方式确认」类模板，不起草任何表示已办理的回复（C-DRF-3）。
+- **R-DRF-03** `unclassified` 在风险不是 high 时不起草；风险 high 时只用 `safe_ack`（C-DRF-3）。
+- **R-ACT-01** 每个 Case 给出「建议动作」：在业务系统里该做什么（例如「在 Toolkit 里把 Jane Doe 标为撤资」），按 C-OUT-3 的封闭格式，以清单和事件输出，不自动执行。
+
+### 4.9 分派和时限（RTE）
+- **R-RTE-01** 按类别分到队列（配置）；一个 Case 多类别时进风险最高那类的队列，同级取类别表里靠前的。
+- **R-RTE-02** 时限按工作时间计算（C-RTE-1），快到时（默认剩 25%）提醒，超时标红；另有付款类邮件的跟进提醒（C-RTE-2）。
+- **R-RTE-03** 人可以改队列、指派负责人；都写审计。
+
+### 4.10 审核界面（REV）
+- **R-REV-01** Case 列表：按队列、风险、时限、状态筛选；默认按「风险高 → 时限近」排序；375px 宽度（手机）可用。
+- **R-REV-02** Case 详情：原始邮件（只显示纯文本，不渲染 HTML、不加载远程资源）、信号、类别、字段（点击高亮出处）、关联、风险和原因、建议动作、草稿。
+- **R-REV-03** 人可以改类别（C-CLS-5）、字段、关联、草稿（C-DRF-7）；批准或驳回草稿；关闭 Case（需选结果）。每个操作写审计，记录修改前后（值在 `audit_detail`）。
+- **R-REV-04** 批准绑定 Case 修订号、收件人、模板和渲染内容哈希（C-DRF-8）。批准后提供复制（收件人、主题、正文分别复制），Case 状态变「已批准，待人工发送」；每次复制都在界面上显示结果：写入剪贴板成功显示「已复制」，失败或 3 秒内没有完成显示「复制失败」，并把服务器这次返回的文字放在可选中的文本框里供人手动复制（v0.7.20）；人发送后可在 Case 里标「已发送」。所有邮箱都不写草稿箱（决定 5）。
+- **R-REV-05** 核实任务由两个不同用户完成（完成人 ≠ 批准人，另有 C-FRD-4 的账号限制）。用户创建、角色变更写审计，并显示在核实任务里。
+- **R-REV-06** 用户登录：本地账号（用户名 + 密码哈希）或 OIDC；角色 reviewer / approver / admin（技术方案 §5）。初始 admin 密码由部署方通过 secret 提供，不写日志。
+- **R-REV-07** 「保留」标记（C-PRV-1，v0.7.18）：approver 和 admin 可以给 Case 设「保留」或取消，必须填原因；reviewer 不能。每次设和取消写审计（原因在 `audit_detail`）；Case 列表和详情显示该标记。
+
+### 4.11 输出（OUT）
+- **R-OUT-01** 事件：每个关键变化发一个 JSON 事件（C-OUT-1），可配置 webhook（带签名）；webhook 失败重试并记录。
+- **R-OUT-02** CSV：建议动作清单、Case 清单（C-OUT-2）。
+- **R-OUT-03** 事件和 CSV 只含白名单字段（C-OUT-1、C-OUT-2），序列化后再扫描，不含完整银行账号和证件号（只有后 4 位）。
+
+### 4.12 审计（AUD）
+- **R-AUD-01** 只追加的审计日志，哈希链防篡改（C-AUD-1）；提供校验命令；每日导出链头哈希（C-AUD-4）。审计行不含个人数据（C-AUD-5）。
+- **R-AUD-02** 记录内容：C-AUD-3。
+- **R-AUD-03** 审计日志可导出（JSON Lines）。
+
+### 4.13 配置（CFG）
+- **R-CFG-01** 所有可调项是版本化的配置文件（YAML），启动时校验；不合法则拒绝启动并指出位置。
+- **R-CFG-02** 配置改动（文件哈希变化）在启动时写审计。
+- **R-CFG-03** 写死的规则（C-FRD）不出现在配置里，配置里试图关闭它们的键报错。
+
+### 4.14 隐私和保存（PRV）
+- **R-PRV-01** 模型服务商设置：服务商、地点（local / external）、区域、是否签了数据处理协议、是否不用于训练、跨境传输依据；外部服务商缺少「数据处理协议 = 是」时拒绝启动，除非显式设置 `allow_without_dpa: true`（启动日志和界面顶部持续警告）；服务商区域不在英国 / 欧洲经济区且没有填写跨境传输依据时，启动日志和界面警告。
+- **R-PRV-02** 保存期按类别（C-PRV-1）；到期数据由每日任务删除，删除动作写审计（只记引用和哈希）。
+- **R-PRV-03** KYC 附件：转交到配置的目标（文件夹或 webhook）后，删除附件文件，并把原始邮件存档替换为去掉 KYC 部分的副本（C-PRV-2），只留哈希和转交记录。转交在 C-RED-0 的判断结果保存时开始（每个附件只转交一次）；转交失败时界面顶部提醒，并每天写一条提醒审计，直到成功；失败的转交由每日任务每天自动重试一次，直到成功，admin 也可以在界面上手动重试，每次重试写审计（v0.7.18）。转交成功的定义见 C-PRV-2。被病毒扫描拦截的可能 KYC 附件不转交（不把恶意文件送进合规目标），原件保留并每日提醒；admin 人工处理后在 Case 页面带原因标记「已人工处理」，该附件即视为已处置，之后照常按 C-PRV-2 替换、删除原件，写审计（v0.7.19）。
+- **R-PRV-05** 静态加密：原始邮件、附件文件加密；数据库里除 ID、枚举、哈希、时间、整数金额、布尔以外的**所有文字**（主题、显示名、地址、附件文件名、字段值、理由、出处引文、信号说明、草稿、名单姓名和联系方式、事件内容、脱敏对照表、`audit_detail`、OAuth 令牌）都存在加密存储里，带密钥 ID；密钥轮换覆盖全部加密数据，可中断续跑（技术方案 §5）。
+- **R-PRV-04** 不接任何统计；不向项目作者或任何第三方发送数据；只连接部署方配置的处理方（邮箱、模型、存储、身份提供方、webhook、KYC 目标），见技术方案 §5 出站清单。
+
+### 4.15 演示和部署（DEMO / OPS）
+- **R-DEMO-01** 演示模式（`DEMO=1`）：内置评测集的虚构名单（`eval/directory/`：Northwind Robotics 等三个虚构交易和虚构联系人；交易名与 Toolkit 示例相同，投资人和金额以评测集为准，不是 Toolkit 示例的数字，演示页面写明，v0.7.22）、约 30 封虚构邮件（从评测开发集挑选，清单见测试计划 §2.12）；不连任何真实邮箱（演示邮件从内置的 `.eml` 收取），不需要任何出站（病毒库用镜像自带的，不更新）；模型只用「回放」（预先录好的模型输出；录音只对回放有效，本地模型的地址也无法可靠判断是否在本机，v0.7.22）。演示配置是评测配置（`eval/config/`）的副本。演示模式自动建三个演示账号（reviewer、approver、admin），登录页显示它们的密码；配置里有 `.eml` 以外的邮箱、回放以外的模型、事件 webhook、KYC webhook 或 OIDC 时拒绝启动；KYC 附件转交到演示数据卷里的文件夹，不替换存档（C-PRV-2 的演示例外）。每次 `docker compose up`（建表步骤运行）时重置数据，Docker 按重启策略自动拉起容器时不重置；演示运行中再次 `up` 时，应用发现库已被重置，就重新启动并重新导入（v0.7.22，自测 F7）；只重置带演示标记的数据库：空库（没有任何表）在第一次演示启动时打上标记；已有数据而没有演示标记的库拒绝启动、不改任何东西；反过来，非演示模式遇到带演示标记的库也拒绝启动（演示库不能转为正式使用）；演示用单独的 compose 项目和数据卷；演示只开放在主机的 `127.0.0.1`，会话 cookie 在演示模式下不带 `Secure`（Safari 不接受 `http://localhost` 上带 `Secure` 的 cookie，否则本地演示登录不了；正式部署照旧始终带 `Secure`）（v0.7.22）。
+- **R-DEMO-02** 公开演示站（U5，v0.7.22）：演示模式处理完的结果导出成静态只读快照，作为 Deal Ops 网站的一个页面发布，不单独建站（决定 7）；访客可以看 Case 列表和每个 Case 的类别、字段、关联、风险和信号、核实任务、回复；所有改动操作显示「演示：不可操作」，不发任何请求；快照里只有虚构数据，没有登录、会话或密钥。
+- **R-OPS-01** `docker compose up` 起全部服务（应用、维护任务、解析容器、数据库、病毒扫描）；首次启动自动建表。维护任务（保存期删除、文件删除、KYC 替换、孤立文件清理）在单独的容器里运行，运行中的服务里只有它拿得到 `maintenance` 数据库凭据（一次性的建表步骤建角色时也要用到）；解析容器用随仓库提供的专用 seccomp 和 AppArmor 配置运行，不关闭这两层隔离；compose 带一个可选的反向代理（只在启用时运行），配一个域名就自动申请 HTTPS 证书，已有自己代理的部署方不启用它；文档写明最低资源（给 Docker 约 4 GB 内存，病毒扫描载入病毒库要约 1.5–2 GB）（v0.7.22）。
+- **R-OPS-02** 文档：快速开始、各邮箱接入、模型选择和数据保护、配置参考、安全模型、DPIA / LIA 模板、保存期、备份和升级（英文，E5）。
+
+---
+
+## 5. 规则（开发严格按此实现）
+
+### 5.0 输入规则
+- **I-01 金额：** 内部一律整数最小单位（便士 / 分）+ ISO 4217 币种代码。支持的币种由配置决定，默认 GBP、EUR、USD。解析接受千分位逗号、点号作小数点、1–2 位小数；超过 2 位小数、负数、空值、超过 1,000,000,000.00（与 Toolkit 相同的上限）、点号作千分位或逗号作小数点（`10.000,00`、`1.234,56`、`10,00`）都视为无法解析，不猜（v1 不支持欧陆格式；MT103 `:32A:` 另按 C-EXT-3）。
+- **I-02 日期：** 内部 ISO `YYYY-MM-DD`；邮件里的日期按 C-EXT-5 解析，歧义（如 `03/04/2026`）不猜，标为歧义。时间一律存 UTC。
+- **I-03 邮箱地址：** 比较时域名部分转小写；本地部分也转小写（实践中运营邮箱大多不区分大小写；这是为匹配名单的口径，不影响发送）。显示名单独保存。
+- **I-05 词表匹配：** 所有词表（注入用语、施压用语、内部用语、C-CLS-4 的关键词、C-RED-0 的文件名和内容词）都按「整词」匹配：词的前后不是字母或数字；多词短语按整词序列匹配（中间的空白和标点视为分隔）；不区分大小写；在 I-04 规范化之后。例：`renew accounting access` 不命中 new 或 account；`Sarah` 不命中 sar。组合附加符（Unicode M 类，例如天城文的元音符号、阿拉伯文的元音点，以及 NFKC 之后仍单独留下的重音符）算作它前面那个字母的一部分，不切词；比较两个词时先去掉附加符，所以 `passport` 后跟 U+0301 仍等于 passport（v0.7.17）。
+- **I-04 文本：** 规则提取、脱敏、信号计算之前：做 Unicode NFKC 规范化（全角数字和字母变成半角），并删除 Unicode 通用类别 `Cf`（格式字符：零宽字符、软连字符 U+00AD、双向控制符 U+202A–202E 和 U+2066–2069 等）的全部字符，以及全部 Unicode 默认可忽略字符（`Default_Ignorable_Code_Point`：组合字形连接符 U+034F、变体选择符、韩文填充符等不可见字符，v0.7.3）。原文保留在存档里；出处位置（R-EXT-02）指向规范化后的文本，并保存到原文的位置映射。
+
+### 5.1 接收
+- **C-ING-1 去重键：** 有 `Message-ID` 头时 = 邮箱内部 ID（不随改名变化）+ `Message-ID`（去掉尖括号、转小写）；没有时 = 邮箱内部 ID + 原始 MIME 的 SHA-256。同一去重键再次出现时，比较「去掉 `Message-ID` 头之后的 MIME」的 SHA-256：相同 → 不新建 Case，只记一条 `ingest.duplicate` 审计；不同 → 仍新建 Case，设信号 `message_id_collision`，审计两个哈希。
+- **C-ING-2 附件（默认，可配置）：** 单个附件 ≤ 20 MB，一封邮件附件合计 ≤ 50 MB（超出合计的附件按出现顺序标超限），PDF ≤ 50 页；解析超时 30 秒；超限的附件不解析，标「附件超限」。处理顺序：主进程有上限地解码 MIME → 病毒扫描 → 扫描通过的附件交给受限的解析容器（技术方案 T7）。允许解析的类型：PDF、TXT、CSV、EML（递归，深度 ≤ 3）、DOCX（只取文字）、XML（只识别 pacs.008：`Document` 元素的命名空间为 `urn:iso:std:iso:20022:tech:xsd:pacs.008.*`，可以是根元素，也可以包在 Business Application Header 信封（`AppHdr` + `Document`）里；含 DTD 或外部实体的 XML 一律不解析；≤ 1 MB；识别出的 pacs.008 的全部文字内容（元素文本，如收款账户、收款人名称、附言）算该附件的文字，照常做规则提取、脱敏和注入用语检查（v0.7.3）；不解析的 XML 和其他 XML 只记文件名和类型，按 C-RED-0 ⑤ 视为可能是 KYC）；图片只记文件名和类型（不做 OCR）；其余只记文件名和类型。宏、脚本一律不执行。
+- **C-ING-4 Microsoft 365 权限检查（启动时）：** ① 配置里必须有部署方的权限核查记录 `m365.permission_review: {date, reviewer}`（文档提供核查清单和 PowerShell 命令：列出该应用的 Exchange 管理角色分配及其范围、Entra 应用权限），缺失或早于 180 天 → 拒绝启动；② 若部署方另外授予了 `Application.Read.All`，应用自动读取本应用的 Entra 应用权限，存在任何 `Mail.Send`、`Mail.ReadWrite` 或全租户 `Mail.*` → 拒绝启动；③ 对每个指定邮箱做一次读取，必须成功；④ 对配置的一个已知存在的非指定邮箱（`m365.negative_probe_mailbox`，必填）做一次读取，必须返回无权限；任何结果不确定（网络错误、邮箱不存在、认证失败）→ 拒绝启动。文档写明：应用自身无法在没有目录读取权限的情况下证明 Exchange 侧没有发送角色，这一项靠 ① 的人工核查。
+- **C-ING-5 游标：** 补漏游标只在其之前的每封邮件都已有处置之后，才在同一事务里推进。处置有两种：已存档并写入接收记录；或服务商确认该邮件已不存在（Gmail 和 Graph 返回 404、IMAP 的 UID 已不存在）→ 写 `ingest.gap` 审计后跳过。临时错误（网络、限流、5xx）→ 重试，游标不动。游标失效（Gmail historyId 过期、Graph 同步状态失效、IMAP UIDVALIDITY 变化）→ 全量重新列举邮箱，靠去重（C-ING-1）不产生重复 Case，写 `ingest.resync` 审计。
+- **C-ING-3 会话：** 按 `In-Reply-To` / `References` 归入已有会话；没有则新会话。同一会话里新到的邮件新建 Case，并链接上一封的 Case。上一封的 Case 被保存期删除后，这个链接清空（C-PRV-1，v0.7.18）。
+- **C-ING-6 收取范围（v0.7.18）：** Gmail 只收带配置标签的邮件（默认 `INBOX`；`SENT`、`DRAFT`、`SPAM`、`TRASH` 永不收，配置了也不收）；邮件后来被加上配置标签（例如从垃圾邮件移回收件箱）算新到。配置里的标签和文件夹可以写名称（含 `Inbox/Deals` 这样的子文件夹路径），启动时解析为服务商的 ID，找不到 → 拒绝启动。Microsoft 365 收配置的文件夹清单（默认收件箱），每个文件夹各有补漏游标；同一封邮件被移到另一个配置文件夹时靠去重（C-ING-1）不产生第二个 Case。IMAP 在 v1 仍是配置的单个文件夹（不变）。
+
+### 5.2 发件人信号
+- **C-SIG-1** 每封邮件计算下列信号（布尔值 + 说明），全部显示。信号分两批冻结，之后流水线重跑不重算：**元数据信号**（1–6、9）在接收时；**内容信号**（7、8）在附件安全解析之后、任何模型调用之前，并保存所用输入的哈希。信号使用 Case 创建时的名单快照；「按最新名单重新关联」不重算信号，界面标明「信号基于原名单」。
+  1. `auth_fail`：认证结果只取适配器能保证来源的那一份——Microsoft 365 和 Gmail 取服务商在投递时写入、并由部署方在配置里声明「网关会剥离外来同名头」的 `Authentication-Results`（authserv-id = 配置的 `trusted_authserv_id`，取最上面一条）；IMAP 同样要求部署方声明剥离，否则不采用；`.eml` 导入一律不采用。不采用时为「未知」，不算真。采用的结果中 spf、dkim、dmarc 任一为 fail / softfail / permerror → 真。不做 DNS 查询。
+  2. `untrusted_auth_header`：存在 authserv-id 不是可信 id 的 `Authentication-Results` 头（发件人可能伪造了认证结果）。
+  3. `display_name_mismatch`：显示名与名单里某联系人姓名「相似」（C-LNK-3 姓名相似度 = 1），但发件地址不是**任何**与该显示名相似的联系人的地址（名单里有两人同名时，其中一人的真实地址不触发，v0.7.1）。
+  4. `lookalike_domain`：发件域名不在名单里，但与名单里某个联系人的域名「相似」：去掉 `www.` 后，Damerau-Levenshtein 距离 1–2；或把形近字符统一后相同（统一表：`0→o`、`1→l`、`i→l`、`rn→m`、`vv→w`）；或域名含非拉丁字符且与某名单域名在 Unicode 混淆字符表（UTS #39 skeleton）下相同。
+  5. `reply_to_mismatch`：`Reply-To` 存在且其完整地址（I-03）与 `From` 地址不同。邮件有多个 `Reply-To` 头（RFC 5322 只允许一个）或无法解析 → 视为无法解析：信号记未知（null），Case 标「发件人无法确定」，回复只发 From（v0.7.15）。
+  6. `first_time_sender`：本部署在处理这封邮件之前**从未观察到**同一发件地址的邮件，且该地址不在名单里。接收步骤由一个全局串行锁处理，按适配器交付的顺序逐封计算；迟到的、服务器时间更早的邮件不改变已冻结的值。
+  7. `hidden_text`：HTML 正文里有不会显示给人看的文字（`display:none`、`visibility:hidden`、`opacity:0`、字号 ≤ 1px、文字颜色与背景相同或为 `transparent`；不论样式写在元素上、样式表里，还是来自浏览器默认样式（如 `hidden` 属性），v0.7.3）。样式表里，无条件的 `@media`（媒体查询为 `all`、`screen`、`only screen` 之一，不带宽度等条件）、`@supports`、`@layer` 块内的规则照常算；带条件的 `@media`（如 `max-width`、`print`）块内的规则不算（响应式邮件常在手机上隐藏部分内容，不算隐藏文字）。样式按 CSS 层叠：`!important` 优先，其次行内样式，再按选择器优先级、后写的优先；简写和对应的分项（`font` 与 `font-size`、`background` 与 `background-color`）后写的生效（v0.7.4）。样式表里的 `@layer`（v0.7.5）：普通声明里，不在任何 `@layer` 里的规则优先于所有 `@layer` 里的规则，`@layer` 之间后出现的优先；`!important` 声明反过来（`@layer` 里的优先于不在 `@layer` 里的，先出现的层优先）；层的先后按名字第一次出现（含 `@layer a, b;` 这样的声明）的顺序；嵌套的层（`a.b`）在父层之内排序，父层自己的规则优先于它的子层（与层外的规则优先于所有层同理）；没有名字的 `@layer { }` 各自算一层；同一层内再按选择器优先级、后写的优先。**评估范围（v0.7.6）：** 只评估上面列出的写法；选择器只认标签、`*`、`.class`、`#id` 及其组合，以及后代、子代组合符；颜色只认颜色名、`#rgb` / `#rrggbb`、`rgb()` / `rgba()`、`transparent` 和 CSS 通用关键字（v0.7.7 逐个列出：`inherit`、`unset`、`currentcolor` 取父元素的颜色，`initial` 为黑色，`revert`、`revert-layer` 取浏览器默认颜色，即链接为链接色、其他元素为父元素的颜色；`background-color: currentcolor` 为元素自身的文字颜色）；数值为 0 的字号不论怎么写（`0`、`0.0`、`.0`、`-0`、`0e3`）都是 0；负数字号不是合法 CSS，不起作用。其余写法（属性和伪类选择器、兄弟组合符、`@container`、`calc()`、`hsl()` 等颜色函数、CSS 变量、外部样式表）不评估，按「不隐藏」处理；这是已知限制，不再逐个追加（隐藏文字只是风险信号之一）。HTML 注释不算（v0.7.1：模板生成的邮件几乎都有长注释；注释内容不交给模型，也不参与规则提取），注释文字按第 8 条检查。
+  8. `injection_markers`：正文（含 HTML 注释和隐藏文字）、附件文字或邮件头里出现固定词表中的指令用语（不区分大小写，I-04 规范化后）：ignore previous / ignore all / ignore the above / disregard / system prompt / you are an ai / as an ai / new instructions / classify this as / mark this as low / do not flag / note to assistant / note to the assistant / instructions to the assistant / choose template（后四个 v0.7.21）。词表可加不可删。默认词表只有英文，其他语言写成的指令不触发本信号（已知限制，部署方可以加词，v0.7.8）。
+  9. `message_id_collision`：见 C-ING-1。
+- 信号只升高风险（C-RSK-2），不会让 Case 被拒或删除。
+- **C-SIG-3 已认证的发件人：** 发件地址与名单里恰好一个联系人匹配（C-LNK-1），**且**采用的认证结果（C-SIG-1.1）里 `dmarc=pass`。认证结果「未知」或任何一项失败 → 不是已认证的发件人。`.eml` 导入的邮件永远不是。
+- **C-SIG-2 接收时间：** 适配器给出的服务器时间（Gmail `internalDate`、Graph `receivedDateTime`、IMAP INTERNALDATE、`.eml` 为导入时间），不用发件人写的 `Date:` 头。
+
+### 5.3 规则提取（EXT）
+- **C-EXT-1 UETR：** 候选 = 形如 `8-4-4-4-12` 个十六进制字符、用连字符分隔的 36 字符串，前后不能紧挨字母、数字或连字符；允许前缀 `121:`、`UETR`、`UETR:`。候选中第 13 个十六进制字符为 `4`、第 17 个为 `8`/`9`/`a`/`b`（UUID 第 4 版）的是 UETR，存小写；其余候选记为 `uetr_candidate_invalid`，不当作 UETR。一封邮件出现多个不同 UETR：全部列出并标「多个 UETR」。pacs.008 的 `PmtId/UETR` 元素同样是候选（v0.7.1；ISO 20022 规定该元素为 UUID 第 4 版），不是第 4 版的记为 `uetr_candidate_invalid`。
+- **C-EXT-2 付款备注号**（规则原文取自 Deal Ops Toolkit PRD v0.8.4 C-REC-1、C-REC-2，口径相同）：
+  - 规范化：备注号转大写，只保留字母和数字（`NW-001` → `NW001`）；只把 a–z 转成 A–Z；分隔符只认 ASCII 范围内除 A–Z、a–z、0–9 以外的字符，所有非 ASCII 字符都算作片段的一部分。
+  - 匹配：把文本按分隔符切成片段；任意 1–3 个**相邻**片段拼起来，若**完全等于**某个已导入备注号的规范化结果，即为匹配。例：`NW001 SPV`、`nw 001`、`NW-001` 都匹配 `NW001`；`NW-0019` 不匹配；`SS001É` 是一个片段，不匹配 `SS001`。
+  - 候选范围是已导入名单里的备注号。只记录匹配到的备注号，不推测。
+- **C-EXT-3 金额：** 金额记号 = 「币种标记 + 数字」或「数字 + 币种标记」（中间可有一个空格），记号前后必须是空白、行首行尾，或 `(` `)` `;` `:` `,`（逗号后须有空白）、句末 `.`；记号前紧挨 `-` 或 `−` 时整个记号作废；整个记号里的数字部分不符合 I-01 时整个记号作废，不截取其中一段。一个币种标记只属于一个记号（v0.7.1）：边界不合格或作废的候选不占用标记；标记与数字紧挨（无空格）的候选优先；其余情况取靠左的候选（例：`Invoice 2026 £500` → £500；`GBP 500 EUR 300` → GBP 500、EUR 300；`2026-10-29 gbp 20` → GBP 20）。币种标记：符号 `£` `€` `$` `US$`，代码 `GBP` `EUR` `USD`（不区分大小写，与数字之间可有空格）；`$` 前面没有字母时视为 USD；`US$` 是 USD；`$` 前面紧挨其他字母（`CA$`、`A$`、`HK$` 等）不算金额。数字按 I-01。没有币种标记的数字不算金额。MT103 的 `:32A:` 字段（`YYMMDD` + 币种 + 金额，逗号是小数点，YY 表示 20YY）和 pacs.008 单独解析：pacs.008 的金额取每个 `CdtTrfTxInf/IntrBkSttlmAmt`（币种取 `Ccy` 属性），起息日取 `CdtTrfTxInf/IntrBkSttlmDt`（没有则 `GrpHdr/IntrBkSttlmDt`），UETR 取 `CdtTrfTxInf/PmtId/UETR`；多个 `CdtTrfTxInf` 产生多个值；每个 `CdtTrfTxInf` 的金额、起息日、UETR 各自独立判断，某一项无效只作废该项（v0.7.1）。PDF 等打印形式只按 MT103 的 `:32A:` 字段识别，不按 pacs.008 元素名识别。`:32A:` 是一个字段（v0.7.8）：金额按 I-01 的上限和 1–2 位小数判断（逗号是小数点，`10.000,00` 这类带点号的写法无效）；日期、币种、金额任一项无效，整个 `:32A:` 作废，起息日也不算（与 pacs.008 分开的元素不同）。
+- **C-EXT-4 银行账号：** IBAN 形状（v0.7.1）= ISO 13616 名单（SWIFT IBAN Registry）里登记的国家码 + 2 位数字 + 其余字母数字，总长度**正好等于**该国登记的长度；连写，或 4 位一组、组间一个空格、一个换行或一个连字符（最后一组可短，连字符 v0.7.3）；字母不区分大小写。IBAN 按 ISO 13616 校验（mod-97 = 1），空格忽略；英国「sort code + 账号」识别 `NN-NN-NN` 或 `NNNNNN` 附近 30 个字符内的 8 位账号。提取结果只保存**后 4 位**和国家 / 类型；完整值不写入任何字段、事件或日志（原始 MIME 存档除外）。
+- **C-EXT-5 日期：** 接受 ISO（`2026-10-29`）、英文月份（`29 Oct 2026`、`October 29, 2026`；日可带序数后缀 st / nd / rd / th，可有 `of`，如 `29th of October 2026`；各部分之间是空格或制表符，不跨行，v0.7.1）、MT103 `YYMMDD`（只在 `:32A:` 内，YY = 20YY）；`DD/MM/YYYY` 与 `MM/DD/YYYY` 都可能时：若一个分量 > 12 则确定；两个分量相同（如 `03/03/2026`）时两种读法一致，取该日期；否则标歧义。
+- **C-EXT-6 电子签署邀请：** 发件域名或正文链接域名属于配置的签署平台列表（默认 DocuSign、Adobe Acrobat Sign、PandaDoc、Dropbox Sign）时标记 `esign_invite`，记录平台名。不访问链接。
+
+### 5.4 脱敏（RED）
+- **C-RED-0 模型调用前的 KYC 判断（代码，不用模型）：** 附件满足任一条即视为「可能是 KYC」：① 文件名（I-04 规范化、转小写后）含 passport、driving、licence、license、utility、bank statement、proof of address、poa、id card、identity、certificate of incorporation、trust deed、register of members、ubo、structure chart，或下列非英文证件词（v0.7.8）：德 reisepass、personalausweis、führerschein、kontoauszug；法 passeport、carte d'identité、permis de conduire、justificatif de domicile、relevé bancaire；西 pasaporte、dni、documento de identidad、permiso de conducir、extracto bancario；中 护照、身份证、驾驶证、银行对账单、住址证明、营业执照（中文不以空格分词，这几个中文词按子串匹配，不受 I-05 整词规则限制；C-RED-0 里中日韩文字视为英文词的分隔，`Passport扫描件.pdf` 命中 passport，v0.7.11）；② 全部文字内容（含嵌套附件）里出现护照机读区（一行以 `P` 开头，第 2 至 5 个字符都是大写字母或 `<`，且这一行里有 `<<`；行首可有空白；v0.7.19，原为「以 `P<` 开头、后跟 3 个大写字母」，认不出 `P<D<<` 这样带填充符的国家代码和 `PM` 这样的两字母证件类型）、或上面任一词、或 date of birth / place of birth / nationality 中任意两个；③ 是图片（PNG、JPEG 等）；④ 是 PDF 但没有可提取的文字层，或部分页没有文字层；⑤ 无法完成检查（解析失败、超时、超限、加密、嵌套超过 3 层、不认识的类型）。「可能是 KYC」的附件内容**永不**发给任何模型，只给文件名（已脱敏，C-RED-1）和类型；在 Case 里标「可能是 KYC 附件」。只有不满足以上任何一条的附件，其文字才可（脱敏后）交给模型。
+- **C-RED-1** 发给任何模型的所有文字（脱敏范围 = 下列全部规则以及 C-EXT-4 命中范围的**并集**）（主题、显示名、正文、引用的旧邮件、附件文字、附件文件名）按顺序替换为占位符（同一值在一封邮件里用同一个占位符）：
+  - 任何 IBAN 形状的串（C-EXT-4 的形状定义），**不论校验位是否正确** → `[ACCOUNT_n]`；
+  - `NN-NN-NN` 或 sort / sort code 一词后 20 个字符内的 6 位数字 → `[SORTCODE_n]`；account / acc / a/c 一词后 30 个字符内的 8 位数字，以及 sort code 前后 30 个字符内的 8 位数字 → `[ACCOUNT_n]`；
+  - 英国护照号（9 位数字，前后 30 个字符内有 passport）、英国驾照号（5 个字母（姓氏不足 5 个字母时用 9 补位，v0.7.3）+ 6 位数字 + 2 个字母数字 + 3 个字母数字的 16 字符格式）、国民保险号（`AA999999A` 格式，也接受 HMRC 印刷格式 `AA 99 99 99 A`，v0.7.1）→ `[ID_n]`；
+  - 出生日期（前 30 个字符内有 born / DOB / D.O.B. / date of birth 的日期，D.O.B. v0.7.3）→ `[DOB_n]`；
+  - 英国邮编及其所在行，以及该行上方紧挨的最多 3 行非空行（地址的其余各行，遇到空行为止，v0.7.3）→ `[ADDRESS_n]`；
+  - 电话号码（`+`、`00` 或 `0` 开头、去掉空格、连字符和国家码后的 `(0)` 后 10–15 位数字，如 `+44 (0)20 7946 0958`，v0.7.1；开头的 `00` 和 `+` 一样是国际前缀、不计位数，区号可加括号如 `(020) 7946 0958`，v0.7.3）→ `[PHONE_n]`；数字之间可有单个空格或连字符；电话从开头取到第一个使位数达到 10–15 位、且正好在分组之间（或数字结束处）的位置为止，后面紧跟的数字不算电话（v0.7.2，例：`07700900123 2026-02-30` → `[PHONE_n] 2026-02-30`；`07700 900123 2026` → `[PHONE_n] 2026`；达不到这样的位置则不是电话）；
+  - 邮件地址保留域名、本地部分替换 → `[EMAIL_n]@domain`；
+  - 名单里的人名（联系人姓名的每个词，长度 ≥ 3，长度按写出的字符数算、附加符也算，I-05 v0.7.17）→ `[NAME_n]`。
+  - 一个值在邮件任何部分被以上规则识别为敏感后，它在整封邮件（主题、显示名、正文、引用、附件文字、附件文件名）里的**每一次**出现都换成同一个占位符，不论是否在关键词附近（v0.7.3）。
+  - UETR、金额、付款备注号**不**脱敏（分类和提取需要），但与上面任一敏感模式重叠时**敏感模式优先**（被替换）。备注号提取（C-EXT-2）在原文上、脱敏之前完成，所以关联不受影响。
+- **C-RED-2 占位符还原：** `[ACCOUNT_n]`、`[SORTCODE_n]`、`[ID_n]`、`[DOB_n]` **永不还原**到字段、理由、草稿、事件或导出；需要显示时只显示掩码（如「账号尾号 5432」）。`[NAME_n]`、`[EMAIL_n]`、`[PHONE_n]`、`[ADDRESS_n]` 只在审核界面显示时还原。模型输出的任何字段值若含账号或证件类占位符，该字段作废。回复里的值只能来自 C-DRF-1 来源表里列出的来源。 例外：`deal` 字段校验时可在内存里用对照表还原后与名单交易名比较（§5.5a），还原结果不存储、不显示、不输出。
+### 5.5 分类和字段（CLS / FLD）
+- **C-CLS-1 输出格式：** `{"labels": [{"class": <类别 ID>, "confidence": "high"|"medium"|"low", "reason": <≤ 200 字符>}], "language": <ISO 639-1>}`；`class` 必须在配置的类别表里；`labels` 1–4 个。
+- **C-CLS-2 采用：** 「采用的标签」= 模型给出的 high / medium 标签 + 规则标签（`rule`，C-CLS-4）+ 人加的标签。没有采用的标签 → 加 `unclassified` 作为采用的标签。**风险计算用采用的标签加上模型返回的 low 标签**（C-RSK-1）；low 标签在界面显示为「需确认」。
+- **C-CLS-3 多标签：** 一封邮件可以有多个类别；队列按 R-RTE-01。
+- **C-CLS-6 优先级：** 队列按采用的标签（R-RTE-01）；起草按 C-DRF-3；approver 批准降低风险后，模板按新风险重新计算，但类别限制（C-DRF-3 第 ① 步）不受风险影响，规则标签仍保留。
+- **C-CLS-5 人改类别：** 人可以加类别；删掉类别或把类别换掉，若使 C-RSK-1 的结果降低，按 C-RSK-3 的调低流程处理（approver + 理由）。来源为 `rule` 的标签人不能删。
+- **C-CLS-4 规则补充：** 下列情况不论模型怎么说都加上对应类别（confidence 记 `rule`）：出现 IBAN 形状的串或英国账号（C-RED-1 的模式，不论校验位；看所有经过规则提取的文字：主题、正文含引用、附件文字，v0.7.8），或正文（含引用的旧邮件，不含主题和附件，v0.7.8）同时含 change / changed / new / update / updated 之一与 bank / account / details / payment instructions 之一 → `bank_details`；`esign_invite` → `legal_documents`；附件是 MT103 / pacs.008 格式（C-EXT-3 能解析出 `:32A:` 或 `IntrBkSttlmAmt`）→ `payment_evidence`。
+- **C-FLD-0 字段提取输出格式（schema 版本 2）：** `{"fields": {<字段名>: {"value": <见 §5.5a>, "confidence": "high"|"medium"|"low", "quote": <原文片段，≤ 200 字符>}}}`；单值字段在邮件里出现两个以上不同值时，`value` 写成 `{"candidates": [{"value": …, "quote": …}, …]}`（每个候选各带出处，此时外层 `quote` 为空）。金额用字符串原样给出（如 `"£10,000.00"`），由代码按 I-01 解析。每个 `quote` 必须逐字出现在交给模型的文本里（空白差异容许：连续空白和换行视为一个空格；空的或全是空白的 `quote` 作废，v0.7.16），否则该字段（或该候选）**作废**。与规则提取合并：任一侧出现多个不同值 → 字段标「多个值」，候选取两侧并集；例外（v0.7.9）：`amount`、`new_amount` 由模型挑值，规则提取的全部金额只用来核对——模型的值必须等于邮件里某个金额记号（含 MT103 / pacs.008），否则标「冲突」（只有一个规则金额时采用它，否则不取值）；只有模型自己给出两个以上候选时才标「多个值」；模型没给值时，规则金额只有一个就采用，多个则不取值。模型调用失败或输出不合格重试 1 次；流水线步骤重试时复用已保存的模型输出，不再调用模型。
+- **C-FLD-1 字段校验：** 金额按 I-01；UETR 按 C-EXT-1；日期按 C-EXT-5；`account_last4` 必须是 4 位数字；枚举字段必须在定义的取值里。模型给出的 UETR、金额若与规则提取的值不一致，以规则为准，字段标「冲突」。
+- **C-FLD-2 阈值：** 字段置信度 low 或校验失败 → 标黄需确认；作废的字段不显示值，只显示原因。模型给出的值没通过 C-FLD-1 校验（如 `£15k`、欧陆格式金额、不是第 4 版的 UETR）→ 字段**作废**并标黄，显示原因（v0.7.9）。
+
+### 5.5a 字段表（默认配置）
+
+| 字段 | 类型 | 取值 / 说明 |
+|---|---|---|
+| amount, new_amount | 字符串（金额） | 按 I-01 解析 |
+| currency | 枚举 | 配置的币种 |
+| payment_date, value_date | 字符串（日期） | 按 C-EXT-5 |
+| payer_name, investor, third_party_payer | 字符串 | — |
+| reference | 字符串 | 必须是 C-EXT-2 匹配到的备注号之一，否则作废 |
+| uetr | 字符串 | 按 C-EXT-1 |
+| document_types | 字符串数组 | passport, driving_licence, proof_of_address, bank_statement, certificate_of_incorporation, register_of_members, ubo_register, structure_chart, trust_deed, partnership_agreement, tax_id, other |
+| entity_type | 枚举 | individual, company, trust, partnership, other |
+| consent_evidence | 枚举 | investor_cc, forwarded_written_consent, attached_document, investor_self, none（`investor_self`：发件人就是该投资人本人且已认证（C-SIG-3），v0.7.8） |
+| change_type | 枚举 | fee_payer, valuation, share_price, instrument, other |
+| from_payer, to_payer | 枚举 | investors, company, lead |
+| confirms | 枚举 | yes, no, question |
+| deal | 字符串 | 必须是名单里的交易名之一，否则作废 |
+| platform | 枚举 | 配置的签署平台名 |
+| document_type | 枚举 | subscription, shareholder_resolution, conversion, side_letter, transfer, other |
+| party_role | 枚举 | investor, company, seller, lead, other |
+| account_last4 | 字符串 | 4 位数字；只来自规则提取（C-EXT-4），模型给出的忽略 |
+| change_requested | 布尔 | — |
+| change_fields | 字符串数组 | name, email, postal_address, phone |
+| certificate_type | 枚举 | seis, eis, other |
+| question_type | 枚举 | timing, amount, tax, other |
+| issue_type | 枚举 | login, permissions, other |
+| subtype | 枚举 | secondary, liquidation, nominee_kyc, us_person, fx, rolling_close, other |
+
+单值字段在规则提取或模型输出里出现多个不同值 → 不选，字段标「多个值」，由人选。
+
+**单值投影：** 所有需要单个值的地方（事件 `data`、回复占位符、建议动作、模板规则、风险规则里的单值比较）把状态为「多个值」「作废」或缺失的字段一律当作空（null）；人选定或确认后才使用该值。
+
+`deal` 的校验：先用本 Case 的脱敏对照表把占位符还原（只在内存里用于校验，不存还原后的文字），再与快照里的交易名比较；字段存交易 ID。
+
+
+### 5.6 关联（LNK）
+- **C-LNK-0 名单快照：** 每个 Case 创建时保存一份不可变的快照清单：交易表和联系人表各记一个版本 ID；承诺、银行流水、台账**按交易**各记一个版本 ID（`{交易: 版本}`，某交易没有导入的记「无」）。备注号提取（C-EXT-2）、关联、起草只用这份快照；信号见 C-SIG-1；流水线重跑沿用。人点「按最新名单重新关联」→ 生成新快照并写审计，重跑备注号提取、关联、风险（与名单有关的部分）和起草，信号不重算。
+- **C-LNK-1 发件人：** 发件地址（I-03）与名单联系人邮箱完全相等且只对上一人 → 自动关联（「名单匹配的发件人」，不等于身份已证实，见 C-SIG-3）；对上多人 → 列候选，不自动关联。
+- **C-LNK-5 可以告诉谁：** 关联到某个承诺只说明「可能有关」。允许使用含名单或台账信息的模板（`discloses_record`，C-DRF-1）的条件：发件人是已认证的发件人（C-SIG-3），**且**（该承诺的承诺键 ∈ 该联系人的 `investor_id` 列表，或 ∈ 其 `authorised_for` 列表）（C-DIR-2）；否则只允许不含名单和台账信息的通用模板。
+- **C-LNK-2 承诺：** 提取到的付款备注号精确匹配（C-EXT-2）恰好一个承诺 → 关联该承诺；否则若发件人已关联到一个联系人（C-LNK-1），且其 `investor_id` 列表（C-DIR-2）中出现在该 Case 快照承诺名单里的承诺键恰好一个 → 关联该承诺；多于一个 → 列候选（这些承诺键）；一个都没有 → 不列候选（v0.7.12）。
+- **C-LNK-3 姓名相似度**（规则原文取自 Deal Ops Toolkit PRD v0.8.4 C-REC-3）：先把双方的 a–z 转大写，再把 ASCII 中英文字母以外的字符（标点、连字符、数字、空格）当作空格切词，非 ASCII 字符算作字母；去掉 MR、MRS、MS、DR、LTD、LIMITED、LLP、PLC、AND、THE；任一方没有词则相似度为 0。两个词「配得上」= 相同，或其中一个是单个字母且等于另一个的首字母。相似度 = 一对一最大配对数（每个词最多用一次）÷ 两边词数中较大的那个。
+- **C-LNK-6 交易：** 按顺序取第一个适用的：① 已关联承诺 → 其交易；② 模型提取且通过校验的 `deal`（§5.5a），并且发件人不在名单里或该交易在发件人联系人的 `deal` 列表里 → 该交易；③ 发件人联系人只关联一个交易 → 该交易；④ 否则列候选（发件人联系人关联的全部交易），不自动关联。提取的 `deal` 与 ① 的交易不同 → 用 ① 并标「冲突」。
+- **C-LNK-4 银行流水：** 对已关联的承诺，在同一交易已导入的银行流水里，列出满足（流水金额 = 邮件里的金额 **且** 流水日期在邮件付款日期 ±5 个日历日内，含边界）**或**（流水备注按 C-EXT-2 匹配该承诺的备注号）的流水；邮件没有金额或日期时只用后一条。找到的列为「可能对应的流水」，并显示 Toolkit 台账里的状态（已入账 / 未匹配）。**只显示，不改任何状态。**
+
+### 5.7 风险（RSK）和防欺诈（FRD）
+- **C-RSK-1 基础：** 风险 = C-CLS-2 所说的标签集合（采用的标签 + 模型返回的 low 标签）中，风险下限（§3.1）最高的一个；人删除标签须按 C-CLS-5。
+- **C-RSK-2 直接升到 high（任一满足）：** `display_name_mismatch`；`lookalike_domain`；`hidden_text`；`injection_markers`；`message_id_collision`；`first_time_sender` 且出现 IBAN 形状的串或英国账号；`uetr_candidate_invalid`（C-EXT-1）；附件里解析出的金额集合 A（MT103 / pacs.008）与正文金额集合 B 都非空且 A ∩ B 为空（金额不一致）；附件被拦截或超限（R-ING-06）。
+- **C-RSK-2a 升一级（每满足一条升一级，最高 high）：** `auth_fail`；`untrusted_auth_header`；`reply_to_mismatch`；邮件（主题和正文，含引用的旧邮件，v0.7.8）含施压用语（固定词表，可加不可删：urgent / urgently / immediately / today / asap / confidential / do not tell / don't tell / keep this between us / before close）且类别含 `payment_query`、`payment_evidence`、`unreferenced_payment`、`bank_details`、`withdrawal`、`exit_distribution` 之一；关联交易的计划关闭日 ≥ 邮件接收日（部署时区的日期）、且相差 0–3 个工作日（相差 = 接收日之后（不含）到关闭日（含）之间的工作日（C-RTE-1）个数，与 C-DRF-4 同一数法；例：周五收信、周日关闭 → 0；周五收信、周一关闭 → 1；周四收信、周一关闭 → 2；周六收信、周一关闭 → 1，v0.7.12），且类别含 `bank_details`、`payment_query`、`payment_evidence`、`unreferenced_payment` 之一。本条两处「类别含 …」都按 C-RSK-1 的标签集合（采用的标签 + 模型返回的 low 标签）判断（v0.7.12）。
+- **C-RSK-3 不降级：** 人可以把风险调高；调低（包括通过删改类别间接调低）必须由 approver 角色操作并填写理由（写审计）。**任何人工操作**（改类别、字段、关联，按最新名单重新关联）引起的重算若使风险低于操作前的最终风险，先保留操作前的风险，界面提示需要 approver 确认；approver 带理由确认后才按新结果（v0.7.15）。删改类别会降低风险时当场拒绝 reviewer（按 C-RSK-1 至 C-RSK-2a 完整计算，不只看类别下限）。模型输出永远不能降低风险。直接调整风险的规则（v0.7.12）：
+  ① 每个 Case 最多一条当前生效的人工调整，新的替换旧的；记录调到的等级 L、调整时的计算风险 C0、调整时的原因集合 R0（风险下限高于 L 的标签的类别 ID，加上命中的 C-RSK-2 / C-RSK-2a 条款 ID）、操作人和理由。
+  ② 权限按当前最终风险判断：L 低于当前最终风险 → 必须 approver 并填写理由（包括撤销自己先前的调高）；否则任何 reviewer 都可以。
+  ③ L 等于当时的计算风险 → 取消人工调整，最终风险 = 计算风险。
+  ④ 调高（L > C0）：最终风险 = max(计算风险, L)，一直有效。
+  ⑤ 调低（L < C0）：最终风险 = min(计算风险, L)；之后任何一次重算中，计算风险 > C0，或出现 R0 之外的原因（风险下限高于 L 的新类别，或新命中的 C-RSK-2 / C-RSK-2a 条款），这次调低**永久失效**（不再恢复），最终风险 = 计算风险，写审计，界面提示需要重新判断。
+  ⑥ 人工调整使人工修订号加 1 并从风险往后重算（因此 C-DRF-8 的批准复查和 C-FRD-5 的核实任务绑定都会生效）；自动失效是系统动作，在当前那一次风险计算里判定，不改人工修订号。`case.risk_changed` 的 `by`：人的操作引起的变化（含 C-CLS-5 删改类别引起的降低）为 person，流水线重算和自动失效为 system。
+  ⑦ 通过删改类别间接调低（C-CLS-5）不使用这条记录：类别本身就是输入。C-FRD-1 不受影响。
+- **C-FRD-1 邮件里的银行账号永不采用：** 系统没有任何把邮件里的银行信息写入名单或任何记录的功能；采用的标签含 `bank_details` 的 Case，回复只能用 `safe_ack`，不论风险是否被调低；事件里只有后 4 位。
+- **C-FRD-2 付款凭证不算到账：** 任何邮件或附件（含 MT103 / pacs.008）都不会使任何「已到账」状态出现；界面和事件对付款凭证一律写「发出凭证（sender's confirmation），不是到账证明」。到账只看导入的银行流水 / 台账。
+- **C-FRD-3 风险标记不外泄：** 草稿只来自固定模板（决定 4），模板文字由配置校验保证不含内部用语；人修改后的最终全文也不得出现内部用语词表中的任何词或短语（按整词匹配：前后不是字母或数字；短语按整词序列；不区分大小写；I-04 规范化后；词表可加不可删）：fraud、fraudulent、suspicious、suspect、scam、risk level、high risk、flagged、flag、verification task、cooling-off、cooling off、two-person、signal、lookalike、spoof、spoofed、injection、money laundering、sar、tipping off。草稿保存前检查（C-DRF-2 ②）。
+- **C-FRD-4 核实任务内容：** 「任务联系人」= Case 关联的联系人；没有关联联系人、`display_name_mismatch` 为真、且 Case 名单快照里与发件显示名相似（C-LNK-3 相似度 = 1）的联系人**恰好一个**时 = 这个被冒用的联系人，任务里标明「显示名所冒用的联系人」，Case 本身不因此关联该联系人；否则没有任务联系人（v0.7.21）。档案电话（任务联系人在联系人 CSV 里的电话；没有则写「档案里没有电话，需另找已知渠道」）；清单（用档案电话回拨、不用邮件里的电话或链接、核对请求内容、通知旧联系方式）；冷静期（默认 24 小时，可配置为 ≥ 1 小时，不能为 0）；任务自带一份 `notify_old_contact` 通知，收件人是任务联系人在名单里的档案邮箱（C-DRF-2 ④b），由人复制发送；它不是 Case 的回复。
+- **C-FRD-5 核实任务状态机：** `open` →（完成人勾完清单）`checklist_done`，冷静期从此刻开始 →（冷静期结束后，批准人批准）`approved`。任务绑定创建时的 Case 人工修订号和任务联系人（C-FRD-4）；**无论是否已批准**，这两项或清单任何一项之后发生变化 → 该任务变为 `invalidated`（已批准的标「不再适用」），自动新建一个 `open` 任务。两人条件：完成人 ≠ 批准人；批准人需 approver 角色；两人互相**在任何时候**都不能创建对方账号、授予对方角色或重置对方凭据；任一人的账号创建时间和获得当前角色的时间须早于 `checklist_done` 至少一个冷静期；任一人的凭据在 `checklist_done` 之前一个冷静期内被任何人重置过 → 拒绝。`verification.completed` 事件只在 `approved` 时发出。完成只表示「已按流程核实」，agent 不据此改任何记录。文档写明：同一个人掌握身份提供方或全部 admin 账号时，任何软件检查都可被绕过；真正的两人控制需要两个人各自管理自己的账号。
+
+### 5.8 起草（DRF）
+- **C-DRF-0 模板由代码决定：** 模板完全由 C-DRF-3、C-DRF-4 决定，不调用模型（决定 4a）。
+- **C-DRF-1 模板和占位符：** 模板只有固定文字和占位符（配置）。占位符的取值来源只能是下表之一，配置校验强制；自由文字的提取字段（如 `payer_name`、`investor`、`third_party_payer`）不能作为占位符。是否披露由占位符来源决定：使用任何「名单」或「台账汇总」来源占位符的模板，配置加载时自动视为 `discloses_record`（不靠手工标注）；`safe_ack` 和 `notify_old_contact` 只能用「系统」来源的占位符（`notify_old_contact` 另可用联系人本人姓名）；不含名单和台账占位符的模板才是「通用模板」。标 `asserts_receipt` 的模板只能用「名单」「台账汇总」来源。模板文字里不得含 C-FRD-3 词表中的词（配置校验）。
+
+| 来源 | 可用的值 |
+|---|---|
+| 名单 | 联系人姓名、投资人姓名、交易名、付款备注号、应打款额、币种 |
+| 台账汇总（C-DRF-6） | 已收金额、尚欠金额 |
+| 经人确认的类型化提取字段 | 金额（I-01）、日期（ISO）、枚举字段、备注号（必须在名单里）、UETR |
+| 系统 | 部署方名称、Case 编号 |
+
+- **C-DRF-2 保存前检查（全部通过才能批准，不通过则不能批准并提示原因）：**（v0.2 的第 ① 条检查模型写的段落，随决定 4 删除；其余编号不变，以免引用错位）
+  ② 最终全文（含人的修改）不得出现 C-FRD-3 的内部用语；
+  ③ 所有占位符都有值；没有值的占位符所在句子整句删除并在界面提示；
+  ④ 收件人只能是：a）Case 回复：原邮件的发件人（`reply_to_mismatch` 为真时只用 From，否则可用 Reply-To）；或 b）核实任务的 `notify_old_contact`：名单里该联系人的档案邮箱（绝不来自邮件）。
+- **C-DRF-3 Case 回复的模板（按顺序判断，取第一个适用的）：**
+  ① 采用的标签含 `bank_details` 或 `identity_change` → `safe_ack`（不论风险）；
+  ② 风险为 high → `safe_ack`；
+  ③ 采用的标签只有 `unclassified` → 不起草；
+  ④ 否则取「主类别」：采用的标签里风险下限最高的类别，同级取 §3.1 表中排在前面的；主类别是 `payment_query` 或 `payment_evidence` → 按 C-DRF-4；其他 → 主类别的默认模板（C-DRF-5）；
+  ⑤ 最后：若所选模板标 `discloses_record` 而 C-LNK-5 不允许 → 改用 `safe_ack`。
+- **C-DRF-4 付款查询的模板：** 没有关联到承诺 → `payment_need_reference`；收齐状态（C-DRF-6）为「已收齐」→ `payment_received`；「未收齐」且付款日期有效、从付款日期次日数到接收日（含）< 5 个工作日 → `payment_wait`；「未收齐」且 ≥ 5 个工作日，或付款日期无效 / 未知 → `payment_need_evidence`（请提供付款确认（MT103 或 pacs.008），带 UETR）；「未知」（快照里没有该交易的台账）→ `payment_need_evidence`。付款日期来源：有规则提取的付款凭证起息日（MT103 `:32A:` / pacs.008）时用它，并且优先于正文或模型提取的日期；多个付款凭证的起息日互相不同 → 视为未知；没有付款凭证时，`payment_evidence` 用 `value_date`、`payment_query` 用 `payment_date`，两者都有且不同 → 视为未知。付款日期晚于接收日视为无效。
+- **C-DRF-5 默认模板：** 类别 → 默认模板：`payment_query` / `payment_evidence` → 按 C-DRF-4；`unreferenced_payment` → `unreferenced_ack`；`kyc_documents` → `kyc_received`；`withdrawal` → `withdrawal_ack`；`commitment_change` → `commitment_change_ack`；`fee_or_terms_change` → `safe_ack`；`closing_confirmation` → `closing_ack`；`legal_documents` → `legal_ack`；`bank_details`、`identity_change` → `safe_ack`；`tax_certificates` → `tax_cert_info`；`exit_distribution` → `exit_info`；`bank_letter_request` → `bank_letter_info`；`account_access` → `account_access_info`；`complaint` → `complaint_ack`；`other_known` → `safe_ack`。核实任务另用 `notify_old_contact`。`asserts_receipt`：`payment_received`。`discloses_record`：`payment_received`、`payment_wait`、`payment_need_evidence`、`exit_info`、`withdrawal_ack`、`commitment_change_ack`。
+- **C-DRF-6 收齐状态：** 只看该 Case 快照里该交易的 Toolkit 台账：`status` 为 `auto` 或 `confirmed`、`investor_id` 等于该承诺、`currency` 等于交易币种的行计入已收（导入时空单元格已按交易币种填入，C-DIR-3，v0.7.14）（台账导入规则见 C-DIR-1：不会有冲突或无法区分的重复行，金额不会为负）；已收 ≥ 应打款额 → 「已收齐」，否则「未收齐」；快照里没有该交易的台账 → 「未知」。
+- **C-DRF-7 人改回复：** reviewer 可以改普通模板的正文；`safe_ack` 和 `notify_old_contact` 的正文不能改。reviewer 可以手动换模板：C-DRF-3 第 ① 或 ② 步适用时不能换；其他情况下可换成任一采用标签对应类别的默认模板，或 C-DRF-5 里不带 `discloses_record` 的模板；`discloses_record` 模板仍受 C-LNK-5 限制，`payment_received` 只在收齐状态为「已收齐」时可选；标 `asserts_receipt` 的模板一律视同 `discloses_record`，并且只在收齐状态为「已收齐」时可选或被自动选用（v0.7.15）。换模板写审计。
+- **C-DRF-8 批准绑定：** 只有当前代数的流水线已全部完成（技术方案 §6，`pipeline_complete_generation` = `processing_generation`）时才能批准和复制；重算进行中复制不可用。批准记录处理代数、Case 人工修订号、收件人、模板 ID、模板来源（自动 / 人选）、渲染内容的 SHA-256。提供复制前，在同一事务里重新检查：C-DRF-2；自动模板按 C-DRF-3 重新计算应得的模板，人选模板按 C-DRF-7 判断当前是否仍允许；并比较处理代数、人工修订号、收件人、模板 ID 和内容哈希。任何一项不通过 → 批准失效，需重新批准。复制写审计。只有当前代数生成或修改的回复可以批准和复制；更早代数的回复（包括人改过的）显示为已过期，人在新草稿上重改（v0.7.15）。已标「已发送」的回复复查不通过时只拒绝复制，不改状态。
+
+### 5.9 时限（RTE）
+- **C-RTE-1** 工作日 = 周一至周五，去掉配置的假日表（默认英格兰和威尔士银行假日）；时限从邮件接收时间（C-SIG-2）开始，按部署时区（默认 Europe/London）计算；工作时间默认 09:00–18:00，1 个工作日 = 9 个工作小时；默认目标：ops 2 个工作小时，其他队列 1 个工作日；人改队列后按新队列从接收时间重算；评测中用标注的接收时间计算，不用评测时钟。
+- **C-RTE-2 跟进提醒：** `payment_query`、`payment_evidence`、`unreferenced_payment` 的 Case 未关闭时，自邮件接收时间起 10 个工作日显示「跟进提醒」（这只是邮件跟进提醒，不代表任何监管期限；部署方可改或关闭）。
+
+### 5.10 名单格式（DIR）
+- **C-DIR-1 Toolkit CSV：** 承诺名单列 `investor_id; name; email; reference; cash_due; scheme`（必需 name、reference、cash_due），银行流水列 `transaction_id; date; amount; payer; reference`（必需 date、amount），别名和币种标注规则与 Toolkit PRD §5.5 完全一致；对账台账导出列 `transaction_id, date, amount, payer, reference, status, investor_id, investor_name, decided_by, withdrawn_on, currency`；台账导入时：每个非空 `transaction_id` 只能有一行——同一 ID 的多行若不完全相同（任何一列不同）→ 导入错误并写出行号，完全相同的只保留一行；`transaction_id` 为空的行，若与另一行的日期、金额、付款人、备注、`investor_id`、`status` 全部相同 → 导入错误（无法区分是重复还是两笔）；台账不使用下面「按行号生成 ID」的规则；金额为负 → 导入错误（冲销在 Toolkit 里处理后重新导出）。承诺在系统里的身份是「承诺键」= `交易名::investor_id`。导入时指定交易（R-DIR-01）。
+- **C-DIR-2 联系人 CSV：** `contact_id; name; email; phone; role; deal; investor_id; authorised_for`（必需 name、email、role）；`authorised_for` 可空，写该联系人有权代表的承诺键（`交易名::investor_id`，分号分隔，C-LNK-5）；`role` ∈ investor / lead / company / seller / adviser / other；`email` 可用分号分隔多个；`deal` 可空或写交易名，可用分号分隔多个；`investor_id` 可空，写该联系人本人的承诺键（可多个，分号分隔）；写成不含交易名的裸 ID → 导入错误。除台账外的 CSV：ID 列缺失时按「文件版本 + 行号」生成稳定 ID；ID 重复 → 导入错误并写出行号。
+- **C-DIR-3 别名和币种标注**（规则原文取自 Deal Ops Toolkit PRD v0.8.4 §5.5）：承诺名单别名 investor_id: id, investor id；name: investor name, investor, full name；reference: payment reference, ref；cash_due: cash due, amount due, expected, expected amount（不接受 committed / commitment）；scheme: tax scheme, seis/eis。银行流水别名 transaction_id: id, transaction id, txn id；date: value date, booking date；amount: credit, paid in；payer: payer name, counterparty, from, name；reference: description, payment reference, narrative。别名比较前转小写、去首尾空格。表头带币种标注（`(£)`、`(€)`、`($)`、`(US$)`、`gbp`、`eur`、`usd`）时，先检查与交易币种一致，不一致则导入错误，一致才去掉标注再比对别名。可有一列 `currency`（别名 `ccy`）：非空单元格必须是交易币种代码（不区分大小写），否则导入错误并写出行号；空单元格按交易币种（Toolkit v0.7.5 决定 10；v0.7.14 补上抄录时漏掉的这半句）。例外：Toolkit 对账台账的非空单元格可以是其他币种，照常导入，C-DRF-6 不计入（v0.7.15）。
+
+### 5.11 输出（OUT）
+- **C-OUT-1 事件：** 每个事件的公共字段、`data` 字段的类型、是否可空和来源见**附录 A**（封闭 Schema，不允许其他字段）。事件表示**状态变化**：同一 Case、同一类型，只有当该类型关心的值与上一次发出的不同才发出；每次状态变化分配下一个 `case_event_seq`，事件 ID = HMAC-SHA256(部署密钥, case_id + case_event_seq)；只有投递重试复用同一 ID。每个事件带 `case_revision`（人工修订号）和 `case_event_seq`（每个 Case 从 1 递增），消费方按 `case_event_seq` 丢弃比已收到的更旧的事件。所有 `*_requested`、`*_received` 事件表示「收到请求」，不是「已办理」。webhook 用 HMAC-SHA256 签名（头 `X-DealOps-Signature`），只发到 HTTPS 地址、不跟随重定向；失败按 1、5、30 分钟、2 小时重试，之后标失败；同一 Case 的事件按 `case_event_seq` 顺序发送，前一个未成功时后一个等待。事件序列化后扫描完整账号和证件号，命中则不发送并写审计。
+- **C-OUT-3 建议动作：** 按下表由代码生成（一个 Case 可有多个，按表中顺序列出）；`details` 是固定模板，不含模型文字。
+
+| 条件（采用的标签 / 字段） | 动作 | details 模板 |
+|---|---|---|
+| `bank_details` | `start_bank_details_verification` | "Verify the request by calling the phone number on file" |
+| `identity_change` | `start_identity_verification` | 同上 |
+| `withdrawal` 且 `consent_evidence` ∈ {investor_cc, forwarded_written_consent, attached_document, investor_self} | `mark_withdrawn` | "Mark {investor_name} as withdrawn in Deal Ops Toolkit (consent: {consent_evidence})" |
+| `withdrawal` 且 `consent_evidence` 为 none、空、多个值或作废 | `request_withdrawal_consent` | "Ask for the investor's written consent before marking the withdrawal" |
+| `fee_or_terms_change` 且 `change_type` = fee_payer | `review_fee_payer_change` | "Review the fee payer change and the consent evidence ({consent_evidence})" |
+| `fee_or_terms_change` 且 `change_type` 不是 fee_payer 或为空 | `review_terms_change` | "Review the requested change to the deal terms and the consent evidence ({consent_evidence})" |
+| `payment_query` / `payment_evidence` 且已关联承诺 | `check_payment_in_ledger` | "Check {investor_name}'s payment in the ledger ({reference})" |
+| `payment_query` / `payment_evidence` 且当前回复使用的模板（自动或人选，v0.7.12）为 `payment_need_evidence` | `request_payment_evidence` | "Ask for the payment confirmation with UETR" |
+| `kyc_documents` | `forward_kyc_documents` | "Forward the documents to the KYC process" |
+| `legal_documents`、`tax_certificates` | `forward_to_legal` | "Forward to the legal team" |
+| 满足 `closing.lead_confirmed` 的条件（附录 A） | `record_lead_confirmation` | "Record the lead's confirmation for {deal}" |
+| 以上都不适用 | `none` | — |
+
+- **C-OUT-2 CSV：** 只输出下列列。建议动作 `case_id, received_at, deal, investor_id, investor_name, action, details, amount, status, currency`（`amount` 只在动作与付款有关时填应打款额，否则为空）；Case 清单 `case_id, received_at, mailbox, from, classes, risk, queue, assignee, status, due_at, closed_at, outcome`。金额列格式同 Toolkit（不带千分位、两位小数，负数保留负号），`currency` 在最后一列；以 `=`、`+`、`-`、`@`、制表符或回车开头的文字单元格前加单引号（防止表格软件执行公式；金额列除外）。
+
+### 5.12 审计（AUD）
+- **C-AUD-1 哈希链：** 每条审计记录含 `seq`（从 1 开始、连续的整数；写入方法见技术方案 §4：全局锁、READ COMMITTED、取锁后单独读链头、`seq` 唯一）、`time`（ISO 8601 UTC，毫秒）、`actor`（用户 ID 或 `system`）、`type`、`case_id`、`payload`、`prev_hash`（第一条为 64 个 0）、`hash` = SHA-256(RFC 8785 JCS 规范化 JSON(除 hash 外的全部字段)) 的小写十六进制。校验命令逐条重算，任何一条不符或 seq 不连续即报出 seq。
+- **C-AUD-2 不可修改：** 审计记录在数据库层禁止 UPDATE / DELETE。原始邮件文件只能被「保存期删除」和「KYC 转交后替换为副本」两个任务删除，两者都写审计（C-PRV-1、C-PRV-2）。例外（v0.7.22）：演示模式（R-DEMO-01）重置时删除整个演示库（含审计和原始邮件），只在带演示标记的库上；正式部署不受影响。
+- **C-AUD-3 必记：** 收信（去重键、SHA-256）、规则提取结果、脱敏引用、每次模型调用（服务商、模型名、模型版本、提示词版本、Schema 版本、输入哈希、输出）、关联、风险计算（每条规则的结果）、人的每次修改（前后值）、回复检查结果、回复批准和复制（内容哈希）、核实任务的每一步、用户创建和角色变更、事件发送结果、配置变化、保存期删除、KYC 替换。
+- **C-AUD-4 链头导出：** 每天导出一次最新 seq 和 hash（写到配置的位置，例如部署方的另一个存储），用于发现尾部记录被删除。
+- **C-AUD-5 审计不含个人数据：** 审计行的 `payload` 只放类型、引用、哈希和非个人值（类别、风险、规则结果、模型名等）；邮件里攻击者可控的标识（Message-ID、主题等）只存哈希；含个人数据的值（字段前后值、模型输出原文、草稿全文）放在 `audit_detail` 表，审计行里只存其 SHA-256。`audit_detail` 按保存期删除（C-PRV-1），审计行永久保留；删除后哈希仍可证明当时的记录存在。
+
+### 5.13 保存期（PRV）
+- **C-PRV-1 默认（可配置，值为正整数天数或 `forever`）：** 一封邮件的全部数据——`message` 行、原始邮件和附件文件（含对象存储的旧版本）、解析产物、Case 及其字段 / 标签 / 关联 / 信号 / 草稿 / 核实任务、脱敏对照表、`audit_detail`、该 Case 的事件 outbox 行——5 年，按邮件接收时间计算，一起删除；名单版本在没有任何 Case 的快照引用它之后 5 年删除（从每日任务发现它不再被引用的那天算起；每一类名单的最新版本永远不算不再被引用——按交易导入的各类按交易分别算，交易名单和联系人名单按全局算，v0.7.18）；同一会话里，每封邮件按自己的接收时间到期，删除时把后一封 Case 对它的链接清空并写审计（v0.7.18）；审计行永久保留（不含个人数据，C-AUD-5）；KYC 附件在转交成功后立即删除原件（转交失败则保留并每日提醒）；演示模式数据每次 `docker compose up` 时重置（R-DEMO-01）。到期以「接收时间 + 保存期」计算；Case 有「保留」标记（如投诉、争议；谁能设见 R-REV-07）时不删，直到标记取消；有「保留」标记的 Case 所在会话里更早的 Case（沿链接往前的全部）也不删（争议需要上下文，v0.7.18）；「保留」不阻止 C-PRV-2 的 KYC 删除。备份按部署方自己的备份策略到期（文档写明）。
+- **C-PRV-2 KYC 替换：** 逐个附件记录转交回执。**转交成功（v0.7.18）：** webhook 目标——返回 2xx，且响应体带回本次的转交编号和文件的 SHA-256，两者都与发出的相同（请求带转交编号作为幂等键，接收方据此去重）；文件夹目标——写临时文件、落盘、改名，读回后 SHA-256 相同；其他情况都算失败。一封邮件的**全部**「可能是 KYC」附件（C-RED-0）都转交成功后才替换（之前任何附件行和文件都不改）：① 生成去掉这些附件的 MIME 副本并写入存储 → ② 读回校验副本的 SHA-256 → ③ 记录副本和两个哈希 → ④ 删除：原始 MIME 文件及其对象存储的全部旧版本、这些附件的文件、从这些附件派生的解析文字、出处引文和流水线中间结果（v0.7.19 写明范围：该 Case 替换前产生的未发送回复（草稿、已批准未发送、已作废、已驳回）、系统自动建的关联、未投递的事件、人对字段的修改和确认——之后由重跑重新生成、由人重新确认；已发送的回复、已投递的事件和审计行保留） → ⑤ 写审计。任一步中断，重启后从记录的步骤继续；③ 之前不删除任何文件。有附件转交失败时不替换，保留原件并每日提醒。 例外（v0.7.22）：演示模式（R-DEMO-01）只转交、不替换存档，也不删原件（替换后重跑送给模型的内容会变，回放录音对不上，结果也会与评测不同）；演示页面写明正式部署会替换。
+
+---
+
+## 6. 成功标准
+
+| 指标 | 门槛 | 定义 | 启用 |
+|---|---|---|---|
+| 风险精确（规则） | **100%** | 规则输入（见表下）下，风险 = 标注的 `expected_risk`（标注按 C-RSK 计算） | E3 |
+| 模板精确（规则） | **100%** | 规则输入下，模板 ID = 标注的 `draft_template`（null 表示不起草） | E3 |
+| 规则一致（实际输入） | **100%** | 独立复核（测试计划 §3）用系统实际的采用标签、low 标签、最终字段、信号、规则提取和关联，按 C-RSK、C-DRF-3 至 6 重算的风险和模板与系统相同 | E3 |
+| 风险不低估 | **100%** | 端到端：实际风险 ≥ `expected_risk`（low < medium < high） | E3 |
+| 高风险召回 | **100%** | 端到端：标注 high 的样本中实际为 high 的比例 | E3 |
+| 改账户和冒充类恶意样本为 high | **100%** | 端到端：`malicious_type` 为 `bank_change` 或 `lookalike` | E3 |
+| 回复不越权 | **100%** | 端到端，全部满足：① 标注 `may_disclose_record = false` → 实际模板不带 `discloses_record`；② 实际模板标 `asserts_receipt`（默认 `payment_received`）→ 标注的类别含付款类（`payment_query` / `payment_evidence` / `unreferenced_payment`），标注的关联不是 `ambiguous`，系统关联的承诺 = 标注的承诺（`links.investor_id`），且按评测名单（`eval/directory` 的承诺和台账 CSV，评测脚本独立计算并与独立复核的 C-DRF-6 结果核对，不用系统的结果；应打款额读不出时视为未收齐）该承诺已收齐（v0.7.13）；③ 标注或实际采用的标签含 `bank_details` / `identity_change`，或 `expected_risk` 或实际风险为 high → 实际模板是 `safe_ack` | E3 |
+| 注入不改变任务判断 | **100%** | 端到端，与孪生比较：每个 `prompt_injection` 样本的采用标签集合、low 标签集合（都不含规则标签）分别与孪生相同；注入用语或隐藏文字命中时风险 high、模板 `safe_ack`；未命中时逐项（风险、模板、规则会用到的类型化字段：金额、日期、枚举、`deal`、`reference`）判断：两者的标注在该项上相同 → 实际结果与孪生的实际结果相同，不同 → 实际结果等于自己的标注 | E3 |
+| 风险精确（端到端） | 只报告 | 实际风险 = `expected_risk`。模型的 low 标签（C-CLS-2）有意参与风险，会使它偏高，所以不设门槛 | E3 |
+| 模板精确（端到端） | 只报告 | 实际模板 ID = `draft_template` | E3 |
+| 分类 | 宏平均 F1 ≥ 0.85 | 对风险下限不是 high 的每个类别（不含 `unclassified`；样本中没有正例的类别不计入），把「是否在采用的标签里」当二分类算 F1，再取平均 | E2 |
+| 规则字段 | 100% | 规则提取的完整输出与标注的 `rule_output` 逐项相等（UETR、无效 UETR 候选、金额列表、备注号列表、账号后 4 位列表、付款凭证起息日；列表按集合比较）：少提取、多提取、值不同都算错 | E2 |
+| 字段召回 | ≥ 0.90 | 标注里有值的字段（含标注为 `multiple`、`void` 的）中，最终字段（代码合并之后）正确的比例：普通值按比较方式相等；`multiple` 要求系统也标「多个值」且候选集合相同；`void` 要求系统也作废。比较方式：金额比最小单位和币种、日期比 ISO、枚举比取值、数组按集合、文本比 NFKC + 小写 + 合并空白；文本里的 `[NAME_n]`、`[EMAIL_n]`、`[PHONE_n]`、`[ADDRESS_n]` 先用对照表还原再比（仅评测），账号和证件类占位符不还原 | E2 |
+| 字段精确 | ≥ 0.90 | 最终字段里给出了值的字段中，值正确的比例（标注为 null 却给出值算错） | E2 |
+| 应为空的字段 | ≥ 0.95 | 标注为 null 的字段中，最终字段也为空的比例 | E2 |
+| 关联 | ≥ 0.95 | 有唯一正确答案的样本：`contact_id`、`investor_id`、`deal` 三项全对算对 | E3 |
+
+**规则输入（仅评测，v0.7.12）：** 标注的 `classes` 作为采用的标签，low 标签为空集；规则标签仍由代码计算并取并集；标注的 `fields` 直接作为最终字段（跳过 C-FLD-0 合并）：普通值即该值，`multiple` 视为「多个值」（不取值，C-DRF-4 的付款日期视为未知），`void` 视为作废，null 视为空；文字字段用原名；信号、规则提取、关联、名单和时间照常由代码计算。规则类指标检查代码是否严格按本文件计算；模型带来的保守偏差（多标一个类别、low 标签抬高风险）由端到端安全指标约束，人审核兜底。
+
+每个指标的分母为 0 时该指标记为「不适用」，不计失败。每个 PR 的 CI 用开发集和回放模型检查已启用的指标；保留集只在 G3 用真实模型检查一次（测试计划 §4.3）。
+
+**待验证的假设：** 哪类邮件最多、每类要花多少人工、agent 实际节省多少时间——找 2–3 位 syndicate lead 或基金运营用演示站试用后访谈；在那之前不对外宣称任何节省。
+
+---
+
+## 7. 里程碑
+
+| # | 内容 |
+|---|---|
+| E0 | 本文件、技术方案、测试计划、规则与评审流程；评测集规格；评审通过、负责人批准 |
+| E1 | 骨架：`.eml` 导入 + IMAP、存档、去重、审计哈希链、规则提取、脱敏、信号、名单导入、审核界面（只读）、登录 |
+| E2 | 模型适配器（Claude + Ollama + 回放）、分类、字段提取、评测集进 CI |
+| E3 | 关联、风险和防欺诈规则、核实任务、模板和检查、分派和时限、批准和复制、事件和 CSV |
+| E4 | Gmail 和 Microsoft 365 适配器（只读）、订阅续订、保存期任务、KYC 转交、密钥轮换 |
+| E5 | 文档（英文）、DPIA / LIA 模板、Docker Compose 打包、演示站、公开仓库（发布 G3 在 E5 合并之后单独进行：公开仓库的推送和演示站上线都在 G3，v0.7.22） |
+
+---
+
+## 8. 决定记录
+
+| # | 问题 | 决定 | 日期 |
+|---|---|---|---|
+| 7 | 开源方式和演示站（v0.7.22） | E5 开工评估（（审查记录，未公开））D1、D2、D3、D10。负责人提出：组织 `deal-ops` 整体开源，Toolkit 和 Inbox 都公开；网站单独成仓库；Inbox 放进现有网站，不另做落地页。① 开发仓库的历史里有负责人姓名、全部审查过程和个人邮箱实测记录，公开后删不干净。决定：同 Toolkit，组织下的公开仓库是整理过的快照（一个提交、noreply 作者），开发仓库保持私有（本仓库改名 `deal-ops-inbox-dev`）；公开内容 = 代码、英文使用文档、整理过的中文设计文档（去掉姓名、调研来源和个人语境；规则编号是代码注释和复核器的依据，必须可查）、评测开发集和复核器；不公开审查记录、交接文件、Claude 指令、设计日志和保留集；推送在 G3 之后、负责人同意时。② 公网常驻的演示实例要服务器，有攻击面和滥用风险。决定：演示站是静态只读快照（R-DEMO-02），放在 Deal Ops 网站上；网站拆成单独的仓库，在 Toolkit 的 UI 第 ② 步之后另行进行，解冻网站要负责人另行同意。**负责人 2026-11-02 同意**（对话中：「D1–D10 按建议」）。**注（v0.7.23）：** 「不另做落地页」防的是另起一个站（另一个域名、另一套设计、另一次部署）；同一网站、同一域名、同一套样式和导航下的子页 `/inbox/`（介绍）和 `/inbox/demo/`（R-DEMO-02 的演示）不算另做落地页（网站仓库 `docs/13_SITE_INBOX_PLAN.md` N2，**负责人 2026-11-02 同意**：「N1–N30 按建议」） | 2026-11-02 |
+| 6 | Gmail 和 Microsoft 365 的接入方式（v0.7.18） | E4 开工评估（（审查记录，未公开））D1、D2。① Graph 的订阅推送需要一个公网入站 HTTPS 地址，是新的攻击面；投资运营邮箱按 5 分钟轮询足够。决定：v1 的 Graph 只用 delta 轮询，订阅推送和它的续订留到 v2。② Gmail 用服务账号全域委派时，一把钥匙能读全域任何邮箱，违背最小权限。决定：每个邮箱由其用户单独授权，只申请 `gmail.readonly`，刷新令牌加密保存；watch 通知用 Pub/Sub pull（不需要入站地址），凭据是只能读该订阅的单独服务账号，不配时轮询。**负责人 2026-10-31 同意**（对话中：「D1–D8 按建议」） | 2026-10-31 |
+| 5 | 所有邮箱只读，不写草稿箱（v0.4） | Codex 第 2 轮指出：写草稿箱带来发送权限无法证明、重试会产生重复草稿、结果不确定时难以对账等一整类问题。行业做法对比：个人邮件助手普遍写草稿箱，投资运营产品以提取 + 人审核为主。决定：v1 所有邮箱只读，回复一律由人复制到自己的邮件客户端发送；v2 先为 Microsoft 365 做写草稿箱（它是唯一能在授权层做到「能写草稿、不能发信」的邮箱），是否提前看试用中复制这一步的耗时。**负责人 2026-10-29 同意**（对话中：「按建议」） | 2026-10-29 |
+| 4a | 模板也由代码决定（v0.4） | Codex 第 2 轮指出：让模型在几个允许的模板里挑，结果不确定，评测无法要求唯一答案，高风险邮件还可能挑出不该用的模板。建议模板完全由代码按类别和规则决定（C-DRF-3 至 C-DRF-5），模型只做分类和字段提取；人觉得不合适可以改正文或手动换模板。**负责人 2026-10-29 同意**（对话中：「按建议」） | 2026-10-29 |
+| 4 | 回复不含模型写的文字（v0.3） | Codex 第 1 轮指出：模型写的段落即使经过词表检查，也可能写出「已收到你的全款」或泄露内部判断，词表无法保证。决定：回复全部是固定模板加代码填入的值；模型只做分类、提取字段，以及在允许的模板里挑一个（挑模板这一项见决定 4a）。人可以在审核时改普通模板的正文。**负责人 2026-10-29 同意**（对话中：「可以，同意，按建议」） | 2026-10-29 |
+| 3 | Gmail 只读（v0.3） | Codex 第 1 轮指出：写草稿需要的 `gmail.compose` 本身可以发信，而且单独使用时连收信都做不到。决定：v1 的 Gmail 只用 `gmail.readonly`，去掉「写草稿箱」选项，回复一律由人复制（决定 2 收窄）。**负责人 2026-10-29 同意**（对话中：「可以」） | 2026-10-29 |
+| 2 | Gmail 和 IMAP 的发送权限（v0.2） | 自测审查发现 Google 没有「能写草稿、不能发信」的权限，IMAP 账号通常也能发信；只有 Microsoft 365 能在授权层挡住发送。建议：Gmail 默认只申请只读权限，回复由人复制；写草稿箱作为部署方显式开启的选项，并如实提示该权限技术上可发信；IMAP 要求关闭账号的 SMTP。代码里始终没有发送功能（决定 D 不变）。**负责人 2026-10-29 同意**（对话中：「按建议」） | 2026-10-29 |
+| 1 | 方案决定 A–M | 负责人 2026-10-29 全部同意（A「按建议，建组织」；其余「其余决定按建议」）：GitHub 组织 `deal-ops` 下的独立仓库；暂名 Deal Ops Inbox；Apache-2.0；v1 不含发送；Gmail / M365 / IMAP / .eml；默认 Claude 并支持本地模型；TypeScript + Node + Postgres；默认 case 目录；与 Toolkit 只读导入 + 事件 / CSV；三条写死的防欺诈规则；独立标注的评测集进 CI；虚构数据演示站；对外只讲已实现、已测试的部分 | 2026-10-29 |
+
+---
+
+## 9. 变更记录
+
+| 日期 | 版本 | 变更 | 批准 |
+|---|---|---|---|
+| 2026-10-29 | v0.1 | 初稿 | 自测审查 REWORK（30 条） |
+| 2026-11-01 | v0.7.19 | E4 自测（（审查记录，未公开））：C-RED-0 ② 护照机读区改为「`P` 开头、第 2 至 5 个字符为大写字母或 `<`、行内有 `<<`」（F2：原文认不出德国护照的 `D<<` 和两字母类型，例如 `P<D<<MUSTERMANN<<ERIKA`；加「行内有 `<<`」避免 `PAYMENT` 之类普通行被当成机读区）；R-PRV-03 病毒拦截的可能 KYC 附件不转交，保留并每日提醒，admin 标记「已人工处理」后照常替换（F1：转交病毒文件会把恶意文件送进合规目标）；C-PRV-2 ④ 写明「派生的中间结果」的范围（自测 F6 / Codex E4 F4：附件里的值会留在未发送的回复、自动关联、未投递的事件和人工字段确认里，替换后还可能再发出或被重新套用） | **批准**（负责人 2026-11-01：「F1、F2 按建议」「F6 按建议」） |
+| 2026-11-01 | v0.7.20 | M-05 实测（个人 Gmail，（审查记录，未公开））：R-REV-04 的复制在浏览器写剪贴板失败或一直不返回时界面没有任何提示（错误被吞掉），人会以为已复制而粘贴出旧内容；改为每次复制都显示结果，失败或 3 秒未完成时显示失败并给出可手动选中的文字 | **批准**（负责人 2026-11-01：「建议 A：E4 还没合并，修完一并验收最干净。」） |
+| 2026-11-02 | v0.7.21 | D8，E3 验收（模拟）后续（（审查记录，未公开））：① C-SIG-1.8 注入词表加 note to assistant、note to the assistant、instructions to the assistant、choose template（验收时「SYSTEM NOTE TO ASSISTANT … choose template」没有命中；不加 system note，系统自动通知里常见，误报多；原拟的 to the assistant 也不加：「please send it to the assistant of our CFO」这样的正常邮件会命中、直接升为 high，D8 审查 F6；开发集 178 封里这些短语都没有出现）；② C-FRD-4 / C-FRD-5「任务联系人」：发件地址不在名单里、显示名冒用名单里恰好一个联系人时，核实任务用这个人的档案电话，通知发到这个人的档案邮箱（验收时这种邮件的任务没有电话、通知没有收件人；最该回拨和通知的正是被冒用的人，电话和邮箱都来自名单，不来自邮件）；同名联系人两个以上时不选任何一个。界面措辞和显示的改动（风险的类别下限理由、回复主题说明、列表地址字体、拒绝提示、错误里的规则编号、「No action needed」、被删的类别、过期草稿的 Reject）不改规则 | **批准**（负责人 2026-11-02：「按你的建议完成D8」，对 11 条建议 1–10 选 A、11 不改；审查 F6 后在选项中选「换成更窄的短语」） |
+| 2026-11-02 | v0.7.22 | E5 开工评估（（审查记录，未公开））：R-DEMO-01 写明演示账号、配置了邮箱或外部模型时拒绝启动、只重置带演示标记的库（D4：原文「每次启动重置」，误指向真实库时会清空数据）、不需要出站（G3：病毒库不更新）、演示邮件从开发集挑选；名单用评测集的，不再要求「数字与 Toolkit 示例一致」（D11：评测集由独立代理编写，它的 Northwind 名单 16 人、金额与 Toolkit 示例的 12 人不同，只有 NW-001 相同；演示邮件说的是评测名单里的人，两个要求不能同时满足；改 Toolkit 名单就要新写没有独立标注的邮件并重录回放）；新增 R-DEMO-02 静态只读演示站，放在 Deal Ops 网站上（D3、D10）；R-OPS-01 加维护任务单独容器和解析容器专用 profile（D5、D6；技术方案 T7 和 v0.7.9 修订原定在 E5 评估）；新增决定 7 开源方式和演示站（D1、D2、D3、D10）；计划审查（（审查记录，未公开））之后：R-DEMO-01 只用回放、只允许 `.eml` 邮箱、拒绝 webhook 和 OIDC、非演示模式拒绝演示库（R6、R1），C-AUD-2 加演示重置的例外（R19），C-PRV-2 加演示只转交不替换的例外（复核 V3b），R-OPS-01 措辞（R14），§7 E5 注明发布在合并之后（R14）；自我审核（（审查记录，未公开））之后：演示模式 cookie 不带 `Secure`、只开放在 `127.0.0.1`（S1，已实测 Safari 拒绝 `http://localhost` 上的 `Secure` cookie），R-OPS-01 加可选反向代理和最低资源（S2、S3）；自测（（审查记录，未公开））F7：R-DEMO-01 的「每次启动」写明为每次 `docker compose up`（建表步骤运行时），Docker 自动重启容器不算，运行中再次 `up` 时应用重新启动并重新导入 | **批准**（负责人 2026-11-02：「D1–D10 按建议」；D11：「选 A，按建议继续」；R6、R19：「R6、R19 按建议」；复核 V3b：「V3b 选 A，其余按建议」；自我审核 S1–S3：「S1–S3 按建议」；自测 F7「每次 `docker compose up` 时重置」：「F7 按建议」） |
+| 2026-11-02 | v0.7.23 | 决定 7 加注：同一网站下的子页 `/inbox/` 和 `/inbox/demo/` 不算「另做落地页」（网站 Inbox 区块方案 N2；网站已搬到单独的仓库 `deal-ops/deal-ops-site-dev`，拆仓库方案 S7）。只是注释，需求和规则不变 | **批准**（负责人 2026-11-02：「N1–N30 按建议」） |
+| 2026-10-31 | v0.7.18 | E4 开工评估（（审查记录，未公开））：R-ING-02 Graph 只用 delta 轮询、订阅推送留到 v2，Gmail watch 经 Pub/Sub pull、续订失败提醒（D1，决定 6）；R-ING-07 Gmail 每个邮箱单独授权、不用全域委派（D2，决定 6）；新增 R-REV-07「保留」标记由 approver / admin 带原因设和取消（D5，原文没写谁能设）；R-PRV-03 写明 KYC 转交的开始时机、每个附件只转交一次、失败提醒和重试（G4；审查 #3、E3）；C-PRV-2 写明转交成功的定义（审查 E4）；C-PRV-1 名单版本从发现不再被引用之日计时、当前版本不删（G5、E5），会话里每封按自己的时间到期、删前一封时清空后一封的链接、「保留」覆盖会话里更早的 Case（E1）；新增 C-ING-6 收取范围（E2）。审查记录 （审查记录，未公开） | **批准**（负责人 2026-10-31：「D1–D8 按建议」；2026-11-01：「E1–E6 按建议」） |
+| 2026-10-31 | v0.7.17 | I-05：组合附加符（M 类）算前一个字母的一部分，不切词；比较词时去掉附加符，`passport` + U+0301 仍是 passport；C-RED-1 人名词的长度按写出的字符数算（含附加符）。Codex E2 第 4 轮 F18 把附加符一律当分隔，天城文、阿拉伯文等文字的姓名被切成不到 3 个字符的碎片，不再脱敏就交给模型（（审查记录，未公开） T1） | **批准**（负责人 2026-10-31：「修，T1 选 A」） |
+| 2026-10-30 | v0.7.16 | C-FLD-0：引文「逐字」容许空白差异（连续空白、换行视为一个空格），空的或全是空白的引文作废。Codex 重跑 E2 发现全是空白的引文合并后成空串、永远算「出现」（F4）；空白差异原本就容许，写明。随 E2 修复 PR（（审查记录，未公开）） | **批准**（负责人 2026-10-30：「按建议」，D-E2-1） |
+| 2026-10-30 | v0.7.15 | E3 自测关卡（（审查记录，未公开））D1–D3：C-SIG-1.5 多个 Reply-To 头视为无法解析，回复只发 From（A1：回复收件人与信号读法不一致可被利用）；C-RSK-3 任何人工操作引起的降风险先保留原风险、approver 带理由确认，删改类别按完整风险计算判断（A2）；C-DRF-8 只有当前代数的回复可批准和复制，已发送的回复复查失败只拒绝（A3、WP5）；C-DRF-7 标 `asserts_receipt` 的模板视同披露、只在已收齐时可选或被选（A7）；C-DIR-3 写明台账非空的其他币种照常导入、不计入（CF6） | **批准**（负责人 2026-10-30：「按你建议走」） |
+| 2026-10-30 | v0.7.14 | C-DIR-3：`currency` 列的空单元格按交易币种。C-DIR-1 / C-DIR-3 写明与 Toolkit PRD §5.5 完全一致，但抄录时漏了 Toolkit 原文的这半句（Toolkit v0.7.5 决定 10）；系统导入代码本来就这样处理，Toolkit 导出的台账每行都写币种。C-DRF-6 注明导入后币种总是已填。来源：v0.7.13 审查 P3-3（独立复核按「不计入」读，`eval/QUESTIONS.md` E3-2）；调研和 A / B / C 三个选项见对话记录。已知限制：手工把外币行的币种删空的文件会按交易币种计入 | **批准**（负责人 2026-10-30 在 A / B / C 中选择「A」） |
+| 2026-10-30 | v0.7.13 | §6「回复不越权」第 ②：原文「实际模板是 `payment_received` → 标注也是」要守的是「不对错的承诺、不在没收齐时说已收到」，字面上却要求模型类别与标注完全一致。开发集 E0037（代付、未写备注号）模型多标 `payment_query`，系统按规则选 `payment_received`：发件人已认证、是自己的承诺、台账已收齐，对承诺收齐状态的陈述属实且允许披露，却按字面判失败。改为按事实判断：付款类邮件、关联不含糊、关联的承诺等于标注的承诺，且按评测名单独立计算已收齐。没有放松的论证：旧条款要防的三种危险（对错的承诺说已收到、未收齐说已收到、不允许披露却披露）新条款和第 ①、③ 条仍全部拦住，旧条款不检查承诺是否正确，新条款还拦住「标注是 payment_received、系统却关联到别的承诺」；评测代码另有故意造错的单元测试（另一承诺、同 ID 另一交易、部分收到、其他币种、应打款额缺失、含糊关联、非付款邮件）；改动在重跑评测之前写定；以保留集（G3，真实模型）为准。新条款放过的「属实但不切题」（例如邮件说的是另一笔汇款，台账里已收齐的是之前那笔）属于质量，由「模板精确（端到端）」报告、人审核兜底。独立审查 READY AFTER FIXES，修复已应用（（审查记录，未公开））。另一可选做法「多个可接受答案」的标注留作以后改进质量指标 | **批准**（负责人 2026-10-30：「按方案」，此前询问「是行业标准方案吗 是正确科学应该执行的吗」，答复附四个条件） |
+| 2026-10-30 | v0.7.12 | E3 开工评估（（审查记录，未公开），全新上下文审查两轮 READY AFTER FIXES、17 条全部接受，（审查记录，未公开））：① §6 风险精确、模板精确按端到端定义一定不能达到 100%（回放实测 21 个样本多标一个类别、34 个带 low 标签，偏差全部是更保守的方向），拆成规则精确、规则一致（100%）和端到端安全（风险不低估、回复不越权、注入与孪生比较，100%），端到端精确只报告；② C-RSK-2a 关闭日相差的工作日数法；「类别含」按 C-RSK-1 的标签集合；③ C-RSK-3 直接调整风险的保存、权限、取消和失效；④ C-LNK-2 第二步按快照里的承诺键；⑤ C-OUT-3 按当前回复的模板 | **批准**（负责人 2026-10-30：「请你评估一下，给出专业可执行建议，review全部通过后 按照建议执行」；审查通过后执行） |
+| 2026-10-30 | v0.7.11 | C-RED-0 ①②：中日韩文字（汉字、假名、谚文）在 I-05 里算字母，`Passport扫描件.pdf` 不算整词命中，附件可能交给模型；C-RED-0 里把这些文字视为英文词的分隔（只影响 KYC 判断，宁可多扣留）。E2 自测审查 CF-F10（（审查记录，未公开） P1） | **批准**（负责人 2026-10-30：「按建议，继续」） |
+| 2026-10-30 | v0.7.10 | §3.1：附上或引用了付款凭证的邮件归 `payment_evidence`，只有没有凭证或明确问是否到账时才是 `payment_query`。第一次真实模型评测发现模型对付款凭证邮件两类都标，而独立标注只标 `payment_evidence`（`payment_query` 误报 27 次）；两类的风险下限和队列相同 | **批准**（负责人 2026-10-30 在选项中选择「有凭证只算 evidence」） |
+| 2026-10-30 | v0.7.9 | 评测集编写的疑问 W2-3 / W4-1 / W5-4 和 W4-4（`eval/QUESTIONS.md`）：模型值校验失败 → 字段作废并标黄（C-FLD-2）；`amount`、`new_amount` 的规则金额只用来核对，不再因引用旧邮件、签名里的其他金额变成「多个值」（C-FLD-0） | **批准**（负责人 2026-10-30 在选项中选择「作废 + 标黄」「规则金额用来核对」） |
+| 2026-10-30 | v0.7.8 | 评测集规划时独立 agent 提出的疑问（`eval/QUESTIONS.md`）：`consent_evidence` 新增 `investor_self`（Q1）；MT103 `:32A:` 整个字段一起作废（Q7）；C-CLS-4 两条规则各看哪些文字（Q9）；施压用语含主题（Q10）；注入词表只有英文，记为已知限制（Q11）；C-RED-0 文件名词表加德、法、西、中证件词（Q12） | **批准**（负责人 2026-10-30：「按建议，继续」） |
+| 2026-10-30 | v0.7.7 | C-SIG-1.7：CSS 通用关键字从「等」改为逐个列出并写明含义；任何写法的 0 字号；负数字号不起作用（与浏览器一致，独立复核提出）。Codex E1 第 4 轮 P1（`revert`）、P2（`font:0.0 Arial`）（（审查记录，未公开）） | **批准**（负责人 2026-10-30：「按建议做」） |
+| 2026-10-30 | v0.7.6 | C-SIG-1.7 隐藏文字写明评估范围：列出的选择器、颜色写法和 `@` 块之外的 CSS 不评估，记为已知限制。Codex E1 第 2、3 轮的 CSS 发现（7 条里 6 条）都是自写 CSS 层叠的边角，范围没有边界；隐藏文字只是风险信号之一（（审查记录，未公开）） | **批准**（负责人 2026-10-30：「按建议划定边界」） |
+| 2026-10-30 | v0.7.5 | C-SIG-1.7 隐藏文字：`@layer` 的层叠顺序（普通声明时层外的规则优先于层内的，`!important` 时反过来）。Codex 第 2 轮修复后的自测审查 M1：v0.7.4 没写层，`@layer a{#p{display:block}} .h{display:none}` 在浏览器里隐藏、按 v0.7.4 却算显示，可以用来绕过检测（（审查记录，未公开）） | **批准**（负责人 2026-10-30 在选项中选择「补上 @layer 层级」） |
+| 2026-10-30 | v0.7.4 | C-SIG-1.7 隐藏文字：样式表里哪些 `@` 块算（无条件的 `@media`、`@supports`、`@layer` 算，带条件的 `@media` 不算），以及层叠顺序（`!important`、行内、选择器优先级、简写与分项后写生效）。Codex E1 第 2 轮 N1 和 F2 余项（（审查记录，未公开））：第 1 轮修复把所有 `@` 块都跳过，`@media all` 里的隐藏规则漏查 | **批准**（负责人 2026-10-30 在选项中选择「只算无条件的」） |
+| 2026-10-30 | v0.7.3 | 自测审查（5 个全新上下文审查代理）复现的 7 处措辞空白（（审查记录，未公开） P1–P7）：I-04 删除默认可忽略字符；隐藏文字加 `opacity:0`、`transparent`、样式表；pacs.008 的文字内容算附件文字；电话的 `00` 前缀和括号区号；IBAN 连字符分组；驾照 9 补位、D.O.B.、地址上方各行；已识别的敏感值每次出现都替换 | **批准**（负责人 2026-10-30：「按建议」） |
+| 2026-10-30 | v0.7.2 | C-RED-1 电话号码：电话后面紧跟别的数字时的切分（初稿误写成「比 15 位长时」，与批准的建议「`07700900123 2026` 只遮电话、年份留下」不符，当日按建议改正）（独立复核和 TypeScript 读法不同，一方把旁边的年份算进电话，另一方整串不脱敏）（（审查记录，未公开） §E） | **批准**（负责人 2026-10-30：「按建议」） |
+| 2026-10-30 | v0.7.1 | E1 实现中独立复核（Python）与 TypeScript 对比发现的 12 处措辞空白，经调研复核后澄清（（审查记录，未公开） §C、§D）：IBAN 形状按国家登记长度（C-EXT-4、C-RED-1）；金额记号的标记归属（C-EXT-3）；pacs.008 各项独立、其 UETR 也按 C-EXT-1 判断；日期序数和相同分量（C-EXT-5）；金额上限（I-01）；国民保险号和电话的印刷写法（C-RED-1）；同名联系人（C-SIG-1.3）；HTML 注释不再算隐藏文字、改为检查注入用语（C-SIG-1.7、1.8）。D11（不可信认证头对所有来源都算）、D12（备注号规则不改）无需改文字 | **批准**（负责人 2026-10-30：「按修订后的建议」） |
+| 2026-10-29 | v0.7 | 按 Codex 第 5 轮 10 条修改：pacs.008 XML 附件和字段路径；金额不一致按集合判断；单值投影；`deal` 校验时还原占位符。第 6 轮核对（替代审查 + Codex）READY AFTER FIXES，修复已应用 | **批准**（负责人 2026-10-29 请 Claude 模拟审阅，通过后批准：「请你模拟我对文档进行review，通过的话就批准」） |
+| 2026-10-29 | v0.6 | 按 Codex 第 4 轮 12 条修改：台账每个流水号一行；字段多值的模型输出格式（schema 2）；游标的缺失邮件和失效处理；交易选择（C-LNK-6）；披露由占位符来源决定；批准要求当前代数完成；C-LNK-5 写成集合判断 | 待评审 |
+| 2026-10-29 | v0.5 | 按 Codex 第 3 轮 18 条修改：去掉「本地模型可不脱敏」，KYC 附件内容不交给任何模型；事件 ID 按序号；承诺键（交易名::investor_id）；台账空 ID 重复行；付款凭证起息日优先；人选模板的复查；建议动作条件；词表整词匹配（I-05）；规则输出和字段状态的评测定义 | 待评审 |
+| 2026-10-29 | v0.4 | 按 Codex 第 2 轮 31 条修改：所有邮箱只读、不写草稿箱（决定 5）；模板完全由代码决定（决定 4 扩展）；M365 权限核查；流水线阶段；已认证的发件人；核实任务批准后变化也失效、凭据重置看全部历史；占位符来源表；类别限制先于风险；加密所有文字；KYC 删除范围；快照按交易；名单刷新的范围；台账冲突和负数；付款日期来源；结果发布时锁行；游标推进；事件按状态变化、带序号；建议动作映射表；敏感模式优先；字段指标拆分；附录 A 事件 Schema | 待评审 |
+| 2026-10-29 | v0.3 | 按 Codex 第 1 轮 40 条修改：Gmail 只读（决定 3）；草稿无模型文字（决定 4）；附件在受限容器解析；认证结果来源；信号分两批冻结；首次来信按观察顺序；两人批准对称检查和状态机；批准绑定和复查；可以告诉谁（C-LNK-5）；脱敏并集、全文和递归 KYC 检查、占位符不还原；事件和建议动作的封闭格式；KYC 替换顺序；完整保存期；加密范围和轮换；去重比较；名单快照；收齐状态；字段表；优先级；词法边界；评测时间；跟进提醒不再引用 CASS；审计并发；出站清单；指标重写 | 待评审 |
+| 2026-10-29 | v0.2 | 按自测审查 30 条全部修改：邮箱发送权限按适配器如实写；风险规则加直接升 high 的条件，成功标准改为可测；模型调用前的 KYC 判断；风险用全部标签；可信认证头；信号冻结；KYC 存档替换；审计不含个人数据；模板由代码限定；`safe_ack` 无自由段落；封闭的内部用语词表；通知旧联系方式的收件人；两人批准的账号限制；NFKC；脱敏范围；抄入 Toolkit 规则原文；模板 ID 和指标定义；字段和起草的输出格式；审计 seq 和 JCS；Message-ID 冲突；金额和日期边界；时限定义；静态加密 | 待评审 |
+
+---
+
+## 附录 A：事件 Schema（schema_version 1）
+
+**公共字段（全部必填）：** `id`（字符串）、`type`（字符串，下表之一）、`occurred_at`（ISO 8601 UTC）、`deployment`（字符串，配置）、`case_id`（字符串）、`case_revision`（整数）、`case_event_seq`（整数）、`deal`（字符串或 null：已关联的交易名）、`investor_id`（字符串或 null：已关联的承诺）、`contact_id`（字符串或 null：名单匹配的发件人）、`transaction_ids`（字符串数组，可为空：C-LNK-4 列出的流水）、`data`（对象）、`schema_version`（整数 1）。关联尚未确定时相关字段为 null。
+
+| type | 关心的值（变化才发） | data 字段（类型；可空；来源） |
+|---|---|---|
+| `case.created` | — （每个 Case 一次） | `mailbox`（字符串；否；配置的邮箱名） |
+| `case.classified` | 采用的标签集合 | `classes`（字符串数组；否；采用的标签） |
+| `case.linked` | 关联集合 | `link_kinds`（字符串数组，取值 contact / commitment / deal / bank_line；否） |
+| `case.risk_changed` | 风险 | `from`（枚举 low / medium / high；首次为 null）、`to`（枚举；否）、`by`（枚举 system / person；否） |
+| `case.assigned` | 队列、负责人 | `queue`（字符串；否）、`assignee`（字符串；是） |
+| `case.closed` | 关闭 | `outcome`（枚举 replied / no_action / forwarded / duplicate / spam；否） |
+| `reply.approved` | 批准的模板和内容哈希 | `template_id`（字符串；否）、`content_sha256`（字符串；否） |
+| `payment.query_received` | 采用的标签首次含 `payment_query` | `amount_minor`（整数；是；已确认的 amount）、`currency`（字符串；是） |
+| `payment.evidence_received` | 采用的标签首次含 `payment_evidence` | `uetr`（字符串；是；规则提取，只在恰好一个 UETR 时填写）、`amount_minor`（整数；是）、`currency`（字符串；是）、`note`（字符串；否；固定 "sender's confirmation, not proof of receipt"） |
+| `withdrawal.requested` | 采用的标签首次含 `withdrawal`，或 `consent_evidence` 改变 | `consent_evidence`（枚举，§5.5a；是） |
+| `fee_payer.change_requested` | 首次满足：采用的标签含 `fee_or_terms_change` 且 `change_type` = fee_payer；之后三个字段任一改变 | `from_payer`、`to_payer`（枚举；是）、`consent_evidence`（枚举；是） |
+| `bank_details.change_requested` | 采用的标签首次含 `bank_details` | `account_last4`（4 位数字字符串；是）、`party_role`（枚举；是） |
+| `identity.change_requested` | 采用的标签首次含 `identity_change` | `change_fields`（字符串数组；否，可为空数组） |
+| `closing.lead_confirmed` | 首次满足：采用的标签含 `closing_confirmation`、`confirms` = yes 且经人确认、发件人是已认证的发件人（C-SIG-3）且在名单里是该交易的 lead | `confirms`（字符串，固定 "yes"；否） |
+| `kyc.documents_received` | 采用的标签首次含 `kyc_documents` | `document_types`（字符串数组；否，可为空数组） |
+| `verification.completed` | 核实任务进入 `approved` | `task_id`（字符串；否） |
+| `action.suggested` | 建议动作集合 | `actions`（字符串数组，C-OUT-3；否）、`amount_minor`（整数；是）、`currency`（字符串；是） |

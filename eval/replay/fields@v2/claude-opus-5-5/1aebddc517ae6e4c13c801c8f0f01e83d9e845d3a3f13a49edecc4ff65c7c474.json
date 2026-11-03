@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"document_types\":{\"value\":[\"other\"],\"confidence\":\"medium\",\"quote\":\"attached please find the scan of the front of my German identity card for your KYC check.\"},\"entity_type\":{\"value\":\"individual\",\"confidence\":\"high\",\"quote\":\"the front of my German identity card\"}}}",
+ "usage": {
+  "inputTokens": 1563,
+  "outputTokens": 95
+ }
+}

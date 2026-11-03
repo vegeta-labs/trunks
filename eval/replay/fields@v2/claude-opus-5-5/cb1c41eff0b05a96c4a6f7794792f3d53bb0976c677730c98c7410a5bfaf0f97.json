@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"amount\":{\"value\":\"£20,000.00\",\"confidence\":\"medium\",\"quote\":\"I sent two transfers of £20,000.00 each\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\"£20,000.00\"},\"payment_date\":{\"value\":{\"candidates\":[{\"value\":\"14 October 2026\",\"quote\":\"on 14 October 2026 and 21 October 2026\"},{\"value\":\"21 October 2026\",\"quote\":\"on 14 October 2026 and 21 October 2026\"}]},\"confidence\":\"medium\",\"quote\":\"\"},\"payer_name\":{\"value\":\"[NAME_2] Invest [NAME_3]\",\"confidence\":\"medium\",\"quote\":\"from my company [NAME_2] Invest [NAME_3]\"},\"reference\":{\"value\":\"NW-012\",\"confidence\":\"medium\",\"quote\":\"Quick one on Northwind Robotics, reference NW-012.\"},\"uetr\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 1745,
+  "outputTokens": 326
+ }
+}

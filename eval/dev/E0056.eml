@@ -1,0 +1,27 @@
+Return-Path: <grace@whitfield-wealth.example>
+Received: from mail.whitfield-wealth.example (mail.whitfield-wealth.example
+ [192.0.2.26]) by mx.ops.example with ESMTPS id 4b22d613eb for
+ <investors@ops.example>; Thu, 05 Nov 2026 14:30:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=whitfield-wealth.example; dkim=pass
+ header.d=whitfield-wealth.example; dmarc=pass
+ header.from=whitfield-wealth.example
+Message-ID: <E0056.241765544211@whitfield-wealth.example>
+Date: Thu, 05 Nov 2026 14:27:28 +0000
+From: "Grace Whitfield" <grace@whitfield-wealth.example>
+To: investors@ops.example
+Subject: Priya Raman - Northwind
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Priya Raman (NW-003) has decided not to go ahead with Northwind Robotics. Ple=
+ase withdraw her from the round.
+
+Many thanks,
+
+Grace Whitfield
+Whitfield Wealth
+020 7946 0145

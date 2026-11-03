@@ -1,0 +1,66 @@
+{
+  "id": "E0028",
+  "family": "F006",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-02T10:10:00Z",
+  "prior_messages": [],
+  "description": "MT103 whose :32A: amount uses a continental format (5.000,00) -> whole :32A: void, no evidence date -> payment_need_evidence.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "b2f87f5e-5f55-4a0a-8c55-cd861de80e32",
+    "amount": {
+      "minor": 500000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": null,
+    "payer_name": "PRIYA RAMAN",
+    "reference": "NW-003"
+  },
+  "rule_output": {
+    "uetrs": [
+      "b2f87f5e-5f55-4a0a-8c55-cd861de80e32"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 500000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-003"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C003",
+    "investor_id": "Northwind Robotics::003",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_need_evidence",
+  "notes": "Deliberately malformed :32A:261029GBP5.000,00. Owner ruling Q7 (PRD v0.7.8 C-EXT-3): any invalid item voids the whole :32A:, value date included -> no evidence amount/date and no payment_evidence rule label (class from the model). Body amount £5,000.00 is the only amount. value_date null (body gives no date). Nothing received -> payment_need_evidence. No amount mismatch: attachment amount set A is empty."
+}

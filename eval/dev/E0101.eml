@@ -1,0 +1,28 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=whitfield-wealth.example; dkim=pass
+ header.d=whitfield-wealth.example; dmarc=pass
+ header.from=whitfield-wealth.example
+Received: from mail.whitfield-wealth.example (mail.whitfield-wealth.example
+ [192.0.2.18]) by mx.ops.example with ESMTPS id FHD8FFIBKCMI; Fri, 06 Nov 2026
+ 16:12:00 +0000
+Message-ID: <E0101.gn6llht41qu3@whitfield-wealth.example>
+Date: Fri, 06 Nov 2026 16:09:38 +0000
+From: Grace Whitfield <grace@whitfield-wealth.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Priya Raman (NW-003) - refund account
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Dear Kestrel team,
+
+On behalf of my client Priya Raman (NW-003): should any refund become due
+from the Northwind Robotics round, for example on a scale-back, please send
+it to her updated account, shown below my signature.
+
+With best wishes,
+
+Grace Whitfield
+Whitfield Wealth Management
++44 20 7946 0145
+Refund account for Priya Raman: sort code 30-96-26, account 70114522

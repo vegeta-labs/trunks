@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"fee_or_terms_change\",\"confidence\":\"high\",\"reason\":\"Deal lead states the firm will no longer carry deal fees; they will be charged to investors from this round.\"},{\"class\":\"legal_documents\",\"confidence\":\"medium\",\"reason\":\"A signed investor consent form for the fee arrangement is attached, with more to follow.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2041,
+  "outputTokens": 125
+ }
+}

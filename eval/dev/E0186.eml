@@ -1,0 +1,93 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=lindqvist-partners.example; dkim=pass
+ header.d=lindqvist-partners.example; dmarc=pass
+ header.from=lindqvist-partners.example
+Received: from mail.lindqvist-partners.example
+ (mail.lindqvist-partners.example [192.0.2.151]) by mx.ops.example with ESMTPS
+ id 9MPPST5IAR for <investors@ops.example>; Thu, 05 Nov 2026 11:00:00 +0000
+Date: Thu, 05 Nov 2026 10:59:14 +0000
+From: Marcus Lindqvist <marcus@lindqvist-partners.example>
+To: investors@ops.example
+Subject: Re: Solent Biotherapeutics - final numbers for sign-off
+Message-ID: <E0186.13dc3w0ht6ws@lindqvist-partners.example>
+In-Reply-To: <21g0h33muq3v9p46@ops.example>
+References: <h1t7jtq4mnss9jrb@ops.example>
+ <67peu48at258fuel@lindqvist-partners.example> <jgyngk4elffo04la@ops.example>
+ <m2g1c4rer280onr6@lindqvist-partners.example> <21g0h33muq3v9p46@ops.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear team,
+
+Thanks for chasing all of this. I confirm the Solent Biotherapeutics numbers =
+as drafted: seven investors and =E2=82=AC275,000.00 in total. Happy for you t=
+o proceed to completion on that basis.
+
+Kind regards,
+Marcus
+
+Marcus Lindqvist
+Partner | Lindqvist Partners
++44 20 7946 0141
+
+On Wed, 4 Nov 2026 at 14:20, Kestrel Syndicate Operations <investors@ops.exam=
+ple> wrote:
+> Dear Marcus,
+>
+> A payment of =E2=82=AC30,000.00 arrived on 27 October without a reference. =
+It looks like Pieter's, and we have asked him to confirm before we allocate i=
+t.
+>
+> Kind regards,
+> Investor Operations
+> Kestrel Syndicate Operations
+>
+> On Wed, 4 Nov 2026 at 08:47, Marcus Lindqvist <marcus@lindqvist-partners.ex=
+ample> wrote:
+>> Spoke to him last night - he is staying at =E2=82=AC15,000 after all. What=
+'s the position on Pieter?
+>>
+>> M.
+>>
+>> On Tue, 3 Nov 2026 at 10:05, Kestrel Syndicate Operations <investors@ops.e=
+xample> wrote:
+>>> Dear Marcus,
+>>>
+>>> Not so far. Until he confirms in writing we are keeping him at =E2=82=AC1=
+5,000.00.
+>>>
+>>> Kind regards,
+>>> Investor Operations
+>>> Kestrel Syndicate Operations
+>>>
+>>> On Mon, 2 Nov 2026 at 15:12, Marcus Lindqvist <marcus@lindqvist-partners.=
+example> wrote:
+>>>> Thanks. Matthias mentioned to me last week that he might go down to =E2=
+=82=AC10,000. Has he written to you?
+>>>>
+>>>> Marcus
+>>>>
+>>>> On Mon, 2 Nov 2026 at 09:30, Kestrel Syndicate Operations <investors@ops=
+.example> wrote:
+>>>>> Dear Marcus,
+>>>>>
+>>>>> Draft final numbers for Solent Biotherapeutics:
+>>>>>
+>>>>>   Investors:          7
+>>>>>   Total commitments:  =E2=82=AC275,000.00
+>>>>>   Received in full:   3 investors
+>>>>>   Part received:      Matthias Vogel, =E2=82=AC5,000.00 of =E2=82=AC15,=
+000.00
+>>>>>   Not yet allocated:  Pieter van Dijk
+>>>>>
+>>>>> Please confirm or let us know any adjustments.
+>>>>>
+>>>>> Kind regards,
+>>>>> Investor Operations
+>>>>> Kestrel Syndicate Operations
+>>>>>
+>>>>
+>>>
+>>
+>

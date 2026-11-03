@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"investor\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\"please process [NAME_1] [NAME_2]'s withdrawal from Northwind Robotics (NW-003) today\"},\"consent_evidence\":{\"value\":\"none\",\"confidence\":\"high\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 1556,
+  "outputTokens": 113
+ }
+}

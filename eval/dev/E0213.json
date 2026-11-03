@@ -1,0 +1,50 @@
+{
+  "id": "E0213",
+  "family": "F048",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-30T11:50:00Z",
+  "prior_messages": [],
+  "description": "Lead confirmation with a Reply-To header identical to From (no reply_to_mismatch).",
+  "classes": [
+    "closing_confirmation"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "confirms": "yes",
+    "deal": "Solent Biotherapeutics"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C041",
+    "investor_id": null,
+    "deal": "Solent Biotherapeutics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "closing_ack",
+  "notes": "Reply-To equals From -> reply_to_mismatch false, no escalation."
+}

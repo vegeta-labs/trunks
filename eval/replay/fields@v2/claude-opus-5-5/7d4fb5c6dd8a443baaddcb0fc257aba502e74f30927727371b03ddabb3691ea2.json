@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"party_role\":{\"value\":\"investor\",\"confidence\":\"medium\",\"quote\":\"For any future payments to me in relation to Northwind Robotics (NW-009), please use:\"},\"change_requested\":{\"value\":true,\"confidence\":\"high\",\"quote\":\"Please note that my bank account has changed.\"}}}",
+ "usage": {
+  "inputTokens": 1522,
+  "outputTokens": 102
+ }
+}

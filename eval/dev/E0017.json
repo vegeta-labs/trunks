@@ -1,0 +1,76 @@
+{
+  "id": "E0017",
+  "family": "F003",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-04T09:30:00Z",
+  "prior_messages": [],
+  "description": "MT103 in body whose :59: carries the SPV's GB IBAN -> rule label bank_details -> high, safe_ack.",
+  "classes": [
+    "payment_evidence",
+    "bank_details"
+  ],
+  "expected_risk": "high",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "105f40cc-99eb-43ea-8be8-115490377ee8",
+    "amount": {
+      "minor": 500000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-11-02",
+    "payer_name": "LUCIA FERNANDEZ",
+    "reference": "NW-008",
+    "party_role": "other",
+    "account_last4": "8838",
+    "change_requested": false
+  },
+  "rule_output": {
+    "uetrs": [
+      "105f40cc-99eb-43ea-8be8-115490377ee8"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 500000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-008"
+    ],
+    "account_last4": [
+      "8838"
+    ],
+    "evidence_value_dates": [
+      "2026-11-02"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C008",
+    "investor_id": "Northwind Robotics::008",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0006"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "IBAN in :59: is the beneficiary SPV account (checksum valid, fictional). bank_details is a rule label (C-CLS-4) -> safe_ack (C-DRF-3 step 1). party_role 'other': the account belongs to the deal SPV, which is none of investor/company/seller/lead (writer's reading, see QUESTIONS W1). change_requested false: nothing asks to change an account."
+}

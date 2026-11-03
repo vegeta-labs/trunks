@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"bank_details\",\"confidence\":\"high\",\"reason\":\"Investor gives a new IBAN for future payments to them relating to Northwind Robotics (NW-009).\"},{\"class\":\"exit_distribution\",\"confidence\":\"low\",\"reason\":\"Future payments to the investor could be distributions of proceeds, but no exit or distribution is mentioned.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1843,
+  "outputTokens": 130
+ }
+}

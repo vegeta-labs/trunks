@@ -1,0 +1,27 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=laurent-mail.example; dkim=pass header.d=laurent-mail.example;
+ dmarc=pass header.from=laurent-mail.example
+Received: from mail.laurent-mail.example (mail.laurent-mail.example
+ [192.0.2.223]) by mx.ops.example with ESMTPS id SX1FXUIMYLEM; Fri, 23 Oct
+ 2026 15:31:00 +0000
+Message-ID: <E0064.wjfcx43jvacy@laurent-mail.example>
+Date: Fri, 23 Oct 2026 15:28:41 +0000
+From: Sophie Laurent <sophie.laurent@laurent-mail.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Reducing my Northwind Robotics allocation
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Would it be possible to reduce my commitment in Northwind Robotics to GBP 12,=
+500
+instead of the =C2=A320,000 I originally indicated? A family matter means I n=
+eed to
+keep more cash available this year.
+
+I'm sorry for the late notice and hope it doesn't cause problems.
+
+Bien =C3=A0 vous,
+Sophie Laurent

@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"document_types\":{\"value\":[\"passport\"],\"confidence\":\"high\",\"quote\":\"attached is a photo of my passport for your KYC checks\"},\"entity_type\":{\"value\":\"individual\",\"confidence\":\"medium\",\"quote\":\"attached is a photo of my passport for your KYC checks\"},\"uetr\":{\"value\":\"29f90f33-942a-4723-a20a-233d120bd672\",\"confidence\":\"high\",\"quote\":\"{121:29f90f33-942a-4723-a20a-233d120bd672}\"},\"amount\":{\"value\":\"£6,000.00\",\"confidence\":\"high\",\"quote\":\"my Northwind Robotics payment of £6,000.00\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\":32A:261104GBP6000,00\"},\"value_date\":{\"value\":\"261104\",\"confidence\":\"high\",\"quote\":\":32A:261104GBP6000,00\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\":50K:/[NAME_1] [NAME_2]\"},\"reference\":{\"value\":\"/ROC/NW-013\",\"confidence\":\"medium\",\"quote\":\":70:/ROC/NW-013\"}}}",
+ "usage": {
+  "inputTokens": 2199,
+  "outputTokens": 396
+ }
+}

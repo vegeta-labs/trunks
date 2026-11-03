@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"amount\":{\"value\":\"GBP 7,500\",\"confidence\":\"high\",\"quote\":\"transferred GBP 7,500 from his own account\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\"transferred GBP 7,500\"},\"payment_date\":{\"value\":\"9 November 2026\",\"confidence\":\"high\",\"quote\":\"on 9 November 2026\"},\"payer_name\":{\"value\":\"Robert [NAME_2]\",\"confidence\":\"high\",\"quote\":\"My father, Robert [NAME_2], transferred GBP 7,500 from his own account\"},\"third_party_payer\":{\"value\":\"Robert [NAME_2]\",\"confidence\":\"high\",\"quote\":\"My father, Robert [NAME_2], transferred GBP 7,500 from his own account\"},\"reference\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"uetr\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 1745,
+  "outputTokens": 305
+ }
+}

@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"b7b59b7d-1327-402d-ba3b-0c49b83ff783\",\"confidence\":\"high\",\"quote\":\"{121:b7b59b7d-1327-402d-ba3b-0c49b83ff783}\"},\"amount\":{\"value\":{\"candidates\":[{\"value\":\"£10,000\",\"quote\":\"I transferred the first £10,000 of my Northwind Robotics commitment\"},{\"value\":\"GBP9000,00\",\"quote\":\":32A:261023GBP9000,00\"}]},\"confidence\":\"medium\",\"quote\":\"\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\":32A:261023GBP9000,00\"},\"value_date\":{\"value\":\"261023\",\"confidence\":\"high\",\"quote\":\":32A:261023GBP9000,00\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\":50K:[NAME_1] [NAME_2]\"},\"reference\":{\"value\":\"NW-007\",\"confidence\":\"high\",\"quote\":\":70:NW-007\"},\"payment_date\":{\"value\":\"23 October 2026\",\"confidence\":\"high\",\"quote\":\"on 23 October 2026 (reference NW-007)\"}}}",
+ "usage": {
+  "inputTokens": 1940,
+  "outputTokens": 407
+ }
+}

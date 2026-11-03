@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"platform\":{\"value\":null,\"confidence\":\"medium\",\"quote\":\"\"},\"document_type\":{\"value\":\"shareholder_resolution\",\"confidence\":\"high\",\"quote\":\"Our lawyers have set up the written shareholder resolution approving the\"},\"deal\":{\"value\":\"Northwind Robotics\",\"confidence\":\"high\",\"quote\":\"Northwind Robotics share issue\"}}}",
+ "usage": {
+  "inputTokens": 1612,
+  "outputTokens": 129
+ }
+}

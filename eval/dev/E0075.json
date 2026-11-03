@@ -1,0 +1,56 @@
+{
+  "id": "E0075",
+  "family": "F018",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-03T11:20:00Z",
+  "prior_messages": [],
+  "description": "Lead moves the Larkspur fees from herself to investors and attaches a signed investor consent PDF (with the investor's reference).",
+  "classes": [
+    "fee_or_terms_change"
+  ],
+  "expected_risk": "high",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "change_type": "fee_payer",
+    "from_payer": "lead",
+    "to_payer": "investors",
+    "consent_evidence": "attached_document"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [
+      "LK-003"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C040",
+    "investor_id": "Larkspur Energy Storage::003",
+    "deal": "Larkspur Energy Storage",
+    "transaction_ids": [
+      "T-LK-0002"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "safe_ack",
+  "notes": "PDF with text layer (no KYC words). Reference LK-003 is only in the PDF text and links Olivia Grant's commitment, so the deal is Larkspur without a deal candidate list; bank line T-LK-0002 carries LK-003."
+}

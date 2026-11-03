@@ -1,0 +1,22 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=priya@ramanfarnily.example; dkim=pass
+ header.d=ramanfarnily.example; dmarc=pass header.from=ramanfarnily.example
+Received: from mail.ramanfarnily.example (mail.ramanfarnily.example
+ [192.0.2.30]) by mx.ops.example with ESMTPS; Wed, 28 Oct 2026 11:26:07 +0000
+From: Priya Raman <priya@ramanfarnily.example>
+To: investors@ops.example
+Subject: Has my payment arrived?
+Date: Wed, 28 Oct 2026 11:26:00 +0000
+Message-ID: <E0245.ccryjz5404ca@ramanfarnily.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+I sent =C2=A35,000 for my Northwind Robotics subscription on 21 October 2026 =
+with the reference NW-003. Could you let me know whether it has arrived and h=
+ow much is still showing against my name?
+
+Many thanks,
+Priya

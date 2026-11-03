@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"unreferenced_payment\",\"confidence\":\"high\",\"reason\":\"Payment made by the investor's husband from his own account without a reference.\"},{\"class\":\"payment_query\",\"confidence\":\"medium\",\"reason\":\"Sender states a payment of £6,000 was made, with no confirmation attached, and asks for allocation.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1844,
+  "outputTokens": 118
+ }
+}

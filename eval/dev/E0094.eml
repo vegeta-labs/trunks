@@ -1,0 +1,60 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=northwind-robotics.example; dkim=pass
+ header.d=northwind-robotics.example; dmarc=pass
+ header.from=northwind-robotics.example
+Received: from mail.northwind-robotics.example
+ (mail.northwind-robotics.example [192.0.2.38]) by mx.ops.example with ESMTPS
+ id VJ3J0JY14E7P; Tue, 10 Nov 2026 09:37:00 +0000
+Message-ID: <E0094.am9952bylw96@northwind-robotics.example>
+Date: Tue, 10 Nov 2026 09:34:42 +0000
+From: Ethan Clarke <ethan.clarke@northwind-robotics.example>
+To: Kestrel Legal <legal@ops.example>
+Cc: Fiona Ramsay <fiona@ramsay-capital.example>
+Subject: Subscription agreement for countersignature
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============2165660248487407570=="
+
+--===============2165660248487407570==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Dear Legal team,
+
+Please find attached the Northwind Robotics subscription agreement for the
+SPV, already signed by the company. It needs the lead's countersignature -
+Fiona is copied - and then the SPV's signature.
+
+Many thanks,
+Ethan Clarke
+CFO, Northwind Robotics Ltd
+
+--===============2165660248487407570==
+Content-Type: application/pdf
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="Northwind_Robotics_Subscription_Agreement.pdf"
+MIME-Version: 1.0
+
+JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4K
+ZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4K
+ZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAg
+MCA1OTUgODQyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvQ29udGVu
+dHMgNSAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUx
+IC9CYXNlRm9udCAvSGVsdmV0aWNhIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nID4+CmVuZG9i
+ago1IDAgb2JqCjw8IC9MZW5ndGggNTA3ID4+CnN0cmVhbQpCVCAvRjEgMTAgVGYgNTYgNzkwIFRk
+IDE0IFRMCihTVUJTQ1JJUFRJT04gQUdSRUVNRU5UKSBUaiBUKgooTm9ydGh3aW5kIFJvYm90aWNz
+IEx0ZCBhbmQgdGhlIEtlc3RyZWwgU1BWKSBUaiBUKgooKSBUaiBUKgooMS4gVGhlIEludmVzdG9y
+IHN1YnNjcmliZXMgZm9yIE9yZGluYXJ5IFNoYXJlcyBmb3IgYW4gYWdncmVnYXRlIHN1YnNjcmlw
+dGlvbikgVGogVCoKKCAgIHByaWNlIG9mIKMzNjYsNTAwLjAwIHBheWFibGUgYXQgQ29tcGxldGlv
+bi4pIFRqIFQqCigyLiBDb21wbGV0aW9uIHNoYWxsIHRha2UgcGxhY2Ugb24gb3IgYWJvdXQgMjAg
+Tm92ZW1iZXIgMjAyNi4pIFRqIFQqCigpIFRqIFQqCihTaWduZWQgZm9yIHRoZSBDb21wYW55OiBF
+dGhhbiBDbGFya2UpIFRqIFQqCihDb3VudGVyc2lnbmVkIGJ5IHRoZSBMZWFkOiBfX19fX19fX19f
+X19fX19fX19fX19fKSBUaiBUKgooU2lnbmVkIGZvciB0aGUgSW52ZXN0b3IgXChTUFZcKTogX19f
+X19fX19fX19fX19fX19fX19fXykgVGogVCoKRVQKZW5kc3RyZWFtCmVuZG9iago2IDAgb2JqCjw8
+IC9UaXRsZSAoU3Vic2NyaXB0aW9uIEFncmVlbWVudCkgL1Byb2R1Y2VyIChEb2NzKSA+PgplbmRv
+YmoKeHJlZgowIDcKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDE1IDAwMDAwIG4gCjAwMDAw
+MDAwNjQgMDAwMDAgbiAKMDAwMDAwMDEyMSAwMDAwMCBuIAowMDAwMDAwMjQ3IDAwMDAwIG4gCjAw
+MDAwMDAzNDQgMDAwMDAgbiAKMDAwMDAwMDkwMiAwMDAwMCBuIAp0cmFpbGVyCjw8IC9TaXplIDcg
+L1Jvb3QgMSAwIFIgL0luZm8gNiAwIFIgPj4Kc3RhcnR4cmVmCjk3MgolJUVPRgo=
+
+--===============2165660248487407570==--

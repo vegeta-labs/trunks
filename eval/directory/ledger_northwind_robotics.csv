@@ -1,0 +1,13 @@
+transaction_id,date,amount,payer,reference,status,investor_id,investor_name,decided_by,withdrawn_on,currency
+T-NW-0001,2026-10-20,10000.00,A HART,NW-001 Hart,auto,001,Amelia Hart,system,,GBP
+T-NW-0002,2026-10-21,15000.00,O BENNETT,NW002,confirmed,002,Oliver Bennett,ops.reviewer,,GBP
+T-NW-0003,2026-10-22,50000.00,T WOLSKI,INVESTMENT,unmatched,,,,,GBP
+T-NW-0004,2026-10-16,100000.00,HARBOUR LANE GROUP PLC,,confirmed,005,Harbour Lane Holdings Ltd,ops.reviewer,,GBP
+T-NW-0005,2026-10-23,15000.00,J BECKER,NW 007,rejected,007,Jonas Becker,ops.reviewer,,GBP
+T-NW-0006,2026-10-26,2500.00,L FERNANDEZ,NW-008 part 1,auto,008,Lucía Fernández,system,,GBP
+T-NW-0007,2026-10-19,30000.00,CHEN W,NW-009,auto,009,Chen Wei,system,,GBP
+T-NW-0008,2026-10-27,8000.00,M ONEILL,NW-011,auto,011,Margaret O'Neill,system,,EUR
+T-NW-0009,2026-10-14,20000.00,DUARTE INVEST LTD,NW-012 1/2,confirmed,012,Rafael Duarte,ops.reviewer,,GBP
+T-NW-0010,2026-10-21,20000.00,DUARTE INVEST LTD,NW-012 2/2,confirmed,012,Rafael Duarte,ops.reviewer,,GBP
+T-NW-0011,2026-10-28,10000.00,P HALL,NW-015,auto,015,Peter Hall,system,,GBP
+T-NW-0012,2026-10-29,9000.00,D OSEI,NW-016,auto,016,Daniel Osei,system,,GBP

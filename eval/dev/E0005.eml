@@ -1,0 +1,23 @@
+Return-Path: <moneill@oneill-home.example>
+Received: from mail.oneill-home.example (mail.oneill-home.example
+ [192.0.2.184]) by mx.ops.example with ESMTPS id 3691a4b66f for
+ <investors@ops.example>; Thu, 29 Oct 2026 15:48:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=oneill-home.example; dkim=pass header.d=oneill-home.example;
+ dmarc=pass header.from=oneill-home.example
+Message-ID: <E0005.a4d2b24e6a3f@oneill-home.example>
+Date: Thu, 29 Oct 2026 15:45:25 +0000
+From: "Margaret O'Neill" <moneill@oneill-home.example>
+To: investors@ops.example
+Subject: Northwind Robotics - my payment
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Good afternoon,
+
+I sent =C2=A38,000.00 to the Northwind Robotics SPV on 27 October 2026 under =
+reference NW-011. Please could you confirm it has been received?
+
+With best wishes,
+Margaret O'Neill

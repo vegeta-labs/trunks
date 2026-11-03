@@ -1,0 +1,31 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=northwind-roboticss.example; dkim=pass
+ header.d=northwind-roboticss.example; dmarc=pass
+ header.from=northwind-roboticss.example
+Received: from mail.northwind-roboticss.example
+ (mail.northwind-roboticss.example [192.0.2.223]) by mx.ops.example with
+ ESMTPS id FCF2XVLJMY for <investors@ops.example>; Mon, 02 Nov 2026 10:45:00
+ +0000
+Date: Mon, 02 Nov 2026 10:44:11 +0000
+From: Ethan Clarke <ethan.clarke@northwind-roboticss.example>
+To: investors@ops.example
+Reply-To: Ethan Clarke <ethan.clarke.nw@postbox-mail.example>
+Subject: Northwind - new account details
+Message-ID: <E0227.pxrsfa2go0pr@northwind-roboticss.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+Quick note from our side: we have changed banks as part of the Series A preparations, so the account details for Northwind Robotics subscriptions are now:
+
+Northwind Robotics Ltd
+GB50 QZBK 4597 5440 1052 45
+
+Could you share this with any investors still to pay? Please send any questions to my personal address for now, as our IT team is migrating mailboxes this week.
+
+Thanks,
+Ethan
+
+Ethan Clarke | Finance Director | Northwind Robotics

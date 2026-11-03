@@ -1,0 +1,31 @@
+Received: from mail.marsh-nominees.example (mail.marsh-nominees.example
+ [192.0.2.147]) by mx.ops.example with ESMTPS id 60c658a509; Wed, 28 Oct 2026
+ 14:51:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=marsh-nominees.example; dkim=pass
+ header.d=marsh-nominees.example; dmarc=pass
+ header.from=marsh-nominees.example
+From: Leo Marsh <leo.marsh@marsh-nominees.example>
+To: Investor Operations <investors@ops.example>
+Subject: Nominee KYC - LK-004
+Date: Wed, 28 Oct 2026 14:50:25 +0000
+Message-ID: <E0150.c4b1d339805a@marsh-nominees.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear colleagues,
+
+Marsh Nominees holds the Larkspur Energy Storage commitment LK-004 as nominee=
+ for our client Mr Ahmed Karim. Before we submit anything, could you confirm =
+what customer due diligence you require from us as the registered nominee, an=
+d what you require on the underlying beneficial owner?
+
+In other syndicates we have provided our own corporate documents plus a relia=
+nce letter covering the beneficial owner. Please let us know whether that app=
+roach is acceptable to you.
+
+Kind regards,
+
+Leo Marsh
+Director, Marsh Nominees

@@ -1,0 +1,55 @@
+Return-Path: <jsmith@smithfamily.example>
+Received: from mail.smithfamily.example (mail.smithfamily.example
+ [192.0.2.194]) by mx.ops.example with ESMTPS id 23d46ac7ae for
+ <investors@ops.example>; Wed, 04 Nov 2026 16:05:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=smithfamily.example; dkim=pass header.d=smithfamily.example;
+ dmarc=pass header.from=smithfamily.example
+Message-ID: <E0030.81b39b17f3e1@smithfamily.example>
+Date: Wed, 04 Nov 2026 16:02:32 +0000
+From: "James Smith" <jsmith@smithfamily.example>
+To: investors@ops.example
+Subject: Bank file for NW-010
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============6931560323080804616=="
+
+--===============6931560323080804616==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+My bank exported the attached file for the GBP 12,000.00 I sent on 2 November=
+ 2026 (reference NW-010). Hopefully it opens at your end.
+
+Regards,
+James Smith
+
+--===============6931560323080804616==
+Content-Type: application/xml
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="pacs008_payment.xml"
+MIME-Version: 1.0
+
+PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPCFET0NUWVBFIERvY3VtZW50
+IFsKICA8IUVMRU1FTlQgRG9jdW1lbnQgQU5ZPgpdPgo8RG9jdW1lbnQgeG1sbnM9InVybjppc286
+c3RkOmlzbzoyMDAyMjp0ZWNoOnhzZDpwYWNzLjAwOC4wMDEuMDgiPgogIDxGSVRvRklDc3RtckNk
+dFRyZj4KICAgIDxHcnBIZHI+CiAgICAgIDxNc2dJZD5RWkJLLU1TRy1KU00tNTE1MDwvTXNnSWQ+
+CiAgICAgIDxDcmVEdFRtPjIwMjYtMTEtMDJUMTA6NDQ6MDlaPC9DcmVEdFRtPgogICAgICA8TmJP
+ZlR4cz4xPC9OYk9mVHhzPgogICAgICA8U3R0bG1JbmY+CiAgICAgICAgPFN0dGxtTXRkPkNMUkc8
+L1N0dGxtTXRkPgogICAgICA8L1N0dGxtSW5mPgogICAgPC9HcnBIZHI+CiAgICA8Q2R0VHJmVHhJ
+bmY+CiAgICAgIDxQbXRJZD4KICAgICAgICA8SW5zdHJJZD5JTlNUUi0xPC9JbnN0cklkPgogICAg
+ICAgIDxFbmRUb0VuZElkPk5PVFBST1ZJREVEPC9FbmRUb0VuZElkPgogICAgICAgIDxVRVRSPjIy
+YjdhM2JjLWRjMDItNDc0MC05YjIxLTg3MGVmY2ViOWY5MzwvVUVUUj4KICAgICAgPC9QbXRJZD4K
+ICAgICAgPEludHJCa1N0dGxtQW10IENjeT0iR0JQIj4xMjAwMC4wMDwvSW50ckJrU3R0bG1BbXQ+
+CiAgICAgIDxJbnRyQmtTdHRsbUR0PjIwMjYtMTEtMDI8L0ludHJCa1N0dGxtRHQ+CiAgICAgIDxD
+aHJnQnI+U0hBUjwvQ2hyZ0JyPgogICAgICA8RGJ0cj48Tm0+SkFNRVMgU01JVEg8L05tPjwvRGJ0
+cj4KICAgICAgPERidHJBZ3Q+PEZpbkluc3RuSWQ+PEJJQ0ZJPlFaQktHQjJMWFhYPC9CSUNGST48
+L0Zpbkluc3RuSWQ+PC9EYnRyQWd0PgogICAgICA8Q2R0ckFndD48RmluSW5zdG5JZD48QklDRkk+
+UVpCS0dCMkxYWFg8L0JJQ0ZJPjwvRmluSW5zdG5JZD48L0NkdHJBZ3Q+CiAgICAgIDxDZHRyPjxO
+bT5OT1JUSFdJTkQgUk9CT1RJQ1MgU1BWIExQPC9ObT48L0NkdHI+CiAgICAgIDxDZHRyQWNjdD48
+SWQ+PE90aHI+PElkPk5XUi1TUFYtQ0xJRU5ULUdCUDwvSWQ+PC9PdGhyPjwvSWQ+PC9DZHRyQWNj
+dD4KICAgICAgPFJtdEluZj48VXN0cmQ+TlctMDEwIFNNSVRIPC9Vc3RyZD48L1JtdEluZj4KICAg
+IDwvQ2R0VHJmVHhJbmY+CiAgPC9GSVRvRklDc3RtckNkdFRyZj4KPC9Eb2N1bWVudD4K
+
+--===============6931560323080804616==--

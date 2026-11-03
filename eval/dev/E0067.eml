@@ -1,0 +1,25 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=duarte-invest.example; dkim=pass
+ header.d=duarte-invest.example; dmarc=pass header.from=duarte-invest.example
+Received: from mail.duarte-invest.example (mail.duarte-invest.example
+ [192.0.2.83]) by mx.ops.example with ESMTPS id 7PSOC4339XXP; Thu, 05 Nov 2026
+ 13:47:00 +0000
+Message-ID: <E0067.n6rcbdkpifer@duarte-invest.example>
+Date: Thu, 05 Nov 2026 13:44:18 +0000
+From: Rafael Duarte <rafael@duarte-invest.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: NW-012 - increase
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello,
+
+For my Northwind Robotics position (NW-012): I would like to take it up to
+US$60,000 in total. Most of my liquidity is in dollars at the moment, so it
+would be easiest for me to send USD.
+
+My Solent holding stays as it is.
+
+Rafael Duarte
+Duarte Invest

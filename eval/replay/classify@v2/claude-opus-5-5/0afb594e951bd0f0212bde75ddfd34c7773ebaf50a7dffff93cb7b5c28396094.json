@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"other_known\",\"confidence\":\"high\",\"reason\":\"Deal lead asks to set up a rolling close: first close 20 November, second close in January for late investors.\"},{\"class\":\"closing_confirmation\",\"confidence\":\"low\",\"reason\":\"Discusses closing timing and the current investor list for the first close.\"},{\"class\":\"kyc_documents\",\"confidence\":\"low\",\"reason\":\"Late investors' KYC will not be completed by the first close date.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1903,
+  "outputTokens": 156
+ }
+}

@@ -1,0 +1,55 @@
+Return-Path: <jsmith@smithfamily.example>
+Received: from mail.smithfamily.example (mail.smithfamily.example
+ [192.0.2.230]) by mx.ops.example with ESMTPS id e685651423 for
+ <investors@ops.example>; Tue, 27 Oct 2026 09:50:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=smithfamily.example; dkim=pass header.d=smithfamily.example;
+ dmarc=pass header.from=smithfamily.example
+Message-ID: <E0047.164575442e27@smithfamily.example>
+Date: Tue, 27 Oct 2026 09:47:43 +0000
+From: "James Smith" <jsmith@smithfamily.example>
+To: investors@ops.example
+Subject: Proof of address
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============3817144289058253502=="
+
+--===============3817144289058253502==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Please find attached a recent utility bill as my proof of address for the Nor=
+thwind Robotics KYC.
+
+Regards,
+James Smith
+
+--===============3817144289058253502==
+Content-Type: application/pdf
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="proof_of_address.pdf"
+MIME-Version: 1.0
+
+JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4K
+ZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4K
+ZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAg
+MCA1OTUgODQyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA1IDAgUiA+PiA+PiAvQ29udGVu
+dHMgNCAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL0xlbmd0aCA0NTUgPj4Kc3RyZWFtCkJUCi9G
+MSAxMCBUZgoxMyBUTAo1MCA3OTAgVGQKKFRoYW1lcyBWYWxlIFdhdGVyKSBUaiBUKgooQW5udWFs
+IHdhdGVyIHVzYWdlIHN0YXRlbWVudCkgVGogVCoKKFN0YXRlbWVudCBkYXRlOiAyIE9jdG9iZXIg
+MjAyNikgVGogVCoKKCkgVGogVCoKKE1yIEphbWVzIFNtaXRoKSBUaiBUKgooMTQgT3JjaGFyZCBD
+bG9zZSkgVGogVCoKKE1hcmxvdykgVGogVCoKKFNMNyAyUVQpIFRqIFQqCigpIFRqIFQqCihDdXN0
+b21lciByZWZlcmVuY2U6IFRWVy01NTIxLUpTKSBUaiBUKgooU3VwcGx5IGFkZHJlc3MgYXMgYWJv
+dmUpIFRqIFQqCihNZXRlciByZWFkaW5nIFwoYWN0dWFsXCk6IDEsNDgyIGN1YmljIG1ldHJlcykg
+VGogVCoKKFVzYWdlIHRoaXMgeWVhcjogMTE4IGN1YmljIG1ldHJlcykgVGogVCoKKFRoYW5rIHlv
+dSBmb3IgYmVpbmcgYSBUaGFtZXMgVmFsZSBXYXRlciBjdXN0b21lci4pIFRqIFQqCkVUCmVuZHN0
+cmVhbQplbmRvYmoKNSAwIG9iago8PCAvVHlwZSAvRm9udCAvU3VidHlwZSAvVHlwZTEgL0Jhc2VG
+b250IC9IZWx2ZXRpY2EgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgPj4KZW5kb2JqCjYgMCBv
+YmoKPDwgL1RpdGxlIChTdGF0ZW1lbnQpIC9Qcm9kdWNlciAoVzEgc2FtcGxlIHdyaXRlcikgPj4K
+ZW5kb2JqCnhyZWYKMCA3CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAxNSAwMDAwMCBuIAow
+MDAwMDAwMDY0IDAwMDAwIG4gCjAwMDAwMDAxMjEgMDAwMDAgbiAKMDAwMDAwMDI0NyAwMDAwMCBu
+IAowMDAwMDAwNzUzIDAwMDAwIG4gCjAwMDAwMDA4NTAgMDAwMDAgbiAKdHJhaWxlcgo8PCAvU2l6
+ZSA3IC9Sb290IDEgMCBSIC9JbmZvIDYgMCBSID4+CnN0YXJ0eHJlZgo5MTkKJSVFT0YK
+
+--===============3817144289058253502==--

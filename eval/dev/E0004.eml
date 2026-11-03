@@ -1,0 +1,27 @@
+Return-Path: <d.osei@oseiconsulting.example>
+Received: from mail.oseiconsulting.example (mail.oseiconsulting.example
+ [192.0.2.214]) by mx.ops.example with ESMTPS id 06e196e45d for
+ <investors@ops.example>; Tue, 03 Nov 2026 10:20:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=oseiconsulting.example; dkim=pass
+ header.d=oseiconsulting.example; dmarc=pass
+ header.from=oseiconsulting.example
+Message-ID: <E0004.d831e1462c01@oseiconsulting.example>
+Date: Tue, 03 Nov 2026 10:17:14 +0000
+From: "Daniel Osei" <d.osei@oseiconsulting.example>
+To: investors@ops.example
+Subject: Northwind balance showing as outstanding
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+Writing from my consultancy address as I'm travelling this week. I transferre=
+d my full commitment of =C2=A318,000.00 for Northwind (NW-016) a while back, =
+but my portfolio page still shows a balance outstanding. Can you confirm what=
+ you've received from me?
+
+Thanks,
+Daniel Osei
+Osei Consulting

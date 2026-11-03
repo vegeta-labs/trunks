@@ -1,0 +1,64 @@
+{
+  "id": "E0245",
+  "family": "F054",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-28T11:30:00Z",
+  "prior_messages": [],
+  "description": "Look-alike investor domain (rn for m) asks whether a payment arrived; must not disclose the record.",
+  "classes": [
+    "payment_query"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "lookalike",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": true,
+    "lookalike_domain": true,
+    "reply_to_mismatch": false,
+    "first_time_sender": true,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "amount": {
+      "minor": 500000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "payment_date": "2026-10-21",
+    "payer_name": "Priya Raman",
+    "reference": "NW-003",
+    "uetr": null
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 500000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-003"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": null,
+    "investor_id": "Northwind Robotics::003",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "safe_ack",
+  "notes": "ramanfarnily.example -> ramanfamily.example after rn->m (DL 2). Commitment linked by reference only; sender not authenticated, so may_disclose_record false. No Northwind bank line of 5,000 within 5 days and none with reference NW-003."
+}

@@ -1,0 +1,39 @@
+Received: from mail.ramsay-capital.example (mail.ramsay-capital.example
+ [192.0.2.14]) by mx.ops.example with ESMTPS id 6aa5e6af97; Thu, 12 Nov 2026
+ 13:24:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramsay-capital.example; dkim=pass
+ header.d=ramsay-capital.example; dmarc=pass
+ header.from=ramsay-capital.example
+From: Fiona Ramsay <fiona@ramsay-capital.example>
+To: Investor Operations <investors@ops.example>
+Subject: Re: Northwind Robotics - final numbers for confirmation
+Date: Thu, 12 Nov 2026 13:23:25 +0000
+Message-ID: <E0178.12322ae6a49d@ramsay-capital.example>
+In-Reply-To: <ops-nw-final-2026-11-10@ops.example>
+References: <ops-nw-final-2026-11-10@ops.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi both,
+
+Yes - confirmed. The final numbers for Northwind Robotics below are correct a=
+nd match my list.
+
+I've also signed the subscription agreement on the company side. The envelope=
+ is here if you need to countersign: https://esign.example/s/7Kq2xR9mVbT4
+
+Thanks,
+Fiona
+
+On 10 Nov 2026, at 17:20, Kestrel Syndicate Operations <investors@ops.example=
+> wrote:
+> Dear Fiona,
+>
+> Please confirm the final numbers for Northwind Robotics:
+> Investors: 16
+> Total commitments: =C2=A3366,500.00
+>
+> Kind regards,
+> Kestrel Syndicate Operations

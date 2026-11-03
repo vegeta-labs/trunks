@@ -1,0 +1,70 @@
+{
+  "id": "E0171",
+  "family": "F042",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-05T11:11:00Z",
+  "prior_messages": [],
+  "description": "Payment query plus a surname change in one email -> identity_change forces safe_ack.",
+  "classes": [
+    "payment_query",
+    "identity_change"
+  ],
+  "expected_risk": "high",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "amount": {
+      "minor": 500000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "payment_date": "2026-11-02",
+    "payer_name": "Lucía Fernández",
+    "reference": "NW-008",
+    "uetr": null,
+    "change_fields": [
+      "name"
+    ]
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 500000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-008"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C008",
+    "investor_id": "Northwind Robotics::008",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0006"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "identity_change floor high; C-DRF-3 ① gives safe_ack. payer_name is the sender (she says she sent it). No bank line of 5000.00 within 5 days of 2026-11-02; T-NW-0006 matches by reference."
+}

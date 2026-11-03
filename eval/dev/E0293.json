@@ -1,0 +1,52 @@
+{
+  "id": "E0293",
+  "family": "F062",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-06T16:05:00Z",
+  "prior_messages": [],
+  "description": "Adviser's withdrawal request with 'urgent', 'today' and 'keep this between us'.",
+  "classes": [
+    "withdrawal"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "pressure",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "investor": "Priya Raman",
+    "consent_evidence": "none"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [
+      "NW-003"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C045",
+    "investor_id": "Northwind Robotics::003",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "Withdrawal floor is already high; the pressure step is capped. No consent from the investor (not copied, nothing attached) -> none."
+}

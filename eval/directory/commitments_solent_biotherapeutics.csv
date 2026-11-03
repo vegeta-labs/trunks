@@ -1,0 +1,8 @@
+investor_id,name,email,reference,cash_due,scheme
+001,Rafael Duarte,rafael@duarte-invest.example,SB-001,25000.00,
+002,Claire Dubois,claire.dubois@dubois-famille.example,SB-002,20000.00,
+003,Matthias Vogel,m.vogel@vogel-familie.example,SB-003,15000.00,
+004,Elena Ruiz,elena.ruiz@ruiz-correo.example,SB-004,10000.00,
+005,Pieter van Dijk,pieter@vandijk-mail.example,SB-005,30000.00,
+006,Wang Fang,wang.fang@wangfang-home.example,SB-006,25000.00,
+007,Nordhaven Family Office Ltd,office@nordhaven-fo.example,SB-007,150000.00,

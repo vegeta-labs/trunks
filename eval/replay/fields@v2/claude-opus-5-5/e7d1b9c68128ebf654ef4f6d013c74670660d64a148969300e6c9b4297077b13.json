@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"party_role\":{\"value\":\"company\",\"confidence\":\"medium\",\"quote\":\"Finance Director, Northwind Robotics\"},\"change_requested\":{\"value\":true,\"confidence\":\"high\",\"quote\":\"Please note that our bank has changed. With immediate effect, all subscription monies for Northwind Robotics [NAME_3] should be paid to our new account:\"}}}",
+ "usage": {
+  "inputTokens": 1602,
+  "outputTokens": 125
+ }
+}

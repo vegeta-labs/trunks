@@ -1,0 +1,46 @@
+Received: from mail.smithfamily.example (mail.smithfamily.example
+ [192.0.2.107]) by mx.ops.example with ESMTPS id 9f6301cfd5; Mon, 19 Oct 2026
+ 08:54:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=smithfamily.example; dkim=pass header.d=smithfamily.example;
+ dmarc=pass header.from=smithfamily.example
+From: James Smith <jsmith@smithfamily.example>
+To: Investor Operations <investors@ops.example>
+Subject: Letter for mortgage application
+Date: Mon, 19 Oct 2026 08:53:25 +0000
+Message-ID: <E0127.022127f9de9e@smithfamily.example>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============5886180969174165635=="
+
+--===============5886180969174165635==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Good morning,
+
+I'm remortgaging and my lender has asked for written confirmation of my inves=
+tments. Could you provide a letter confirming my investment in Northwind Robo=
+tics through your SPV, addressed to me? A PDF is fine; they accept scanned le=
+tters.
+
+Kind regards,
+James Smith
+
+--===============5886180969174165635==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><head><meta charset=3D"utf-8"></head><body style=3D"font-family:Arial,s=
+ans-serif;font-size:14px;color:#222222;background:#ffffff">
+<p>Good morning,</p>
+<p>I&#x27;m remortgaging and my lender has asked for written confirmation of =
+my investments. Could you provide a letter confirming my investment in Northw=
+ind Robotics through your SPV, addressed to me? A PDF is fine; they accept sc=
+anned letters.</p>
+<p>Kind regards,<br>
+James Smith</p>
+</body></html>
+
+--===============5886180969174165635==--

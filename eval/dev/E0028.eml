@@ -1,0 +1,39 @@
+Return-Path: <priya@ramanfamily.example>
+Received: from mail.ramanfamily.example (mail.ramanfamily.example
+ [192.0.2.202]) by mx.ops.example with ESMTPS id 347fed3d8f for
+ <investors@ops.example>; Mon, 02 Nov 2026 10:10:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramanfamily.example; dkim=pass header.d=ramanfamily.example;
+ dmarc=pass header.from=ramanfamily.example
+Message-ID: <E0028.e83ad1bd9944@ramanfamily.example>
+Date: Mon, 02 Nov 2026 10:07:26 +0000
+From: "Priya Raman" <priya@ramanfamily.example>
+To: investors@ops.example
+Subject: Payment confirmation (MT103)
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============2433261902783779651=="
+
+--===============2433261902783779651==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+Attached is the confirmation of my =C2=A35,000.00 payment for Northwind Robot=
+ics that your colleague asked for.
+
+Thanks,
+Priya Raman
+
+--===============2433261902783779651==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_confirmation.txt"
+MIME-Version: 1.0
+
+ezM6ezEyMTpiMmY4N2Y1ZS01ZjU1LTRhMGEtOGM1NS1jZDg2MWRlODBlMzJ9fQ0KezQ6DQo6MjA6
+UFJNLVRSRi0wMDQyDQo6MjNCOkNSRUQNCjozMkE6MjYxMDI5R0JQNS4wMDAsMDANCjo1MEs6UFJJ
+WUEgUkFNQU4NCjo1OTovTk9SVEhXSU5EIFJPQk9USUNTIFNQVg0KOjcwOk5XLTAwMw0KOjcxQTpT
+SEENCi19DQo=
+
+--===============2433261902783779651==--

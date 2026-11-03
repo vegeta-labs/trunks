@@ -1,0 +1,28 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=kowalczyk-home.example; dkim=pass
+ header.d=kowalczyk-home.example; dmarc=pass
+ header.from=kowalczyk-home.example
+Received: from mail.kowalczyk-home.example (mail.kowalczyk-home.example
+ [192.0.2.46]) by mx.ops.example with ESMTPS id JKFBSJW280UF; Tue, 27 Oct 2026
+ 09:42:00 +0000
+Message-ID: <E0061.o9v0c7qrhvs0@kowalczyk-home.example>
+Date: Tue, 27 Oct 2026 09:39:23 +0000
+From: Hannah Kowalczyk <hannah.k@kowalczyk-home.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Northwind - please withdraw me
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+I'm sorry to do this, but please withdraw me from the Northwind round. My
+circumstances have changed this month and I can no longer commit the =C2=A36,=
+000
+I signed up for.
+
+I haven't sent any money yet, so hopefully this is straightforward. Let me
+know if you need anything signed.
+
+Many thanks,
+Hannah Kowalczyk

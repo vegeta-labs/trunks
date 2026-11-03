@@ -1,0 +1,39 @@
+Return-Path: <daniel.osei@osei-mail.example>
+Received: from mail.osei-mail.example (mail.osei-mail.example [192.0.2.30]) by
+ mx.ops.example with ESMTPS id 9871dc74dd for <investors@ops.example>; Mon, 02
+ Nov 2026 12:18:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=osei-mail.example; dkim=pass header.d=osei-mail.example;
+ dmarc=pass header.from=osei-mail.example
+Message-ID: <E0019.d840e10e867a@osei-mail.example>
+Date: Mon, 02 Nov 2026 12:15:27 +0000
+From: "Daniel Osei" <daniel.osei@osei-mail.example>
+To: investors@ops.example
+Subject: Second half - MT103
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============3554761262766462774=="
+
+--===============3554761262766462774==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+Attached is my bank's MT103 for the second half of my Northwind subscription =
+(=C2=A39,000.00).
+
+Cheers,
+Dan
+
+--===============3554761262766462774==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="mt103_second_half.txt"
+MIME-Version: 1.0
+
+ezM6ezEyMTo4NTVkZjc4MS03MGM4LTQyODUtODJmZS0wMzJmYzFhZTU4Njl9fQ0KezQ6DQo6MjA6
+T1NFLVBNVC0yLU9GLTINCjoyM0I6Q1JFRA0KOjMyQToyNjEwMzBHQlA5MDAwLDAwDQo6NTBLOkRB
+TklFTCBPU0VJDQo6NTk6L0dCNDFRWkJLNzkxMzcyMTE5ODEzMTINCk5PUlRIV0lORCBST0JPVElD
+UyBTUFYgTFANCjo3MDpOVy0wMTYgU0VDT05EIEhBTEYNCjo3MUE6U0hBDQotfQ0K
+
+--===============3554761262766462774==--

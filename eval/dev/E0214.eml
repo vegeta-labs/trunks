@@ -1,0 +1,57 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=duarte-invest.example; dkim=pass
+ header.d=duarte-invest.example; dmarc=pass header.from=duarte-invest.example
+Received: from mail.duarte-invest.example (mail.duarte-invest.example
+ [192.0.2.185]) by mx.ops.example with ESMTPS id QMPQDH20PE for
+ <investors@ops.example>; Mon, 26 Oct 2026 10:05:00 +0000
+Date: Mon, 26 Oct 2026 10:04:38 +0000
+From: Rafael Duarte <rafael@duarte-invest.example>
+To: investors@ops.example
+Subject: Northwind - second tranche
+Message-ID: <E0214.xrsykx76w7tk@duarte-invest.example>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============0586979366833993717=="
+
+--===============0586979366833993717==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+I sent the second tranche of =C2=A320,000.00 for Northwind Robotics on 21 Oct=
+ober 2026 (reference NW-012 2/2). Could you confirm that both tranches have n=
+ow been received?
+
+Many thanks,
+Rafael Duarte
+Duarte Invest
+
+--===============0586979366833993717==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<!DOCTYPE html>
+<html><head><meta charset=3D"utf-8">
+<style>
+  body { font-family: Arial, sans-serif; color: #222222; background: #ffffff;=
+ }
+  .preheader { font-size: 12px; color: #666666; }
+  .sig { color: #555555; font-size: 13px; }
+  @media (max-width:600px) {
+    .preheader { display: none !important; }
+    .sig { font-size: 12px; }
+  }
+</style></head>
+<body>
+<span class=3D"preheader">Second tranche sent - NW-012</span>
+<p>Hello,</p>
+<p>I sent the second tranche of =C2=A320,000.00 for Northwind Robotics on 21 =
+October 2026 (reference NW-012 2/2). Could you confirm that both tranches hav=
+e now been received?</p>
+<p>Many thanks,</p>
+<p class=3D"sig">Rafael Duarte<br>Duarte Invest</p>
+</body></html>
+
+--===============0586979366833993717==--

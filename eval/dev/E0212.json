@@ -1,0 +1,55 @@
+{
+  "id": "E0212",
+  "family": "F048",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-09T13:30:00Z",
+  "prior_messages": [],
+  "description": "\"I created a new account login\" - genuine portal question, but \"new\" + \"account\" fire the bank_details rule (false positive by rule).",
+  "classes": [
+    "bank_details",
+    "account_access"
+  ],
+  "expected_risk": "high",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "party_role": null,
+    "account_last4": null,
+    "change_requested": null,
+    "issue_type": "permissions"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [
+      "NW-010"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C010",
+    "investor_id": "Northwind Robotics::010",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "Rule label bank_details from the whole words \"new\" and \"account\" (C-CLS-4) -> high -> safe_ack; annotated honestly as a rule false positive. bank_details fields are null (nothing about a bank account in the email; see QUESTIONS W4-2). issue_type permissions: he can log in but cannot see his investment. Sender is C010 (Northwind), not the Larkspur James Smith."
+}

@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"deal\":{\"value\":\"Northwind Robotics\",\"confidence\":\"high\",\"quote\":\"We hold an interest in Northwind Robotics through your SPV.\"},\"question_type\":{\"value\":\"other\",\"confidence\":\"medium\",\"quote\":\"Would a distribution on an exit be made in cash only, or could the SPV distribute shares in specie if the buyer pays partly in its own stock?\"}}}",
+ "usage": {
+  "inputTokens": 1658,
+  "outputTokens": 133
+ }
+}

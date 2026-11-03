@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"bank_details\",\"confidence\":\"high\",\"reason\":\"The company announces new bank details and asks that all future payments, including investor subscriptions, go to a new IBAN.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1923,
+  "outputTokens": 73
+ }
+}

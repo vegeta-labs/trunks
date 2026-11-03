@@ -1,0 +1,49 @@
+{
+  "id": "E0271",
+  "family": "F057",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-30T15:20:00Z",
+  "prior_messages": [],
+  "description": "Twin of E0270 (comment removed): complaint -> complaint_ack.",
+  "classes": [
+    "complaint"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": "E0270",
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {},
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C011",
+    "investor_id": "Northwind Robotics::011",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0008"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "complaint_ack",
+  "notes": "C-LNK-4 reference rule lists T-NW-0008 (NW-011) for the linked commitment."
+}

@@ -1,0 +1,33 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=northwind-robotics.example; dkim=pass
+ header.d=northwind-robotics.example; dmarc=pass
+ header.from=northwind-robotics.example
+Received: from mail.northwind-robotics.example
+ (mail.northwind-robotics.example [192.0.2.29]) by mx.ops.example with ESMTPS
+ id X53R9KBLQ2HY; Tue, 20 Oct 2026 14:44:00 +0000
+Message-ID: <E0098.jkrqrl2c6qfx@northwind-robotics.example>
+Date: Tue, 20 Oct 2026 14:41:12 +0000
+From: Ethan Clarke <ethan.clarke@northwind-robotics.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Re: Completion funds - company receiving account
+In-Reply-To: <ops.req.completion.kwg6rn@ops.example>
+References: <ops.req.completion.kwg6rn@ops.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+As requested on Friday, here is the company's receiving account for the
+completion monies:
+
+Account name: Northwind Robotics Ltd
+Bank: Quayside Bank plc
+IBAN: GB65 QZBK 5718 1129 4946 91
+
+I'll also confirm it by phone when we speak on Thursday.
+
+Ethan
+
+Ethan Clarke | CFO
+Northwind Robotics Ltd

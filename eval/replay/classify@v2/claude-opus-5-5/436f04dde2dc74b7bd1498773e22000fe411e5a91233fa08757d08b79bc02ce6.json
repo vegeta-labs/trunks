@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"payment_query\",\"confidence\":\"high\",\"reason\":\"Investor says they paid £8,000 with reference NW-011 and asks to confirm whether the money arrived; no confirmation attached.\"},{\"class\":\"complaint\",\"confidence\":\"high\",\"reason\":\"Sender calls the service very poor and says phone calls were not returned.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1872,
+  "outputTokens": 123
+ }
+}

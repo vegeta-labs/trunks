@@ -1,0 +1,32 @@
+Received: from mail.meridian-events.example (mail.meridian-events.example
+ [192.0.2.111]) by mx.ops.example with ESMTPS id 04f441975a; Fri, 06 Nov 2026
+ 11:43:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=meridian-events.example; dkim=pass
+ header.d=meridian-events.example; dmarc=pass
+ header.from=meridian-events.example
+From: Daniel Price <daniel.price@meridian-events.example>
+To: Investor Operations <investors@ops.example>
+Subject: Invitation: Q4 portfolio operations catch-up @ Thu 12 Nov 2026 10:00
+ - 11:00 (GMT)
+Date: Fri, 06 Nov 2026 11:42:25 +0000
+Message-ID: <E0164.5fb48fa3450d@meridian-events.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+You have been invited to the following event.
+
+Q4 portfolio operations catch-up
+When: Thursday 12 November 2026, 10:00 - 11:00 (GMT)
+Where: Video call - https://meet.meridian-events.example/j/4471-2290
+Organiser: Daniel Price
+
+Guests:
+- Daniel Price (organiser)
+- investors@ops.example
+
+Agenda: open discussion of the year-end reporting calendar.
+
+Going? Yes - Maybe - No
+Invitation from Meridian Events Calendar

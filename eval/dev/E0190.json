@@ -1,0 +1,72 @@
+{
+  "id": "E0190",
+  "family": "F044",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-09T15:10:00Z",
+  "prior_messages": [
+    {
+      "from": "jonas.becker@becker-post.example",
+      "message_id": "<d1qpqgoe050mrrol@becker-post.example>",
+      "sans_msgid_sha256": "88c262657570a5b4e0dad137dda57dc85d4472b53e31c92608b558cc6fc2f299"
+    },
+    {
+      "from": "jonas.becker@becker-post.example",
+      "message_id": "<f56wuo6g3mpuy08x@becker-post.example>",
+      "sans_msgid_sha256": "b90f8099b85441a3c6745b4cbdf79c60bae8cfec8d8b01ee7b7502704093baa8"
+    },
+    {
+      "from": "jonas.becker@becker-post.example",
+      "message_id": "<4c6ba6l9ja2o0dwo@becker-post.example>",
+      "sans_msgid_sha256": "6d0358f09efe61449c887a22699990df29aeb7304dfd3fe5fc8635fa04136333"
+    }
+  ],
+  "description": "Investor escalates to a formal complaint after six quoted messages about an unmatched payment; latest message is a complaint only.",
+  "classes": [
+    "complaint"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {},
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1500000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-007"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C007",
+    "investor_id": "Northwind Robotics::007",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0005"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "complaint_ack",
+  "notes": "The quoted first message is a payment query (amount and reference are still extracted), but the latest message decides the class: complaint only."
+}

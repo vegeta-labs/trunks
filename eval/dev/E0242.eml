@@ -1,0 +1,22 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=deals@rarnsay-capital.example; dkim=pass
+ header.d=rarnsay-capital.example; dmarc=pass
+ header.from=rarnsay-capital.example
+Received: from mail.rarnsay-capital.example (mail.rarnsay-capital.example
+ [192.0.2.33]) by mx.ops.example with ESMTPS; Mon, 09 Nov 2026 15:01:07 +0000
+From: Ramsay Capital <deals@rarnsay-capital.example>
+To: investors@ops.example
+Subject: Larkspur Energy Storage - numbers confirmed
+Date: Mon, 09 Nov 2026 15:01:00 +0000
+Message-ID: <E0242.8imn8bctywh2@rarnsay-capital.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello,
+
+Fiona has asked me to confirm on her behalf that the Larkspur Energy Storage allocation is final: five investors, US$120,000 in total. Please go ahead and prepare for closing.
+
+Regards,
+Tom Ashby
+Analyst, Ramsay Capital

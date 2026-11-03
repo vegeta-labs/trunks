@@ -1,0 +1,60 @@
+Return-Path: <grace@whitfield-wealth.example>
+Received: from mail.whitfield-wealth.example (mail.whitfield-wealth.example
+ [192.0.2.167]) by mx.ops.example with ESMTPS id 369c02f7d2 for
+ <investors@ops.example>; Wed, 04 Nov 2026 11:05:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=whitfield-wealth.example; dkim=pass
+ header.d=whitfield-wealth.example; dmarc=pass
+ header.from=whitfield-wealth.example
+Message-ID: <E0055.ad0fd3f78247@whitfield-wealth.example>
+Date: Wed, 04 Nov 2026 11:02:46 +0000
+From: "Grace Whitfield" <grace@whitfield-wealth.example>
+To: investors@ops.example
+Subject: Northwind Robotics - signed withdrawal letter (Priya Raman)
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============7422267634144212851=="
+
+--===============7422267634144212851==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear Operations team,
+
+Please find attached Priya Raman's signed letter asking to withdraw from Nort=
+hwind Robotics (NW-003).
+
+Kind regards,
+
+Grace Whitfield
+Whitfield Wealth
+020 7946 0145
+
+--===============7422267634144212851==
+Content-Type: application/pdf
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="withdrawal_letter_signed.pdf"
+MIME-Version: 1.0
+
+JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4K
+ZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4K
+ZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAg
+MCA1OTUgODQyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA1IDAgUiA+PiA+PiAvQ29udGVu
+dHMgNCAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL0xlbmd0aCA0NzUgPj4Kc3RyZWFtCkJUCi9G
+MSAxMCBUZgoxMyBUTAo1MCA3OTAgVGQKKFByaXlhIFJhbWFuKSBUaiBUKgooKSBUaiBUKgooVG86
+IFdoaXRmaWVsZCBXZWFsdGggYW5kIHRoZSBvcGVyYXRpb25zIHRlYW0pIFRqIFQqCihEYXRlOiAz
+IE5vdmVtYmVyIDIwMjYpIFRqIFQqCigpIFRqIFQqCihSZTogTm9ydGh3aW5kIFJvYm90aWNzIC0g
+d2l0aGRyYXdhbCBvZiBjb21taXRtZW50IFwoTlctMDAzXCkpIFRqIFQqCigpIFRqIFQqCihJIGhl
+cmVieSByZXF1ZXN0IHRoYXQgbXkgY29tbWl0bWVudCB0byBOb3J0aHdpbmQgUm9ib3RpY3MgYmUg
+d2l0aGRyYXduIGJlZm9yZSB0aGUgY2xvc2luZy4pIFRqIFQqCihJIGF1dGhvcmlzZSBHcmFjZSBX
+aGl0ZmllbGQgb2YgV2hpdGZpZWxkIFdlYWx0aCB0byBhY3Qgb24gbXkgYmVoYWxmIGluIHRoaXMg
+bWF0dGVyLikgVGogVCoKKCkgVGogVCoKKFNpZ25lZDogUC4gUmFtYW4pIFRqIFQqCihQcml5YSBS
+YW1hbikgVGogVCoKRVQKZW5kc3RyZWFtCmVuZG9iago1IDAgb2JqCjw8IC9UeXBlIC9Gb250IC9T
+dWJ0eXBlIC9UeXBlMSAvQmFzZUZvbnQgL0hlbHZldGljYSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNv
+ZGluZyA+PgplbmRvYmoKNiAwIG9iago8PCAvVGl0bGUgKFdpdGhkcmF3YWwgbGV0dGVyKSAvUHJv
+ZHVjZXIgKFcxIHNhbXBsZSB3cml0ZXIpID4+CmVuZG9iagp4cmVmCjAgNwowMDAwMDAwMDAwIDY1
+NTM1IGYgCjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMDA2NCAwMDAwMCBuIAowMDAwMDAwMTIx
+IDAwMDAwIG4gCjAwMDAwMDAyNDcgMDAwMDAgbiAKMDAwMDAwMDc3MyAwMDAwMCBuIAowMDAwMDAw
+ODcwIDAwMDAwIG4gCnRyYWlsZXIKPDwgL1NpemUgNyAvUm9vdCAxIDAgUiAvSW5mbyA2IDAgUiA+
+PgpzdGFydHhyZWYKOTQ3CiUlRU9GCg==
+
+--===============7422267634144212851==--

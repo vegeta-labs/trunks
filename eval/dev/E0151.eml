@@ -1,0 +1,51 @@
+Received: from mail.hartfamily.example (mail.hartfamily.example [192.0.2.79])
+ by mx.ops.example with ESMTPS id b95a070bff; Mon, 02 Nov 2026 15:05:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=hartfamily.example; dkim=pass header.d=hartfamily.example;
+ dmarc=pass header.from=hartfamily.example
+From: Amelia Hart <amelia@hartfamily.example>
+To: Investor Operations <investors@ops.example>
+Subject: Moving to the US - effect on my holding?
+Date: Mon, 02 Nov 2026 15:04:25 +0000
+Message-ID: <E0151.62766dee5894@hartfamily.example>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============5272251451601193539=="
+
+--===============5272251451601193539==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+A bit of advance warning: my husband has been offered a job in Boston and we =
+expect to move to the United States next summer, at which point I'll become a=
+ US tax resident.
+
+Does that affect my Northwind Robotics holding through the SPV in any way? I'=
+ve heard that some funds have to treat US persons differently and may ask for=
+ a W-9 form. I'd rather sort it out now than find a problem later.
+
+Best wishes,
+Amelia
+
+--===============5272251451601193539==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><head><meta charset=3D"utf-8"></head><body style=3D"font-family:Arial,s=
+ans-serif;font-size:14px;color:#222222;background:#ffffff">
+<p>Hi,</p>
+<p>A bit of advance warning: my husband has been offered a job in Boston and =
+we expect to move to the United States next summer, at which point I&#x27;ll =
+become a US tax resident.</p>
+<p>Does that affect my Northwind Robotics holding through the SPV in any way?=
+ I&#x27;ve heard that some funds have to treat US persons differently and may=
+ ask for a W-9 form. I&#x27;d rather sort it out now than find a problem late=
+r.</p>
+<p>Best wishes,<br>
+Amelia</p>
+</body></html>
+
+--===============5272251451601193539==--

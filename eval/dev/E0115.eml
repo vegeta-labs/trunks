@@ -1,0 +1,57 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=chenwei-family.example; dkim=pass
+ header.d=chenwei-family.example; dmarc=pass
+ header.from=chenwei-family.example
+Received: from mail.chenwei-family.example (mail.chenwei-family.example
+ [192.0.2.101]) by mx.ops.example with ESMTPS id BVO0K9SQJMN0; Mon, 09 Nov
+ 2026 13:17:00 +0000
+Message-ID: <E0115.9esqnfg8ej38@chenwei-family.example>
+Date: Mon, 09 Nov 2026 13:14:37 +0000
+From: Chen Wei <chen.wei@chenwei-family.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Draft EIS3 - corrections needed
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============2278423301469721005=="
+
+--===============2278423301469721005==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Dear team,
+
+Thank you for the draft EIS3 for Northwind Robotics (attached again for
+reference). Two corrections before it is issued, please:
+
+1. My name is shown as "Wei Chen"; it should read "Chen Wei" as on my
+   subscription.
+2. The share issue date should be 19 October 2026, not 9 October.
+
+Kind regards,
+Chen Wei
+
+--===============2278423301469721005==
+Content-Type: application/pdf
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="EIS3_draft_NorthwindRobotics.pdf"
+MIME-Version: 1.0
+
+JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4K
+ZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4K
+ZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAg
+MCA1OTUgODQyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvQ29udGVu
+dHMgNSAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUx
+IC9CYXNlRm9udCAvSGVsdmV0aWNhIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nID4+CmVuZG9i
+ago1IDAgb2JqCjw8IC9MZW5ndGggMzE3ID4+CnN0cmVhbQpCVCAvRjEgMTAgVGYgNTYgNzkwIFRk
+IDE0IFRMCihEUkFGVCAtIEVJUzMgY29tcGxpYW5jZSBjZXJ0aWZpY2F0ZSBcKGludmVzdG9yIGNv
+cHlcKSkgVGogVCoKKCkgVGogVCoKKENvbXBhbnk6IE5vcnRod2luZCBSb2JvdGljcyBMdGQpIFRq
+IFQqCihJbnZlc3RvcjogV2VpIENoZW4pIFRqIFQqCihJbnZlc3RvciByZWZlcmVuY2U6IE5XLTAw
+OSkgVGogVCoKKEFtb3VudCBzdWJzY3JpYmVkOiCjMzAsMDAwLjAwKSBUaiBUKgooU2hhcmUgaXNz
+dWUgZGF0ZTogOSBPY3RvYmVyIDIwMjYpIFRqIFQqCihDbGFzcyBvZiBzaGFyZXM6IE9yZGluYXJ5
+KSBUaiBUKgpFVAplbmRzdHJlYW0KZW5kb2JqCjYgMCBvYmoKPDwgL1RpdGxlIChFSVMzIGRyYWZ0
+KSAvUHJvZHVjZXIgKERvY3MpID4+CmVuZG9iagp4cmVmCjAgNwowMDAwMDAwMDAwIDY1NTM1IGYg
+CjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMDA2NCAwMDAwMCBuIAowMDAwMDAwMTIxIDAwMDAw
+IG4gCjAwMDAwMDAyNDcgMDAwMDAgbiAKMDAwMDAwMDM0NCAwMDAwMCBuIAowMDAwMDAwNzEyIDAw
+MDAwIG4gCnRyYWlsZXIKPDwgL1NpemUgNyAvUm9vdCAxIDAgUiAvSW5mbyA2IDAgUiA+PgpzdGFy
+dHhyZWYKNzcwCiUlRU9GCg==
+
+--===============2278423301469721005==--

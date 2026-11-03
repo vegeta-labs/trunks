@@ -1,0 +1,57 @@
+{
+  "id": "E0121",
+  "family": "F030",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-22T14:05:00Z",
+  "prior_messages": [],
+  "description": "Investor asks how much per share a Northwind sale will pay out (question_type amount); amount token in body is her original investment.",
+  "classes": [
+    "exit_distribution"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "deal": "Northwind Robotics",
+    "question_type": "amount"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 600000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-013"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C013",
+    "investor_id": "Northwind Robotics::013",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "exit_info",
+  "notes": "No bank line carries NW-013 and the email has no payment date, so transaction_ids is empty."
+}

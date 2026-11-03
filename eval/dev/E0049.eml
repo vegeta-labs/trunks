@@ -1,0 +1,80 @@
+Return-Path: <priya@ramanfamily.example>
+Received: from mail.ramanfamily.example (mail.ramanfamily.example
+ [192.0.2.50]) by mx.ops.example with ESMTPS id 3054ab5bae for
+ <investors@ops.example>; Tue, 10 Nov 2026 10:40:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramanfamily.example; dkim=pass header.d=ramanfamily.example;
+ dmarc=pass header.from=ramanfamily.example
+Message-ID: <E0049.61b36179d64c@ramanfamily.example>
+Date: Tue, 10 Nov 2026 10:37:47 +0000
+From: "Priya Raman" <priya@ramanfamily.example>
+To: investors@ops.example
+Subject: Fwd: KYC documents
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============6463688049729281376=="
+
+--===============6463688049729281376==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+I sent my passport in September to the onboarding address, but I've just been=
+ told it never reached the right team. I'm attaching that original email so y=
+ou have it.
+
+Thanks,
+Priya
+
+--===============6463688049729281376==
+Content-Type: message/rfc822
+Content-Transfer-Encoding: 8bit
+Content-Disposition: attachment; filename="KYC documents.eml"
+MIME-Version: 1.0
+
+Message-ID: <CAP7r1q.20260929.pp@ramanfamily.example>
+Date: Tue, 29 Sep 2026 19:02:10 +0000
+From: "Priya Raman" <priya@ramanfamily.example>
+To: onboarding@ops.example
+Subject: KYC documents
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============5332791567127146588=="
+
+--===============5332791567127146588==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello,
+
+As requested, my passport is attached.
+
+Priya
+
+--===============5332791567127146588==
+Content-Type: application/pdf
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="passport.pdf"
+MIME-Version: 1.0
+
+JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4K
+ZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4K
+ZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAg
+MCA1OTUgODQyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA1IDAgUiA+PiA+PiAvQ29udGVu
+dHMgNCAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL0xlbmd0aCAzMzUgPj4Kc3RyZWFtCkJUCi9G
+MSAxMCBUZgoxMyBUTAo1MCA3OTAgVGQKKFVOSVRFRCBLSU5HRE9NIE9GIEdSRUFUIEJSSVRBSU4g
+QU5EIE5PUlRIRVJOIElSRUxBTkQpIFRqIFQqCihQQVNTUE9SVCkgVGogVCoKKFN1cm5hbWUgUkFN
+QU4pIFRqIFQqCihHaXZlbiBuYW1lcyBQUklZQSkgVGogVCoKKE5hdGlvbmFsaXR5IEJSSVRJU0gg
+Q0lUSVpFTikgVGogVCoKKERhdGUgb2YgYmlydGggMDMgU0VQIDE5OTApIFRqIFQqCihQPEdCUlJB
+TUFOPDxQUklZQTw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8KSBUaiBUKgooNzcxNjA0NTI4
+M0dCUjkwMDkwMzFGMzMwNDE4NTw8PDw8PDw8PDw8PDw8MDYpIFRqIFQqCkVUCmVuZHN0cmVhbQpl
+bmRvYmoKNSAwIG9iago8PCAvVHlwZSAvRm9udCAvU3VidHlwZSAvVHlwZTEgL0Jhc2VGb250IC9I
+ZWx2ZXRpY2EgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgPj4KZW5kb2JqCjYgMCBvYmoKPDwg
+L1RpdGxlIChwYXNzcG9ydCkgL1Byb2R1Y2VyIChXMSBzYW1wbGUgd3JpdGVyKSA+PgplbmRvYmoK
+eHJlZgowIDcKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDE1IDAwMDAwIG4gCjAwMDAwMDAw
+NjQgMDAwMDAgbiAKMDAwMDAwMDEyMSAwMDAwMCBuIAowMDAwMDAwMjQ3IDAwMDAwIG4gCjAwMDAw
+MDA2MzMgMDAwMDAgbiAKMDAwMDAwMDczMCAwMDAwMCBuIAp0cmFpbGVyCjw8IC9TaXplIDcgL1Jv
+b3QgMSAwIFIgL0luZm8gNiAwIFIgPj4Kc3RhcnR4cmVmCjc5OAolJUVPRgo=
+
+--===============5332791567127146588==--
+
+--===============6463688049729281376==--

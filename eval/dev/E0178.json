@@ -1,0 +1,58 @@
+{
+  "id": "E0178",
+  "family": "F042",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-12T13:25:00Z",
+  "prior_messages": [],
+  "description": "Lead confirms final numbers (yes) and sends an esign.example envelope link: closing_confirmation + legal_documents (rule label); legal floor high -> safe_ack.",
+  "classes": [
+    "closing_confirmation",
+    "legal_documents"
+  ],
+  "expected_risk": "high",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "confirms": "yes",
+    "deal": "Northwind Robotics",
+    "platform": "esign.example",
+    "document_type": "subscription"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 36650000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C040",
+    "investor_id": null,
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "safe_ack",
+  "notes": "Deal from the validated deal field, which is in the lead's deal list (C-LNK-6 ②). The quoted ops message carries the total £366,500.00 (sum of Northwind cash_due), counted as an amount token. Lead has no commitment, so may_disclose_record is false."
+}

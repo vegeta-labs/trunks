@@ -1,0 +1,61 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=solent-bio.example; dkim=pass header.d=solent-bio.example;
+ dmarc=pass header.from=solent-bio.example
+Received: from mail.solent-bio.example (mail.solent-bio.example [192.0.2.170])
+ by mx.ops.example with ESMTPS id W6DQZ4VQ1L for <legal@ops.example>; Mon, 02
+ Nov 2026 14:35:00 +0000
+Date: Mon, 02 Nov 2026 14:34:25 +0000
+From: Aoife Brennan <aoife.brennan@solent-bio.example>
+To: legal@ops.example
+Subject: Shareholder resolution for signature
+Message-ID: <E0215.eh3ifz0hch6b@solent-bio.example>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============2810588601286793748=="
+
+--===============2810588601286793748==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Dear Legal team,
+
+The shareholder resolution approving the Solent Biotherapeutics licensing agreement is ready for signature by the SPV as shareholder. You can review and sign it here:
+
+https://esign.example/sign/SB-RES-7Q2KD9X4
+
+The board would like all signatures back by 16 November.
+
+Kind regards,
+Aoife Brennan
+Company Secretary, Solent Biotherapeutics
+
+--===============2810588601286793748==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<!DOCTYPE html>
+<html><head><meta charset=3D"utf-8"></head>
+<body>
+<!-- ////////////////////////////////////////////////////////////
+// Begin Template Header \\
+// Solent Biotherapeutics corporate email template v3.2
+// Maintained by Communications. Do not edit by hand.
+// Colours: #0b3d5c (primary), #e8f1f6 (panel)
+// Logo block intentionally omitted for plain clients.
+// End Template Header \\
+//////////////////////////////////////////////////////////// -->
+<div style=3D"font-family:Georgia,serif;color:#1a1a1a;background:#ffffff">
+<p>Dear Legal team,</p>
+<p>The shareholder resolution approving the Solent Biotherapeutics licensing =
+agreement is ready for signature by the SPV as shareholder. You can review an=
+d sign it here:</p>
+<p><a href=3D"https://esign.example/sign/SB-RES-7Q2KD9X4">https://esign.examp=
+le/sign/SB-RES-7Q2KD9X4</a></p>
+<p>The board would like all signatures back by 16 November.</p>
+<p>Kind regards,<br>Aoife Brennan<br>Company Secretary, Solent Biotherapeutic=
+s</p>
+</div>
+</body></html>
+
+--===============2810588601286793748==--

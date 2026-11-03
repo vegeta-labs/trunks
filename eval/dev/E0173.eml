@@ -1,0 +1,25 @@
+Received: from mail.smithfamily.example (mail.smithfamily.example
+ [192.0.2.22]) by mx.ops.example with ESMTPS id 5f2b9dbee8; Tue, 27 Oct 2026
+ 14:34:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=smithfamily.example; dkim=pass header.d=smithfamily.example;
+ dmarc=pass header.from=smithfamily.example
+From: James Smith <jsmith@smithfamily.example>
+To: Investor Operations <investors@ops.example>
+Subject: Confirmation letter + portal locked
+Date: Tue, 27 Oct 2026 14:33:25 +0000
+Message-ID: <E0173.d03f01b487d5@smithfamily.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+My mortgage lender wants a letter confirming my investment in Northwind Robot=
+ics. I tried to download the investment confirmation from the portal myself b=
+ut I've been locked out after too many password attempts.
+
+Could you either unlock my login or email me the letter directly?
+
+Thanks,
+James Smith

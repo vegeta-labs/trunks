@@ -1,0 +1,24 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=office@nordhaven-fo.example; dkim=pass
+ header.d=nordhaven-fo.example; dmarc=pass header.from=nordhaven-fo.example
+Received: from mail.nordhaven-fo.example (mail.nordhaven-fo.example
+ [192.0.2.30]) by mx.ops.example with ESMTPS; Wed, 21 Oct 2026 15:26:07 +0000
+From: Nordhaven Family Office <office@nordhaven-fo.example>
+To: investors@ops.example
+Subject: Solent - timing of distributions
+Date: Wed, 21 Oct 2026 15:26:00 +0000
+Message-ID: <E0261.l9tofncljf6l@nordhaven-fo.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Good afternoon,
+
+Following the press coverage of a possible trade sale of Solent Biotherapeuti=
+cs, could you tell us when the SPV would expect to make a distribution to inv=
+estors if the sale completes, and roughly how long after completion?
+
+Kind regards,
+Ingrid S=C3=B8rensen
+Investment Operations, Nordhaven Family Office Ltd
+020 7946 0125

@@ -1,0 +1,53 @@
+Received: from mail.chenwei-family.example (mail.chenwei-family.example
+ [192.0.2.31]) by mx.ops.example with ESMTPS id 5006b72744; Tue, 20 Oct 2026
+ 09:41:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=chenwei-family.example; dkim=pass
+ header.d=chenwei-family.example; dmarc=pass
+ header.from=chenwei-family.example
+From: Chen Wei <chen.wei@chenwei-family.example>
+To: Investor Operations <investors@ops.example>
+Subject: Northwind Robotics - any timeline for an exit?
+Date: Tue, 20 Oct 2026 09:40:25 +0000
+Message-ID: <E0120.9a2ed5945403@chenwei-family.example>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============3060714762362494253=="
+
+--===============3060714762362494253==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+I saw a piece in the trade press last week suggesting that Northwind Robotics=
+ has been approached by a larger industrial automation group. I appreciate yo=
+u may not be able to say much, but is there any indication of when an exit or=
+ a distribution to SPV investors might happen? Are we talking months or years?
+
+I'm planning a few things for next year and it would help to know roughly wha=
+t to expect.
+
+Many thanks,
+Chen Wei
+
+--===============3060714762362494253==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><head><meta charset=3D"utf-8"></head><body style=3D"font-family:Arial,s=
+ans-serif;font-size:14px;color:#222222;background:#ffffff">
+<p>Hello,</p>
+<p>I saw a piece in the trade press last week suggesting that Northwind Robot=
+ics has been approached by a larger industrial automation group. I appreciate=
+ you may not be able to say much, but is there any indication of when an exit=
+ or a distribution to SPV investors might happen? Are we talking months or ye=
+ars?</p>
+<p>I&#x27;m planning a few things for next year and it would help to know rou=
+ghly what to expect.</p>
+<p>Many thanks,<br>
+Chen Wei</p>
+</body></html>
+
+--===============3060714762362494253==--

@@ -1,0 +1,57 @@
+Return-Path: <hannah.k@kowalczyk-home.example>
+Received: from mail.kowalczyk-home.example (mail.kowalczyk-home.example
+ [192.0.2.201]) by mx.ops.example with ESMTPS id 5d93c72fc7 for
+ <investors@ops.example>; Wed, 21 Oct 2026 10:00:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=kowalczyk-home.example; dkim=pass
+ header.d=kowalczyk-home.example; dmarc=pass
+ header.from=kowalczyk-home.example
+Message-ID: <E0045.1273484b5c3d@kowalczyk-home.example>
+Date: Wed, 21 Oct 2026 09:57:17 +0000
+From: "Hannah Kowalczyk" <hannah.k@kowalczyk-home.example>
+To: investors@ops.example
+Subject: Passport for KYC
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============8136254872810699110=="
+
+--===============8136254872810699110==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+As requested for the Northwind Robotics onboarding, please find my passport s=
+can attached.
+
+Best wishes,
+Hannah Kowalczyk
+
+--===============8136254872810699110==
+Content-Type: application/pdf
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="passport_scan.pdf"
+MIME-Version: 1.0
+
+JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4K
+ZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4K
+ZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAg
+MCA1OTUgODQyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA1IDAgUiA+PiA+PiAvQ29udGVu
+dHMgNCAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL0xlbmd0aCA0NjcgPj4Kc3RyZWFtCkJUCi9G
+MSAxMCBUZgoxMyBUTAo1MCA3OTAgVGQKKFVOSVRFRCBLSU5HRE9NIE9GIEdSRUFUIEJSSVRBSU4g
+QU5EIE5PUlRIRVJOIElSRUxBTkQpIFRqIFQqCihQQVNTUE9SVCkgVGogVCoKKFR5cGUgUCAgIENv
+ZGUgR0JSKSBUaiBUKgooU3VybmFtZSBLT1dBTENaWUspIFRqIFQqCihHaXZlbiBuYW1lcyBIQU5O
+QUggTUFSSUEpIFRqIFQqCihOYXRpb25hbGl0eSBCUklUSVNIIENJVElaRU4pIFRqIFQqCihEYXRl
+IG9mIGJpcnRoIDE0IEZFQiAxOTg4KSBUaiBUKgooUGxhY2Ugb2YgYmlydGggTEVFRFMpIFRqIFQq
+CihEYXRlIG9mIGlzc3VlIDIzIE1BWSAyMDIxKSBUaiBUKgooQXV0aG9yaXR5IEhNUE8pIFRqIFQq
+CigpIFRqIFQqCihQPEdCUktPV0FMQ1pZSzw8SEFOTkFIPE1BUklBPDw8PDw8PDw8PDw8PDw8PDw8
+KSBUaiBUKgooNTM5MDE4NzI2NEdCUjg4MDIxNDlGMzEwNTIyNzw8PDw8PDw8PDw8PDw8MDQpIFRq
+IFQqCkVUCmVuZHN0cmVhbQplbmRvYmoKNSAwIG9iago8PCAvVHlwZSAvRm9udCAvU3VidHlwZSAv
+VHlwZTEgL0Jhc2VGb250IC9IZWx2ZXRpY2EgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgPj4K
+ZW5kb2JqCjYgMCBvYmoKPDwgL1RpdGxlIChTY2FuKSAvUHJvZHVjZXIgKFcxIHNhbXBsZSB3cml0
+ZXIpID4+CmVuZG9iagp4cmVmCjAgNwowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMTUgMDAw
+MDAgbiAKMDAwMDAwMDA2NCAwMDAwMCBuIAowMDAwMDAwMTIxIDAwMDAwIG4gCjAwMDAwMDAyNDcg
+MDAwMDAgbiAKMDAwMDAwMDc2NSAwMDAwMCBuIAowMDAwMDAwODYyIDAwMDAwIG4gCnRyYWlsZXIK
+PDwgL1NpemUgNyAvUm9vdCAxIDAgUiAvSW5mbyA2IDAgUiA+PgpzdGFydHhyZWYKOTI2CiUlRU9G
+Cg==
+
+--===============8136254872810699110==--

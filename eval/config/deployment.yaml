@@ -1,0 +1,42 @@
+# Evaluation deployment (eval/SCHEMA.md config/; content from the evaluation author's proposal in config.yaml, keys as the loader reads them). Deployment settings (PRD R-CFG-01). Secrets are never written here: only the names of environment variables.
+deployment:
+  name: Kestrel Syndicate Operations
+  timezone: Europe/London
+  currencies: [GBP, EUR, USD]
+
+mailboxes:
+  # per sample the annotation decides mailbox_strips_auth_results; the eval runner passes it at ingest (test plan §4.2)
+  - id: ops
+    name: Operations
+    kind: eml
+    trusted_authserv_id: mx.ops.example
+  - id: legal
+    name: Legal
+    kind: eml
+    trusted_authserv_id: mx.ops.example
+
+esign_platforms:
+  esign.example: [esign.example]
+
+attachments:
+  max_attachment_bytes: 20971520 # 20 MB
+  max_total_bytes: 52428800 # 50 MB
+  max_pdf_pages: 50
+  parse_timeout_seconds: 30
+  max_nesting: 3
+
+# words may be added; the built-in lists cannot be shortened (C-SIG-1.8)
+signals:
+  injection_markers_extra: []
+
+audit:
+  head_export_path: /var/lib/deal-ops-inbox/state/audit-head.jsonl
+
+# the evaluation runs on recorded model replies (test plan §4.4); `npm run eval:record` records them with a real model
+model:
+  provider: replay
+  model_id: claude-opus-5-5
+  location: local
+  dpa: false
+  no_training: true
+  replay_dir: eval/replay

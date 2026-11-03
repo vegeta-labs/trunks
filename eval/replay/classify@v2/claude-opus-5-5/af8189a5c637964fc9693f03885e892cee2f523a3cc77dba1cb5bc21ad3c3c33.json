@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"complaint\",\"confidence\":\"high\",\"reason\":\"Investor is dissatisfied that a second statement contains an error and questions how statements are checked.\"},{\"class\":\"other_known\",\"confidence\":\"low\",\"reason\":\"Discrepancy in shareholding on the quarterly statement/share register; no specific category covers statement corrections.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1905,
+  "outputTokens": 122
+ }
+}

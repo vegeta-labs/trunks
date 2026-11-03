@@ -1,0 +1,56 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=larkspur-energy.example; dkim=pass
+ header.d=larkspur-energy.example; dmarc=pass
+ header.from=larkspur-energy.example
+Received: from mail.larkspur-energy.example (mail.larkspur-energy.example
+ [192.0.2.125]) by mx.ops.example with ESMTPS id J0KCQRBTK93O; Fri, 06 Nov
+ 2026 11:14:00 +0000
+Message-ID: <E0093.ki8cz7xyzq0v@larkspur-energy.example>
+Date: Fri, 06 Nov 2026 11:11:10 +0000
+From: Noah Fischer <noah.fischer@larkspur-energy.example>
+To: Kestrel Legal <legal@ops.example>
+Subject: Larkspur - shareholder resolution for signature
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============8696852095322407129=="
+
+--===============8696852095322407129==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello Legal,
+
+Attached is the written resolution of the shareholders of Larkspur Energy
+Storage approving the seed issue. Please print, sign on behalf of the SPV
+and return a scan to me.
+
+Thanks,
+Noah Fischer
+Head of Finance, Larkspur Energy Storage Inc.
+
+--===============8696852095322407129==
+Content-Type: application/pdf
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="shareholder_resolution.pdf"
+MIME-Version: 1.0
+
+JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4K
+ZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4K
+ZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAg
+MCA1OTUgODQyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvQ29udGVu
+dHMgNSAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUx
+IC9CYXNlRm9udCAvSGVsdmV0aWNhIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nID4+CmVuZG9i
+ago1IDAgb2JqCjw8IC9MZW5ndGggMzgyID4+CnN0cmVhbQpCVCAvRjEgMTAgVGYgNTYgNzkwIFRk
+IDE0IFRMCihMQVJLU1BVUiBFTkVSR1kgU1RPUkFHRSwgSU5DLikgVGogVCoKKFdSSVRURU4gUkVT
+T0xVVElPTiBPRiBUSEUgU0hBUkVIT0xERVJTKSBUaiBUKgooKSBUaiBUKgooVGhlIHVuZGVyc2ln
+bmVkIHNoYXJlaG9sZGVycyByZXNvbHZlIHRoYXQgdGhlIENvbXBhbnkgaXNzdWUgdXAgdG8gMiww
+MDAsMDAwKSBUaiBUKgooU2VyaWVzIFNlZWQgUHJlZmVycmVkIHNoYXJlcyBhdCBVUyQyLjQwIHBl
+ciBzaGFyZS4pIFRqIFQqCigpIFRqIFQqCihTaWduZWQgZm9yIGFuZCBvbiBiZWhhbGYgb2YgdGhl
+IEtlc3RyZWwgU1BWOiBfX19fX19fX19fX19fX19fX19fX19fKSBUaiBUKgooRGF0ZTogX19fX19f
+X19fX19fX18pIFRqIFQqCkVUCmVuZHN0cmVhbQplbmRvYmoKNiAwIG9iago8PCAvVGl0bGUgKFNo
+YXJlaG9sZGVyIHJlc29sdXRpb24pIC9Qcm9kdWNlciAoRG9jcykgPj4KZW5kb2JqCnhyZWYKMCA3
+CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAxNSAwMDAwMCBuIAowMDAwMDAwMDY0IDAwMDAw
+IG4gCjAwMDAwMDAxMjEgMDAwMDAgbiAKMDAwMDAwMDI0NyAwMDAwMCBuIAowMDAwMDAwMzQ0IDAw
+MDAwIG4gCjAwMDAwMDA3NzcgMDAwMDAgbiAKdHJhaWxlcgo8PCAvU2l6ZSA3IC9Sb290IDEgMCBS
+IC9JbmZvIDYgMCBSID4+CnN0YXJ0eHJlZgo4NDcKJSVFT0YK
+
+--===============8696852095322407129==--

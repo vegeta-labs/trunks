@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"platform\":{\"value\":\"esign-example\",\"confidence\":\"medium\",\"quote\":\"esign-example notifications\"},\"document_type\":{\"value\":\"subscription\",\"confidence\":\"high\",\"quote\":\"Northwind Robotics [NAME_3] - Subscription Agreement (SPV)\"},\"deal\":{\"value\":\"Northwind Robotics\",\"confidence\":\"high\",\"quote\":\"[NAME_1] [NAME_2] (Northwind Robotics) has sent you a document to review and sign.\"}}}",
+ "usage": {
+  "inputTokens": 1651,
+  "outputTokens": 167
+ }
+}

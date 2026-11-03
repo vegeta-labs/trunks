@@ -1,0 +1,50 @@
+{
+  "id": "E0114",
+  "family": "F028",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-04T09:58:00Z",
+  "prior_messages": [],
+  "description": "Northwind James Smith asks for \"the tax certificate\" without a type or deal; must link to C010, not the Larkspur James Smith.",
+  "classes": [
+    "tax_certificates"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "certificate_type": null,
+    "deal": null
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C010",
+    "investor_id": "Northwind Robotics::010",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "tax_cert_info",
+  "notes": "certificate_type null: the mail does not say SEIS or EIS (and \"other\" would claim a different kind). Deal null as a field; the link comes from the contact's single deal. Display name matches two contacts but the address is C010's, so no display_name_mismatch (v0.7.1)."
+}

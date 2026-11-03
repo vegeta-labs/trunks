@@ -1,0 +1,53 @@
+{
+  "id": "E0226",
+  "family": "F050",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-27T13:05:00Z",
+  "prior_messages": [],
+  "description": "Look-alike domain (northwlnd) with a free-mail Reply-To announces a new receiving account.",
+  "classes": [
+    "bank_details"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "bank_change",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": true,
+    "reply_to_mismatch": true,
+    "first_time_sender": true,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "party_role": "company",
+    "account_last4": "6816",
+    "change_requested": true
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [],
+    "account_last4": [
+      "6816"
+    ],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": null,
+    "investor_id": null,
+    "deal": null,
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "safe_ack",
+  "notes": "Generic display name (no directory name) -> no display_name_mismatch. Reply-To to a free-mail address -> reply_to_mismatch. IBAN checksum valid (fictional)."
+}

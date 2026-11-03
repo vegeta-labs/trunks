@@ -1,0 +1,52 @@
+{
+  "id": "E0056",
+  "family": "F013",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-05T14:30:00Z",
+  "prior_messages": [],
+  "description": "Adviser asks to withdraw the client with no consent evidence -> consent none.",
+  "classes": [
+    "withdrawal"
+  ],
+  "expected_risk": "high",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "investor": "Priya Raman",
+    "consent_evidence": "none"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [
+      "NW-003"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C045",
+    "investor_id": "Northwind Robotics::003",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "Authorised adviser but no investor cc, forwarded consent or attachment -> none (C-OUT-3: request_withdrawal_consent)."
+}

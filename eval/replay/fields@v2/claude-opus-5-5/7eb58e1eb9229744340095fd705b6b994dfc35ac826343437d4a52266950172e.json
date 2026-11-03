@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"platform\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"document_type\":{\"value\":\"shareholder_resolution\",\"confidence\":\"high\",\"quote\":\"Attached is the written resolution of the shareholders of Larkspur Energy\"},\"deal\":{\"value\":\"Larkspur Energy Storage\",\"confidence\":\"high\",\"quote\":\"Attached is the written resolution of the shareholders of Larkspur Energy\"}}}",
+ "usage": {
+  "inputTokens": 1749,
+  "outputTokens": 147
+ }
+}

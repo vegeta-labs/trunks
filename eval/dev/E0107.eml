@@ -1,0 +1,23 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=osei-mail.example; dkim=pass header.d=osei-mail.example;
+ dmarc=pass header.from=osei-mail.example
+Received: from mail.osei-mail.example (mail.osei-mail.example [192.0.2.133])
+ by mx.ops.example with ESMTPS id QDA7T5N0WA1P; Thu, 05 Nov 2026 08:46:00
+ +0000
+Message-ID: <E0107.hlq8a4bn4tds@osei-mail.example>
+Date: Thu, 05 Nov 2026 08:43:54 +0000
+From: Daniel Osei <daniel.osei@osei-mail.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Mobile number
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+Small housekeeping item: my mobile number is now 07700 900816 - the old one
+ending 116 has been cancelled. Please use the new number if you need to call
+me about Northwind.
+
+Cheers,
+Daniel Osei

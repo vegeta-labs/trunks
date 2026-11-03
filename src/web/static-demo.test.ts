@@ -1,0 +1,21 @@
+// TC-DEMO-04 (PRD R-DEMO-02; site interface T1, T2): the static demo answers reads from the snapshot, refuses changes.
+import { afterEach, describe, expect, it } from 'vitest'
+import { staticAnswer } from './static-demo.ts'
+
+const g = globalThis as { DOI_DEMO?: unknown }
+afterEach(() => delete g.DOI_DEMO)
+
+describe('static demo answers', () => {
+  it('TC-DEMO-04 reads from the snapshot (filters as the server), sample IDs for cases, every change refused', () => {
+    g.DOI_DEMO = { info: { version: '0.1.0', built_at: 'x' }, session: { user: { username: 'demo-reviewer' } }, meta: { m: 1 },
+      cases: [{ id: 'E0001', risk: 'medium', status: 'open', queue: 'ops' }, { id: 'E0225', risk: 'high', status: 'open', queue: 'compliance' }],
+      details: { E0225: { id: 'E0225' } } }
+    expect(staticAnswer('GET', '/api/session')).toEqual({ status: 200, data: { user: { username: 'demo-reviewer' } } })
+    expect((staticAnswer('GET', '/api/cases?risk=high')!.data as { cases: unknown[] }).cases).toEqual([{ id: 'E0225', risk: 'high', status: 'open', queue: 'compliance' }])
+    expect((staticAnswer('GET', '/api/cases')!.data as { cases: unknown[] }).cases.length).toBe(2)
+    expect(staticAnswer('GET', '/api/cases/E0225')).toEqual({ status: 200, data: { id: 'E0225' } })
+    expect(staticAnswer('GET', '/api/cases/E9999')!.status).toBe(404)
+    for (const m of ['POST', 'PUT', 'DELETE', 'PATCH']) expect(staticAnswer(m, '/api/cases/E0225/relink')).toBeNull()
+    expect(staticAnswer('POST', '/api/logout')).toBeNull()
+  })
+})

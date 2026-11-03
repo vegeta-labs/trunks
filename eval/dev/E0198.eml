@@ -1,0 +1,26 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=vogel-familie.example; dkim=pass
+ header.d=vogel-familie.example; dmarc=pass header.from=vogel-familie.example
+Received: from mail.vogel-familie.example (mail.vogel-familie.example
+ [192.0.2.97]) by mx.ops.example with ESMTPS id J2V2MF2ZM4 for
+ <investors@ops.example>; Tue, 10 Nov 2026 09:45:00 +0000
+Date: Tue, 10 Nov 2026 10:43:57 +0100
+From: Matthias Vogel <m.vogel@vogel-familie.example>
+To: investors@ops.example
+Subject: Frage zu =?utf-8?q?Aussch=C3=BCttungen?= - Solent
+Message-ID: <E0198.1e5f3gw3bcv7@vogel-familie.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Guten Tag,
+
+ich habe in der Fachpresse gelesen, dass Solent Biotherapeutics einen Lizenzv=
+ertrag f=C3=BCr sein wichtigstes Programm abgeschlossen hat.
+
+Ist dadurch mit einer Aussch=C3=BCttung an die Investoren der Zweckgesellscha=
+ft zu rechnen, und wenn ja, ungef=C3=A4hr wann? Ich plane gerade meine Liquid=
+it=C3=A4t f=C3=BCr das kommende Jahr.
+
+Vielen Dank und beste Gr=C3=BC=C3=9Fe
+Matthias Vogel

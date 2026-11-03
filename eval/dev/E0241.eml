@@ -1,0 +1,26 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=fiona@ramsay-capltal.example; dkim=pass
+ header.d=ramsay-capltal.example; dmarc=pass
+ header.from=ramsay-capltal.example
+Received: from mail.ramsay-capltal.example (mail.ramsay-capltal.example
+ [192.0.2.32]) by mx.ops.example with ESMTPS; Tue, 27 Oct 2026 10:38:07 +0000
+From: Fiona Ramsay <fiona@ramsay-capltal.example>
+To: investors@ops.example
+Subject: Re: Northwind Robotics - final numbers for sign-off
+Date: Tue, 27 Oct 2026 10:38:00 +0000
+Message-ID: <E0241.oh7rokh6jj5y@ramsay-capltal.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi team,
+
+Confirming the final numbers for Northwind Robotics as circulated: 16 investo=
+rs, total =C2=A3366,500.00. Happy for you to proceed to close on that basis.
+
+Best,
+Fiona
+
+Fiona Ramsay
+Ramsay Capital
+020 7946 0140

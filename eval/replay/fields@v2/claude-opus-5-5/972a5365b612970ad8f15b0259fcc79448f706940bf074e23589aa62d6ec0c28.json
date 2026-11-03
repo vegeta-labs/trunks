@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"new_amount\":{\"value\":\"US$60,000\",\"confidence\":\"high\",\"quote\":\"US$60,000 in total\"},\"currency\":{\"value\":\"USD\",\"confidence\":\"high\",\"quote\":\"it would be easiest for me to send USD\"},\"subtype\":{\"value\":\"fx\",\"confidence\":\"medium\",\"quote\":\"Most of my liquidity is in dollars at the moment, so it\\nwould be easiest for me to send USD.\"}}}",
+ "usage": {
+  "inputTokens": 1594,
+  "outputTokens": 146
+ }
+}

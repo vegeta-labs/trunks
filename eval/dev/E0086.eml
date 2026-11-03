@@ -1,0 +1,25 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramsay-capital.example; dkim=pass
+ header.d=ramsay-capital.example; dmarc=pass
+ header.from=ramsay-capital.example
+Received: from mail.ramsay-capital.example (mail.ramsay-capital.example
+ [192.0.2.143]) by mx.ops.example with ESMTPS id 0SPGG8HZI6W4; Wed, 18 Nov
+ 2026 09:12:00 +0000
+Message-ID: <E0086.o00vpk9r7ojk@ramsay-capital.example>
+Date: Wed, 18 Nov 2026 09:09:51 +0000
+From: Fiona Ramsay <fiona@ramsay-capital.example>
+To: Kestrel Legal <legal@ops.example>
+Subject: Northwind Robotics - final numbers confirmed
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Dear Legal team,
+
+Writing to confirm, for the closing file, that I approve the final
+Northwind Robotics numbers as circulated on Monday. Please proceed with the
+completion documents.
+
+Regards,
+Fiona Ramsay
+Ramsay Capital

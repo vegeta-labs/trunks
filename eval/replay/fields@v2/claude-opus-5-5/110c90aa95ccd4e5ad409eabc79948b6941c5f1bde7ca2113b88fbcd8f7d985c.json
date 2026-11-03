@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"amount\":{\"value\":\"£15,000.00\",\"confidence\":\"high\",\"quote\":\"I transferred £15,000.00 on 23 October with the reference NW 007.\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\"I transferred £15,000.00 on 23 October\"},\"payment_date\":{\"value\":\"23 October\",\"confidence\":\"high\",\"quote\":\"I transferred £15,000.00 on 23 October with the reference NW 007.\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"medium\",\"quote\":\"[NAME_1] [NAME_2] <[EMAIL_2]@becker-post.example> wrote:\"},\"reference\":{\"value\":\"NW 007\",\"confidence\":\"high\",\"quote\":\"with the reference NW 007\"},\"uetr\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 2506,
+  "outputTokens": 292
+ }
+}

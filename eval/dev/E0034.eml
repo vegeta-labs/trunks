@@ -1,0 +1,24 @@
+Return-Path: <t.wolski@wolski-family.example>
+Received: from mail.wolski-family.example (mail.wolski-family.example
+ [192.0.2.176]) by mx.ops.example with ESMTPS id 144918daac for
+ <investors@ops.example>; Mon, 26 Oct 2026 10:30:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=wolski-family.example; dkim=pass
+ header.d=wolski-family.example; dmarc=pass header.from=wolski-family.example
+Message-ID: <E0034.40c53065cbd3@wolski-family.example>
+Date: Mon, 26 Oct 2026 10:27:46 +0000
+From: "Tomasz Wolski" <t.wolski@wolski-family.example>
+To: investors@ops.example
+Subject: Northwind - payment sent without reference
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Good morning,
+
+I'm afraid I sent my Northwind Robotics subscription without putting the refe=
+rence on it. It was =C2=A350,000.00 from my personal account, on 22 October 2=
+026. Please could you match it to my commitment?
+
+Kind regards,
+Tomasz Wolski

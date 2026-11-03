@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"deal\":{\"value\":\"Northwind Robotics\",\"confidence\":\"high\",\"quote\":\"my Northwind Robotics shares were bought under EIS\"},\"question_type\":{\"value\":\"tax\",\"confidence\":\"high\",\"quote\":\"what happens to my income tax relief, and will the proceeds be subject to capital gains tax?\"},\"certificate_type\":{\"value\":\"eis\",\"confidence\":\"high\",\"quote\":\"my Northwind Robotics shares were bought under EIS\"}}}",
+ "usage": {
+  "inputTokens": 1726,
+  "outputTokens": 160
+ }
+}

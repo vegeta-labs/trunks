@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"fee_or_terms_change\",\"confidence\":\"high\",\"reason\":\"SPV instrument changes from a SAFE to ordinary shares in the priced round, with the SAFE holder's written agreement forwarded.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2044,
+  "outputTokens": 88
+ }
+}

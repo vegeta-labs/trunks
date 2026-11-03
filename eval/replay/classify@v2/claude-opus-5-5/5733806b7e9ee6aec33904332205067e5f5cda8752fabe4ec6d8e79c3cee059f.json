@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"payment_evidence\",\"confidence\":\"high\",\"reason\":\"Investor attaches a pacs.008 XML file from their Paris bank as confirmation of the transfer for Northwind Robotics.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2043,
+  "outputTokens": 83
+ }
+}

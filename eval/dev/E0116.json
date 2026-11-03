@@ -1,0 +1,54 @@
+{
+  "id": "E0116",
+  "family": "F028",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-12T10:44:00Z",
+  "prior_messages": [],
+  "description": "Investor's accountant (not in the directory, first-time sender) asks for an EIS certificate with the reference.",
+  "classes": [
+    "tax_certificates"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": true,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "certificate_type": "eis",
+    "deal": "Northwind Robotics"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [
+      "NW-002"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": null,
+    "investor_id": "Northwind Robotics::002",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0002"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "tax_cert_info",
+  "notes": "First-time sender; commitment linked by the reference only; may_disclose_record false (not a directory contact)."
+}

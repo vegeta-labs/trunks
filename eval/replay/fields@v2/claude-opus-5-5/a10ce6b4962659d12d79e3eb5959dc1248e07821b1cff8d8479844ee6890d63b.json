@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"b2f87f5e-5f55-4a0a-8c55-cd861de80e32\",\"confidence\":\"high\",\"quote\":\"{121:b2f87f5e-5f55-4a0a-8c55-cd861de80e32}\"},\"amount\":{\"value\":\"£5,000.00\",\"confidence\":\"high\",\"quote\":\"my £5,000.00 payment for Northwind Robotics\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\":32A:261029GBP5.000,00\"},\"value_date\":{\"value\":\"261029\",\"confidence\":\"high\",\"quote\":\":32A:261029GBP5.000,00\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\":50K:[NAME_1] [NAME_2]\"},\"reference\":{\"value\":{\"candidates\":[{\"value\":\"NW-003\",\"quote\":\":70:NW-003\"},{\"value\":\"PRM-TRF-0042\",\"quote\":\":20:PRM-TRF-0042\"}]},\"confidence\":\"medium\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 1839,
+  "outputTokens": 363
+ }
+}

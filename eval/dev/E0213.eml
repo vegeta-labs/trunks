@@ -1,0 +1,26 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=lindqvist-partners.example; dkim=pass
+ header.d=lindqvist-partners.example; dmarc=pass
+ header.from=lindqvist-partners.example
+Received: from mail.lindqvist-partners.example
+ (mail.lindqvist-partners.example [192.0.2.146]) by mx.ops.example with ESMTPS
+ id XXPHOXVA10 for <investors@ops.example>; Fri, 30 Oct 2026 11:50:00 +0000
+Date: Fri, 30 Oct 2026 11:49:40 +0000
+From: Marcus Lindqvist <marcus@lindqvist-partners.example>
+To: investors@ops.example
+Reply-To: Marcus Lindqvist <marcus@lindqvist-partners.example>
+Subject: Re: Solent - final schedule
+Message-ID: <E0213.y0f33mh344zx@lindqvist-partners.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Dear team,
+
+Confirmed - the final Solent Biotherapeutics numbers in your schedule of 29 October are fine by me. Please proceed.
+
+Best regards,
+Marcus
+
+Marcus Lindqvist
+Partner | Lindqvist Partners

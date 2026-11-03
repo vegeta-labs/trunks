@@ -1,0 +1,38 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=jonas.becker@becker-post.example; dkim=pass
+ header.d=becker-post.example; dmarc=pass header.from=becker-post.example
+Received: from mail.becker-post.example (mail.becker-post.example
+ [192.0.2.29]) by mx.ops.example with ESMTPS; Wed, 28 Oct 2026 09:36:07 +0000
+From: Jonas Becker <jonas.becker@becker-post.example>
+To: investors@ops.example
+Subject: Northwind payment - MT103 attached
+Date: Wed, 28 Oct 2026 09:36:00 +0000
+Message-ID: <E0287.05nypih2attg@becker-post.example>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=_w5_jdf8p34m17kdreje"
+
+--=_w5_jdf8p34m17kdreje
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+I transferred the first =C2=A310,000 of my Northwind Robotics commitment on 2=
+3 October 2026 (reference NW-007). Has it arrived? I attach the MT103 from my=
+ bank.
+
+Viele Gr=C3=BC=C3=9Fe
+Jonas Becker
+
+--=_w5_jdf8p34m17kdreje
+Content-Type: text/plain
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103.txt"
+MIME-Version: 1.0
+
+ezE6RjAxUVpCS0dCMkxBWFhYfXsyOk8xMDNRWkJLREVGRlhYWFhOfXszOnsxMjE6YjdiNTliN2Qt
+MTMyNy00MDJkLWJhM2ItMGM0OWI4M2ZmNzgzfX17NDoNCjoyMDpRWkQtODgyMTMNCjoyM0I6Q1JF
+RA0KOjMyQToyNjEwMjNHQlA5MDAwLDAwDQo6NTBLOkpPTkFTIEJFQ0tFUg0KQkVSTElODQo6NTk6
+Tk9SVEhXSU5EIFJPQk9USUNTIFNQVg0KOjcwOk5XLTAwNw0KOjcxQTpTSEENCi19DQo=
+
+--=_w5_jdf8p34m17kdreje--

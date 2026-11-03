@@ -1,0 +1,49 @@
+Received: from mail.bennettmail.example (mail.bennettmail.example
+ [192.0.2.36]) by mx.ops.example with ESMTPS id 80e7388362; Mon, 02 Nov 2026
+ 09:44:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=bennettmail.example; dkim=pass header.d=bennettmail.example;
+ dmarc=pass header.from=bennettmail.example
+From: Oliver Bennett <oliver.bennett@bennettmail.example>
+To: Investor Operations <investors@ops.example>
+Subject: EIS3 certificate and exit question
+Date: Mon, 02 Nov 2026 09:43:25 +0000
+Message-ID: <E0176.3aa72eccb4b5@bennettmail.example>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============9154928864106686573=="
+
+--===============9154928864106686573==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Could you send me the EIS3 certificate for my Northwind Robotics investment? =
+I need it to claim the relief for the 2026-27 tax year.
+
+And a related question: if Northwind is sold in a couple of years, will the d=
+istribution I receive be covered by the EIS capital gains exemption, given th=
+e shares are held through the SPV?
+
+Thanks,
+Oliver Bennett
+
+--===============9154928864106686573==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><head><meta charset=3D"utf-8"></head><body style=3D"font-family:Arial,s=
+ans-serif;font-size:14px;color:#222222;background:#ffffff">
+<p>Hello,</p>
+<p>Could you send me the EIS3 certificate for my Northwind Robotics investmen=
+t? I need it to claim the relief for the 2026-27 tax year.</p>
+<p>And a related question: if Northwind is sold in a couple of years, will th=
+e distribution I receive be covered by the EIS capital gains exemption, given=
+ the shares are held through the SPV?</p>
+<p>Thanks,<br>
+Oliver Bennett</p>
+</body></html>
+
+--===============9154928864106686573==--

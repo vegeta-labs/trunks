@@ -1,0 +1,35 @@
+Return-Path: <jonas.becker@becker-post.example>
+Received: from mail.becker-post.example (mail.becker-post.example
+ [192.0.2.226]) by mx.ops.example with ESMTPS id 971090ed71 for
+ <investors@ops.example>; Mon, 26 Oct 2026 15:02:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=becker-post.example; dkim=pass header.d=becker-post.example;
+ dmarc=pass header.from=becker-post.example
+Message-ID: <E0016.5115d345af02@becker-post.example>
+Date: Mon, 26 Oct 2026 14:59:46 +0000
+From: "Jonas Becker" <jonas.becker@becker-post.example>
+To: investors@ops.example
+Subject: Transfer confirmation Northwind Robotics
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear Sir or Madam,
+
+please find below the MT103 confirmation for my transfer to Northwind Robotic=
+s. My bank tells me the money left my account on the value date shown.
+
+{3:{121:ba4b628d-589e-4dbe-86e7-53c6a3c1676d}}
+{4:
+:20:BCK-TRF-9921
+:23B:CRED
+:32A:261014GBP15000,00
+:50K:JONAS BECKER
+BERLIN
+:59:/NORTHWIND ROBOTICS SPV
+:70:NW 007 BECKER
+:71A:OUR
+-}
+
+Kind regards
+Jonas Becker

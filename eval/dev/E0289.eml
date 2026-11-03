@@ -1,0 +1,38 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=oliver.bennett@bennettmail.example; dkim=pass
+ header.d=bennettmail.example; dmarc=pass header.from=bennettmail.example
+Received: from mail.bennettmail.example (mail.bennettmail.example
+ [192.0.2.29]) by mx.ops.example with ESMTPS; Fri, 06 Nov 2026 10:16:07 +0000
+From: Oliver Bennett <oliver.bennett@bennettmail.example>
+To: investors@ops.example
+Subject: Northwind balance paid - MT103
+Date: Fri, 06 Nov 2026 10:16:00 +0000
+Message-ID: <E0289.0b7rk2m9qa1x@bennettmail.example>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=_w5_ob"
+
+--=_w5_ob
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+Resending in case my earlier email didn't reach you. I paid the balance of =
+=C2=A315,000 for Northwind Robotics on 3 November 2026 (NW-002). MT103 attach=
+ed - can you confirm it has arrived?
+
+Thanks,
+Oliver Bennett
+
+--=_w5_ob
+Content-Type: text/plain
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103.txt"
+MIME-Version: 1.0
+
+ezE6RjAxUVpCS0dCMkxBWFhYfXsyOk8xMDNRWkJLREVGRlhYWFhOfXszOnsxMjE6MmFkZmJkMGMt
+Y2U5OC00ODYwLThjMjktY2RiNzlhNGQ0MGZlfX17NDoNCjoyMDpRWkMtNTAzMTcNCjoyM0I6Q1JF
+RA0KOjMyQToyNjExMDNHQlAxNTAwMCwwMA0KOjUwSzpPTElWRVIgQkVOTkVUVA0KTE9ORE9ODQo6
+NTk6Tk9SVEhXSU5EIFJPQk9USUNTIFNQVg0KOjcwOk5XLTAwMg0KOjcxQTpTSEENCi19DQo=
+
+--=_w5_ob--

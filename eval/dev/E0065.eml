@@ -1,0 +1,32 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=harbourlane.example; dkim=pass header.d=harbourlane.example;
+ dmarc=pass header.from=harbourlane.example
+Received: from mail.harbourlane.example (mail.harbourlane.example
+ [192.0.2.56]) by mx.ops.example with ESMTPS id PVC6USI2IUJQ; Thu, 29 Oct 2026
+ 10:12:00 +0000
+Message-ID: <E0065.st0lsxp5ssqh@harbourlane.example>
+Date: Thu, 29 Oct 2026 10:09:52 +0000
+From: Harbour Lane Holdings Ltd <investments@harbourlane.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Northwind Robotics - top-up following allocation
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Good morning,
+
+We have received the allocation note for Northwind Robotics, thank you. Our
+investment committee has approved a top-up of =C2=A325,000.00, bringing our t=
+otal
+commitment to =C2=A3125,000.00 (current commitment =C2=A3100,000.00, already =
+funded
+under NW-005).
+
+Could you confirm whether there is still room in the round, and how you would
+like the top-up to be paid?
+
+Regards,
+
+Imogen Clarke-Bray
+Investment Operations
+Harbour Lane Holdings Ltd

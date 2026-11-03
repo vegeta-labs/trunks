@@ -1,0 +1,17 @@
+investor_id,name,email,reference,cash_due,scheme
+001,Amelia Hart,amelia@hartfamily.example,NW-001,10000.00,SEIS
+002,Oliver Bennett,oliver.bennett@bennettmail.example,NW-002,25000.00,EIS
+003,Priya Raman,priya@ramanfamily.example,NW-003,5000.00,SEIS
+004,Tomasz Wolski,t.wolski@wolski-family.example,NW-004,50000.00,EIS
+005,Harbour Lane Holdings Ltd,investments@harbourlane.example,NW-005,100000.00,EIS
+006,Sophie Laurent,sophie.laurent@laurent-mail.example,NW-006,20000.00,
+007,Jonas Becker,jonas.becker@becker-post.example,NW-007,15000.00,
+008,Lucía Fernández,lucia.fernandez@correo-fernandez.example,NW-008,7500.00,
+009,Chen Wei,chen.wei@chenwei-family.example,NW-009,30000.00,EIS
+010,James Smith,jsmith@smithfamily.example,NW-010,12000.00,SEIS
+011,Margaret O'Neill,moneill@oneill-home.example,NW-011,8000.00,EIS
+012,Rafael Duarte,rafael@duarte-invest.example,NW-012,40000.00,
+013,Hannah Kowalczyk,hannah.k@kowalczyk-home.example,NW-013,6000.00,SEIS
+014,Susan Hall,hall.family@hallhome.example,NW-014,10000.00,EIS
+015,Peter Hall,hall.family@hallhome.example,NW-015,10000.00,EIS
+016,Daniel Osei,daniel.osei@osei-mail.example,NW-016,18000.00,EIS

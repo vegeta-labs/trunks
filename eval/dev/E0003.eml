@@ -1,0 +1,24 @@
+Return-Path: <priya@ramanfamily.example>
+Received: from mail.ramanfamily.example (mail.ramanfamily.example
+ [192.0.2.208]) by mx.ops.example with ESMTPS id 79c2f289d0 for
+ <investors@ops.example>; Wed, 28 Oct 2026 14:37:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramanfamily.example; dkim=pass header.d=ramanfamily.example;
+ dmarc=pass header.from=ramanfamily.example
+Message-ID: <E0003.b0cdb7af8b24@ramanfamily.example>
+Date: Wed, 28 Oct 2026 14:34:25 +0000
+From: "Priya Raman" <priya@ramanfamily.example>
+To: investors@ops.example
+Subject: Payment confirmation please
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear Investor Relations team,
+
+I made my payment of GBP 5,000 for Northwind Robotics on 19 October 2026, ref=
+erence NW003 SPV. I haven't had any confirmation from you yet - could you che=
+ck please?
+
+Kind regards
+Priya Raman

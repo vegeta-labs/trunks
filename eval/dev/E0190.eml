@@ -1,0 +1,86 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=becker-post.example; dkim=pass header.d=becker-post.example;
+ dmarc=pass header.from=becker-post.example
+Received: from mail.becker-post.example (mail.becker-post.example
+ [192.0.2.77]) by mx.ops.example with ESMTPS id QWBLHD96A0 for
+ <investors@ops.example>; Mon, 09 Nov 2026 15:10:00 +0000
+Date: Mon, 09 Nov 2026 16:09:01 +0100
+From: Jonas Becker <jonas.becker@becker-post.example>
+To: investors@ops.example
+Subject: Re: Payment NW 007 not showing
+Message-ID: <E0190.vjp7c4kcvspc@becker-post.example>
+In-Reply-To: <3t3jl45uhwnl2po6@ops.example>
+References: <d1qpqgoe050mrrol@becker-post.example>
+ <k1yis82r9v9od0bn@ops.example> <f56wuo6g3mpuy08x@becker-post.example>
+ <zx8fdpj7nopvs8mr@ops.example> <4c6ba6l9ja2o0dwo@becker-post.example>
+ <3t3jl45uhwnl2po6@ops.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Nobody called. I am now making a formal complaint about how this has been han=
+dled. Two weeks of "we will be in touch" without a single real answer is not =
+acceptable for an investment of this size.
+
+Please pass this to whoever manages your operations team, and tell me who wil=
+l be responsible for it from now on.
+
+Jonas Becker
+
+On Thu, 5 Nov 2026 at 13:50, Kestrel Syndicate Operations <investors@ops.exam=
+ple> wrote:
+> Dear Jonas,
+>
+> Sorry for the delay. A colleague will call you.
+>
+> Kind regards,
+> Investor Operations
+> Kestrel Syndicate Operations
+>
+> On Thu, 5 Nov 2026 at 09:14, Jonas Becker <jonas.becker@becker-post.example=
+> wrote:
+>> Still nothing. Could someone please call me?
+>>
+>> Jonas
+>>
+>> On Mon, 2 Nov 2026 at 10:30, Kestrel Syndicate Operations <investors@ops.e=
+xample> wrote:
+>>> Dear Jonas,
+>>>
+>>> We have raised this with the team and will be in touch.
+>>>
+>>> Kind regards,
+>>> Investor Operations
+>>> Kestrel Syndicate Operations
+>>>
+>>> On Fri, 30 Oct 2026 at 16:02, Jonas Becker <jonas.becker@becker-post.exam=
+ple> wrote:
+>>>> Any news? It has been a week.
+>>>>
+>>>> J. Becker
+>>>>
+>>>> On Tue, 27 Oct 2026 at 09:45, Kestrel Syndicate Operations <investors@op=
+s.example> wrote:
+>>>>> Dear Jonas,
+>>>>>
+>>>>> Thank you, we are looking into it.
+>>>>>
+>>>>> Kind regards,
+>>>>> Investor Operations
+>>>>> Kestrel Syndicate Operations
+>>>>>
+>>>>> On Mon, 26 Oct 2026 at 08:30, Jonas Becker <jonas.becker@becker-post.ex=
+ample> wrote:
+>>>>>> Hello,
+>>>>>>
+>>>>>> I transferred =C2=A315,000.00 on 23 October with the reference NW 007.=
+ Your portal still shows my commitment as outstanding. Can you check?
+>>>>>>
+>>>>>> Jonas Becker
+>>>>>
+>>>>
+>>>
+>>
+>

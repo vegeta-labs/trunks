@@ -1,0 +1,24 @@
+Received: from mail.laurent-mail.example (mail.laurent-mail.example
+ [192.0.2.163]) by mx.ops.example with ESMTPS id 02b8b12121; Thu, 05 Nov 2026
+ 10:25:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=laurent-mail.example; dkim=pass header.d=laurent-mail.example;
+ dmarc=pass header.from=laurent-mail.example
+From: Sophie Laurent <sophie.laurent@laurent-mail.example>
+To: Investor Operations <investors@ops.example>
+Subject: Paying the Northwind commitment from a euro account
+Date: Thu, 05 Nov 2026 10:24:25 +0000
+Message-ID: <E0152.3a24850d4d02@laurent-mail.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+My savings are held in euros. For my Northwind Robotics commitment of =C2=A32=
+0,000.00, can I send euros and have them converted to sterling on your side, =
+or do I have to convert to GBP myself before sending? If the SPV converts, wh=
+ich rate would apply and who bears the cost?
+
+Merci d'avance,
+Sophie Laurent

@@ -1,0 +1,26 @@
+Return-Path: <rafael@duarte-invest.example>
+Received: from mail.duarte-invest.example (mail.duarte-invest.example
+ [192.0.2.92]) by mx.ops.example with ESMTPS id 333e9a8def for
+ <investors@ops.example>; Fri, 23 Oct 2026 08:41:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=duarte-invest.example; dkim=pass
+ header.d=duarte-invest.example; dmarc=pass header.from=duarte-invest.example
+Message-ID: <E0006.6d43e97e6f3d@duarte-invest.example>
+Date: Fri, 23 Oct 2026 08:38:31 +0000
+From: "Rafael Duarte" <rafael@duarte-invest.example>
+To: investors@ops.example
+Subject: Northwind funding check
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi team,
+
+Quick one on Northwind Robotics, reference NW-012. I sent two transfers of =
+=C2=A320,000.00 each, on 14 October 2026 and 21 October 2026, from my company=
+ Duarte Invest Ltd. Can you confirm both have landed and that the commitment =
+is fully funded?
+
+(For the avoidance of doubt this is about Northwind, not my Solent position.)
+
+Rafael Duarte

@@ -1,0 +1,29 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=northwind-robotics.example; dkim=pass
+ header.d=northwind-robotics.example; dmarc=pass
+ header.from=northwind-robotics.example
+Received: from mail.northwind-robotics.example
+ (mail.northwind-robotics.example [192.0.2.69]) by mx.ops.example with ESMTPS
+ id 96BI1WYMPJRD; Mon, 02 Nov 2026 10:40:00 +0000
+Message-ID: <E0091.kmxoj4zg8mlx@northwind-robotics.example>
+Date: Mon, 02 Nov 2026 10:37:41 +0000
+From: Ethan Clarke <ethan.clarke@northwind-robotics.example>
+To: Kestrel Legal <legal@ops.example>
+Subject: Shareholder resolution - signing link
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+Our lawyers have set up the written shareholder resolution approving the
+Northwind Robotics share issue. As the SPV will be a shareholder at
+completion, could someone with authority sign via the link below:
+
+https://esign.example/s/Rv3Wn8Ka2Yd6Pc
+
+The link was sent to me directly so I'm passing it on - shout if it doesn't
+open for you.
+
+Thanks,
+Ethan

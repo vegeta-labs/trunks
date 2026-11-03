@@ -1,0 +1,64 @@
+{
+  "id": "E0189",
+  "family": "F044",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-06T13:25:00Z",
+  "prior_messages": [
+    {
+      "from": "investments@harbourlane.example",
+      "message_id": "<e4fgfm5eda0h298x@harbourlane.example>",
+      "sans_msgid_sha256": "dce35eed4629e0178e4fdcbf4e68831faa0ba98104371a34a1232a728bcb0e10"
+    },
+    {
+      "from": "investments@harbourlane.example",
+      "message_id": "<1knoxd9awk4ezn4t@harbourlane.example>",
+      "sans_msgid_sha256": "d999e7e28fbc129713a3ef09020b55d142964c7eac45b95feeb0eb54c46feb15"
+    }
+  ],
+  "description": "Corporate investor resubmits KYC documents via the portal after two rejected scans (5 quoted messages).",
+  "classes": [
+    "kyc_documents"
+  ],
+  "expected_risk": "high",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "document_types": [
+      "certificate_of_incorporation",
+      "register_of_members"
+    ],
+    "entity_type": "company"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C005",
+    "investor_id": "Northwind Robotics::005",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "No attachment: the documents were uploaded to the portal. kyc_documents floor high -> safe_ack."
+}

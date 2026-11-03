@@ -1,0 +1,87 @@
+# Changelog
+
+## v0.1.0 (2026-11-03): first public release
+
+Deal Ops Inbox is a self-hosted, **read-only** email agent for investment-operations inboxes. For each inbound email
+it picks categories, extracts the key facts, links the email to your directory, flags risk, prepares a reply from a
+fixed template for a person to check, copy and send, and routes the email to a queue. It never sends email, never
+writes to a mailbox, never moves money and never changes business records.
+
+This list names only what has been built **and tested**. Where a part was tested only in a limited way, it says so.
+
+### What it does
+
+- **Mailboxes, read-only:** IMAP (opened read-only), `.eml` import, Gmail (`gmail.readonly`, one consent per mailbox),
+  Microsoft 365 (`Mail.Read` on named mailboxes, permission check at every start). No code path can send or write
+  mail; a CI check blocks mail-write calls.
+- **Rules first, model second:** amounts, dates, payment references, UETRs, IBANs and UK account numbers,
+  MT103 and pacs.008 payment messages are read by code. A language model only picks categories and extracts fields,
+  as validated JSON, with no tools. Everything sent to a model is redacted first; attachments that may be identity
+  documents never go to any model.
+- **Models:** Anthropic Claude, or a local model through Ollama. By default a hosted provider refuses to start
+  until the operator records that a data processing agreement exists (`dpa: true`, the operator's own declaration);
+  an explicit override (`allow_without_dpa: true`) starts it with a warning in the log and the review UI.
+- **Fraud rules fixed in code:** bank details from an email are never applied; an emailed payment confirmation
+  never counts as received; risk wording never appears in replies. Bank-detail and identity changes create a
+  verification task: call the phone number on file, a cooling-off period, approval by a second person.
+- **Replies from fixed templates only:** the template is chosen by code; record data is disclosed only to an
+  authenticated sender who is entitled to see it.
+- **Directory:** deals, commitments, bank lines and the reconciliation ledger from Deal Ops Toolkit CSV files, plus a
+  contacts file.
+- **Review UI:** plain-text email view, signals, risk with reasons, replies to approve and copy, verification tasks,
+  CSV exports, JSON events to a signed webhook.
+- **Data protection:** every text value in the database is encrypted; a hash-chained audit log; retention periods
+  per category; possible-KYC attachments transferred to your own folder or webhook and then removed; master key
+  rotation; DPIA and LIA templates.
+- **Packaging:** Docker Compose with separate containers for the app, maintenance, the database, the virus scanner
+  and a sandboxed attachment parser (its own seccomp and AppArmor profiles); a local demo with fictional data and no
+  outbound connections.
+
+### How it was tested
+
+- Unit, integration and browser tests; an independent Python implementation of the rules, written only from the
+  requirements, compared with the code; mutation checks; the Docker Compose stack started, backed up and restored in CI
+  (and upgraded from the previous internal version, in the development repository); the documented user and directory commands run exactly as written in CI.
+- An evaluation set of fictional emails written by independent agents that saw only the requirements: a
+  development set of 178 emails (run on recorded model replies in CI) and a separate held-out set of 121 emails that
+  development never read.
+- **Held-out set, real model (Claude Opus 5.5), run once for this release by an independent runner** (121 emails,
+  all processed, no model fallbacks). Every gated metric met its threshold:
+
+  | Metric | Threshold | Result |
+  |---|---|---|
+  | Classification, macro F1 (¹) | ≥ 0.85 | 0.946 |
+  | Fields extracted by rules | 100% | 100% (121/121) |
+  | Field recall | ≥ 0.90 | 93.6% |
+  | Field precision | ≥ 0.90 | 91.9% |
+  | Fields that should stay empty | ≥ 0.95 | 96.9% |
+  | Contact, commitment and deal all linked correctly, samples with one unambiguous answer | ≥ 0.95 | 100% (120/120) |
+  | Risk never underestimated | 100% | 100% (121/121) |
+  | High-risk emails rated high | 100% | 100% (57/57) |
+  | Emails annotated as malicious bank-detail changes or look-alike senders rated high | 100% | 100% (12/12) |
+  | Replies never disclose more than allowed | 100% | 100% (121/121) |
+  | Prompt injection does not change the judgement (vs. a clean twin) | 100% | 100% (7/7) |
+  | Risk and template from the rules, given the annotated categories and fields | 100% | 100% |
+
+  (¹) Over the categories whose risk floor is not high, without `unclassified` and without categories that have no
+  example in the set. Emails in the high-risk categories (for example bank details and identity changes) are measured
+  by the risk rows instead (risk never underestimated, high-risk emails rated high).
+
+  Reported without a threshold (end to end, with the model's own categories): risk exactly as annotated 94.2%,
+  reply template exactly as annotated 86.0%. A person reviews every Case and reply. The held-out set is now used
+  up; the next release is measured on a newly written one.
+
+### Limits of this release
+
+- **Microsoft 365 and Gmail push notifications (Pub/Sub)** were tested only against simulated services. Gmail
+  polling was tested on one personal Gmail account. Test with your own tenant before going live.
+- **Demo start-up time:** measured at about 2 minutes on a machine that already had the images and base images
+  cached (macOS, Docker Desktop). A first start on a clean machine also downloads the base images and was not
+  measured.
+- **No screens for users and the directory:** an admin uses the HTTP API with `curl`
+  (see `docs/en/users-and-directory.md`).
+- Inline signature images count as possible identity documents; there is no OCR; the AppArmor profile needs
+  AppArmor 4 (for example Ubuntu 24.04); macOS runs the parser without AppArmor. See `docs/en/security-model.md` §8.
+- Not tested with real production mail volumes.
+
+Licence: Apache-2.0.

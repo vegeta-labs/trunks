@@ -1,0 +1,25 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=hartfamily.example; dkim=pass header.d=hartfamily.example;
+ dmarc=pass header.from=hartfamily.example
+Received: from mail.hartfamily.example (mail.hartfamily.example [192.0.2.248])
+ by mx.ops.example with ESMTPS id GEHKI59OZ3TM; Mon, 02 Nov 2026 09:15:00
+ +0000
+Message-ID: <E0066.fdzcc8xspgpi@hartfamily.example>
+Date: Mon, 02 Nov 2026 09:12:46 +0000
+From: Amelia Hart <amelia@hartfamily.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: quick one - Northwind
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi both,
+
+Quick one: could you move my Northwind commitment from =C2=A310k to =C2=A315k=
+? Happy to
+send the difference whenever suits. Ref is NW-001 as before.
+
+Thanks!
+Amelia
+
+Sent from my phone

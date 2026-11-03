@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"complaint\",\"confidence\":\"high\",\"reason\":\"Sender is very disappointed that three phone calls this month went unanswered and asks for someone senior to contact them.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1837,
+  "outputTokens": 72
+ }
+}

@@ -1,0 +1,51 @@
+{
+  "id": "E0244",
+  "family": "F054",
+  "mailbox": "legal",
+  "mailbox_strips_auth_results": false,
+  "received_at": "2026-11-05T13:20:00Z",
+  "prior_messages": [],
+  "description": "Display-name impersonation of the company contact from free-mail with a 'review document' link, sent to the legal mailbox.",
+  "classes": [
+    "legal_documents"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "lookalike",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": null,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": true,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": true,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "platform": null,
+    "document_type": "shareholder_resolution",
+    "deal": "Northwind Robotics"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": null,
+    "investor_id": null,
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "safe_ack",
+  "notes": "Legal mailbox does not strip foreign Authentication-Results, so auth_fail is null (unknown). docs-share.example is not an e-sign platform: no esign_invite."
+}

@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"subtype\":{\"value\":\"secondary\",\"confidence\":\"high\",\"quote\":\"A second party has approached me about buying a further 5% of my remaining shares outside the round.\"},\"platform\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"document_type\":{\"value\":\"transfer\",\"confidence\":\"medium\",\"quote\":\"or would it have to be a separate transfer between the buyer and me?\"},\"deal\":{\"value\":\"Northwind Robotics\",\"confidence\":\"high\",\"quote\":\"selling into the Northwind Robotics round\"}}}",
+ "usage": {
+  "inputTokens": 1699,
+  "outputTokens": 178
+ }
+}

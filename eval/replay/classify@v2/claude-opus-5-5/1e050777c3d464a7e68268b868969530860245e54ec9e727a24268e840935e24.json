@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"unclassified\",\"confidence\":\"high\",\"reason\":\"A calendar invitation to a Q4 operations catch-up meeting about the reporting calendar; it matches none of the defined categories.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1965,
+  "outputTokens": 80
+ }
+}

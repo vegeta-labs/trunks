@@ -1,0 +1,24 @@
+Return-Path: <jsmith@smithfamily.example>
+Received: from mail.smithfamily.example (mail.smithfamily.example
+ [192.0.2.198]) by mx.ops.example with ESMTPS id d627bc6e5c for
+ <investors@ops.example>; Thu, 05 Nov 2026 13:26:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=smithfamily.example; dkim=pass header.d=smithfamily.example;
+ dmarc=pass header.from=smithfamily.example
+Message-ID: <E0008.73a93cacbdd5@smithfamily.example>
+Date: Thu, 05 Nov 2026 13:23:36 +0000
+From: "James Smith" <jsmith@smithfamily.example>
+To: investors@ops.example
+Subject: Payment for Northwind Robotics
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+I'm one of the investors in Northwind Robotics (reference NW-010). I paid =C2=
+=A312,000.00 by bank transfer on 30 October 2026. Could you let me know once =
+it shows on your side?
+
+Regards,
+James Smith

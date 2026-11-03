@@ -1,0 +1,58 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramsay-capital.example; dkim=pass
+ header.d=ramsay-capital.example; dmarc=pass
+ header.from=ramsay-capital.example
+Received: from mail.ramsay-capital.example (mail.ramsay-capital.example
+ [192.0.2.243]) by mx.ops.example with ESMTPS id 88NEGQV6J5VA; Tue, 03 Nov
+ 2026 11:20:00 +0000
+Message-ID: <E0075.m6t3bg0dp3li@ramsay-capital.example>
+Date: Tue, 03 Nov 2026 11:17:28 +0000
+From: Fiona Ramsay <fiona@ramsay-capital.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Larkspur - fees now payable by investors
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============2898854166125517465=="
+
+--===============2898854166125517465==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello,
+
+For Larkspur Energy Storage: my firm will no longer carry the deal fees, and
+from this round they will be charged to the investors in the usual way.
+Investors were told at the information session and are signing consent forms.
+
+The first signed consent is attached; the others will follow as they come in.
+
+Best wishes,
+Fiona Ramsay
+Ramsay Capital
+
+--===============2898854166125517465==
+Content-Type: application/pdf
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="fee_consent_signed.pdf"
+MIME-Version: 1.0
+
+JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4K
+ZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4K
+ZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAg
+MCA1OTUgODQyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvQ29udGVu
+dHMgNSAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUx
+IC9CYXNlRm9udCAvSGVsdmV0aWNhIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nID4+CmVuZG9i
+ago1IDAgb2JqCjw8IC9MZW5ndGggMzk5ID4+CnN0cmVhbQpCVCAvRjEgMTAgVGYgNTYgNzkwIFRk
+IDE0IFRMCihMYXJrc3B1ciBFbmVyZ3kgU3RvcmFnZSAtIGludmVzdG9yIGNvbnNlbnQgdG8gZmVl
+IGFycmFuZ2VtZW50cykgVGogVCoKKCkgVGogVCoKKEludmVzdG9yOiBPbGl2aWEgR3JhbnQpIFRq
+IFQqCihSZWZlcmVuY2U6IExLLTAwMykgVGogVCoKKCkgVGogVCoKKEkgY29uc2VudCB0byB0aGUg
+ZGVhbCBmZWVzIGZvciB0aGUgTGFya3NwdXIgRW5lcmd5IFN0b3JhZ2Ugcm91bmQgYmVpbmcgY2hh
+cmdlZCkgVGogVCoKKHRvIGludmVzdG9ycyByYXRoZXIgdGhhbiBwYWlkIGJ5IHRoZSBsZWFkLCBS
+YW1zYXkgQ2FwaXRhbC4pIFRqIFQqCigpIFRqIFQqCihTaWduZWQ6IE9saXZpYSBHcmFudCkgVGog
+VCoKKERhdGU6IDIgTm92ZW1iZXIgMjAyNikgVGogVCoKRVQKZW5kc3RyZWFtCmVuZG9iago2IDAg
+b2JqCjw8IC9UaXRsZSAoRmVlIGNvbnNlbnQpIC9Qcm9kdWNlciAoRG9jcykgPj4KZW5kb2JqCnhy
+ZWYKMCA3CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAxNSAwMDAwMCBuIAowMDAwMDAwMDY0
+IDAwMDAwIG4gCjAwMDAwMDAxMjEgMDAwMDAgbiAKMDAwMDAwMDI0NyAwMDAwMCBuIAowMDAwMDAw
+MzQ0IDAwMDAwIG4gCjAwMDAwMDA3OTQgMDAwMDAgbiAKdHJhaWxlcgo8PCAvU2l6ZSA3IC9Sb290
+IDEgMCBSIC9JbmZvIDYgMCBSID4+CnN0YXJ0eHJlZgo4NTMKJSVFT0YK
+
+--===============2898854166125517465==--

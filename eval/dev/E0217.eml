@@ -1,0 +1,73 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=fundops-digest.example; dkim=pass
+ header.d=fundops-digest.example; dmarc=pass
+ header.from=fundops-digest.example
+Received: from mail.fundops-digest.example (mail.fundops-digest.example
+ [192.0.2.240]) by mx.ops.example with ESMTPS id 4ADCK7L9TN for
+ <investors@ops.example>; Tue, 03 Nov 2026 08:30:00 +0000
+Date: Tue, 03 Nov 2026 08:28:56 +0000
+From: Fund Ops Digest <digest@fundops-digest.example>
+To: investors@ops.example
+Subject: Fund Ops Digest - November 2026
+Message-ID: <E0217.6nmdixdanjyi@fundops-digest.example>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============8052363321007417006=="
+List-Unsubscribe: <https://fundops-digest.example/u/8KQ2>
+
+--===============8052363321007417006==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+FUND OPS DIGEST - November 2026
+
+In this issue
+- Closing checklists: what the fastest SPV teams do differently
+- Reconciliation: five habits that cut month-end time in half
+- Events: the Fund Operations Forum, 3 December, Manchester
+
+Closing checklists
+Teams that close quickly agree final numbers with the lead in writing at least a week ahead and keep a single register as the source of truth.
+
+Reconciliation habits
+Match incoming payments every working morning, keep notes on every exception, and review unmatched lines weekly.
+
+You are receiving this because you subscribed at fundops-digest.example.
+Unsubscribe: https://fundops-digest.example/u/8KQ2
+
+--===============8052363321007417006==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<!DOCTYPE html>
+<html><head><meta charset=3D"utf-8">
+<style>
+  body { font-family: Helvetica, Arial, sans-serif; color: #202020; backgroun=
+d: #f4f4f4; }
+  .wrap { background: #ffffff; padding: 24px; }
+  .toolbar { font-size: 12px; color: #555555; }
+  @media print {
+    .toolbar { display: none; }
+  }
+</style></head>
+<body><div class=3D"wrap">
+<div class=3D"toolbar">View in browser | Forward to a colleague | Unsubscribe=
+</div>
+<h1>FUND OPS DIGEST - November 2026</h1>
+<h3>In this issue</h3>
+<ul><li>Closing checklists: what the fastest SPV teams do differently</li>
+<li>Reconciliation: five habits that cut month-end time in half</li>
+<li>Events: the Fund Operations Forum, 3 December, Manchester</li></ul>
+<h3>Closing checklists</h3>
+<p>Teams that close quickly agree final numbers with the lead in writing at l=
+east a week ahead and keep a single register as the source of truth.</p>
+<h3>Reconciliation habits</h3>
+<p>Match incoming payments every working morning, keep notes on every excepti=
+on, and review unmatched lines weekly.</p>
+<p style=3D"font-size:12px;color:#555555">You are receiving this because you =
+subscribed at fundops-digest.example.<br>
+<a href=3D"https://fundops-digest.example/u/8KQ2">Unsubscribe</a></p>
+</div></body></html>
+
+--===============8052363321007417006==--

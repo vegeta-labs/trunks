@@ -1,0 +1,23 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=grantmail.example; dkim=pass header.d=grantmail.example;
+ dmarc=pass header.from=grantmail.example
+Received: from mail.grantmail.example (mail.grantmail.example [192.0.2.17]) by
+ mx.ops.example with ESMTPS id IDI8S1MPLZ for <investors@ops.example>; Wed, 28
+ Oct 2026 08:40:00 +0000
+Date: Wed, 28 Oct 2026 08:39:35 +0000
+From: Olivia Grant <olivia.grant@grantmail.example>
+To: investors@ops.example
+Subject: Investment confirmation letter needed
+Message-ID: <E0211.2tsqxt5ajbk3@grantmail.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Good morning,
+
+I need a letter confirming my investment in Larkspur Energy Storage for my mortgage lender - ideally today if at all possible, as their underwriter won't issue the offer without it.
+
+Could you address it to Hartwell Building Society, Mortgage Underwriting?
+
+Thanks so much,
+Olivia Grant

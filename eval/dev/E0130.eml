@@ -1,0 +1,26 @@
+Received: from mail.osei-mail.example (mail.osei-mail.example [192.0.2.199])
+ by mx.ops.example with ESMTPS id 0f55342928; Wed, 11 Nov 2026 08:30:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=osei-mail.example; dkim=pass header.d=osei-mail.example;
+ dmarc=pass header.from=osei-mail.example
+From: Daniel Osei <daniel.osei@osei-mail.example>
+To: Investor Operations <investors@ops.example>
+Subject: Investment letter needed today please
+Date: Wed, 11 Nov 2026 08:29:25 +0000
+Message-ID: <E0130.58672fcdd07f@osei-mail.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+Sorry for the short notice. My bank's underwriter has come back asking for a =
+letter confirming my investment in Northwind Robotics, and they want it today=
+ if at all possible so the offer doesn't lapse.
+
+Could you email a PDF confirmation to me at this address? I can forward it on.
+
+Thanks a lot,
+Daniel
+
+Daniel Osei

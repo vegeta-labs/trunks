@@ -1,0 +1,25 @@
+Return-Path: <sophie.laurent@laurent-mail.example>
+Received: from mail.laurent-mail.example (mail.laurent-mail.example
+ [192.0.2.154]) by mx.ops.example with ESMTPS id f33208a94d for
+ <investors@ops.example>; Fri, 06 Nov 2026 15:15:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=laurent-mail.example; dkim=pass header.d=laurent-mail.example;
+ dmarc=pass header.from=laurent-mail.example
+Message-ID: <E0036.8febc8d0821a@laurent-mail.example>
+Date: Fri, 06 Nov 2026 15:12:13 +0000
+From: "Sophie Laurent" <sophie.laurent@laurent-mail.example>
+To: investors@ops.example
+Subject: Virement Northwind depuis ma =?utf-8?b?c29jacOpdMOp?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+For information, the =C2=A320,000.00 for my Northwind Robotics commitment was=
+ paid on 4 November 2026 from my company, Laurent Conseil SARL, and not from =
+my personal account. I forgot to add the reference.
+
+Merci et bonne journ=C3=A9e,
+Sophie Laurent
+Laurent Conseil SARL

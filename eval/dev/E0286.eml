@@ -1,0 +1,38 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=t.wolski@wolski-family.example; dkim=pass
+ header.d=wolski-family.example; dmarc=pass header.from=wolski-family.example
+Received: from mail.wolski-family.example (mail.wolski-family.example
+ [192.0.2.31]) by mx.ops.example with ESMTPS; Tue, 27 Oct 2026 12:06:07 +0000
+From: Tomasz Wolski <t.wolski@wolski-family.example>
+To: investors@ops.example
+Subject: MT103 - Northwind subscription
+Date: Tue, 27 Oct 2026 12:06:00 +0000
+Message-ID: <E0286.q59qyqnvjshc@wolski-family.example>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=_w5_iz89qavyh4h0smgq"
+
+--=_w5_iz89qavyh4h0smgq
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Good afternoon,
+
+As requested, here is the MT103 for my =C2=A350,000 transfer for Northwind Ro=
+botics, reference NW-004. My bank sent it on 22 October 2026.
+
+Best regards,
+Tomasz Wolski
+07700 900104
+
+--=_w5_iz89qavyh4h0smgq
+Content-Type: text/plain
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_wolski.txt"
+MIME-Version: 1.0
+
+ezE6RjAxUVpCS0dCMkxBWFhYfXsyOk8xMDNRWkJLREVGRlhYWFhOfXszOnsxMjE6OGQzZjYxYTIt
+NWI3ZS0xYzRhLTllMmQtNmYwYjNhN2M5MWU0fX17NDoNCjoyMDpRWkItVFQtNDQ3MQ0KOjIzQjpD
+UkVEDQo6MzJBOjI2MTAyMkdCUDUwMDAwLDAwDQo6NTBLOlRPTUFTWiBXT0xTS0kNCkxPTkRPTg0K
+OjU5Ok5PUlRIV0lORCBST0JPVElDUyBTUFYNCjo3MDpOVy0wMDQNCjo3MUE6U0hBDQotfQ0K
+
+--=_w5_iz89qavyh4h0smgq--

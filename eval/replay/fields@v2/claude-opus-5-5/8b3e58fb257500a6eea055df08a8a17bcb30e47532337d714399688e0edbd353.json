@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"deal\":{\"value\":\"Solent Biotherapeutics\",\"confidence\":\"high\",\"quote\":\"a possible trade sale of Solent Biotherapeutics\"},\"question_type\":{\"value\":\"timing\",\"confidence\":\"high\",\"quote\":\"could you tell us when the SPV would expect to make a distribution to investors if the sale completes, and roughly how long after completion?\"}}}",
+ "usage": {
+  "inputTokens": 1585,
+  "outputTokens": 128
+ }
+}

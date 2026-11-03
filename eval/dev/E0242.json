@@ -1,0 +1,55 @@
+{
+  "id": "E0242",
+  "family": "F054",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-09T15:05:00Z",
+  "prior_messages": [],
+  "description": "Look-alike domain rarnsay-capital (rn->m) confirms Larkspur numbers on the lead's behalf.",
+  "classes": [
+    "closing_confirmation"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "lookalike",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": true,
+    "reply_to_mismatch": false,
+    "first_time_sender": true,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "confirms": "yes",
+    "deal": "Larkspur Energy Storage"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 12000000,
+        "currency": "USD"
+      }
+    ],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": null,
+    "investor_id": null,
+    "deal": "Larkspur Energy Storage",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "safe_ack",
+  "notes": "rarnsay-capital.example equals ramsay-capital.example after rn->m and has DL distance 2. Display name 'Ramsay Capital' is not name-similar (1/2) to Fiona Ramsay, so no display_name_mismatch."
+}

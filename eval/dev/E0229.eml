@@ -1,0 +1,27 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=solent-blo.example; dkim=pass header.d=solent-blo.example;
+ dmarc=pass header.from=solent-blo.example
+Received: from mail.solent-blo.example (mail.solent-blo.example [192.0.2.173])
+ by mx.ops.example with ESMTPS id UTJ9LSVCTJ for <investors@ops.example>; Tue,
+ 10 Nov 2026 11:00:00 +0000
+Date: Tue, 10 Nov 2026 10:59:21 +0000
+From: Aoife Brennan <aoife.brennan@solent-blo.example>
+To: investors@ops.example
+Subject: Solent Biotherapeutics - updated bank account
+Message-ID: <E0229.vktvuslr0wrq@solent-blo.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Dear colleagues,
+
+I'm writing to let you know that Solent Biotherapeutics has changed its bank following our move to a euro-denominated treasury structure. Investors in the SPV should now pay their subscriptions to:
+
+Solent Biotherapeutics Ltd
+IBAN DE91 1122 6331 8949 6231 91
+
+Please update your records and let me know once the investors have been informed.
+
+Kind regards,
+Aoife Brennan
+Company Secretary, Solent Biotherapeutics

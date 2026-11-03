@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"payment_query\",\"confidence\":\"high\",\"reason\":\"Investor says they sent the £9,000 second instalment with reference NW-016 and asks to be told when it arrives; no confirmation attached.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1842,
+  "outputTokens": 83
+ }
+}

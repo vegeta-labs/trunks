@@ -1,0 +1,20 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=tom.reed@reedfo.example; dkim=pass header.d=reedfo.example;
+ dmarc=pass header.from=reedfo.example
+Received: from mail.reedfo.example (mail.reedfo.example [192.0.2.24]) by
+ mx.ops.example with ESMTPS; Thu, 22 Oct 2026 10:46:07 +0000
+From: Tom Reed <tom.reed@reedfo.example>
+To: investors@ops.example
+Subject: Confidential - Solent distribution
+Date: Thu, 22 Oct 2026 10:46:00 +0000
+Message-ID: <E0294.elfce9kgdskd@reedfo.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello,
+
+This is confidential. We hold an interest in Solent Biotherapeutics through your SPV and need the expected distribution amount per share before close of business on Friday. Please send it as soon as you can.
+
+Tom Reed
+Reed Family Office

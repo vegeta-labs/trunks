@@ -1,0 +1,70 @@
+{
+  "id": "E0016",
+  "family": "F003",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-26T15:02:00Z",
+  "prior_messages": [],
+  "description": "MT103 in body; ledger row for this investor was rejected (not received); value date 8 working days back -> payment_need_evidence.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "ba4b628d-589e-4dbe-86e7-53c6a3c1676d",
+    "amount": {
+      "minor": 1500000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-10-14",
+    "payer_name": "JONAS BECKER",
+    "reference": "NW-007"
+  },
+  "rule_output": {
+    "uetrs": [
+      "ba4b628d-589e-4dbe-86e7-53c6a3c1676d"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1500000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-007"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": [
+      "2026-10-14"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C007",
+    "investor_id": "Northwind Robotics::007",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0005"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_need_evidence",
+  "notes": "Ledger T-NW-0005 has status rejected -> not counted (C-DRF-6). Bank line T-NW-0005 is still listed (reference 'NW 007'). From 2026-10-14 to 2026-10-26 = 8 working days -> payment_need_evidence (the template still asks for a UETR, by design)."
+}

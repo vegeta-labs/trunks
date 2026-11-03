@@ -1,0 +1,22 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=smithfamily.example; dkim=pass header.d=smithfamily.example;
+ dmarc=pass header.from=smithfamily.example
+Received: from mail.smithfamily.example (mail.smithfamily.example
+ [192.0.2.116]) by mx.ops.example with ESMTPS id YZWE02B3GLU3; Wed, 04 Nov
+ 2026 09:58:00 +0000
+Message-ID: <E0114.ehxpptrjovii@smithfamily.example>
+Date: Wed, 04 Nov 2026 09:55:28 +0000
+From: James Smith <jsmith@smithfamily.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: tax certificate
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hi there,
+
+When will the tax certificate for my investment be ready? I'd like to get
+my paperwork done early this year.
+
+Thanks
+James

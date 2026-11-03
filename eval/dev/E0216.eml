@@ -1,0 +1,22 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=wolski-family.example; dkim=pass
+ header.d=wolski-family.example; dmarc=pass header.from=wolski-family.example
+Received: from mail.wolski-family.example (mail.wolski-family.example
+ [192.0.2.29]) by mx.ops.example with ESMTPS id 0YKJ028CCM for
+ <investors@ops.example>; Fri, 30 Oct 2026 09:25:00 +0000
+Date: Fri, 30 Oct 2026 09:24:19 +0000
+From: Tomasz Wolski <t.wolski@wolski-family.example>
+To: investors@ops.example
+Subject: Complaint - no call back
+Message-ID: <E0216.yni9b7pi0b77@wolski-family.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello,
+
+I'm writing to complain. On Monday Sarah from your team promised to call me back the same afternoon about my Northwind Robotics investment. Nobody called, and I have now been chasing for a week.
+
+I would like an explanation and a firm time when someone will actually ring me.
+
+Tomasz Wolski

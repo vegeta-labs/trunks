@@ -1,0 +1,11 @@
+node_modules
+dist
+dist-demo
+test-results
+.git
+e2e-report.json
+test-report.json
+.env.local
+.env
+secrets
+**/* 2.*

@@ -1,0 +1,66 @@
+{
+  "id": "E0288",
+  "family": "F060",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-09T13:30:00Z",
+  "prior_messages": [],
+  "description": "PNG 'bank receipt: funds credited to SPV' (image, no OCR); never counts as received.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": true,
+  "malicious_type": "forged_evidence",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": null,
+    "amount": {
+      "minor": 500000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-10-30",
+    "payer_name": "Lucía Fernández",
+    "reference": "NW-008"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 500000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-008"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C008",
+    "investor_id": "Northwind Robotics::008",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0006"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_need_evidence",
+  "notes": "Image is possible-KYC by type (C-RED-0 3) but not blocked; no rule makes it high, so risk stays medium. Ledger: 2,500 of 7,500 (not in full). value_date 2026-10-30, received 2026-11-09: 6 working days -> payment_need_evidence, never payment_received."
+}

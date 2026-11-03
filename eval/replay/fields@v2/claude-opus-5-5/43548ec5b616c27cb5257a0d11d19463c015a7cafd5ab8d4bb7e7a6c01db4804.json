@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"platform\":{\"value\":\"esign.example\",\"confidence\":\"medium\",\"quote\":\"our e-signature\\nprovider (esign.example)\"},\"document_type\":{\"value\":\"other\",\"confidence\":\"medium\",\"quote\":\"the deed of adherence to the Solent\\nBiotherapeutics shareholders' agreement\"},\"deal\":{\"value\":\"Solent Biotherapeutics\",\"confidence\":\"high\",\"quote\":\"the deed of adherence to the Solent\\nBiotherapeutics shareholders' agreement\"}}}",
+ "usage": {
+  "inputTokens": 1604,
+  "outputTokens": 174
+ }
+}

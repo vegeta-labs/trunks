@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"party_role\":{\"value\":\"company\",\"confidence\":\"medium\",\"quote\":\"Northwind Robotics [NAME_1] has changed its bank details\"},\"change_requested\":{\"value\":true,\"confidence\":\"high\",\"quote\":\"All future payments, including the remaining investor subscriptions, must be made to the following account:\"}}}",
+ "usage": {
+  "inputTokens": 1602,
+  "outputTokens": 110
+ }
+}

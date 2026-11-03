@@ -1,0 +1,7 @@
+# Test only (TC-DEMO-01): every network internal, so no container can reach anything outside; nothing is published.
+services:
+  app:
+    ports: !reset []
+networks:
+  backend: { internal: true }
+  edge: { internal: true }

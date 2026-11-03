@@ -1,0 +1,70 @@
+{
+  "id": "E0027",
+  "family": "F005",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-12T14:20:00Z",
+  "prior_messages": [],
+  "description": "pacs.008 with no CdtTrfTxInf/IntrBkSttlmDt; value date from GrpHdr/IntrBkSttlmDt; partial payer 2 working days -> payment_wait.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "6a2afcd8-dd76-45c5-9fb1-5c4682c5d02f",
+    "amount": {
+      "minor": 1000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-11-10",
+    "payer_name": "OLIVER BENNETT",
+    "reference": "NW-002"
+  },
+  "rule_output": {
+    "uetrs": [
+      "6a2afcd8-dd76-45c5-9fb1-5c4682c5d02f"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-002"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": [
+      "2026-11-10"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C002",
+    "investor_id": "Northwind Robotics::002",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0002"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_wait",
+  "notes": "Value date taken from GrpHdr/IntrBkSttlmDt because CdtTrfTxInf has none (C-EXT-3)."
+}

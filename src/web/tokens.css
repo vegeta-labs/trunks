@@ -1,0 +1,110 @@
+/*
+ * Shared design variables of the Deal Ops work interfaces (Toolkit app, Inbox review UI). The website keeps its own styles.
+ * Source: Deal Ops Inbox docs/09_UI_DESIGN.md §2. The two copies are identical byte for byte; change them only as §10 says.
+ */
+:root {
+  --bg: #f6f8f3;
+  --surface: #ffffff;
+  --surface-2: #eef2e9;
+  --surface-3: #e3e9dc;
+  --text: #151619;
+  --text-strong: #151619;
+  --muted: #5f6359;
+  --border: #dde2d6;
+  --border-strong: #7f8577;
+  --primary: #151619;
+  --primary-text: #f6f8f3;
+  --accent: #eab189;
+  --accent-text: #151619;
+  --link: #9c4f1e;
+  --ok: #1a6b41;
+  --ok-bg: #e7f0e0;
+  --warn: #8a5a00;
+  --warn-bg: #fbf1dc;
+  --bad: #b3261e;
+  --bad-bg: #fbe9e7;
+  --bad-fill: #b3261e;
+  --bad-fill-text: #ffffff;
+  --info-bg: #f5ffdf;
+  --code-bg: #eef2e9;
+  --radius-btn: 6px;
+  --radius-field: 8px;
+  --radius-box: 12px;
+  --radius-nav: 16px;
+  --radius-card: 24px;
+  --radius-panel: 18px;
+  --radius-pill: 9999px;
+  --control-h: 40px;
+  --shadow-pop: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 5px 10px rgba(0, 0, 0, 0.12);
+  --card-glow: none;
+  --ease: 160ms ease-out;
+  --sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  color-scheme: light dark;
+}
+/* a choice made on the page (R-X-04, decision 9) also sets native controls and scrollbars */
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #161616;
+    --surface: #1e1e1e;
+    --surface-2: #282828;
+    --surface-3: #383838;
+    --text: #d1d5db;
+    --text-strong: #f9fafb;
+    --muted: #969696;
+    --border: #383838;
+    --border-strong: #767676;
+    --primary: #eab189;
+    --primary-text: #161616;
+    --accent: #eab189;
+    --accent-text: #161616;
+    --link: #eab189;
+    --ok: #5cc48e;
+    --ok-bg: #16261d;
+    --warn: #e8b04a;
+    --warn-bg: #2a2110;
+    --bad: #f08a7e;
+    --bad-bg: #2c1715;
+    --bad-fill: #f08a7e;
+    --bad-fill-text: #161616;
+    --info-bg: #1a2a20;
+    --code-bg: #282828;
+    --shadow-pop: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 5px 10px rgba(0, 0, 0, 0.2), 0 15px 40px rgba(0, 0, 0, 0.4);
+    --card-glow: inset 0 0 16px rgba(56, 56, 56, 0.5);
+  }
+}
+:root[data-theme='dark'] {
+  --bg: #161616;
+  --surface: #1e1e1e;
+  --surface-2: #282828;
+  --surface-3: #383838;
+  --text: #d1d5db;
+  --text-strong: #f9fafb;
+  --muted: #969696;
+  --border: #383838;
+  --border-strong: #767676;
+  --primary: #eab189;
+  --primary-text: #161616;
+  --accent: #eab189;
+  --accent-text: #161616;
+  --link: #eab189;
+  --ok: #5cc48e;
+  --ok-bg: #16261d;
+  --warn: #e8b04a;
+  --warn-bg: #2a2110;
+  --bad: #f08a7e;
+  --bad-bg: #2c1715;
+  --bad-fill: #f08a7e;
+  --bad-fill-text: #161616;
+  --info-bg: #1a2a20;
+  --code-bg: #282828;
+  --shadow-pop: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 5px 10px rgba(0, 0, 0, 0.2), 0 15px 40px rgba(0, 0, 0, 0.4);
+  --card-glow: inset 0 0 16px rgba(56, 56, 56, 0.5);
+}

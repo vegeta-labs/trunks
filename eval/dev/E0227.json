@@ -1,0 +1,53 @@
+{
+  "id": "E0227",
+  "family": "F050",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-02T10:45:00Z",
+  "prior_messages": [],
+  "description": "Look-alike domain (roboticss), company contact's display name and free-mail Reply-To; new receiving account.",
+  "classes": [
+    "bank_details"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "bank_change",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": true,
+    "lookalike_domain": true,
+    "reply_to_mismatch": true,
+    "first_time_sender": true,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "party_role": "company",
+    "account_last4": "5245",
+    "change_requested": true
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [],
+    "account_last4": [
+      "5245"
+    ],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": null,
+    "investor_id": null,
+    "deal": null,
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "safe_ack",
+  "notes": "Signals: lookalike_domain, display_name_mismatch, reply_to_mismatch, first_time_sender. IBAN checksum valid (fictional)."
+}

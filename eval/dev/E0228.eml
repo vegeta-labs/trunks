@@ -1,0 +1,30 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=nothwind-robotics.example; dkim=pass
+ header.d=nothwind-robotics.example; dmarc=pass
+ header.from=nothwind-robotics.example
+Received: from mail.nothwind-robotics.example (mail.nothwind-robotics.example
+ [192.0.2.42]) by mx.ops.example with ESMTPS id AERBV1IXDX for
+ <investors@ops.example>; Fri, 06 Nov 2026 15:40:00 +0000
+Date: Fri, 06 Nov 2026 15:39:54 +0000
+From:
+ Accounts Payable | Northwind Robotics <accounts@nothwind-robotics.example>
+To: investors@ops.example
+Subject: Notice: change of bank details
+Message-ID: <E0228.hs90fjzwu22w@nothwind-robotics.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Dear Sir/Madam,
+
+Please be advised that Northwind Robotics Ltd has changed its bank details. All future payments, including the remaining investor subscriptions, must be made to the following account:
+
+Bank: Harbourside Bank plc, London
+Account name: Northwind Robotics Ltd
+IBAN: GB86 QZBK 2872 0972 1288 53
+
+Payments made to the previous account after 6 November cannot be guaranteed.
+
+Yours faithfully,
+Accounts Payable
+Northwind Robotics Ltd

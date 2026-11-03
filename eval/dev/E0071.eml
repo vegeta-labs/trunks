@@ -1,0 +1,34 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=lindqvist-partners.example; dkim=pass
+ header.d=lindqvist-partners.example; dmarc=pass
+ header.from=lindqvist-partners.example
+Received: from mail.lindqvist-partners.example
+ (mail.lindqvist-partners.example [192.0.2.79]) by mx.ops.example with ESMTPS
+ id CADTF6QZXDJS; Tue, 20 Oct 2026 10:24:00 +0000
+Message-ID: <E0071.1vk04waeiamd@lindqvist-partners.example>
+Date: Tue, 20 Oct 2026 10:21:47 +0000
+From: Marcus Lindqvist <marcus@lindqvist-partners.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Cc: Claire Dubois <claire.dubois@dubois-famille.example>,
+ Elena Ruiz <elena.ruiz@ruiz-correo.example>
+Subject: Solent - moving the fees to the company
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hi team,
+
+Following the board call yesterday: Solent has agreed to cover the deal fees
+itself, so investors in the Solent Biotherapeutics SPV will no longer be
+charged the arrangement fee. The company will pay it at completion.
+
+I've copied Claire and Elena, who raised this originally and are both happy
+with the change.
+
+Could you reflect this in the closing pack?
+
+Thanks,
+Marcus
+
+Marcus Lindqvist
+Lindqvist Partners

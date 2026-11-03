@@ -1,0 +1,69 @@
+{
+  "id": "E0083",
+  "family": "F020",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-13T08:48:00Z",
+  "prior_messages": [
+    {
+      "from": "fiona@ramsay-capital.example",
+      "message_id": "<E0083.p1.so31q5ahie@ramsay-capital.example>",
+      "sans_msgid_sha256": "9b92356d929d320801093273ca11ae6f5dbf6182a0bee93f525c0933d26e7c50"
+    }
+  ],
+  "description": "Lead says the Northwind numbers are wrong (no) in a thread where she wrote earlier; prior message listed.",
+  "classes": [
+    "closing_confirmation"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "confirms": "no",
+    "deal": "Northwind Robotics"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 4500000,
+        "currency": "GBP"
+      },
+      {
+        "minor": 5000000,
+        "currency": "GBP"
+      },
+      {
+        "minor": 36650000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C040",
+    "investor_id": null,
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "closing_ack",
+  "notes": "Her lower figure for one investor is part of the closing reply, not a commitment change request by the investor; classes kept to closing_confirmation. closing_ack treated as generic (see W2 question)."
+}

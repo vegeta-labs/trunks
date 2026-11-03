@@ -1,0 +1,55 @@
+Received: from mail.nordhaven-fo.example (mail.nordhaven-fo.example
+ [192.0.2.96]) by mx.ops.example with ESMTPS id 6072528ec3; Wed, 28 Oct 2026
+ 10:02:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=nordhaven-fo.example; dkim=pass header.d=nordhaven-fo.example;
+ dmarc=pass header.from=nordhaven-fo.example
+From: Nordhaven Family Office <office@nordhaven-fo.example>
+To: Investor Operations <investors@ops.example>
+Subject: Portal access for our analyst
+Date: Wed, 28 Oct 2026 10:01:25 +0000
+Message-ID: <E0135.d42aada7c089@nordhaven-fo.example>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============9208846270691038435=="
+
+--===============9208846270691038435==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Good morning,
+
+Could you please give our investment analyst, Ruth Okafor (ruth.okafor@nordha=
+ven-fo.example), read-only access to our investor portal so she can download =
+the quarterly reports for Solent Biotherapeutics? She should not be able to s=
+ign anything or make elections on our behalf.
+
+If you need a signed authority from one of our directors, let me know and I w=
+ill arrange it.
+
+With thanks,
+Isla Rennie
+Office Manager
+Nordhaven Family Office Ltd
+
+--===============9208846270691038435==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><head><meta charset=3D"utf-8"></head><body style=3D"font-family:Arial,s=
+ans-serif;font-size:14px;color:#222222;background:#ffffff">
+<p>Good morning,</p>
+<p>Could you please give our investment analyst, Ruth Okafor (ruth.okafor@nor=
+dhaven-fo.example), read-only access to our investor portal so she can downlo=
+ad the quarterly reports for Solent Biotherapeutics? She should not be able t=
+o sign anything or make elections on our behalf.</p>
+<p>If you need a signed authority from one of our directors, let me know and =
+I will arrange it.</p>
+<p>With thanks,<br>
+Isla Rennie<br>
+Office Manager<br>
+Nordhaven Family Office Ltd</p>
+</body></html>
+
+--===============9208846270691038435==--

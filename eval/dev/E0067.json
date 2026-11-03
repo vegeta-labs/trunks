@@ -1,0 +1,63 @@
+{
+  "id": "E0067",
+  "family": "F016",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-05T13:47:00Z",
+  "prior_messages": [],
+  "description": "Investor in two deals gives the reference and states the new Northwind (GBP) amount in USD; currency mismatch for a person to confirm.",
+  "classes": [
+    "commitment_change"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "new_amount": {
+      "minor": 6000000,
+      "currency": "USD"
+    },
+    "currency": "USD"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 6000000,
+        "currency": "USD"
+      }
+    ],
+    "references": [
+      "NW-012"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C012",
+    "investor_id": "Northwind Robotics::012",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0009",
+      "T-NW-0010"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "commitment_change_ack",
+  "notes": "Currency mismatch: Northwind is a GBP deal but the new amount is in USD. No rule changes risk or template; the reviewer must confirm. Reference NW-012 links the Northwind commitment although he also invests in Solent; bank lines T-NW-0009 and T-NW-0010 carry NW-012."
+}

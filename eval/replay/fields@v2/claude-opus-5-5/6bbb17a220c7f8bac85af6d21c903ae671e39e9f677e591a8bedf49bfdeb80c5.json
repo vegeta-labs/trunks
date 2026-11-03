@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"investor\":{\"value\":\"[NAME_3] [NAME_4]\",\"confidence\":\"high\",\"quote\":\"[NAME_3] [NAME_4] wishes to withdraw her commitment to Northwind Robotics (NW-003).\"},\"consent_evidence\":{\"value\":\"forwarded_written_consent\",\"confidence\":\"high\",\"quote\":\"Following our call, I confirm that I want to withdraw from the Northwind Robotics investment.\"}}}",
+ "usage": {
+  "inputTokens": 1774,
+  "outputTokens": 153
+ }
+}

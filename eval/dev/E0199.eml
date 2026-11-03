@@ -1,0 +1,27 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=correo-fernandez.example; dkim=pass
+ header.d=correo-fernandez.example; dmarc=pass
+ header.from=correo-fernandez.example
+Received: from mail.correo-fernandez.example (mail.correo-fernandez.example
+ [192.0.2.216]) by mx.ops.example with ESMTPS id TTJ0ZKEKYR for
+ <investors@ops.example>; Thu, 05 Nov 2026 12:20:00 +0000
+Date: Thu, 05 Nov 2026 13:19:02 +0100
+From: =?utf-8?q?Luc=C3=ADa_Fern=C3=A1ndez?=
+ <lucia.fernandez@correo-fernandez.example>
+To: investors@ops.example
+Subject: Segundo pago Northwind Robotics
+Message-ID: <E0199.wfn5933lfgi4@correo-fernandez.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hola:
+
+El 2 de noviembre de 2026 transfer=C3=AD =C2=A32,500.00, el segundo pago de m=
+i inversi=C3=B3n en Northwind Robotics, con la referencia NW-008.
+
+=C2=BFPod=C3=A9is confirmarme que ha llegado? En el portal todav=C3=ADa apare=
+ce el mismo saldo pendiente que la semana pasada.
+
+Un saludo,
+Luc=C3=ADa Fern=C3=A1ndez

@@ -1,0 +1,25 @@
+node_modules/
+test-report.json
+coverage/
+dist/
+__pycache__/
+.env
+*.local
+test-results/
+e2e-report.json
+playwright-report/
+
+# local secrets (model API key for eval:record)
+.env.local
+/secrets/
+/dist-demo/
+/demo-e2e-report.json
+/compose-report.json
+/deal-ops-inbox-demo-v*.tar.gz
+/deal-ops-inbox-demo-v*.tar.gz.sha256
+/demo-secrets/
+/.env
+/eval-actual/
+/compose-memory.txt
+# a deployment's own configuration (quickstart §2.2)
+/config/local/

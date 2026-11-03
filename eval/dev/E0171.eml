@@ -1,0 +1,30 @@
+Received: from mail.correo-fernandez.example (mail.correo-fernandez.example
+ [192.0.2.204]) by mx.ops.example with ESMTPS id 89ee6b2d32; Thu, 05 Nov 2026
+ 11:10:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=correo-fernandez.example; dkim=pass
+ header.d=correo-fernandez.example; dmarc=pass
+ header.from=correo-fernandez.example
+From: =?utf-8?q?Luc=C3=ADa_Fern=C3=A1ndez?=
+ <lucia.fernandez@correo-fernandez.example>
+To: Investor Operations <investors@ops.example>
+Subject: Second instalment NW-008 + my surname
+Date: Thu, 05 Nov 2026 11:09:25 +0000
+Message-ID: <E0171.44763ed70e2b@correo-fernandez.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Two things:
+
+1) I sent the second instalment of =C2=A35,000.00 for Northwind Robotics (NW-=
+008) on 2 November. Could you let me know whether it has arrived?
+
+2) I got married in September and now use my married surname, Fern=C3=A1ndez-=
+Ortega. Please use it on all documents and the share register from now on - I=
+ can send a copy of the marriage certificate if you need it.
+
+Muchas gracias,
+Luc=C3=ADa Fern=C3=A1ndez-Ortega

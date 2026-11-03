@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"issue_type\":{\"value\":\"permissions\",\"confidence\":\"high\",\"quote\":\"Please renew accounting access to the investor portal for our finance team member, Tom Reyes\"}}}",
+ "usage": {
+  "inputTokens": 1482,
+  "outputTokens": 66
+ }
+}

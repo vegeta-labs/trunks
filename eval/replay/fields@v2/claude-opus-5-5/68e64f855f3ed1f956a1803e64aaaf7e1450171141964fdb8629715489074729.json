@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"party_role\":{\"value\":\"investor\",\"confidence\":\"medium\",\"quote\":\"On behalf of my client [NAME_1] [NAME_2] (NW-003): should any refund become due\"},\"change_requested\":{\"value\":true,\"confidence\":\"high\",\"quote\":\"please send\\nit to her updated account, shown below my signature.\"}}}",
+ "usage": {
+  "inputTokens": 1610,
+  "outputTokens": 113
+ }
+}

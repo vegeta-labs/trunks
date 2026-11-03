@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"payment_evidence\",\"confidence\":\"high\",\"reason\":\"Attaches a pacs.008 bank file for the balance payment of the Northwind commitment.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2011,
+  "outputTokens": 70
+ }
+}

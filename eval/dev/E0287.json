@@ -1,0 +1,84 @@
+{
+  "id": "E0287",
+  "family": "F060",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-28T09:40:00Z",
+  "prior_messages": [],
+  "description": "Body claims £10,000 but MT103 :32A: says GBP 9,000 (amount mismatch).",
+  "classes": [
+    "payment_evidence",
+    "payment_query"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "forged_evidence",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "b7b59b7d-1327-402d-ba3b-0c49b83ff783",
+    "amount": {
+      "multiple": [
+        {
+          "minor": 1000000,
+          "currency": "GBP"
+        },
+        {
+          "minor": 900000,
+          "currency": "GBP"
+        }
+      ]
+    },
+    "currency": "GBP",
+    "value_date": "2026-10-23",
+    "payment_date": "2026-10-23",
+    "payer_name": "Jonas Becker",
+    "reference": "NW-007"
+  },
+  "rule_output": {
+    "uetrs": [
+      "b7b59b7d-1327-402d-ba3b-0c49b83ff783"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1000000,
+        "currency": "GBP"
+      },
+      {
+        "minor": 900000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-007"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": [
+      "2026-10-23"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C007",
+    "investor_id": "Northwind Robotics::007",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0005"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "Attachment amount set {9,000} and body set {10,000} disjoint -> high (C-RSK-2). amount has two values -> multiple."
+}

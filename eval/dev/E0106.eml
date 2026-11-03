@@ -1,0 +1,27 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=oneill-home.example; dkim=pass header.d=oneill-home.example;
+ dmarc=pass header.from=oneill-home.example
+Received: from mail.oneill-home.example (mail.oneill-home.example
+ [192.0.2.29]) by mx.ops.example with ESMTPS id N38VHGQ1UC96; Mon, 02 Nov 2026
+ 11:27:00 +0000
+Message-ID: <E0106.30bpu2zx516t@oneill-home.example>
+Date: Mon, 02 Nov 2026 11:24:34 +0000
+From: Margaret O'Neill <moneill@oneill-home.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Change of address
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Dear Kestrel,
+
+I have moved house. Please send any post to my new address:
+
+Margaret O'Neill
+Flat 3, 27 Harrow Lane
+Clifton
+Bristol
+BS8 4QT
+
+Thank you,
+Margaret O'Neill

@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"change_type\":{\"value\":\"instrument\",\"confidence\":\"high\",\"quote\":\"the Northwind Robotics SPV will now take ordinary shares in the\\npriced round instead of holding the SAFE\"},\"from_payer\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"to_payer\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"consent_evidence\":{\"value\":null,\"confidence\":\"medium\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 1878,
+  "outputTokens": 153
+ }
+}

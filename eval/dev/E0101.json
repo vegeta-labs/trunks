@@ -1,0 +1,55 @@
+{
+  "id": "E0101",
+  "family": "F024",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-06T16:12:00Z",
+  "prior_messages": [],
+  "description": "Authorised adviser updates her client's refund account, given as a UK sort code and account in the signature block.",
+  "classes": [
+    "bank_details"
+  ],
+  "expected_risk": "high",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "party_role": "investor",
+    "account_last4": "4522",
+    "change_requested": true
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [
+      "NW-003"
+    ],
+    "account_last4": [
+      "4522"
+    ],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C045",
+    "investor_id": "Northwind Robotics::003",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "Adviser is authorised for NW-003 and authenticated, so may_disclose_record is true; bank_details forces safe_ack anyway."
+}

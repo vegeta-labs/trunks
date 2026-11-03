@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"change_type\":{\"value\":\"fee_payer\",\"confidence\":\"high\",\"quote\":\"my firm will no longer carry the deal fees, and\\nfrom this round they will be charged to the investors in the usual way.\"},\"from_payer\":{\"value\":\"lead\",\"confidence\":\"high\",\"quote\":\"charged\\nto investors rather than paid by the lead, [NAME_2] Capital.\"},\"to_payer\":{\"value\":\"investors\",\"confidence\":\"high\",\"quote\":\"from this round they will be charged to the investors in the usual way.\"},\"consent_evidence\":{\"value\":null,\"confidence\":\"medium\",\"quote\":\"\"},\"platform\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"document_type\":{\"value\":\"other\",\"confidence\":\"medium\",\"quote\":\"Larkspur Energy Storage - investor consent to fee arrangements\"},\"deal\":{\"value\":\"Larkspur Energy Storage\",\"confidence\":\"high\",\"quote\":\"For Larkspur Energy Storage: my firm will no longer carry the deal fees\"}}}",
+ "usage": {
+  "inputTokens": 2028,
+  "outputTokens": 335
+ }
+}

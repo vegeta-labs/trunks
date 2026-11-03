@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"account_access\",\"confidence\":\"medium\",\"reason\":\"Investor reports portal dashboard showing duplicate holding and error page on documents tab.\"},{\"class\":\"complaint\",\"confidence\":\"low\",\"reason\":\"Mild dissatisfaction: says the display is confusing, though not a big problem.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1868,
+  "outputTokens": 113
+ }
+}

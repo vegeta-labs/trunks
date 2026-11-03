@@ -1,0 +1,51 @@
+{
+  "id": "E0175",
+  "family": "F042",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-30T15:55:00Z",
+  "prior_messages": [],
+  "description": "Investor herself (authenticated) withdraws and complains in the same email; withdrawal floor high -> safe_ack.",
+  "classes": [
+    "withdrawal",
+    "complaint"
+  ],
+  "expected_risk": "high",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "investor": "Priya Raman",
+    "consent_evidence": "investor_self"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C003",
+    "investor_id": "Northwind Robotics::003",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "Owner ruling Q1 (PRD v0.7.8): the authenticated investor writing herself -> consent_evidence investor_self. \"documents changed\" has change words but no bank/account/details word, so no bank_details."
+}

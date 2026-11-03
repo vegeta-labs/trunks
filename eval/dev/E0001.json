@@ -1,0 +1,66 @@
+{
+  "id": "E0001",
+  "family": "F001",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-26T09:14:00Z",
+  "prior_messages": [],
+  "description": "Authenticated Northwind investor asks whether her payment arrived; ledger shows it received in full -> payment_received.",
+  "classes": [
+    "payment_query"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "amount": {
+      "minor": 1000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "payment_date": "2026-10-20",
+    "payer_name": "Amelia Hart",
+    "reference": "NW-001",
+    "uetr": null
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-001"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C001",
+    "investor_id": "Northwind Robotics::001",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0001"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_received",
+  "notes": ""
+}

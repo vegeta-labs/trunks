@@ -1,0 +1,51 @@
+{
+  "id": "E0090",
+  "family": "F022",
+  "mailbox": "legal",
+  "mailbox_strips_auth_results": false,
+  "received_at": "2026-10-30T13:25:00Z",
+  "prior_messages": [],
+  "description": "E-sign invitation from noreply@esign.example with a signing link (rule label legal_documents); first-time sender.",
+  "classes": [
+    "legal_documents"
+  ],
+  "expected_risk": "high",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": null,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": true,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "platform": "esign.example",
+    "document_type": "subscription",
+    "deal": "Northwind Robotics"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": null,
+    "investor_id": null,
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "safe_ack",
+  "notes": "Rule label legal_documents from the esign.example sender and link (C-EXT-6). Deal from the extracted deal field (sender not in directory). Legal mailbox: auth not adopted."
+}

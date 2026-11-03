@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"identity_change\",\"confidence\":\"high\",\"reason\":\"Investor states they have moved and provides a new postal address for correspondence.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1816,
+  "outputTokens": 60
+ }
+}

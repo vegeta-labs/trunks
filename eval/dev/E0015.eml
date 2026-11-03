@@ -1,0 +1,37 @@
+Return-Path: <hannah.k@kowalczyk-home.example>
+Received: from mail.kowalczyk-home.example (mail.kowalczyk-home.example
+ [192.0.2.137]) by mx.ops.example with ESMTPS id a6c23c747c for
+ <investors@ops.example>; Wed, 28 Oct 2026 10:44:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=kowalczyk-home.example; dkim=pass
+ header.d=kowalczyk-home.example; dmarc=pass
+ header.from=kowalczyk-home.example
+Message-ID: <E0015.9f8c631c4548@kowalczyk-home.example>
+Date: Wed, 28 Oct 2026 10:41:26 +0000
+From: "Hannah Kowalczyk" <hannah.k@kowalczyk-home.example>
+To: investors@ops.example
+Subject: MT103 for my Northwind payment
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+As requested, here is the MT103 from my bank for my Northwind Robotics paymen=
+t. I actually instructed it on 20 October but the bank only processed it late=
+r.
+
+{3:{121:e7a726cf-0c10-411c-b3c6-69b49576f64f}}
+{4:
+:20:HKZ-PMT-3318
+:23B:CRED
+:32A:261026GBP6000,00
+:50K:HANNAH KOWALCZYK
+:59:/NORTHWIND RB SPV CLIENT AC
+NORTHWIND ROBOTICS SPV LP
+:70:NW-013 KOWALCZYK
+:71A:SHA
+-}
+
+Best wishes,
+Hannah

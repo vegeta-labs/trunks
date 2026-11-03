@@ -1,0 +1,6 @@
+investor_id,name,email,reference,cash_due,scheme
+001,James Smith,james.smith@smith-ventures.example,LK-001,20000.00,
+002,Kenji Tanaka,kenji@tanaka-home.example,LK-002,15000.00,
+003,Olivia Grant,olivia.grant@grantmail.example,LK-003,50000.00,
+004,Ahmed Karim,ahmed.karim@karim-family.example,LK-004,10000.00,
+005,Holloway Family Trust,bea@holloway-trust.example,LK-005,25000.00,

@@ -1,0 +1,72 @@
+{
+  "id": "E0006",
+  "family": "F001",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-23T08:41:00Z",
+  "prior_messages": [],
+  "description": "Investor in two deals names the Northwind reference; two confirmed ledger rows sum to cash_due -> payment_received.",
+  "classes": [
+    "payment_query"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "amount": {
+      "minor": 2000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "payment_date": {
+      "multiple": [
+        "2026-10-14",
+        "2026-10-21"
+      ]
+    },
+    "payer_name": "Duarte Invest Ltd",
+    "reference": "NW-012",
+    "uetr": null
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 2000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-012"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C012",
+    "investor_id": "Northwind Robotics::012",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0009",
+      "T-NW-0010"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_received",
+  "notes": "Two different payment dates -> payment_date multiple; amount is one value (two equal transfers). Paid from his own company; the email asks whether payments arrived, so class payment_query only. Reference NW-012 selects the Northwind commitment although C012 is also in Solent."
+}

@@ -1,0 +1,24 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=inbox-mail.example; dkim=pass header.d=inbox-mail.example;
+ dmarc=pass header.from=inbox-mail.example
+Received: from mail.inbox-mail.example (mail.inbox-mail.example [192.0.2.83])
+ by mx.ops.example with ESMTPS id BJP1B6MKAS for <investors@ops.example>; Thu,
+ 12 Nov 2026 09:35:00 +0000
+Date: Thu, 12 Nov 2026 09:33:56 +0000
+From: =?utf-8?q?Ame=E2=80=8Blia?= Hart <a.hart.personal@inbox-mail.example>
+To: investors@ops.example
+Subject: Northwind distribution
+Message-ID: <E0233.xtgr288fcokj@inbox-mail.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello,
+
+Could you let me know when the Northwind Robotics distribution is expected to be paid?
+
+Also, please note my updated bank details for that payment:
+IBAN GB18QZBK14212782966136
+
+Best wishes,
+Amelia

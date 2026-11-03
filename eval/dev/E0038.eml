@@ -1,0 +1,24 @@
+Return-Path: <jsmith@smithfamily.example>
+Received: from mail.smithfamily.example (mail.smithfamily.example
+ [192.0.2.58]) by mx.ops.example with ESMTPS id 90986c906e for
+ <investors@ops.example>; Wed, 11 Nov 2026 11:10:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=smithfamily.example; dkim=pass header.d=smithfamily.example;
+ dmarc=pass header.from=smithfamily.example
+Message-ID: <E0038.1ec8466cfe4e@smithfamily.example>
+Date: Wed, 11 Nov 2026 11:07:27 +0000
+From: "James Smith" <jsmith@smithfamily.example>
+To: investors@ops.example
+Subject: Payment made by my father
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+My father, Robert Smith, transferred GBP 7,500 from his own account on 9 Nove=
+mber 2026 towards my Northwind Robotics commitment. He didn't have the refere=
+nce to hand, so the transfer will just show his name.
+
+Thanks,
+James

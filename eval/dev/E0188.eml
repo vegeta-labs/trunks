@@ -1,0 +1,66 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=hartfamily.example; dkim=pass header.d=hartfamily.example;
+ dmarc=pass header.from=hartfamily.example
+Received: from mail.hartfamily.example (mail.hartfamily.example [192.0.2.89])
+ by mx.ops.example with ESMTPS id SDXMUH9NM8 for <investors@ops.example>; Fri,
+ 30 Oct 2026 10:10:00 +0000
+Date: Fri, 30 Oct 2026 10:09:32 +0000
+From: Amelia Hart <amelia@hartfamily.example>
+To: investors@ops.example
+Subject: Re: Increasing my Northwind commitment?
+Message-ID: <E0188.jkwu94j2o0b6@hartfamily.example>
+In-Reply-To: <pysoh0plimoyqaio@ops.example>
+References: <ncbv3r3cmd2x6kck@hartfamily.example>
+ <kqbamtun3g78kh18@ops.example> <co8dnjzz2p8l67r8@hartfamily.example>
+ <pysoh0plimoyqaio@ops.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Thanks, my adviser is happy with it.
+
+Please take my commitment up to =C2=A315,000.00 in total. I'll transfer the d=
+ifference as soon as you confirm.
+
+Best wishes,
+Amelia
+
+On Tue, 27 Oct 2026 at 13:40, Kestrel Syndicate Operations <investors@ops.exa=
+mple> wrote:
+> Dear Amelia,
+>
+> SEIS relief has an annual cap per investor, so your tax adviser is best pla=
+ced to confirm how it applies to you. The deal itself accepts increases.
+>
+> Kind regards,
+> Investor Operations
+> Kestrel Syndicate Operations
+>
+> On Tue, 27 Oct 2026 at 09:12, Amelia Hart <amelia@hartfamily.example> wrote:
+>> Thank you. Does the SEIS limit affect how much I can put in?
+>>
+>> Amelia
+>>
+>> On Mon, 26 Oct 2026 at 15:30, Kestrel Syndicate Operations <investors@ops.=
+example> wrote:
+>>> Dear Amelia,
+>>>
+>>> Yes - increases are possible until the final numbers are agreed with the =
+lead investor. Just let us know the figure you have in mind.
+>>>
+>>> Kind regards,
+>>> Investor Operations
+>>> Kestrel Syndicate Operations
+>>>
+>>> On Mon, 26 Oct 2026 at 11:00, Amelia Hart <amelia@hartfamily.example> wro=
+te:
+>>>> Hello,
+>>>>
+>>>> Is it still possible to increase my commitment to Northwind Robotics bef=
+ore the round closes?
+>>>>
+>>>> Best wishes,
+>>>> Amelia Hart
+>>>
+>>
+>

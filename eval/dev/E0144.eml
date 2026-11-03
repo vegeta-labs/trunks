@@ -1,0 +1,24 @@
+Received: from mail.becker-post.example (mail.becker-post.example
+ [192.0.2.124]) by mx.ops.example with ESMTPS id 844deca572; Thu, 12 Nov 2026
+ 10:57:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=becker-post.example; dkim=pass header.d=becker-post.example;
+ dmarc=pass header.from=becker-post.example
+From: Jonas Becker <jonas.becker@becker-post.example>
+To: Investor Operations <investors@ops.example>
+Subject: Fed up
+Date: Thu, 12 Nov 2026 10:56:25 +0000
+Message-ID: <E0144.d74f33382425@becker-post.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+I have to say I am completely fed up with how this whole Northwind Robotics p=
+rocess has been run. Every single interaction has been a struggle. Documents =
+arrive late, the portal is clunky, and nobody seems to know what anybody else=
+ is doing.
+
+I invested with you because I was told it would be straightforward. It has be=
+en anything but.
+
+Jonas Becker

@@ -1,0 +1,20 @@
+# Default case catalogue (PRD §3.1). Order matters: ties go to the class listed first (R-RTE-01, C-DRF-3).
+classes:
+  - { id: payment_query, risk_floor: medium, queue: ops }
+  - { id: payment_evidence, risk_floor: medium, queue: ops }
+  - { id: unreferenced_payment, risk_floor: medium, queue: ops }
+  - { id: kyc_documents, risk_floor: high, queue: compliance }
+  - { id: withdrawal, risk_floor: high, queue: ops }
+  - { id: commitment_change, risk_floor: medium, queue: ops }
+  - { id: fee_or_terms_change, risk_floor: high, queue: deal_ops }
+  - { id: closing_confirmation, risk_floor: medium, queue: deal_ops }
+  - { id: legal_documents, risk_floor: high, queue: legal }
+  - { id: bank_details, risk_floor: high, queue: compliance }
+  - { id: identity_change, risk_floor: high, queue: compliance }
+  - { id: tax_certificates, risk_floor: medium, queue: legal }
+  - { id: exit_distribution, risk_floor: medium, queue: deal_ops }
+  - { id: bank_letter_request, risk_floor: low, queue: ops }
+  - { id: account_access, risk_floor: medium, queue: ops }
+  - { id: complaint, risk_floor: medium, queue: ops_lead }
+  - { id: other_known, risk_floor: high, queue: ops_lead }
+  - { id: unclassified, risk_floor: medium, queue: ops }

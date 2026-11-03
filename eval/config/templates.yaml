@@ -1,0 +1,143 @@
+# Reply templates (PRD C-DRF-0 to C-DRF-7): fixed text and {placeholders} only; code chooses the template, never a model.
+# Placeholder sources (C-DRF-1): directory {contact_name} {investor_name} {deal_name} {reference} {cash_due} {currency};
+# ledger summary {received_amount} {outstanding_amount}; typed fields confirmed by a person {amount} {payment_date}
+# {value_date} {uetr}; system {deployment_name} {case_number}.
+# A template that uses a directory or ledger placeholder discloses record data (`discloses_record`, set automatically) and
+# is only used when C-LNK-5 allows it. safe_ack and notify_old_contact take system placeholders only (notify_old_contact
+# also {contact_name}); payment_received asserts receipt and takes directory and ledger values only. The checks reject
+# internal terms (C-FRD-3). A sentence whose placeholder has no value is left out (C-DRF-2 ③). Each paragraph is one line,
+# so a sentence never spans two lines.
+templates:
+  - id: safe_ack
+    subject: "Re: {case_number}"
+    body: |
+      Thank you for your email. We have received it and will confirm next steps with you through the contact details we already hold for you.
+
+      {deployment_name}
+
+  # sent by a person to the contact's address on file, not as a reply to the mail (C-FRD-4)
+  - id: notify_old_contact
+    subject: "A change to your details was requested"
+    body: |
+      Dear {contact_name},
+
+      We have received a request to change the contact or payment details we hold for you. If you made this request, there is nothing more to do: we will confirm it with you by phone. If you did not make it, please call us on the number you already have for us.
+
+      {deployment_name}
+
+  - id: payment_need_reference
+    subject: "Re: {case_number}"
+    body: |
+      Thank you for your email about a payment. So that we can find it, please reply with the name of the deal and the payment reference you used.
+
+      {deployment_name}
+
+  - id: payment_received
+    subject: "Your payment for {deal_name}"
+    body: |
+      Dear {contact_name},
+
+      We have received {received_amount} for {deal_name} (reference {reference}). Your commitment of {cash_due} is paid in full.
+
+      Kind regards
+
+  - id: payment_wait
+    subject: "Re: {case_number}"
+    body: |
+      Dear {contact_name},
+
+      Thank you for letting us know about your payment for {deal_name} (reference {reference}). Bank transfers can take a few working days to arrive. We will check again and contact you if it has not reached us.
+
+      {deployment_name}
+
+  - id: payment_need_evidence
+    subject: "Re: {case_number}"
+    body: |
+      Dear {contact_name},
+
+      Thank you for your email about your payment for {deal_name} (reference {reference}). We have not been able to match it yet. Please send us the payment confirmation from your bank (MT103 or pacs.008), including the UETR, so that we can trace it.
+
+      {deployment_name}
+
+  - id: unreferenced_ack
+    subject: "Re: {case_number}"
+    body: |
+      Thank you for your email about a payment. So that we can match it, please tell us the deal, the investor the payment is for and the payment reference used.
+
+      {deployment_name}
+
+  - id: kyc_received
+    subject: "Re: {case_number}"
+    body: |
+      Thank you for sending the documents. We will review them and let you know if anything else is needed.
+
+      {deployment_name}
+
+  - id: withdrawal_ack
+    subject: "Re: {case_number}"
+    body: |
+      Dear {contact_name},
+
+      We have received your request about withdrawing from {deal_name}. We will confirm the next steps with you before anything changes.
+
+      {deployment_name}
+
+  - id: commitment_change_ack
+    subject: "Re: {case_number}"
+    body: |
+      Dear {contact_name},
+
+      We have received your request to change your commitment to {deal_name}. We will confirm the next steps with you before anything changes.
+
+      {deployment_name}
+
+  - id: closing_ack
+    subject: "Re: {case_number}"
+    body: |
+      Thank you for your confirmation. We will be in touch about the next steps for the closing.
+
+      {deployment_name}
+
+  - id: legal_ack
+    subject: "Re: {case_number}"
+    body: |
+      Thank you for the documents. Our legal team will review them and come back to you.
+
+      {deployment_name}
+
+  - id: tax_cert_info
+    subject: "Re: {case_number}"
+    body: |
+      Thank you for your email about tax certificates. Certificates are issued once the scheme has been approved, and we will send yours as soon as it is available.
+
+      {deployment_name}
+
+  - id: exit_info
+    subject: "Re: {case_number}"
+    body: |
+      Dear {contact_name},
+
+      Thank you for your question about distributions from {deal_name}. We will send you the details as soon as they are confirmed.
+
+      {deployment_name}
+
+  - id: bank_letter_info
+    subject: "Re: {case_number}"
+    body: |
+      Thank you for your request. We will prepare the letter and send it to you through the contact details we already hold for you.
+
+      {deployment_name}
+
+  - id: account_access_info
+    subject: "Re: {case_number}"
+    body: |
+      Thank you for your email about access to your account. For your protection, we will confirm any change with you through the contact details we already hold for you.
+
+      {deployment_name}
+
+  - id: complaint_ack
+    subject: "Re: {case_number}"
+    body: |
+      Thank you for telling us about this, and we are sorry for the trouble. Your message has been passed to a senior member of the team, who will reply to you.
+
+      {deployment_name}

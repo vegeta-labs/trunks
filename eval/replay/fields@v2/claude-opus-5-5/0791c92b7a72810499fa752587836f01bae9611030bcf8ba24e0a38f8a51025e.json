@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"deal\":{\"value\":\"Northwind Robotics\",\"confidence\":\"high\",\"quote\":\"Northwind Robotics - any timeline for an exit?\"},\"question_type\":{\"value\":\"timing\",\"confidence\":\"high\",\"quote\":\"is there any indication of when an exit or a distribution to SPV investors might happen? Are we talking months or years?\"}}}",
+ "usage": {
+  "inputTokens": 1716,
+  "outputTokens": 119
+ }
+}

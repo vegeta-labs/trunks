@@ -1,0 +1,40 @@
+Return-Path: <chen.wei@chenwei-family.example>
+Received: from mail.chenwei-family.example (mail.chenwei-family.example
+ [192.0.2.16]) by mx.ops.example with ESMTPS id ef654e6ca4 for
+ <investors@ops.example>; Wed, 21 Oct 2026 08:55:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=chenwei-family.example; dkim=pass
+ header.d=chenwei-family.example; dmarc=pass
+ header.from=chenwei-family.example
+Message-ID: <E0018.d2e66df403a1@chenwei-family.example>
+Date: Wed, 21 Oct 2026 08:52:19 +0000
+From: "Chen Wei" <chen.wei@chenwei-family.example>
+To: investors@ops.example
+Subject: MT103 attached - Northwind Robotics
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============8380103789656405479=="
+
+--===============8380103789656405479==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear team,
+
+Please see the attached MT103 for my payment of =C2=A330,000.00 to Northwind =
+Robotics.
+
+Best regards,
+Chen Wei
+
+--===============8380103789656405479==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_ChenWei.txt"
+MIME-Version: 1.0
+
+ezM6ezEyMTo3YzJhMzNjNC02ZWUzLTQ4NTItODNjMC0yMDQ0YjYxZTgzYmJ9fQ0KezQ6DQo6MjA6
+Q1dGLVBNVC0xMDE5QQ0KOjIzQjpDUkVEDQo6MzJBOjI2MTAxOUdCUDMwMDAwLDAwDQo6NTBLOkNI
+RU4gV0VJDQpMT05ET04NCjo1OTovTk9SVEhXSU5EIFJPQk9USUNTIFNQViBDTElFTlQgQUMNCjo3
+MDpOVy0wMDkNCjo3MUE6U0hBDQotfQ0K
+
+--===============8380103789656405479==--

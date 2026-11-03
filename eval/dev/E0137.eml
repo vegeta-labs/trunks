@@ -1,0 +1,25 @@
+Received: from mail.vogel-familie.example (mail.vogel-familie.example
+ [192.0.2.52]) by mx.ops.example with ESMTPS id 0be6405731; Mon, 09 Nov 2026
+ 11:35:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=vogel-familie.example; dkim=pass
+ header.d=vogel-familie.example; dmarc=pass header.from=vogel-familie.example
+From: Matthias Vogel <m.vogel@vogel-familie.example>
+To: Investor Operations <investors@ops.example>
+Subject: Portal shows my Solent investment twice
+Date: Mon, 09 Nov 2026 11:34:25 +0000
+Message-ID: <E0137.e27999ff272f@vogel-familie.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear team,
+
+When I log in to the investor portal my holding in Solent Biotherapeutics now=
+ appears twice on the dashboard, once with the correct figures and once with =
+blank values. The documents tab for the second entry gives an error page.
+
+Not a big problem but it is confusing - can you have a look?
+
+Mit freundlichen Gr=C3=BC=C3=9Fen
+Matthias Vogel

@@ -1,0 +1,26 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=moorepell.example; dkim=pass header.d=moorepell.example;
+ dmarc=pass header.from=moorepell.example
+Received: from mail.moorepell.example (mail.moorepell.example [192.0.2.221])
+ by mx.ops.example with ESMTPS id ILV92O3IJZEI; Thu, 12 Nov 2026 10:44:00
+ +0000
+Message-ID: <E0116.1utsjg8s2gd1@moorepell.example>
+Date: Thu, 12 Nov 2026 10:41:31 +0000
+From: Rachel Moore <r.moore@moorepell.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: EIS3 request - Oliver Bennett, Northwind Robotics
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Dear Sirs,
+
+We act for Oliver Bennett and are preparing his 2026-27 self-assessment.
+Please could you confirm when the EIS3 certificate for his investment in
+Northwind Robotics (your reference NW-002) will be issued, and send a copy
+to us when available.
+
+Yours faithfully,
+
+Rachel Moore ACA
+Moore & Pell Chartered Accountants

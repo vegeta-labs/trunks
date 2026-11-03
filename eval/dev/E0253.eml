@@ -1,0 +1,22 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=priya@ramanfamily.example; dkim=pass
+ header.d=ramanfamily.example; dmarc=pass header.from=ramanfamily.example
+Received: from mail.ramanfamily.example (mail.ramanfamily.example
+ [192.0.2.29]) by mx.ops.example with ESMTPS; Thu, 29 Oct 2026 09:16:07 +0000
+From: Priya Raman <priya@ramanfamily.example>
+To: investors@ops.example
+Subject: Northwind payment
+Date: Thu, 29 Oct 2026 09:16:00 +0000
+Message-ID: <E0253.x6bkizciw3v1@ramanfamily.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+I paid my Northwind Robotics subscription on 26 October 2026 using reference =
+NW-003. Could you confirm it has arrived?
+
+Thanks very much,
+Priya Raman
+07700 900103

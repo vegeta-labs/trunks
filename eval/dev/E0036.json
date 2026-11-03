@@ -1,0 +1,61 @@
+{
+  "id": "E0036",
+  "family": "F008",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-06T15:15:00Z",
+  "prior_messages": [],
+  "description": "Investor paid from her own company's account without a reference -> third_party_payer is the company.",
+  "classes": [
+    "unreferenced_payment"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "amount": {
+      "minor": 2000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "payment_date": "2026-11-04",
+    "payer_name": "Laurent Conseil SARL",
+    "third_party_payer": "Laurent Conseil SARL"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 2000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C006",
+    "investor_id": "Northwind Robotics::006",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "unreferenced_ack",
+  "notes": "The investor's own company is a separate legal entity, so it is annotated as third_party_payer."
+}

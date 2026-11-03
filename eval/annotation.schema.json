@@ -1,0 +1,1723 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/deal-ops/deal-ops-inbox/eval/annotation.schema.json",
+  "title": "Deal Ops Inbox evaluation annotation",
+  "description": "Version 2 (PRD v0.5). Every top-level field is required. Category-dependent completeness of `fields` is checked by eval/validate (E2). See eval/SCHEMA.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "family",
+    "mailbox",
+    "mailbox_strips_auth_results",
+    "received_at",
+    "prior_messages",
+    "description",
+    "classes",
+    "expected_risk",
+    "malicious",
+    "malicious_type",
+    "twin_of",
+    "signals",
+    "fields",
+    "rule_output",
+    "links",
+    "may_disclose_record",
+    "draft_template",
+    "notes"
+  ],
+  "$defs": {
+    "risk": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "classId": {
+      "enum": [
+        "payment_query",
+        "payment_evidence",
+        "unreferenced_payment",
+        "kyc_documents",
+        "withdrawal",
+        "commitment_change",
+        "fee_or_terms_change",
+        "closing_confirmation",
+        "legal_documents",
+        "bank_details",
+        "identity_change",
+        "tax_certificates",
+        "exit_distribution",
+        "bank_letter_request",
+        "account_access",
+        "complaint",
+        "other_known",
+        "unclassified"
+      ]
+    },
+    "templateId": {
+      "enum": [
+        "safe_ack",
+        "payment_received",
+        "payment_wait",
+        "payment_need_evidence",
+        "payment_need_reference",
+        "unreferenced_ack",
+        "kyc_received",
+        "withdrawal_ack",
+        "commitment_change_ack",
+        "closing_ack",
+        "legal_ack",
+        "tax_cert_info",
+        "exit_info",
+        "bank_letter_info",
+        "account_access_info",
+        "complaint_ack"
+      ]
+    },
+    "money": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minor",
+        "currency"
+      ],
+      "properties": {
+        "minor": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        }
+      }
+    },
+    "linkTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contact_id",
+        "investor_id",
+        "deal"
+      ],
+      "properties": {
+        "contact_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "investor_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "deal": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    }
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^E[0-9]{4}$"
+    },
+    "family": {
+      "type": "string",
+      "pattern": "^F[0-9]{3,}$"
+    },
+    "mailbox": {
+      "type": "string"
+    },
+    "mailbox_strips_auth_results": {
+      "type": "boolean"
+    },
+    "received_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "prior_messages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "from",
+          "message_id",
+          "sans_msgid_sha256"
+        ],
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "message_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sans_msgid_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "classes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/classId"
+      }
+    },
+    "expected_risk": {
+      "$ref": "#/$defs/risk"
+    },
+    "malicious": {
+      "type": "boolean"
+    },
+    "malicious_type": {
+      "enum": [
+        null,
+        "bank_change",
+        "lookalike",
+        "prompt_injection",
+        "forged_evidence",
+        "pressure"
+      ]
+    },
+    "twin_of": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^E[0-9]{4}$"
+    },
+    "signals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "auth_fail",
+        "untrusted_auth_header",
+        "display_name_mismatch",
+        "lookalike_domain",
+        "reply_to_mismatch",
+        "first_time_sender",
+        "hidden_text",
+        "injection_markers",
+        "message_id_collision"
+      ],
+      "properties": {
+        "auth_fail": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "untrusted_auth_header": {
+          "type": "boolean"
+        },
+        "display_name_mismatch": {
+          "type": "boolean"
+        },
+        "lookalike_domain": {
+          "type": "boolean"
+        },
+        "reply_to_mismatch": {
+          "type": "boolean"
+        },
+        "first_time_sender": {
+          "type": "boolean"
+        },
+        "hidden_text": {
+          "type": "boolean"
+        },
+        "injection_markers": {
+          "type": "boolean"
+        },
+        "message_id_collision": {
+          "type": "boolean"
+        }
+      }
+    },
+    "fields": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/money"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "$ref": "#/$defs/money"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "new_amount": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/money"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "$ref": "#/$defs/money"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3}$"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "payment_date": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/date"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "$ref": "#/$defs/date"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "value_date": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/date"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "$ref": "#/$defs/date"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "payer_name": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "investor": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "third_party_payer": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "reference": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "uetr": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "document_types": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "enum": [
+                  "passport",
+                  "driving_licence",
+                  "proof_of_address",
+                  "bank_statement",
+                  "certificate_of_incorporation",
+                  "register_of_members",
+                  "ubo_register",
+                  "structure_chart",
+                  "trust_deed",
+                  "partnership_agreement",
+                  "tax_id",
+                  "other"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "passport",
+                        "driving_licence",
+                        "proof_of_address",
+                        "bank_statement",
+                        "certificate_of_incorporation",
+                        "register_of_members",
+                        "ubo_register",
+                        "structure_chart",
+                        "trust_deed",
+                        "partnership_agreement",
+                        "tax_id",
+                        "other"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "entity_type": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "individual",
+                "company",
+                "trust",
+                "partnership",
+                "other"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "enum": [
+                      "individual",
+                      "company",
+                      "trust",
+                      "partnership",
+                      "other"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "consent_evidence": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "investor_cc",
+                "forwarded_written_consent",
+                "attached_document",
+                "investor_self",
+                "none"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "enum": [
+                      "investor_cc",
+                      "forwarded_written_consent",
+                      "attached_document",
+                      "investor_self",
+                      "none"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "change_type": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "fee_payer",
+                "valuation",
+                "share_price",
+                "instrument",
+                "other"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "enum": [
+                      "fee_payer",
+                      "valuation",
+                      "share_price",
+                      "instrument",
+                      "other"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "from_payer": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "investors",
+                "company",
+                "lead"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "enum": [
+                      "investors",
+                      "company",
+                      "lead"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "to_payer": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "investors",
+                "company",
+                "lead"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "enum": [
+                      "investors",
+                      "company",
+                      "lead"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "confirms": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "yes",
+                "no",
+                "question"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "enum": [
+                      "yes",
+                      "no",
+                      "question"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "deal": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "document_type": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "subscription",
+                "shareholder_resolution",
+                "conversion",
+                "side_letter",
+                "transfer",
+                "other"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "enum": [
+                      "subscription",
+                      "shareholder_resolution",
+                      "conversion",
+                      "side_letter",
+                      "transfer",
+                      "other"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "party_role": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "investor",
+                "company",
+                "seller",
+                "lead",
+                "other"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "enum": [
+                      "investor",
+                      "company",
+                      "seller",
+                      "lead",
+                      "other"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "account_last4": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9]{4}$"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[0-9]{4}$"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "change_requested": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "change_fields": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "enum": [
+                  "name",
+                  "email",
+                  "postal_address",
+                  "phone"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "name",
+                        "email",
+                        "postal_address",
+                        "phone"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "certificate_type": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "seis",
+                "eis",
+                "other"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "enum": [
+                      "seis",
+                      "eis",
+                      "other"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "question_type": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "timing",
+                "amount",
+                "tax",
+                "other"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "enum": [
+                      "timing",
+                      "amount",
+                      "tax",
+                      "other"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "issue_type": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "login",
+                "permissions",
+                "other"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "enum": [
+                      "login",
+                      "permissions",
+                      "other"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "subtype": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "secondary",
+                "liquidation",
+                "nominee_kyc",
+                "us_person",
+                "fx",
+                "rolling_close",
+                "other"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "multiple"
+              ],
+              "properties": {
+                "multiple": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "enum": [
+                      "secondary",
+                      "liquidation",
+                      "nominee_kyc",
+                      "us_person",
+                      "fx",
+                      "rolling_close",
+                      "other"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "void"
+              ],
+              "properties": {
+                "void": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "links": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ambiguous",
+        "contact_id",
+        "investor_id",
+        "deal",
+        "transaction_ids",
+        "candidates"
+      ],
+      "properties": {
+        "ambiguous": {
+          "type": "boolean"
+        },
+        "contact_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "investor_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "deal": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "transaction_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/linkTarget"
+          }
+        }
+      }
+    },
+    "may_disclose_record": {
+      "type": "boolean"
+    },
+    "draft_template": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/templateId"
+        }
+      ]
+    },
+    "notes": {
+      "type": "string"
+    },
+    "rule_output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "uetrs",
+        "uetr_candidates_invalid",
+        "amounts",
+        "references",
+        "account_last4",
+        "evidence_value_dates"
+      ],
+      "properties": {
+        "uetrs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          }
+        },
+        "uetr_candidates_invalid": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "amounts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/money"
+          }
+        },
+        "references": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "account_last4": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9]{4}$"
+          }
+        },
+        "evidence_value_dates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/date"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "malicious": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "malicious_type": {
+            "const": null
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "malicious": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "malicious_type": {
+            "not": {
+              "const": null
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "links": {
+            "properties": {
+              "ambiguous": {
+                "const": true
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "links": {
+            "properties": {
+              "candidates": {
+                "minItems": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "expected_risk": {
+            "const": "high"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "draft_template": {
+            "const": "safe_ack"
+          }
+        }
+      }
+    }
+  ]
+}

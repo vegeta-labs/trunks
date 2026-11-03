@@ -1,0 +1,33 @@
+Received: from mail.brightwater-bank.example (mail.brightwater-bank.example
+ [192.0.2.125]) by mx.ops.example with ESMTPS id 44e032a859; Mon, 02 Nov 2026
+ 10:39:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=brightwater-bank.example; dkim=pass
+ header.d=brightwater-bank.example; dmarc=pass
+ header.from=brightwater-bank.example
+From: Kate Morrow <k.morrow@brightwater-bank.example>
+To: Investor Operations <investors@ops.example>
+Subject: Investment confirmation request - Ms Amelia Hart
+Date: Mon, 02 Nov 2026 10:38:25 +0000
+Message-ID: <E0129.392de7a44b01@brightwater-bank.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear Investor Operations team,
+
+I am the lending officer handling a mortgage application from Ms Amelia Hart.=
+ As part of our affordability checks Ms Hart has told us she holds an investm=
+ent of =C2=A310,000.00 in Northwind Robotics through your syndicate, payment =
+reference NW-001.
+
+Could you please send us a letter on your headed paper confirming the investm=
+ent, the amount invested and the date? Ms Hart has given her consent for us t=
+o contact you; please let me know if you need it in writing from her.
+
+Kind regards,
+
+Kate Morrow
+Lending Officer, Residential Mortgages
+Brightwater Bank
+Tel: 020 7946 0381

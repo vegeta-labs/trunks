@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"withdrawal\",\"confidence\":\"high\",\"reason\":\"Investor asks to withdraw participation in Solent Biotherapeutics before closing, no payment made yet.\"},{\"class\":\"legal_documents\",\"confidence\":\"low\",\"reason\":\"Asks whether any documents need to be signed for the withdrawal.\"}],\"language\":\"fr\"}",
+ "usage": {
+  "inputTokens": 1915,
+  "outputTokens": 119
+ }
+}

@@ -1,0 +1,25 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=mailbox-free.example; dkim=pass header.d=mailbox-free.example;
+ dmarc=pass header.from=mailbox-free.example
+Received: from mail.mailbox-free.example (mail.mailbox-free.example
+ [192.0.2.157]) by mx.ops.example with ESMTPS id 2S2NVHK9KS for
+ <investors@ops.example>; Thu, 29 Oct 2026 16:20:00 +0000
+Date: Thu, 29 Oct 2026 16:19:28 +0000
+From: Amelia Hart <amelia.hart@mailbox-free.example>
+To: investors@ops.example
+Subject: Distribution payment
+Message-ID: <E0230.9hbewlhf6sj3@mailbox-free.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+I've switched banks recently. When the Northwind Robotics distribution is paid out, please send my share to my new account rather than the old one:
+
+IBAN GB45 QZBK 0331 3537 9940 19
+Name: Amelia Hart
+
+My investment reference is NW-001. Thanks so much!
+
+Amelia

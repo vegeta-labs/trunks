@@ -1,0 +1,20 @@
+# Default case catalogue (PRD §3.1). Order matters: ties go to the class listed first (R-RTE-01, C-DRF-3).
+classes:
+  - { id: payment_query, risk_floor: medium, queue: ops, fields: [amount, currency, payment_date, payer_name, reference, uetr] }
+  - { id: payment_evidence, risk_floor: medium, queue: ops, fields: [uetr, amount, currency, value_date, payer_name, reference] }
+  - { id: unreferenced_payment, risk_floor: medium, queue: ops, fields: [amount, currency, payment_date, payer_name, third_party_payer] }
+  - { id: kyc_documents, risk_floor: high, queue: compliance, fields: [document_types, entity_type] }
+  - { id: withdrawal, risk_floor: high, queue: ops, fields: [investor, consent_evidence] }
+  - { id: commitment_change, risk_floor: medium, queue: ops, fields: [new_amount, currency] }
+  - { id: fee_or_terms_change, risk_floor: high, queue: deal_ops, fields: [change_type, from_payer, to_payer, consent_evidence] }
+  - { id: closing_confirmation, risk_floor: medium, queue: deal_ops, fields: [confirms, deal] }
+  - { id: legal_documents, risk_floor: high, queue: legal, fields: [platform, document_type, deal] }
+  - { id: bank_details, risk_floor: high, queue: compliance, fields: [party_role, account_last4, change_requested] }
+  - { id: identity_change, risk_floor: high, queue: compliance, fields: [change_fields] }
+  - { id: tax_certificates, risk_floor: medium, queue: legal, fields: [certificate_type, deal] }
+  - { id: exit_distribution, risk_floor: medium, queue: deal_ops, fields: [deal, question_type] }
+  - { id: bank_letter_request, risk_floor: low, queue: ops, fields: [deal] }
+  - { id: account_access, risk_floor: medium, queue: ops, fields: [issue_type] }
+  - { id: complaint, risk_floor: medium, queue: ops_lead, fields: [] }
+  - { id: other_known, risk_floor: high, queue: ops_lead, fields: [subtype] }
+  - { id: unclassified, risk_floor: medium, queue: ops, fields: [] }

@@ -1,0 +1,71 @@
+# Deployment settings (PRD R-CFG-01). Secrets are never written here: only the names of environment variables.
+deployment:
+  name: Example Capital Ops
+  timezone: Europe/London
+  currencies: [GBP, EUR, USD]
+
+mailboxes:
+  - id: ops
+    name: Operations
+    kind: imap
+    imap:
+      host: imap.example
+      port: 993
+      tls: true
+      user_env: IMAP_OPS_USER
+      password_env: IMAP_OPS_PASSWORD
+      folder: INBOX
+    # declare only when the mail gateway strips Authentication-Results headers that arrive from outside (C-SIG-1.1)
+    strips_external_auth_results: false
+    trusted_authserv_id: mx.ops.example
+    catch_up_minutes: 5
+  # Gmail example (tech design §7 v0.7.10): set strips_external_auth_results to true only after checking, before going
+  # live, that Gmail strips forged Authentication-Results headers from outside
+  # - id: deals
+  #   name: Deals
+  #   kind: gmail
+  #   gmail:
+  #     address: deals@capital.example
+  #     labels: [INBOX]
+  #   strips_external_auth_results: true
+  #   trusted_authserv_id: mx.google.com
+  #   catch_up_minutes: 5
+  # (Gmail mailboxes also need a top-level block: gmail: { client_id_env: GMAIL_CLIENT_ID, client_secret_env: GMAIL_CLIENT_SECRET })
+
+esign_platforms:
+  DocuSign: [docusign.net, docusign.com]
+  Adobe Acrobat Sign: [adobesign.com, echosign.com]
+  PandaDoc: [pandadoc.com, pandadoc.net]
+  Dropbox Sign: [hellosign.com, dropboxsign.com]
+
+attachments:
+  max_attachment_bytes: 20971520 # 20 MB
+  max_total_bytes: 52428800 # 50 MB
+  max_pdf_pages: 50
+  parse_timeout_seconds: 30
+  max_nesting: 3
+
+# words may be added; the built-in lists cannot be shortened (C-SIG-1.8)
+signals:
+  injection_markers_extra: []
+
+audit:
+  head_export_path: /var/lib/deal-ops-inbox/state/audit-head.jsonl
+
+# where possible-KYC attachments go (PRD R-PRV-03). Without a target every transfer fails and is reminded daily.
+# In Compose the kyc volume is mounted at /var/lib/deal-ops-inbox/kyc. See docs/en/configuration.md.
+# A webhook target instead: target: { kind: webhook, url: https://kyc.capital.example/upload, secret_env: KYC_WEBHOOK_SECRET }
+# kyc:
+#   target: { kind: folder, path: /var/lib/deal-ops-inbox/kyc }
+
+# the model provider (PRD R-PRV-01, tech design §3.2). An external provider without a data processing agreement
+# refuses to start: set dpa: true once one is signed (or allow_without_dpa: true, which warns in the log and the UI).
+# A local model instead: provider: ollama, location: local, ollama_host: http://ollama:11434
+model:
+  provider: anthropic
+  model_id: claude-opus-5-5
+  location: external
+  region: eu
+  dpa: false
+  no_training: true
+  api_key_env: ANTHROPIC_API_KEY

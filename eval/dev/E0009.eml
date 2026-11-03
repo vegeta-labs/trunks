@@ -1,0 +1,23 @@
+Return-Path: <hall.family@hallhome.example>
+Received: from mail.hallhome.example (mail.hallhome.example [192.0.2.217]) by
+ mx.ops.example with ESMTPS id 4cd91a9ae0 for <investors@ops.example>; Mon, 02
+ Nov 2026 16:10:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=hallhome.example; dkim=pass header.d=hallhome.example;
+ dmarc=pass header.from=hallhome.example
+Message-ID: <E0009.6ae03541920f@hallhome.example>
+Date: Mon, 02 Nov 2026 16:07:44 +0000
+From: "Hall Family" <hall.family@hallhome.example>
+To: investors@ops.example
+Subject: Our Northwind payment
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+Can you let us know whether our payment of =C2=A310,000.00, sent on 28 Octobe=
+r 2026 for the Northwind Robotics investment, has reached you?
+
+Thanks,
+Sue and Peter

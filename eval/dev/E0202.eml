@@ -1,0 +1,28 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=wangfang-home.example; dkim=pass
+ header.d=wangfang-home.example; dmarc=pass header.from=wangfang-home.example
+Received: from mail.wangfang-home.example (mail.wangfang-home.example
+ [192.0.2.179]) by mx.ops.example with ESMTPS id 6HCMG64W6S for
+ <investors@ops.example>; Wed, 11 Nov 2026 10:05:00 +0000
+Date: Wed, 11 Nov 2026 10:04:55 +0000
+From: =?utf-8?b?546L6Iqz?= <wang.fang@wangfang-home.example>
+To: investors@ops.example
+Subject: =?utf-8?b?5peg5rOV55m75b2V5oqV6LWE5Lq65bmz5Y+w?=
+Message-ID: <E0202.wdad6yqdzwdl@wangfang-home.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+=E6=82=A8=E5=A5=BD=EF=BC=8C
+
+=E6=88=91=E6=97=A0=E6=B3=95=E7=99=BB=E5=BD=95=E6=8A=95=E8=B5=84=E4=BA=BA=E5=
+=B9=B3=E5=8F=B0=E3=80=82=E6=88=91=E7=82=B9=E5=87=BB=E2=80=9C=E5=BF=98=E8=AE=
+=B0=E5=AF=86=E7=A0=81=E2=80=9D=E4=BB=A5=E5=90=8E=E4=B8=80=E7=9B=B4=E6=B2=A1=
+=E6=9C=89=E6=94=B6=E5=88=B0=E9=87=8D=E7=BD=AE=E9=82=AE=E4=BB=B6=EF=BC=8C=E5=
+=B7=B2=E7=BB=8F=E8=AF=95=E4=BA=86=E4=B8=89=E6=AC=A1=EF=BC=8C=E5=9E=83=E5=9C=
+=BE=E9=82=AE=E4=BB=B6=E9=87=8C=E4=B9=9F=E6=B2=A1=E6=9C=89=E3=80=82
+
+=E9=BA=BB=E7=83=A6=E5=B8=AE=E6=88=91=E7=9C=8B=E4=B8=80=E4=B8=8B=EF=BC=8C=E8=
+=B0=A2=E8=B0=A2=EF=BC=81
+
+=E7=8E=8B=E8=8A=B3

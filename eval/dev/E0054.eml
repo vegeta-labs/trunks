@@ -1,0 +1,42 @@
+Return-Path: <grace@whitfield-wealth.example>
+Received: from mail.whitfield-wealth.example (mail.whitfield-wealth.example
+ [192.0.2.54]) by mx.ops.example with ESMTPS id 8d76c75d2c for
+ <investors@ops.example>; Tue, 03 Nov 2026 09:40:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=whitfield-wealth.example; dkim=pass
+ header.d=whitfield-wealth.example; dmarc=pass
+ header.from=whitfield-wealth.example
+Message-ID: <E0054.a2224e91c147@whitfield-wealth.example>
+Date: Tue, 03 Nov 2026 09:37:33 +0000
+From: "Grace Whitfield" <grace@whitfield-wealth.example>
+To: investors@ops.example
+Subject: Fwd: Northwind - please withdraw me
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear Operations team,
+
+Please see below my client's written instruction. Priya Raman wishes to withd=
+raw her commitment to Northwind Robotics (NW-003). Could you confirm the next=
+ steps?
+
+Kind regards,
+
+Grace Whitfield
+Whitfield Wealth
+020 7946 0145
+
+---------- Forwarded message ---------
+From: Priya Raman <priya@ramanfamily.example>
+Date: Mon, 2 Nov 2026 at 19:24
+Subject: Northwind - please withdraw me
+To: Grace Whitfield <grace@whitfield-wealth.example>
+
+Hi Grace,
+
+Following our call, I confirm that I want to withdraw from the Northwind Robo=
+tics investment. Please arrange this with the operations team.
+
+Thanks,
+Priya

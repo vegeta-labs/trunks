@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"bank_letter_request\",\"confidence\":\"high\",\"reason\":\"Investor's mortgage lender requests a letter confirming the investment in Northwind Robotics.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1824,
+  "outputTokens": 72
+ }
+}

@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"change_type\":{\"value\":\"fee_payer\",\"confidence\":\"high\",\"quote\":\"Solent has agreed to cover the deal fees\\nitself\"},\"from_payer\":{\"value\":\"investors\",\"confidence\":\"high\",\"quote\":\"investors in the Solent Biotherapeutics SPV will no longer be\\ncharged the arrangement fee\"},\"to_payer\":{\"value\":\"company\",\"confidence\":\"high\",\"quote\":\"The company will pay it at completion.\"},\"consent_evidence\":{\"value\":null,\"confidence\":\"medium\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 1750,
+  "outputTokens": 183
+ }
+}

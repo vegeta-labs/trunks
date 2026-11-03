@@ -1,0 +1,95 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramsay-capital.example; dkim=pass
+ header.d=ramsay-capital.example; dmarc=pass
+ header.from=ramsay-capital.example
+Received: from mail.ramsay-capital.example (mail.ramsay-capital.example
+ [192.0.2.19]) by mx.ops.example with ESMTPS id GQHXEP4CEM for
+ <investors@ops.example>; Thu, 12 Nov 2026 15:30:00 +0000
+Date: Thu, 12 Nov 2026 15:29:35 +0000
+From: Fiona Ramsay <fiona@ramsay-capital.example>
+To: investors@ops.example
+Subject: Re: Northwind Robotics - draft final numbers
+Message-ID: <E0185.j5pk79fkwb4t@ramsay-capital.example>
+In-Reply-To: <tevsmmbigrhe6n3z@ops.example>
+References: <vusj91zxh8v4v5eh@ops.example>
+ <ye5p4raw5oiwdpba@ramsay-capital.example> <ggd5cc8d6xspzs25@ops.example>
+ <n60mb52uo6j5byqr@ramsay-capital.example> <tevsmmbigrhe6n3z@ops.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Perfect, thank you.
+
+Confirmed: the final numbers for Northwind Robotics are as per your draft - 1=
+6 investors, =C2=A3366,500.00 in total. Please go ahead on that basis.
+
+Best,
+Fiona
+
+--
+Fiona Ramsay
+Managing Partner, Ramsay Capital
++44 20 7946 0140
+
+On Wed, 11 Nov 2026 at 11:30, Kestrel Syndicate Operations <investors@ops.exa=
+mple> wrote:
+> Hi Fiona,
+>
+> All three have told us the balance is on its way. If anyone is still short =
+at close we will come back to you straight away so you can decide how to trea=
+t the allocation.
+>
+> Kind regards,
+> Investor Operations
+> Kestrel Syndicate Operations
+>
+> On Tue, 10 Nov 2026 at 13:02, Fiona Ramsay <fiona@ramsay-capital.example> w=
+rote:
+>> Great. And Oliver, Luc=C3=ADa and Daniel - do we expect them to complete b=
+efore the 20th? I'd rather not carry part-paid positions into completion.
+>>
+>> Fiona
+>>
+>> On Tue, 10 Nov 2026 at 09:15, Kestrel Syndicate Operations <investors@ops.=
+example> wrote:
+>>> Hi Fiona,
+>>>
+>>> Yes, Harbour Lane Holdings remains at =C2=A3100,000.00 and has paid in fu=
+ll. We have nothing from them about scaling back.
+>>>
+>>> Kind regards,
+>>> Investor Operations
+>>> Kestrel Syndicate Operations
+>>>
+>>> On Mon, 9 Nov 2026 at 16:40, Fiona Ramsay <fiona@ramsay-capital.example> =
+wrote:
+>>>> Thanks for this. Before I sign anything off - is the Harbour Lane alloca=
+tion still =C2=A3100,000.00? I had a note from their CFO that they might scal=
+e back.
+>>>>
+>>>> F
+>>>>
+>>>> On Mon, 9 Nov 2026 at 10:02, Kestrel Syndicate Operations <investors@ops=
+.example> wrote:
+>>>>> Hi Fiona,
+>>>>>
+>>>>> Please find below the draft final numbers for Northwind Robotics ahead =
+of the close on 20 November:
+>>>>>
+>>>>> - Investors: 16
+>>>>> - Total commitments: =C2=A3366,500.00
+>>>>> - Fully paid: 6 investors
+>>>>> - Part paid: Oliver Bennett (=C2=A315,000.00 of =C2=A325,000.00), Luc=
+=C3=ADa Fern=C3=A1ndez (=C2=A32,500.00 of =C2=A37,500.00), Daniel Osei (=C2=
+=A39,000.00 of =C2=A318,000.00)
+>>>>>
+>>>>> Could you confirm these numbers, or tell us what needs adjusting?
+>>>>>
+>>>>> Kind regards,
+>>>>> Investor Operations
+>>>>> Kestrel Syndicate Operations
+>>>>>
+>>>>
+>>>
+>>
+>

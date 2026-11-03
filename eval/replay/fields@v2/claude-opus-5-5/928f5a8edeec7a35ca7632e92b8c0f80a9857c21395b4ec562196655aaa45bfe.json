@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"party_role\":{\"value\":\"company\",\"confidence\":\"medium\",\"quote\":\"[NAME_1] [NAME_2] | Finance Director | Northwind Robotics\"},\"change_requested\":{\"value\":true,\"confidence\":\"high\",\"quote\":\"we have changed banks as part of the Series A preparations, so the account details for Northwind Robotics subscriptions are now:\"}}}",
+ "usage": {
+  "inputTokens": 1589,
+  "outputTokens": 129
+ }
+}

@@ -1,0 +1,51 @@
+{
+  "id": "E0211",
+  "family": "F048",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-28T08:40:00Z",
+  "prior_messages": [],
+  "description": "Investment confirmation letter requested \"today\" - a pressure word, but bank_letter_request is not a class that escalates.",
+  "classes": [
+    "bank_letter_request"
+  ],
+  "expected_risk": "low",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "deal": "Larkspur Energy Storage"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C032",
+    "investor_id": "Larkspur Energy Storage::003",
+    "deal": "Larkspur Energy Storage",
+    "transaction_ids": [
+      "T-LK-0002"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "bank_letter_info",
+  "notes": "\"today\" is in the pressure list, but C-RSK-2a applies only to payment/bank/withdrawal/exit classes -> stays low."
+}

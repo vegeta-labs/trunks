@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"2adfbd0c-ce98-4860-8c29-cdb79a4d40fe\",\"confidence\":\"high\",\"quote\":\"{121:2adfbd0c-ce98-4860-8c29-cdb79a4d40fe}\"},\"amount\":{\"value\":\"£15,000\",\"confidence\":\"high\",\"quote\":\"I paid the balance of £15,000 for Northwind Robotics\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\":32A:261103GBP15000,00\"},\"value_date\":{\"value\":\"261103\",\"confidence\":\"high\",\"quote\":\":32A:261103GBP15000,00\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\":50K:[NAME_1] [NAME_2]\"},\"reference\":{\"value\":\"NW-002\",\"confidence\":\"high\",\"quote\":\":70:NW-002\"},\"payment_date\":{\"value\":\"3 November 2026\",\"confidence\":\"high\",\"quote\":\"for Northwind Robotics on 3 November 2026 (NW-002)\"}}}",
+ "usage": {
+  "inputTokens": 1948,
+  "outputTokens": 364
+ }
+}

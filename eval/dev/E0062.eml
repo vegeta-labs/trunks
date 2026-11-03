@@ -1,0 +1,40 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=correo-fernandez.example; dkim=pass
+ header.d=correo-fernandez.example; dmarc=pass
+ header.from=correo-fernandez.example
+Received: from mail.correo-fernandez.example (mail.correo-fernandez.example
+ [192.0.2.127]) by mx.ops.example with ESMTPS id ELQ4MIFG4PE5; Wed, 04 Nov
+ 2026 14:18:00 +0000
+Message-ID: <E0062.4vz5lpty9jla@correo-fernandez.example>
+Date: Wed, 04 Nov 2026 14:15:54 +0000
+From: =?utf-8?q?Luc=C3=ADa_Fern=C3=A1ndez?=
+ <lucia.fernandez@correo-fernandez.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Re: Northwind Robotics - balance due for NW-008
+In-Reply-To: <ops.reminder.nw008.k2x9@ops.example>
+References: <ops.reminder.nw008.k2x9@ops.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi there,
+
+Thanks for the reminder. I've thought about it over the weekend and I would
+rather not continue - please withdraw me from the Northwind round. I know
+I've already sent part of the money; I'm happy to hear from you about how
+that comes back to me.
+
+Best regards,
+Luc=C3=ADa Fern=C3=A1ndez
+
+On Mon, 2 Nov 2026 at 10:05, Kestrel Syndicate Operations <investors@ops.exam=
+ple> wrote:
+> Dear Luc=C3=ADa,
+>
+> This is a friendly reminder about your commitment to Northwind Robotics
+> (reference NW-008). We have so far received =C2=A32,500.00 of the =C2=A37,5=
+00.00 due.
+> The round is planned to close on 20 November 2026.
+>
+> Kind regards,
+> Kestrel Syndicate Operations

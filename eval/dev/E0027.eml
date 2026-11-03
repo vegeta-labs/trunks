@@ -1,0 +1,55 @@
+Return-Path: <oliver.bennett@bennettmail.example>
+Received: from mail.bennettmail.example (mail.bennettmail.example
+ [192.0.2.171]) by mx.ops.example with ESMTPS id 5e49eed0e1 for
+ <investors@ops.example>; Thu, 12 Nov 2026 14:20:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=bennettmail.example; dkim=pass header.d=bennettmail.example;
+ dmarc=pass header.from=bennettmail.example
+Message-ID: <E0027.96d614d6cb39@bennettmail.example>
+Date: Thu, 12 Nov 2026 14:17:48 +0000
+From: "Oliver Bennett" <oliver.bennett@bennettmail.example>
+To: investors@ops.example
+Subject: Balance payment - bank file
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============3491842276955937745=="
+
+--===============3491842276955937745==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+Attaching the bank's file for the balance of my Northwind commitment, in case=
+ it helps you match it.
+
+Best,
+Oliver
+
+--===============3491842276955937745==
+Content-Type: application/xml
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="pacs008_4.xml"
+MIME-Version: 1.0
+
+PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPERvY3VtZW50IHhtbG5zPSJ1
+cm46aXNvOnN0ZDppc286MjAwMjI6dGVjaDp4c2Q6cGFjcy4wMDguMDAxLjA4Ij4KICA8RklUb0ZJ
+Q3N0bXJDZHRUcmY+CiAgICA8R3JwSGRyPgogICAgICA8TXNnSWQ+UVpCSy1NU0ctT0JOLTExODg8
+L01zZ0lkPgogICAgICA8Q3JlRHRUbT4yMDI2LTExLTEwVDA5OjAyOjUxWjwvQ3JlRHRUbT4KICAg
+ICAgPE5iT2ZUeHM+MTwvTmJPZlR4cz4KICAgICAgPEludHJCa1N0dGxtRHQ+MjAyNi0xMS0xMDwv
+SW50ckJrU3R0bG1EdD4KICAgICAgPFN0dGxtSW5mPgogICAgICAgIDxTdHRsbU10ZD5DTFJHPC9T
+dHRsbU10ZD4KICAgICAgPC9TdHRsbUluZj4KICAgIDwvR3JwSGRyPgogICAgPENkdFRyZlR4SW5m
+PgogICAgICA8UG10SWQ+CiAgICAgICAgPEluc3RySWQ+SU5TVFItMTwvSW5zdHJJZD4KICAgICAg
+ICA8RW5kVG9FbmRJZD5OT1RQUk9WSURFRDwvRW5kVG9FbmRJZD4KICAgICAgICA8VUVUUj42YTJh
+ZmNkOC1kZDc2LTQ1YzUtOWZiMS01YzQ2ODJjNWQwMmY8L1VFVFI+CiAgICAgIDwvUG10SWQ+CiAg
+ICAgIDxJbnRyQmtTdHRsbUFtdCBDY3k9IkdCUCI+MTAwMDAuMDA8L0ludHJCa1N0dGxtQW10Pgog
+ICAgICA8Q2hyZ0JyPlNIQVI8L0NocmdCcj4KICAgICAgPERidHI+PE5tPk9MSVZFUiBCRU5ORVRU
+PC9ObT48L0RidHI+CiAgICAgIDxEYnRyQWd0PjxGaW5JbnN0bklkPjxCSUNGST5RWkJLR0IyTFhY
+WDwvQklDRkk+PC9GaW5JbnN0bklkPjwvRGJ0ckFndD4KICAgICAgPENkdHJBZ3Q+PEZpbkluc3Ru
+SWQ+PEJJQ0ZJPlFaQktHQjJMWFhYPC9CSUNGST48L0Zpbkluc3RuSWQ+PC9DZHRyQWd0PgogICAg
+ICA8Q2R0cj48Tm0+Tk9SVEhXSU5EIFJPQk9USUNTIFNQViBMUDwvTm0+PC9DZHRyPgogICAgICA8
+Q2R0ckFjY3Q+PElkPjxPdGhyPjxJZD5OV1ItU1BWLUNMSUVOVC1HQlA8L0lkPjwvT3Rocj48L0lk
+PjwvQ2R0ckFjY3Q+CiAgICAgIDxSbXRJbmY+PFVzdHJkPk5XMDAyIEJBTEFOQ0U8L1VzdHJkPjwv
+Um10SW5mPgogICAgPC9DZHRUcmZUeEluZj4KICA8L0ZJVG9GSUNzdG1yQ2R0VHJmPgo8L0RvY3Vt
+ZW50Pgo=
+
+--===============3491842276955937745==--

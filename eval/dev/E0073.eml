@@ -1,0 +1,28 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=solent-bio.example; dkim=pass header.d=solent-bio.example;
+ dmarc=pass header.from=solent-bio.example
+Received: from mail.solent-bio.example (mail.solent-bio.example [192.0.2.15])
+ by mx.ops.example with ESMTPS id 0G2GSZMBOOM8; Mon, 26 Oct 2026 09:51:00
+ +0000
+Message-ID: <E0073.fe80pkbqx1bd@solent-bio.example>
+Date: Mon, 26 Oct 2026 09:48:34 +0000
+From: Aoife Brennan <aoife.brennan@solent-bio.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Solent Series A - share price
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear all,
+
+A short note to let you know that the issue price per Series A share has been
+set at =E2=82=AC1.05 rather than the =E2=82=AC1.20 shown in the term sheet, f=
+ollowing the
+updated cap table. The number of shares each investor receives will go up
+accordingly; the amounts invested do not change.
+
+We'll send revised share numbers shortly.
+
+Kind regards,
+Aoife Brennan
+Company Secretary, Solent Biotherapeutics Ltd

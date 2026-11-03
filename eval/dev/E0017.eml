@@ -1,0 +1,37 @@
+Return-Path: <lucia.fernandez@correo-fernandez.example>
+Received: from mail.correo-fernandez.example (mail.correo-fernandez.example
+ [192.0.2.127]) by mx.ops.example with ESMTPS id ecf5ef3f4e for
+ <investors@ops.example>; Wed, 04 Nov 2026 09:30:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=correo-fernandez.example; dkim=pass
+ header.d=correo-fernandez.example; dmarc=pass
+ header.from=correo-fernandez.example
+Message-ID: <E0017.ad955292540e@correo-fernandez.example>
+Date: Wed, 04 Nov 2026 09:27:20 +0000
+From: =?utf-8?q?Luc=C3=ADa_Fern=C3=A1ndez?=
+ <lucia.fernandez@correo-fernandez.example>
+To: investors@ops.example
+Subject: Justificante / payment confirmation NW-008
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Here is the transfer confirmation for the rest of my Northwind commitment (NW=
+-008), copied from my online banking.
+
+{3:{121:105f40cc-99eb-43ea-8be8-115490377ee8}}
+{4:
+:20:LFZ-0211-UK
+:23B:CRED
+:32A:261102GBP5000,00
+:50K:LUCIA FERNANDEZ
+:59:/GB46QZBK78607222578838
+NORTHWIND ROBOTICS SPV LP
+:70:NW-008 FERNANDEZ
+:71A:SHA
+-}
+
+Un saludo,
+Luc=C3=ADa Fern=C3=A1ndez

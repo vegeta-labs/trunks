@@ -1,0 +1,19 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=kenji@tanaka-home.example; dkim=pass
+ header.d=tanaka-home.example; dmarc=pass header.from=tanaka-home.example
+Received: from mail.tanaka-home.example (mail.tanaka-home.example
+ [192.0.2.29]) by mx.ops.example with ESMTPS; Thu, 12 Nov 2026 09:26:07 +0000
+From: Kenji Tanaka <kenji@tanaka-home.example>
+To: investors@ops.example
+Subject: Can't log in to the investor portal
+Date: Thu, 12 Nov 2026 09:26:00 +0000
+Message-ID: <E0269.ph4ateuhp91t@tanaka-home.example>
+MIME-Version: 1.0
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+<html><body>
+<p>Hello,</p>
+<p>Since last week I can't log in to the investor portal. It says my password is incorrect and the reset email never arrives. Could someone help? I'm trying to view my Larkspur documents.</p>
+<p>Thanks,<br>Kenji</p>
+</body></html>

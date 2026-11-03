@@ -1,0 +1,56 @@
+Authentication-Results: mx.ops.example; spf=pass smtp.mailfrom=esign.example;
+ dkim=pass header.d=esign.example; dmarc=pass header.from=esign.example
+Received: from mail.esign.example (mail.esign.example [192.0.2.102]) by
+ mx.ops.example with ESMTPS id 8E9WRN5C446G; Fri, 30 Oct 2026 13:25:00 +0000
+Message-ID: <E0090.l07pr0wanb38@esign.example>
+Date: Fri, 30 Oct 2026 13:22:53 +0000
+From: "esign.example" <noreply@esign.example>
+To: Kestrel Legal <legal@ops.example>
+Subject: Please sign: Northwind Robotics - Subscription Agreement
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============2704064252962198849=="
+
+--===============2704064252962198849==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Ethan Clarke sent you a document to review and sign.
+
+Northwind Robotics - Subscription Agreement (SPV)
+
+Message from Ethan Clarke:
+"Please countersign on behalf of the SPV. Thanks, Ethan"
+
+Review document: https://esign.example/s/Hk7Qm2Rx9Lp4Tz
+
+This invitation was sent by esign.example on behalf of Ethan Clarke
+(ethan.clarke@northwind-robotics.example). Please do not forward this email:
+anyone with the link can open the document.
+
+esign.example - electronic signatures
+
+--===============2704064252962198849==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<!DOCTYPE html><html><body style=3D"font-family:Arial,sans-serif;color:#222;b=
+ackground:#fff">
+<p>Ethan Clarke sent you a document to review and sign.</p>
+<h2 style=3D"font-size:18px">Northwind Robotics - Subscription Agreement (SPV=
+)</h2>
+<p>Message from Ethan Clarke:<br>&quot;Please countersign on behalf of the SP=
+V. Thanks, Ethan&quot;</p>
+<p><a href=3D"https://esign.example/s/Hk7Qm2Rx9Lp4Tz" style=3D"background:#1a=
+5fb4;color:#ffffff;padding:10px 18px;text-decoration:none">Review document</a=
+></p>
+<p style=3D"font-size:12px;color:#666">This invitation was sent by esign.exam=
+ple on behalf of Ethan Clarke
+(ethan.clarke@northwind-robotics.example). Please do not forward this email: =
+anyone with the link can open the document.</p>
+<p style=3D"font-size:12px;color:#666">esign.example - electronic signatures<=
+/p>
+</body></html>
+
+--===============2704064252962198849==--

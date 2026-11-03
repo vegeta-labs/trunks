@@ -1,0 +1,32 @@
+Received: from mail.harbourlane.example (mail.harbourlane.example
+ [192.0.2.93]) by mx.ops.example with ESMTPS id 108f851490; Tue, 03 Nov 2026
+ 15:29:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=harbourlane.example; dkim=pass header.d=harbourlane.example;
+ dmarc=pass header.from=harbourlane.example
+From: Harbour Lane Holdings <investments@harbourlane.example>
+To: Investor Operations <investors@ops.example>
+Subject: Northwind Robotics - form of any distribution
+Date: Tue, 03 Nov 2026 15:28:25 +0000
+Message-ID: <E0123.a90248a60014@harbourlane.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear Sir or Madam,
+
+We hold an interest in Northwind Robotics through your SPV. Our board is revi=
+ewing the group structure and asked us to clarify two points regarding any fu=
+ture distribution:
+
+1. Would a distribution on an exit be made in cash only, or could the SPV dis=
+tribute shares in specie if the buyer pays partly in its own stock?
+2. If the SPV were to distribute in specie, would the shares be registered in=
+ the name of Harbour Lane Holdings Ltd directly?
+
+No action is needed at present; we simply want to brief the board accurately.
+
+Yours faithfully,
+
+Investment Administration
+Harbour Lane Holdings Ltd

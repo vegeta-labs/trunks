@@ -1,0 +1,46 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=lucia.fernandez@correo-fernandez.example; dkim=pass
+ header.d=correo-fernandez.example; dmarc=pass
+ header.from=correo-fernandez.example
+Received: from mail.correo-fernandez.example (mail.correo-fernandez.example
+ [192.0.2.34]) by mx.ops.example with ESMTPS; Mon, 09 Nov 2026 13:26:07 +0000
+From: =?utf-8?q?Luc=C3=ADa_Fern=C3=A1ndez?=
+ <lucia.fernandez@correo-fernandez.example>
+To: investors@ops.example
+Subject: Receipt for my Northwind payment
+Date: Mon, 09 Nov 2026 13:26:00 +0000
+Message-ID: <E0288.0f6sjgyi6kui@correo-fernandez.example>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=_w5_0tu4b03bg0fok3fp"
+
+--=_w5_0tu4b03bg0fok3fp
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+I paid the remaining =C2=A35,000 for Northwind Robotics on 30 October 2026, r=
+eference NW-008. Attached is the receipt from my bank showing the funds credi=
+ted to the SPV.
+
+Saludos,
+Luc=C3=ADa Fern=C3=A1ndez
+
+--=_w5_0tu4b03bg0fok3fp
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="bank_receipt.png"
+MIME-Version: 1.0
+
+iVBORw0KGgoAAAANSUhEUgAAAQQAAAB4CAIAAACb/RtTAAAB8ElEQVR42u3aTW7CMBCAUQ7BmpOw
+5nQcGGUFEhKK4pmxQeH/WW9RUkKr4i9xSjbbwxG42PgTgBhADCAGEAOIAcQAYgAxgBhADCAGEAOI
+AcQAYgAxgBhADCAGEAN8YAzTdAIuxABiADGAGEAMIAYQA4gBxABiADGAGEAMIAYQA4gBxADfGMPe
++NRRvzuL714f3jYW+97e93YazLcvvgh3bH96+FIjk1AMRjxrs/dlMf8Wk7WtYj41i0lfTOhwkhTP
+DDN7WQli+MGjfjj173pOe97ollBkGYZXnF7qLZZJxjoniuxw3n3N7mE7+wWyY3m26Ar3GtkiBtM9
+WOh3J3c2ZcPVS7H74DonXJi1VxT3Xio8Iwkx/NFF88gTunXVh+qi0uzquV4avWyNJIZ/v6jIDvP1
+sir7/0+W1uCcfuDksG4tPmcAMYAYQAwgBhADiAHEAGIAMYAYQAwgBnDXqvG+G2DFIAZDDGIwxCAG
+QwxiMMQgBkMMYjDE4HMGEAOIAcQAYgAxgBhADCAGEAOIAcQAYgAxgBhADCAGEAOIgZXtjnvmxCAG
+xCAGAYgBMYgBMYgBMYgBMYgBMYgBMYgBMYgBMYgB3JsEYgAxgBhADCAGEAOIAcQAYgAxgBhADCAG
+EAOIAcQAYgDEAGIAMYAYQAww5AzPl8FphGNqCQAAAABJRU5ErkJggg==
+
+--=_w5_0tu4b03bg0fok3fp--

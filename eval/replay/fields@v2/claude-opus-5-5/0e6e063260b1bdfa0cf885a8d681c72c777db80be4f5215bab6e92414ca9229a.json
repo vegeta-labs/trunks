@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"7c2a33c4-6ee3-4852-83c0-2044b61e83bb\",\"confidence\":\"high\",\"quote\":\"{121:7c2a33c4-6ee3-4852-83c0-2044b61e83bb}\"},\"amount\":{\"value\":\"£30,000.00\",\"confidence\":\"high\",\"quote\":\"my payment of £30,000.00 to Northwind Robotics\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\":32A:261019GBP30000,00\"},\"value_date\":{\"value\":\"261019\",\"confidence\":\"high\",\"quote\":\":32A:261019GBP30000,00\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\":50K:[NAME_1] [NAME_2]\"},\"reference\":{\"value\":{\"candidates\":[{\"value\":\"NW-009\",\"quote\":\":70:NW-009\"},{\"value\":\"CWF-PMT-1019A\",\"quote\":\":20:CWF-PMT-1019A\"}]},\"confidence\":\"medium\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 1850,
+  "outputTokens": 364
+ }
+}

@@ -1,0 +1,55 @@
+{
+  "id": "E0232",
+  "family": "F051",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-22T11:45:00Z",
+  "prior_messages": [],
+  "description": "Display-name impersonation from free-mail announcing a changed account with an IBAN whose checksum is wrong.",
+  "classes": [
+    "bank_details"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "bank_change",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": true,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": true,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "party_role": "investor",
+    "account_last4": null,
+    "change_requested": true
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [
+      "NW-009"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": null,
+    "investor_id": "Northwind Robotics::009",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0007"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "safe_ack",
+  "notes": "DELIBERATELY INVALID IBAN: GB57QZBK55360505996280 fails mod-97 (valid form ends ...6289). Still IBAN-shaped -> bank_details rule label; account_last4 empty in rule_output and null in fields."
+}

@@ -1,0 +1,28 @@
+Received: from mail.correo-fernandez.example (mail.correo-fernandez.example
+ [192.0.2.91]) by mx.ops.example with ESMTPS id 627e431d18; Wed, 04 Nov 2026
+ 13:14:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=correo-fernandez.example; dkim=pass
+ header.d=correo-fernandez.example; dmarc=pass
+ header.from=correo-fernandez.example
+From: =?utf-8?q?Luc=C3=ADa_Fern=C3=A1ndez?=
+ <lucia.fernandez@correo-fernandez.example>
+To: Investor Operations <investors@ops.example>
+Subject: Lost my authenticator - locked out
+Date: Wed, 04 Nov 2026 13:13:25 +0000
+Message-ID: <E0136.5c7632072448@correo-fernandez.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+My phone was stolen at the weekend and with it the authenticator app I use fo=
+r the two-factor code on your investor portal. I've got a replacement phone w=
+ith the same number, but the portal still asks for the six-digit code from th=
+e app and I can't get past that screen.
+
+Is there a way to reset the two-factor setup so I can log in again?
+
+Gracias,
+Luc=C3=ADa Fern=C3=A1ndez

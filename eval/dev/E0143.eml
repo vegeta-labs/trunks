@@ -1,0 +1,29 @@
+Received: from mail.oseiconsulting.example (mail.oseiconsulting.example
+ [192.0.2.197]) by mx.ops.example with ESMTPS id 10288673df; Fri, 06 Nov 2026
+ 14:11:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=oseiconsulting.example; dkim=pass
+ header.d=oseiconsulting.example; dmarc=pass
+ header.from=oseiconsulting.example
+From: Daniel Osei <d.osei@oseiconsulting.example>
+To: Investor Operations <investors@ops.example>
+Subject: Wrong figures on my quarterly statement
+Date: Fri, 06 Nov 2026 14:10:25 +0000
+Message-ID: <E0143.ab1725804b8b@oseiconsulting.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+My Q3 statement for Northwind Robotics shows a holding of 1,800 shares. The a=
+llocation confirmation I received at the time showed 18,000 shares. Either th=
+e statement has dropped a zero or something has gone wrong with the share reg=
+ister.
+
+This is the second statement with an error on it. I would like it corrected a=
+nd reissued, and frankly I'd like to understand how these statements are chec=
+ked before they go out.
+
+Daniel Osei
+Osei Consulting

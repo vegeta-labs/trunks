@@ -1,0 +1,21 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=rafael@duarte-invest.example; dkim=pass
+ header.d=duarte-invest.example; dmarc=pass header.from=duarte-invest.example
+Received: from mail.duarte-invest.example (mail.duarte-invest.example
+ [192.0.2.31]) by mx.ops.example with ESMTPS; Tue, 20 Oct 2026 13:41:07 +0000
+From: Rafael Duarte <rafael@duarte-invest.example>
+To: investors@ops.example
+Subject: Northwind commitment
+Date: Tue, 20 Oct 2026 13:41:00 +0000
+Message-ID: <E0267.z87ag9otmgvv@duarte-invest.example>
+MIME-Version: 1.0
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+<html><head><style>@layer a{#p{display:block}} .h{display:none}</style></head=
+><body>
+<p>Hi team,</p>
+<p>I would like to raise my Northwind Robotics commitment (NW-012) from =C2=
+=A340,000 to =C2=A350,000. I'll wire the difference once you confirm.</p>
+<p>Best,<br>Rafael</p>
+</body></html>

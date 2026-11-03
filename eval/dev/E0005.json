@@ -1,0 +1,66 @@
+{
+  "id": "E0005",
+  "family": "F001",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-29T15:48:00Z",
+  "prior_messages": [],
+  "description": "Ledger row for this investor is in EUR so it does not count; paid 2 working days ago -> payment_wait.",
+  "classes": [
+    "payment_query"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "amount": {
+      "minor": 800000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "payment_date": "2026-10-27",
+    "payer_name": "Margaret O'Neill",
+    "reference": "NW-011",
+    "uetr": null
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 800000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-011"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C011",
+    "investor_id": "Northwind Robotics::011",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0008"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_wait",
+  "notes": "Ledger T-NW-0008 is status auto but currency EUR in a GBP deal -> not counted (C-DRF-6) -> not received in full. The bank line is still listed by C-LNK-4 (reference and amount/date match)."
+}

@@ -1,0 +1,21 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramsay-capital.example; dkim=pass
+ header.d=ramsay-capital.example; dmarc=pass
+ header.from=ramsay-capital.example
+Received: from mail.ramsay-capital.example (mail.ramsay-capital.example
+ [192.0.2.157]) by mx.ops.example with ESMTPS id 1ZKJMJ0DCHB8; Tue, 17 Nov
+ 2026 10:03:00 +0000
+Message-ID: <E0085.xjjeqbqweh7n@ramsay-capital.example>
+Date: Tue, 17 Nov 2026 10:00:48 +0000
+From: Fiona Ramsay <fiona@ramsay-capital.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Re: final numbers
+In-Reply-To: <ops.final.bqkt4p@ops.example>
+References: <ops.final.bqkt4p@ops.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+All good from my side - numbers confirmed.
+
+Fiona

@@ -1,0 +1,53 @@
+{
+  "id": "E0141",
+  "family": "F036",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-21T16:50:00Z",
+  "prior_messages": [
+    {
+      "from": "priya@ramanfamily.example",
+      "message_id": "<CAPR7731.1007@ramanfamily.example>",
+      "sans_msgid_sha256": "f06920e5eb28500ce36e0a3a0070e5b2e80180cc688b0e6354a60fdfb1b4f7fe"
+    }
+  ],
+  "description": "Investor complains about slow responses (third chase); the quoted earlier message is her own inbound email, listed in prior_messages.",
+  "classes": [
+    "complaint"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {},
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C003",
+    "investor_id": "Northwind Robotics::003",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "complaint_ack",
+  "notes": "The quoted earlier request mentions SEIS paperwork; the latest message is a complaint about response times. Per plan F044 convention the latest message decides; tax_certificates is not expected (model judgement; the PRD has no rule label for it). See eval/QUESTIONS.md W3."
+}

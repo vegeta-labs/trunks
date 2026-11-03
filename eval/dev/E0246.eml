@@ -1,0 +1,27 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=grace@whitfield-weaith.example; dkim=pass
+ header.d=whitfield-weaith.example; dmarc=pass
+ header.from=whitfield-weaith.example
+Received: from mail.whitfield-weaith.example (mail.whitfield-weaith.example
+ [192.0.2.34]) by mx.ops.example with ESMTPS; Tue, 03 Nov 2026 09:44:07 +0000
+From: Grace Whitfield <grace@whitfield-weaIth.example>
+To: investors@ops.example
+Subject: Withdrawal - Oliver Bennett (NW-002)
+Date: Tue, 03 Nov 2026 09:44:00 +0000
+Message-ID: <E0246.rdrejnsybup7@whitfield-weaith.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear Operations,
+
+I act for Oliver Bennett on his Northwind Robotics commitment (NW-002). Olive=
+r has decided to withdraw before closing. Please process the withdrawal and r=
+eturn the =C2=A315,000 he has already paid.
+
+I will send his signed instruction separately.
+
+Kind regards,
+Grace Whitfield
+Whitfield Wealth
+020 7946 0145

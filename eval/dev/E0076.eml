@@ -1,0 +1,27 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=larkspur-energy.example; dkim=pass
+ header.d=larkspur-energy.example; dmarc=pass
+ header.from=larkspur-energy.example
+Received: from mail.larkspur-energy.example (mail.larkspur-energy.example
+ [192.0.2.194]) by mx.ops.example with ESMTPS id K99LD5DE7UF9; Mon, 09 Nov
+ 2026 15:05:00 +0000
+Message-ID: <E0076.cun7jbcaeukz@larkspur-energy.example>
+Date: Mon, 09 Nov 2026 15:02:26 +0000
+From: Noah Fischer <noah.fischer@larkspur-energy.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Instrument for the Larkspur round
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+Heads-up from our side: our US counsel recommends that the Larkspur round is
+documented as a priced preferred equity round rather than SAFEs. We'd like the
+SPV to subscribe for Series Seed Preferred instead. Happy to walk you through it.
+
+Noah
+
+--
+Noah Fischer
+Head of Finance, Larkspur Energy Storage Inc.

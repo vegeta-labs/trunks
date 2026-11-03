@@ -1,0 +1,29 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=northwlnd-robotics.example; dkim=pass
+ header.d=northwlnd-robotics.example; dmarc=pass
+ header.from=northwlnd-robotics.example
+Received: from mail.northwlnd-robotics.example
+ (mail.northwlnd-robotics.example [192.0.2.151]) by mx.ops.example with ESMTPS
+ id MXZQ1IU4YA for <investors@ops.example>; Tue, 27 Oct 2026 13:05:00 +0000
+Date: Tue, 27 Oct 2026 13:04:28 +0000
+From: Northwind Robotics Finance <finance@northwlnd-robotics.example>
+To: investors@ops.example
+Reply-To: Northwind Finance <northwind.finance@mailbox-free.example>
+Subject: Updated payment instructions - Northwind Robotics
+Message-ID: <E0226.toc8bvuct50k@northwlnd-robotics.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello,
+
+Following our move to a new banking partner, Northwind Robotics' receiving account has been updated. Investors should now pay to:
+
+  Beneficiary: Northwind Robotics Ltd
+  IBAN: GB08QZBK83169123296816
+
+The previous account will be closed at the end of the month. Please reply to this email to confirm that you have noted this.
+
+Best regards,
+Finance Team
+Northwind Robotics

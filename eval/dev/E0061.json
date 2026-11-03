@@ -1,0 +1,55 @@
+{
+  "id": "E0061",
+  "family": "F015",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-27T09:42:00Z",
+  "prior_messages": [],
+  "description": "Investor writes personally from her file address asking to be withdrawn from Northwind Robotics; authenticated, consent investor_self.",
+  "classes": [
+    "withdrawal"
+  ],
+  "expected_risk": "high",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "investor": "Hannah Kowalczyk",
+    "consent_evidence": "investor_self"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 600000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C013",
+    "investor_id": "Northwind Robotics::013",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "Q1 ruled (PRD v0.7.8): the authenticated investor writing herself -> consent_evidence investor_self. No reference in the text; commitment linked through the sender (one deal). Withdrawal floor is high -> safe_ack."
+}

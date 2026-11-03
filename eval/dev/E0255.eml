@@ -1,0 +1,25 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=d.osei@oseiconsulting.example; dkim=pass
+ header.d=oseiconsulting.example; dmarc=pass
+ header.from=oseiconsulting.example
+Received: from mail.oseiconsulting.example (mail.oseiconsulting.example
+ [192.0.2.32]) by mx.ops.example with ESMTPS; Wed, 11 Nov 2026 10:51:07 +0000
+From: Daniel Osei <d.osei@oseiconsulting.example>
+To: investors@ops.example
+Subject: Second instalment sent
+Date: Wed, 11 Nov 2026 10:51:00 +0000
+Message-ID: <E0255.mkm4iityht6g@oseiconsulting.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+I've sent the second half of my Northwind Robotics commitment, =C2=A39,000, o=
+n 3 November 2026 with reference NW-016. Please let me know once it shows on =
+your side.
+
+Regards,
+Daniel Osei
+Osei Consulting
+07700 900116

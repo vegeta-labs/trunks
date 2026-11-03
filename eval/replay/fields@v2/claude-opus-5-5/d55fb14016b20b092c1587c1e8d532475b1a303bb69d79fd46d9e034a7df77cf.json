@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"deal\":{\"value\":\"Northwind Robotics\",\"confidence\":\"high\",\"quote\":\"Northwind Robotics has agreed terms for a sale of the business\"},\"question_type\":{\"value\":\"amount\",\"confidence\":\"high\",\"quote\":\"Could you tell me how much will be paid per share, and how that translates to what I receive through the SPV after any fees and carry?\"}}}",
+ "usage": {
+  "inputTokens": 1553,
+  "outputTokens": 126
+ }
+}

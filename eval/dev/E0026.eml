@@ -1,0 +1,67 @@
+Return-Path: <wang.fang@wangfang-home.example>
+Received: from mail.wangfang-home.example (mail.wangfang-home.example
+ [192.0.2.67]) by mx.ops.example with ESMTPS id ece9c19747 for
+ <investors@ops.example>; Mon, 02 Nov 2026 09:12:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=wangfang-home.example; dkim=pass
+ header.d=wangfang-home.example; dmarc=pass header.from=wangfang-home.example
+Message-ID: <E0026.83eea410822b@wangfang-home.example>
+Date: Mon, 02 Nov 2026 09:09:37 +0000
+From: "Wang Fang" <wang.fang@wangfang-home.example>
+To: investors@ops.example
+Subject: Payment for Solent - two transfers
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============8837915213815381217=="
+
+--===============8837915213815381217==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+My bank's daily limit meant I had to split the Solent payment into two transf=
+ers. The attached file from the bank shows both of them.
+
+Kind regards,
+Wang Fang
+
+--===============8837915213815381217==
+Content-Type: application/xml
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="pacs008_3.xml"
+MIME-Version: 1.0
+
+PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPERvY3VtZW50IHhtbG5zPSJ1
+cm46aXNvOnN0ZDppc286MjAwMjI6dGVjaDp4c2Q6cGFjcy4wMDguMDAxLjA4Ij4KICA8RklUb0ZJ
+Q3N0bXJDZHRUcmY+CiAgICA8R3JwSGRyPgogICAgICA8TXNnSWQ+UVpCSy1NU0ctV0ZHLTMzMDI8
+L01zZ0lkPgogICAgICA8Q3JlRHRUbT4yMDI2LTEwLTMwVDE2OjIwOjExWjwvQ3JlRHRUbT4KICAg
+ICAgPE5iT2ZUeHM+MjwvTmJPZlR4cz4KICAgICAgPFN0dGxtSW5mPgogICAgICAgIDxTdHRsbU10
+ZD5DTFJHPC9TdHRsbU10ZD4KICAgICAgPC9TdHRsbUluZj4KICAgIDwvR3JwSGRyPgogICAgPENk
+dFRyZlR4SW5mPgogICAgICA8UG10SWQ+CiAgICAgICAgPEluc3RySWQ+V0YtQTwvSW5zdHJJZD4K
+ICAgICAgICA8RW5kVG9FbmRJZD5OT1RQUk9WSURFRDwvRW5kVG9FbmRJZD4KICAgICAgICA8VUVU
+Uj5kMGI1NDg1Yi02OWIxLTQ5ZTEtYjhiYy0xNmJkNmVmMjYxY2Q8L1VFVFI+CiAgICAgIDwvUG10
+SWQ+CiAgICAgIDxJbnRyQmtTdHRsbUFtdCBDY3k9IkVVUiI+MTUwMDAuMDA8L0ludHJCa1N0dGxt
+QW10PgogICAgICA8SW50ckJrU3R0bG1EdD4yMDI2LTEwLTI5PC9JbnRyQmtTdHRsbUR0PgogICAg
+ICA8Q2hyZ0JyPlNIQVI8L0NocmdCcj4KICAgICAgPERidHI+PE5tPldBTkcgRkFORzwvTm0+PC9E
+YnRyPgogICAgICA8RGJ0ckFndD48RmluSW5zdG5JZD48QklDRkk+UVpCS0dCMkxYWFg8L0JJQ0ZJ
+PjwvRmluSW5zdG5JZD48L0RidHJBZ3Q+CiAgICAgIDxDZHRyQWd0PjxGaW5JbnN0bklkPjxCSUNG
+ST5RWkJLR0IyTFhYWDwvQklDRkk+PC9GaW5JbnN0bklkPjwvQ2R0ckFndD4KICAgICAgPENkdHI+
+PE5tPlNPTEVOVCBCSU9USEVSQVBFVVRJQ1MgU1BWPC9ObT48L0NkdHI+CiAgICAgIDxDZHRyQWNj
+dD48SWQ+PE90aHI+PElkPlNPTEVOVC1TUFYtRVVSLUNMSUVOVDwvSWQ+PC9PdGhyPjwvSWQ+PC9D
+ZHRyQWNjdD4KICAgICAgPFJtdEluZj48VXN0cmQ+U0ItMDA2IDEvMjwvVXN0cmQ+PC9SbXRJbmY+
+CiAgICA8L0NkdFRyZlR4SW5mPgogICAgPENkdFRyZlR4SW5mPgogICAgICA8UG10SWQ+CiAgICAg
+ICAgPEluc3RySWQ+V0YtQjwvSW5zdHJJZD4KICAgICAgICA8RW5kVG9FbmRJZD5OT1RQUk9WSURF
+RDwvRW5kVG9FbmRJZD4KICAgICAgICA8VUVUUj5mN2FmYTk3OS1iNGJhLTRiZmMtOTdlNi1jZWU3
+MjNiNzJiMmE8L1VFVFI+CiAgICAgIDwvUG10SWQ+CiAgICAgIDxJbnRyQmtTdHRsbUFtdCBDY3k9
+IkVVUiI+MTAwMDAuMDA8L0ludHJCa1N0dGxtQW10PgogICAgICA8SW50ckJrU3R0bG1EdD4yMDI2
+LTEwLTMwPC9JbnRyQmtTdHRsbUR0PgogICAgICA8Q2hyZ0JyPlNIQVI8L0NocmdCcj4KICAgICAg
+PERidHI+PE5tPldBTkcgRkFORzwvTm0+PC9EYnRyPgogICAgICA8RGJ0ckFndD48RmluSW5zdG5J
+ZD48QklDRkk+UVpCS0dCMkxYWFg8L0JJQ0ZJPjwvRmluSW5zdG5JZD48L0RidHJBZ3Q+CiAgICAg
+IDxDZHRyQWd0PjxGaW5JbnN0bklkPjxCSUNGST5RWkJLR0IyTFhYWDwvQklDRkk+PC9GaW5JbnN0
+bklkPjwvQ2R0ckFndD4KICAgICAgPENkdHI+PE5tPlNPTEVOVCBCSU9USEVSQVBFVVRJQ1MgU1BW
+PC9ObT48L0NkdHI+CiAgICAgIDxDZHRyQWNjdD48SWQ+PE90aHI+PElkPlNPTEVOVC1TUFYtRVVS
+LUNMSUVOVDwvSWQ+PC9PdGhyPjwvSWQ+PC9DZHRyQWNjdD4KICAgICAgPFJtdEluZj48VXN0cmQ+
+U0ItMDA2IDIvMjwvVXN0cmQ+PC9SbXRJbmY+CiAgICA8L0NkdFRyZlR4SW5mPgogIDwvRklUb0ZJ
+Q3N0bXJDZHRUcmY+CjwvRG9jdW1lbnQ+Cg==
+
+--===============8837915213815381217==--

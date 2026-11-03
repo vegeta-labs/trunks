@@ -1,0 +1,29 @@
+Received: from mail.duarte-invest.example (mail.duarte-invest.example
+ [192.0.2.145]) by mx.ops.example with ESMTPS id a36fb63880; Fri, 30 Oct 2026
+ 09:26:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=duarte-invest.example; dkim=pass
+ header.d=duarte-invest.example; dmarc=pass header.from=duarte-invest.example
+From: Rafael Duarte <rafael@duarte-invest.example>
+To: Investor Operations <investors@ops.example>
+Subject: Fees on my Northwind Robotics investment (NW-012)
+Date: Fri, 30 Oct 2026 09:25:25 +0000
+Message-ID: <E0142.f3c5a06e4a98@duarte-invest.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear Sirs,
+
+I have just looked at the completion statement for my Northwind Robotics inve=
+stment (NW-012) and I am frankly unhappy with the fees. An arrangement fee of=
+ =C2=A3800 was deducted on top of the carry, and nowhere in the deal summary =
+I was sent in September was this fee mentioned. On my Solent investment with =
+you there was no such charge.
+
+I would like an explanation of why this fee was applied and where it was disc=
+losed.
+
+Regards,
+Rafael Duarte
+Duarte Invest

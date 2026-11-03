@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"party_role\":{\"value\":\"investor\",\"confidence\":\"medium\",\"quote\":\"please send my share to my new account rather than the old one\"},\"change_requested\":{\"value\":true,\"confidence\":\"high\",\"quote\":\"please send my share to my new account rather than the old one\"},\"deal\":{\"value\":\"Northwind Robotics\",\"confidence\":\"high\",\"quote\":\"When the Northwind Robotics distribution is paid out\"},\"question_type\":{\"value\":\"other\",\"confidence\":\"medium\",\"quote\":\"please send my share to my new account rather than the old one\"}}}",
+ "usage": {
+  "inputTokens": 1620,
+  "outputTokens": 179
+ }
+}

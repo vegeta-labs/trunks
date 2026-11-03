@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"bank_details\",\"confidence\":\"high\",\"reason\":\"Investor provides sort code and account number for receiving future distributions.\"},{\"class\":\"exit_distribution\",\"confidence\":\"medium\",\"reason\":\"Concerns where distributions from the Northwind Robotics SPV should be paid.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1846,
+  "outputTokens": 109
+ }
+}

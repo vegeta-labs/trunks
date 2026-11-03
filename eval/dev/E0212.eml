@@ -1,0 +1,23 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=smithfamily.example; dkim=pass header.d=smithfamily.example;
+ dmarc=pass header.from=smithfamily.example
+Received: from mail.smithfamily.example (mail.smithfamily.example
+ [192.0.2.226]) by mx.ops.example with ESMTPS id HYBR0D21DW for
+ <investors@ops.example>; Mon, 09 Nov 2026 13:30:00 +0000
+Date: Mon, 09 Nov 2026 13:29:39 +0000
+From: James Smith <jsmith@smithfamily.example>
+To: investors@ops.example
+Subject: Portal login shows no investments
+Message-ID: <E0212.k3leqrzjb7qh@smithfamily.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello,
+
+I created a new account login on the investor portal this morning, but when I sign in it says there are no investments linked to my profile. I should be seeing Northwind Robotics (NW-010).
+
+Could you link it up for me?
+
+Thanks,
+James Smith

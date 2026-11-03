@@ -1,0 +1,56 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=becker-post.example; dkim=pass header.d=becker-post.example;
+ dmarc=pass header.from=becker-post.example
+Received: from mail.becker-post.example (mail.becker-post.example
+ [192.0.2.79]) by mx.ops.example with ESMTPS id OD3S5U8YK5 for
+ <investors@ops.example>; Fri, 23 Oct 2026 11:35:00 +0000
+Date: Fri, 23 Oct 2026 13:33:57 +0200
+From: Jonas Becker <jonas.becker@becker-post.example>
+To: investors@ops.example
+Subject: Unterlagen - Reisepass
+Message-ID: <E0197.tt84amuy9jro@becker-post.example>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============2086488025728844916=="
+
+--===============2086488025728844916==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Sehr geehrte Damen und Herren,
+
+wie gew=C3=BCnscht sende ich Ihnen anbei eine Kopie meines Reisepasses f=C3=
+=BCr die Pr=C3=BCfung im Rahmen meiner Beteiligung an Northwind Robotics (Ref=
+erenz NW-007).
+
+Falls Sie zus=C3=A4tzlich eine Meldebescheinigung ben=C3=B6tigen, lassen Sie =
+es mich bitte wissen.
+
+Mit freundlichen Gr=C3=BC=C3=9Fen
+Jonas Becker
+
+--===============2086488025728844916==
+Content-Type: application/pdf
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="Reisepass.pdf"
+MIME-Version: 1.0
+
+JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4K
+ZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4K
+ZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAg
+MCA1OTUgODQyXSAvQ29udGVudHMgNCAwIFIgL1Jlc291cmNlcyA8PCAvRm9udCA8PCAvRjEgNSAw
+IFIgPj4gPj4gPj4KZW5kb2JqCjQgMCBvYmoKPDwgL0xlbmd0aCAzMTMgPj4Kc3RyZWFtCkJUIC9G
+MSAxMSBUZiA1MCA3OTAgVGQgMTQgVEwKKEtvcGllIC0gUmVpc2VwYXNzKSBUaiBUKgooQnVuZGVz
+cmVwdWJsaWsgRGV1dHNjaGxhbmQpIFRqIFQqCigpIFRqIFQqCihOYW1lOiBCRUNLRVIpIFRqIFQq
+CihWb3JuYW1lOiBKT05BUykgVGogVCoKKFN0YWF0c2FuZ2Vo9nJpZ2tlaXQ6IERFVVRTQ0gpIFRq
+IFQqCihBdXNzdGVsbGVuZGUgQmVo9nJkZTogU3RhZHQgQmVybGluKSBUaiBUKgooR/xsdGlnIGJp
+czogMTQuMDUuMjAzMSkgVGogVCoKKCkgVGogVCoKKEtvcGllIHN0aW1tdCBtaXQgZGVtIE9yaWdp
+bmFsIPxiZXJlaW4uKSBUaiBUKgpFVAplbmRzdHJlYW0KZW5kb2JqCjUgMCBvYmoKPDwgL1R5cGUg
+L0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhIC9FbmNvZGluZyAvV2lu
+QW5zaUVuY29kaW5nID4+CmVuZG9iago2IDAgb2JqCjw8IC9UaXRsZSAoUmVpc2VwYXNzKSAvUHJv
+ZHVjZXIgKFc0IHNhbXBsZSBnZW5lcmF0b3IpID4+CmVuZG9iagp4cmVmCjAgNwowMDAwMDAwMDAw
+IDY1NTM1IGYgCjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMDA2NCAwMDAwMCBuIAowMDAwMDAw
+MTIxIDAwMDAwIG4gCjAwMDAwMDAyNDcgMDAwMDAgbiAKMDAwMDAwMDYxMCAwMDAwMCBuIAowMDAw
+MDAwNzA3IDAwMDAwIG4gCnRyYWlsZXIKPDwgL1NpemUgNyAvUm9vdCAxIDAgUiAvSW5mbyA2IDAg
+UiA+PgpzdGFydHhyZWYKNzc5CiUlRU9GCg==
+
+--===============2086488025728844916==--

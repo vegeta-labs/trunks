@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"issue_type\":{\"value\":\"permissions\",\"confidence\":\"high\",\"quote\":\"Could you please give our investment analyst, Ruth Okafor ([EMAIL_1]@nordhaven-fo.example), read-only access to our investor portal\"}}}",
+ "usage": {
+  "inputTokens": 1724,
+  "outputTokens": 90
+ }
+}

@@ -1,0 +1,23 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=hartfamily.example; dkim=pass header.d=hartfamily.example;
+ dmarc=pass header.from=hartfamily.example
+Received: from mail.hartfamily.example (mail.hartfamily.example [192.0.2.183])
+ by mx.ops.example with ESMTPS id A693YPWSJTL1; Thu, 22 Oct 2026 10:05:00
+ +0000
+Message-ID: <E0112.5gk875q2g9ct@hartfamily.example>
+Date: Thu, 22 Oct 2026 10:02:20 +0000
+From: Amelia Hart <amelia@hartfamily.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: SEIS3 for Northwind Robotics
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+Could you let me know when the SEIS3 certificate for my Northwind Robotics
+investment will be available? My accountant wants to include the relief in
+this year's return.
+
+Thanks,
+Amelia Hart

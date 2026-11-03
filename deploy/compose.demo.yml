@@ -1,0 +1,25 @@
+# Demo (PRD R-DEMO-01 v0.7.22, tech design v0.7.11): fictional data, replayed model replies, no mailbox, no outbound.
+#   mkdir -m 700 demo-secrets && docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/demo-secrets:/out" deal-ops-inbox:local init-secrets /out
+#   DOI_SECRETS_DIR=./demo-secrets docker compose -f docker-compose.yml -f deploy/compose.demo.yml up -d
+# then open http://127.0.0.1:8080 (the sign-in page lists the demo accounts). Every `up` resets the demo database.
+# Its own project and fixed volume names: never the volumes of a real deployment (plan review R1, V7).
+name: deal-ops-inbox-demo
+
+services:
+  migrate:
+    environment: { DEMO: '1' }
+  app:
+    environment: { DEMO: '1' }
+    ports: !override ['127.0.0.1:${DOI_PORT:-8080}:8080']
+  maintenance:
+    environment: { DEMO: '1' }
+  clamav:
+    # the virus database that comes with the image; no download (zero outbound, G3)
+    environment: { CLAMAV_NO_FRESHCLAMD: 'true' }
+
+volumes:
+  db: { name: deal-ops-inbox-demo-db }
+  files: { name: deal-ops-inbox-demo-files }
+  state: { name: deal-ops-inbox-demo-state }
+  kyc: { name: deal-ops-inbox-demo-kyc }
+  parser-socket: { name: deal-ops-inbox-demo-parser-socket }

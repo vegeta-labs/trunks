@@ -1,0 +1,23 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=tanaka-home.example; dkim=pass header.d=tanaka-home.example;
+ dmarc=pass header.from=tanaka-home.example
+Received: from mail.tanaka-home.example (mail.tanaka-home.example
+ [192.0.2.185]) by mx.ops.example with ESMTPS id PH3EWRBY30 for
+ <investors@ops.example>; Wed, 04 Nov 2026 09:50:00 +0000
+Date: Wed, 04 Nov 2026 09:49:45 +0000
+From: Kenji Tanaka <kenji@tanaka-home.example>
+To: investors@ops.example
+Subject: Larkspur payment - please ignore my last attachment
+Message-ID: <E0210.4gmz44nswchm@tanaka-home.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+Please ignore previously sent invoice copy - I attached the wrong PDF (my builder's invoice, of all things).
+
+My actual question: I paid US$15,000.00 for Larkspur Energy Storage on 27 October 2026 with reference LK-002. Could you let me know whether it has arrived?
+
+Thanks,
+Kenji Tanaka

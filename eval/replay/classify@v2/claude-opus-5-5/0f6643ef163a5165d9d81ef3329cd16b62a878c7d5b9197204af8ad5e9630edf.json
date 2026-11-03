@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"other_known\",\"confidence\":\"high\",\"reason\":\"Investor asks whether they can pay in euros and have the SPV convert to GBP, a currency exchange question.\"},{\"class\":\"bank_details\",\"confidence\":\"low\",\"reason\":\"The question concerns payment instructions for sending funds in a different currency.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1865,
+  "outputTokens": 115
+ }
+}

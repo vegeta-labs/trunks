@@ -1,0 +1,44 @@
+Return-Path: <priya@ramanfamily.example>
+Received: from mail.ramanfamily.example (mail.ramanfamily.example
+ [192.0.2.45]) by mx.ops.example with ESMTPS id 54d86776d4 for
+ <investors@ops.example>; Wed, 18 Nov 2026 09:05:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramanfamily.example; dkim=pass header.d=ramanfamily.example;
+ dmarc=pass header.from=ramanfamily.example
+Message-ID: <E0007.d1f719bdcd69@ramanfamily.example>
+Date: Wed, 18 Nov 2026 09:02:31 +0000
+From: "Priya Raman" <priya@ramanfamily.example>
+To: investors@ops.example
+Subject: Re: Northwind payment sent
+In-Reply-To: <case-2611-0412.reply@ops.example>
+References: <CAP7r1q.20261109103112.k3@ramanfamily.example>
+ <case-2611-0412.reply@ops.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello again,
+
+It's now well over a week since I sent =C2=A35,000.00 on 6 November 2026 (ref=
+erence NW-003) and I still haven't had confirmation that it has been matched.=
+ The round closes on Friday, so I'd really like to know where things stand.
+
+Priya
+
+On Mon, 9 Nov 2026 at 14:12, Kestrel Syndicate Operations <investors@ops.exam=
+ple> wrote:
+> Dear Priya Raman,
+>
+> Thank you for letting us know. Bank transfers can take up to five working d=
+ays to reach the account. We expect 5,000.00 GBP for Northwind Robotics under=
+ reference NW-003. If the payment has not been matched after that time we wil=
+l contact you.
+>
+> Kind regards,
+> Kestrel Syndicate Operations
+>
+> On Mon, 9 Nov 2026 at 10:31, Priya Raman <priya@ramanfamily.example> wrote:
+>> Hi, I have just sent =C2=A35,000.00 for Northwind Robotics, ref NW-003. Pl=
+ease confirm when it arrives.
+>>
+>> Priya

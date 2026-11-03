@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"amount\":{\"value\":\"GBP 100,000.00\",\"confidence\":\"high\",\"quote\":\"subscription monies of GBP 100,000.00\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\"GBP 100,000.00\"},\"payment_date\":{\"value\":\"16 October 2026\",\"confidence\":\"high\",\"quote\":\"remitted on 16 October 2026\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2] Group plc\",\"confidence\":\"high\",\"quote\":\"by our parent company, [NAME_1] [NAME_2] Group plc, on our behalf\"},\"third_party_payer\":{\"value\":\"[NAME_1] [NAME_2] Group plc\",\"confidence\":\"high\",\"quote\":\"by our parent company, [NAME_1] [NAME_2] Group plc, on our behalf\"},\"reference\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"uetr\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 1917,
+  "outputTokens": 329
+ }
+}

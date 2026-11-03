@@ -1,0 +1,5 @@
+{
+  "now": "2026-12-16T12:00:00Z",
+  "timezone": "Europe/London",
+  "note": "Evaluation clock: only for 'current time' behaviour (near-due reminders, overdue, follow-up reminders). Deadlines and template rules use each annotation's received_at (PRD C-RTE-1). Every sample's received_at is on or before 2026-12-15."
+}

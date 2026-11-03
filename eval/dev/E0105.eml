@@ -1,0 +1,23 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=wolski-family.example; dkim=pass
+ header.d=wolski-family.example; dmarc=pass header.from=wolski-family.example
+Received: from mail.wolski-family.example (mail.wolski-family.example
+ [192.0.2.95]) by mx.ops.example with ESMTPS id I951E27NPIFZ; Mon, 26 Oct 2026
+ 13:52:00 +0000
+Message-ID: <E0105.vicvf19j92gk@wolski-family.example>
+Date: Mon, 26 Oct 2026 13:49:37 +0000
+From: Tomasz Wolski <t.wolski@wolski-family.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: New email address
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Dear Sir or Madam,
+
+Please note that I will stop using this mailbox at the end of the month.
+From now on, please write to me at tomasz.wolski@wolski-mail.example for
+everything relating to Northwind Robotics.
+
+Yours faithfully,
+Tomasz Wolski

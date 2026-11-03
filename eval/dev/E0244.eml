@@ -1,0 +1,26 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ethanclarke.nwr@postbox-mail.example; dkim=pass
+ header.d=postbox-mail.example; dmarc=pass header.from=postbox-mail.example
+Received: from mail.postbox-mail.example (mail.postbox-mail.example
+ [192.0.2.30]) by mx.ops.example with ESMTPS; Thu, 05 Nov 2026 13:16:07 +0000
+From: Ethan Clarke <ethanclarke.nwr@postbox-mail.example>
+To: legal@ops.example
+Subject: Board resolution - please review before Friday
+Date: Thu, 05 Nov 2026 13:16:00 +0000
+Message-ID: <E0244.x5z6acsp76p4@postbox-mail.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+I'm writing from my personal address as I'm travelling this week. Could you review the shareholder resolution for the Northwind Robotics follow-on before Friday? The document is here:
+
+https://docs-share.example/view/nwr-resolution-v3
+
+You'll need to sign in with your work email to open it.
+
+Thanks,
+Ethan
+
+Sent from my phone

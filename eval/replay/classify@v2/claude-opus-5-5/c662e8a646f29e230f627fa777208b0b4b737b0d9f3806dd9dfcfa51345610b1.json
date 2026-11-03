@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"unreferenced_payment\",\"confidence\":\"high\",\"reason\":\"Payment made from the investor's company rather than personal account, and without a reference.\"},{\"class\":\"payment_query\",\"confidence\":\"medium\",\"reason\":\"Sender states they paid £20,000 on 4 November 2026 without attaching a payment confirmation.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1865,
+  "outputTokens": 121
+ }
+}

@@ -1,0 +1,23 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramanfamily.example; dkim=pass header.d=ramanfamily.example;
+ dmarc=pass header.from=ramanfamily.example
+Received: from mail.ramanfamily.example (mail.ramanfamily.example
+ [192.0.2.57]) by mx.ops.example with ESMTPS id 20JXVEXD2QUM; Wed, 21 Oct 2026
+ 09:19:00 +0000
+Message-ID: <E0104.wrbih7l98vrg@ramanfamily.example>
+Date: Wed, 21 Oct 2026 09:16:49 +0000
+From: Priya Raman <priya@ramanfamily.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Name change after marriage
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello,
+
+I got married in September and have changed my surname. Could you please
+record my name as Priya Desai from now on? I'm happy to send a copy of the
+marriage certificate if you need it.
+
+Many thanks,
+Priya (formerly Raman)

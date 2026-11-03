@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"fee_or_terms_change\",\"confidence\":\"high\",\"reason\":\"The company will now cover the deal fees instead of the SPV investors being charged the arrangement fee.\"},{\"class\":\"closing_confirmation\",\"confidence\":\"low\",\"reason\":\"The sender asks for the change to be reflected in the closing pack, which may affect the closing figures.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1916,
+  "outputTokens": 129
+ }
+}

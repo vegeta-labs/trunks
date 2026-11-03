@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"subtype\":{\"value\":\"nominee_kyc\",\"confidence\":\"high\",\"quote\":\"Nominee KYC - LK-004\"},\"document_types\":{\"value\":[\"other\"],\"confidence\":\"low\",\"quote\":\"we have provided our own corporate documents plus a reliance letter covering the beneficial owner\"},\"entity_type\":{\"value\":\"company\",\"confidence\":\"medium\",\"quote\":\"[NAME_2] Nominees holds the Larkspur Energy Storage commitment LK-004 as nominee\"}}}",
+ "usage": {
+  "inputTokens": 1749,
+  "outputTokens": 172
+ }
+}

@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"uetr\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"amount\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"currency\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"value_date\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"payer_name\":{\"value\":null,\"confidence\":\"low\",\"quote\":\"\"},\"reference\":{\"value\":null,\"confidence\":\"medium\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 1660,
+  "outputTokens": 153
+ }
+}

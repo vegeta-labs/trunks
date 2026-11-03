@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"deal\":{\"value\":\"Northwind Robotics\",\"confidence\":\"high\",\"quote\":\"the Northwind Robotics distribution\"},\"question_type\":{\"value\":\"timing\",\"confidence\":\"high\",\"quote\":\"Could you let me know when the Northwind Robotics distribution is expected to be paid?\"},\"party_role\":{\"value\":\"investor\",\"confidence\":\"medium\",\"quote\":\"please note my updated bank details for that payment\"},\"change_requested\":{\"value\":true,\"confidence\":\"high\",\"quote\":\"please note my updated bank details for that payment:\"}}}",
+ "usage": {
+  "inputTokens": 1593,
+  "outputTokens": 184
+ }
+}

@@ -1,0 +1,31 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramsay-capital.example; dkim=pass
+ header.d=ramsay-capital.example; dmarc=pass
+ header.from=ramsay-capital.example
+Received: from mail.ramsay-capital.example (mail.ramsay-capital.example
+ [192.0.2.165]) by mx.ops.example with ESMTPS id KU7WOHVMWCGZ; Mon, 16 Nov
+ 2026 09:33:00 +0000
+Message-ID: <E0082.96709gri2jwi@ramsay-capital.example>
+Date: Mon, 16 Nov 2026 09:30:45 +0000
+From: Fiona Ramsay <fiona@ramsay-capital.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Re: Northwind Robotics - final numbers for sign-off
+In-Reply-To: <ops.final.nw.7c1q@ops.example>
+References: <ops.final.nw.7c1q@ops.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Confirmed - those are the right numbers. Go ahead.
+
+Fiona
+
+On Fri, 13 Nov 2026 at 16:10, Kestrel Syndicate Operations <investors@ops.exa=
+mple> wrote:
+> Dear Fiona,
+>
+> Please confirm the final numbers for Northwind Robotics before we prepare
+> the completion pack: 16 investors, total commitments =C2=A3366,500.00.
+>
+> Kind regards,
+> Kestrel Syndicate Operations

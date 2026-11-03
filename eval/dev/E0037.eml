@@ -1,0 +1,32 @@
+Return-Path: <investments@harbourlane.example>
+Received: from mail.harbourlane.example (mail.harbourlane.example
+ [192.0.2.47]) by mx.ops.example with ESMTPS id edf34bdd73 for
+ <investors@ops.example>; Tue, 20 Oct 2026 09:20:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=harbourlane.example; dkim=pass header.d=harbourlane.example;
+ dmarc=pass header.from=harbourlane.example
+Message-ID: <E0037.436ff787f6db@harbourlane.example>
+Date: Tue, 20 Oct 2026 09:17:25 +0000
+From: "Harbour Lane Holdings - Fund Administration"
+ <investments@harbourlane.example>
+To: investors@ops.example
+Subject: Harbour Lane Holdings - Northwind subscription funding
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear Sirs,
+
+Please note that the subscription monies of GBP 100,000.00 for Harbour Lane H=
+oldings Ltd's participation in Northwind Robotics were remitted on 16 October=
+ 2026 by our parent company, Harbour Lane Group plc, on our behalf. No refere=
+nce was quoted on the transfer.
+
+We would be grateful if you could allocate the receipt to Harbour Lane Holdin=
+gs Ltd.
+
+Yours faithfully,
+
+Rhea Collins
+Fund Administration
+Harbour Lane Holdings Ltd

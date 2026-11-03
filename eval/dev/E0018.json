@@ -1,0 +1,70 @@
+{
+  "id": "E0018",
+  "family": "F003",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-21T08:55:00Z",
+  "prior_messages": [],
+  "description": "MT103 as .txt attachment from an investor already received in full -> payment_received.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "7c2a33c4-6ee3-4852-83c0-2044b61e83bb",
+    "amount": {
+      "minor": 3000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-10-19",
+    "payer_name": "CHEN WEI",
+    "reference": "NW-009"
+  },
+  "rule_output": {
+    "uetrs": [
+      "7c2a33c4-6ee3-4852-83c0-2044b61e83bb"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 3000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-009"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": [
+      "2026-10-19"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C009",
+    "investor_id": "Northwind Robotics::009",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0007"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_received",
+  "notes": "Attachment uses CRLF. Body amount equals :32A: amount -> no mismatch. "
+}

@@ -1,0 +1,68 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramanfamily.example; dkim=pass header.d=ramanfamily.example;
+ dmarc=pass header.from=ramanfamily.example
+Received: from mail.ramanfamily.example (mail.ramanfamily.example
+ [192.0.2.23]) by mx.ops.example with ESMTPS id H0SUR1V82D for
+ <investors@ops.example>; Mon, 02 Nov 2026 09:40:00 +0000
+Date: Mon, 02 Nov 2026 09:39:47 +0000
+From: Priya Raman <priya@ramanfamily.example>
+To: investors@ops.example
+Subject: Re: Northwind payment - NW-003
+Message-ID: <E0187.8jxxbmumddu9@ramanfamily.example>
+In-Reply-To: <u5v7qoccn6od1ccl@ops.example>
+References: <bt3va7dq4owl2urm@ramanfamily.example>
+ <mdvl3wvbji0ne4zh@ops.example> <fn8nab0kluvz52zv@ramanfamily.example>
+ <u5v7qoccn6od1ccl@ops.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+It's now well over a week since I sent the =C2=A35,000 on 21 October and I st=
+ill haven't heard anything. My bank tells me the transfer left on the same da=
+y. What do you need from me to trace it?
+
+Thanks,
+Priya Raman
++44 7700 900103
+
+On Tue, 27 Oct 2026 at 15:45, Kestrel Syndicate Operations <investors@ops.exa=
+mple> wrote:
+> Dear Priya,
+>
+> Not yet, I'm afraid. We review incoming payments every working morning and =
+will let you know.
+>
+> Kind regards,
+> Investor Operations
+> Kestrel Syndicate Operations
+>
+> On Tue, 27 Oct 2026 at 10:20, Priya Raman <priya@ramanfamily.example> wrote:
+>> Hi again - just checking whether it has arrived yet?
+>>
+>> Priya
+>>
+>> On Thu, 22 Oct 2026 at 14:00, Kestrel Syndicate Operations <investors@ops.=
+example> wrote:
+>>> Dear Priya,
+>>>
+>>> Thank you. Transfers can take a few working days to reach us; we will loo=
+k out for it.
+>>>
+>>> Kind regards,
+>>> Investor Operations
+>>> Kestrel Syndicate Operations
+>>>
+>>> On Thu, 22 Oct 2026 at 09:10, Priya Raman <priya@ramanfamily.example> wro=
+te:
+>>>> Hello,
+>>>>
+>>>> I paid =C2=A35,000 for my Northwind Robotics investment on 21 October 20=
+26, reference NW-003. Could you let me know when it shows up?
+>>>>
+>>>> Thanks,
+>>>> Priya Raman
+>>>
+>>
+>

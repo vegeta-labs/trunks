@@ -1,0 +1,29 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=postbox-mail.example; dkim=pass header.d=postbox-mail.example;
+ dmarc=pass header.from=postbox-mail.example
+Received: from mail.postbox-mail.example (mail.postbox-mail.example
+ [192.0.2.45]) by mx.ops.example with ESMTPS id NGOI73B7EY for
+ <investors@ops.example>; Tue, 03 Nov 2026 14:10:00 +0000
+Date: Tue, 03 Nov 2026 14:09:09 +0000
+From: Oliver Bennett <oliver.bennett@postbox-mail.example>
+To: investors@ops.example
+Subject: Withdrawal and refund
+Message-ID: <E0231.1604m01e1t0q@postbox-mail.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Following my decision to withdraw from Northwind Robotics, please refund the =
+=C2=A315,000.00 I paid (reference NW-002) to my new bank account, as my old a=
+ccount is being closed:
+
+Sort code: 20-41-77
+Account number: 41862093
+Account name: O Bennett
+
+Please process this urgently.
+
+Regards,
+Oliver Bennett

@@ -1,0 +1,31 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=becker-post.example; dkim=pass header.d=becker-post.example;
+ dmarc=pass header.from=becker-post.example
+Received: from mail.becker-post.example (mail.becker-post.example
+ [192.0.2.67]) by mx.ops.example with ESMTPS id NO9NLXE6679K; Wed, 11 Nov 2026
+ 15:23:00 +0000
+Message-ID: <E0108.kzpx6uebs2az@becker-post.example>
+Date: Wed, 11 Nov 2026 15:20:44 +0000
+From: Jonas Becker <jonas.becker@becker-post.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Moving to London - please update my contact details
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello,
+
+I am relocating to London next month, so please update my contact details:
+
+New email: jonas@becker-london.example
+New postal address:
+Jonas Becker
+14 Albion Mews
+London
+W2 2AX
+
+The old German address and this email address will stop working in
+December.
+
+Best regards,
+Jonas Becker

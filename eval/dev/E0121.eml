@@ -1,0 +1,30 @@
+Received: from mail.kowalczyk-home.example (mail.kowalczyk-home.example
+ [192.0.2.217]) by mx.ops.example with ESMTPS id de572514d3; Thu, 22 Oct 2026
+ 14:04:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=kowalczyk-home.example; dkim=pass
+ header.d=kowalczyk-home.example; dmarc=pass
+ header.from=kowalczyk-home.example
+From: Hannah Kowalczyk <hannah.k@kowalczyk-home.example>
+To: Investor Operations <investors@ops.example>
+Subject: Sale of Northwind - what do I get per share? (NW-013)
+Date: Thu, 22 Oct 2026 14:03:25 +0000
+Message-ID: <E0121.fee57756338a@kowalczyk-home.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi there,
+
+The company's letter to shareholders says Northwind Robotics has agreed terms=
+ for a sale of the business. Could you tell me how much will be paid per shar=
+e, and how that translates to what I receive through the SPV after any fees a=
+nd carry?
+
+For reference I put in =C2=A36,000 under NW-013 earlier this year.
+
+Thanks so much,
+Hannah
+
+--
+Hannah Kowalczyk

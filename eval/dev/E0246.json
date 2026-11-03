@@ -1,0 +1,59 @@
+{
+  "id": "E0246",
+  "family": "F054",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-03T09:48:00Z",
+  "prior_messages": [],
+  "description": "Look-alike adviser domain whitfield-weaIth (capital I for l) requests a withdrawal for a client.",
+  "classes": [
+    "withdrawal"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "lookalike",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": true,
+    "lookalike_domain": true,
+    "reply_to_mismatch": false,
+    "first_time_sender": true,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "investor": "Oliver Bennett",
+    "consent_evidence": "none"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1500000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-002"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": null,
+    "investor_id": "Northwind Robotics::002",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0002"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "safe_ack",
+  "notes": "Domain is lower-cased (I-03) to whitfield-weaith.example; i->l gives whitfield-wealth.example, DL 1. Consent only promised, not given -> none. C-LNK-4: e-mail has an amount but no payment date, so only the reference rule applies -> T-NW-0002 (NW002)."
+}

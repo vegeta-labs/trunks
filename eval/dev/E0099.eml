@@ -1,0 +1,28 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=bennettmail.example; dkim=pass header.d=bennettmail.example;
+ dmarc=pass header.from=bennettmail.example
+Received: from mail.bennettmail.example (mail.bennettmail.example
+ [192.0.2.73]) by mx.ops.example with ESMTPS id KP0A9YLPPZYQ; Wed, 28 Oct 2026
+ 12:09:00 +0000
+Message-ID: <E0099.so0w63qmpk2o@bennettmail.example>
+Date: Wed, 28 Oct 2026 12:06:22 +0000
+From: Oliver Bennett <oliver.bennett@bennettmail.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Re: Where should we pay distributions?
+In-Reply-To: <ops.distrib.6k71sm@ops.example>
+References: <ops.distrib.6k71sm@ops.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+In answer to your question - for any future distributions from the
+Northwind Robotics SPV, please pay:
+
+Mr O Bennett
+Sort code 08-99-45
+Account number 31926819
+
+Thanks,
+Oliver Bennett

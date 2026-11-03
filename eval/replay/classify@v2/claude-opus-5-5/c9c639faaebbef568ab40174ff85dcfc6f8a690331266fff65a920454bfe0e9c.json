@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"other_known\",\"confidence\":\"high\",\"reason\":\"Investor will become a US tax resident and asks how US person status (W-9) affects her SPV holding.\"},{\"class\":\"identity_change\",\"confidence\":\"low\",\"reason\":\"Planned move to the US implies a future change of postal address.\"},{\"class\":\"tax_certificates\",\"confidence\":\"low\",\"reason\":\"Mentions a W-9 tax form that may be required.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2046,
+  "outputTokens": 149
+ }
+}

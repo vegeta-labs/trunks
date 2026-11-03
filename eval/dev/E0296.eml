@@ -1,0 +1,23 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=hannah.k@kowalczyk-home.example; dkim=pass
+ header.d=kowalczyk-home.example; dmarc=pass
+ header.from=kowalczyk-home.example
+Received: from mail.kowalczyk-home.example (mail.kowalczyk-home.example
+ [192.0.2.32]) by mx.ops.example with ESMTPS; Thu, 05 Nov 2026 09:21:07 +0000
+From: Hannah Kowalczyk <hannah.k@kowalczyk-home.example>
+To: investors@ops.example
+Subject: Payment without reference
+Date: Thu, 05 Nov 2026 09:21:00 +0000
+Message-ID: <E0296.a9nf92o2vmwd@kowalczyk-home.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear Sir or Madam,
+
+My husband Piotr Kowalczyk paid =C2=A36,000 for my Northwind Robotics commitm=
+ent on 3 November 2026 from his own account, but he forgot to add the referen=
+ce. Please allocate it to me immediately.
+
+Kind regards,
+Hannah Kowalczyk

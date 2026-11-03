@@ -1,0 +1,26 @@
+Received: from mail.wolski-family.example (mail.wolski-family.example
+ [192.0.2.249]) by mx.ops.example with ESMTPS id 33aaf864a7; Tue, 20 Oct 2026
+ 16:19:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=wolski-family.example; dkim=pass
+ header.d=wolski-family.example; dmarc=pass header.from=wolski-family.example
+From: Tomasz Wolski <t.wolski@wolski-family.example>
+To: Investor Operations <investors@ops.example>
+Subject: Can't log in to the investor portal
+Date: Tue, 20 Oct 2026 16:18:25 +0000
+Message-ID: <E0134.6acde1bd078f@wolski-family.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+I've been trying to log in to the investor portal since Friday without succes=
+s. It tells me my password is incorrect, and when I click "forgot password" t=
+he reset email never arrives - I've checked spam and junk.
+
+Could someone look into it for me? I'd like to see the Northwind Robotics doc=
+uments before the close.
+
+Regards,
+Tomasz Wolski

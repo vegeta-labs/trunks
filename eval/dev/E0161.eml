@@ -1,0 +1,82 @@
+Received: from mail.venture-ops-weekly.example
+ (mail.venture-ops-weekly.example [192.0.2.147]) by mx.ops.example with ESMTPS
+ id 63d4d855de; Mon, 26 Oct 2026 08:29:02 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=venture-ops-weekly.example; dkim=pass
+ header.d=venture-ops-weekly.example; dmarc=pass
+ header.from=venture-ops-weekly.example
+From: Venture Operations Weekly <newsletter@venture-ops-weekly.example>
+To: investors@ops.example
+Subject: Venture Operations Weekly #112: secondaries hold up
+Date: Mon, 26 Oct 2026 08:28:25 +0000
+Message-ID: <E0161.d7dc8bfb4526@venture-ops-weekly.example>
+List-Unsubscribe: <https://news.venture-ops-weekly.example/u/8f2a1c>
+Precedence: bulk
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============4077831490770580637=="
+
+--===============4077831490770580637==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+VENTURE OPERATIONS WEEKLY - Issue 112
+
+This week
+- Secondaries volumes hold up in Q3 as more early employees seek liquidity
+- Five things we learned at the London angel networks roundtable
+- Reader survey: how many tools does your back office run on?
+
+SECONDARIES HOLD UP
+Q3 data from three secondary platforms shows deal counts flat on Q2 and prici=
+ng discounts narrowing for later-stage software companies. Hardware and life-=
+sciences assets still trade at wider discounts.
+
+ROUNDTABLE NOTES
+Our roundtable brought together twelve syndicate leads. The common theme: inv=
+estor onboarding still takes too long, and most of the delay is document chas=
+ing rather than review.
+
+READER SURVEY
+Tell us how your operations stack looks. It takes three minutes: https://news=
+.venture-ops-weekly.example/survey/112
+
+You are receiving this because you subscribed at venture-ops-weekly.example.
+Unsubscribe: https://news.venture-ops-weekly.example/u/8f2a1c
+
+--===============4077831490770580637==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><head><meta charset=3D"utf-8"><style>
+body{margin:0;background:#f4f4f4;font-family:Georgia,serif}
+.wrap{max-width:600px;margin:0 auto;background:#ffffff;padding:24px}
+h1{font-size:22px;color:#13294b} h2{font-size:17px;color:#13294b}
+.foot{font-size:12px;color:#666666}
+</style></head><body><div class=3D"wrap">
+<h1>Venture Operations Weekly &mdash; Issue 112</h1>
+<p><b>This week</b></p>
+<ul><li>Secondaries volumes hold up in Q3 as more early employees seek liquid=
+ity</li>
+<li>Five things we learned at the London angel networks roundtable</li>
+<li>Reader survey: how many tools does your back office run on?</li></ul>
+<h2>Secondaries hold up</h2>
+<p>Q3 data from three secondary platforms shows deal counts flat on Q2 and pr=
+icing discounts narrowing for later-stage software companies. Hardware and li=
+fe-sciences assets still trade at wider discounts.</p>
+<h2>Roundtable notes</h2>
+<p>Our roundtable brought together twelve syndicate leads. The common theme: =
+investor onboarding still takes too long, and most of the delay is document c=
+hasing rather than review.</p>
+<h2>Reader survey</h2>
+<p>Tell us how your operations stack looks. It takes three minutes: <a href=
+=3D"https://news.venture-ops-weekly.example/survey/112">take the survey</a></=
+p>
+<p class=3D"foot">You are receiving this because you subscribed at venture-op=
+s-weekly.example.<br>
+<a href=3D"https://news.venture-ops-weekly.example/u/8f2a1c">Unsubscribe</a><=
+/p>
+</div></body></html>
+
+--===============4077831490770580637==--

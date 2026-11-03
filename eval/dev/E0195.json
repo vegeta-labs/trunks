@@ -1,0 +1,58 @@
+{
+  "id": "E0195",
+  "family": "F046",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-27T09:20:00Z",
+  "prior_messages": [],
+  "description": "French payment query with the amount in continental format (not an amount token) and an unambiguous DD/MM date.",
+  "classes": [
+    "payment_query"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "amount": {
+      "void": "continental format \"20 000,00 €\" does not parse under I-01"
+    },
+    "currency": "EUR",
+    "payment_date": "2026-10-22",
+    "payer_name": "Sophie Laurent",
+    "reference": "NW-006",
+    "uetr": null
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [
+      "NW-006"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C006",
+    "investor_id": "Northwind Robotics::006",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_wait",
+  "notes": "\"20 000,00 €\" is not an amount token (C-EXT-3/I-01) so rule_output.amounts is empty; the amount field is annotated void because the value fails I-01 (see QUESTIONS W4-1). currency EUR as written by the investor, although the deal is in GBP. 22/10/2026 is unambiguous (22 > 12). 3 working days, nothing received -> payment_wait."
+}

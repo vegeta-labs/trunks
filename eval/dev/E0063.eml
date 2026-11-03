@@ -1,0 +1,28 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=chenwei-family.example; dkim=pass
+ header.d=chenwei-family.example; dmarc=pass
+ header.from=chenwei-family.example
+Received: from mail.chenwei-family.example (mail.chenwei-family.example
+ [192.0.2.167]) by mx.ops.example with ESMTPS id ROUGRQ7RM78C; Wed, 21 Oct
+ 2026 11:06:00 +0000
+Message-ID: <E0063.5djpff0xegn1@chenwei-family.example>
+Date: Wed, 21 Oct 2026 11:03:32 +0000
+From: Chen Wei <chen.wei@chenwei-family.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Increase Northwind commitment (NW-009)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Dear Kestrel team,
+
+Further to the call with Fiona last week, I would like to increase my
+commitment to Northwind Robotics from =C2=A330,000.00 to =C2=A340,000.00. The=
+ reference
+on my side is NW-009.
+
+Please let me know what you need from me and when the additional amount
+should be sent.
+
+Kind regards,
+Chen Wei

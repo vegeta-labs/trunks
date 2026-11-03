@@ -1,0 +1,25 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramsay-capital.example; dkim=pass
+ header.d=ramsay-capital.example; dmarc=pass
+ header.from=ramsay-capital.example
+Received: from mail.ramsay-capital.example (mail.ramsay-capital.example
+ [192.0.2.18]) by mx.ops.example with ESMTPS id 8Z2Y16VWC6LT; Mon, 16 Nov 2026
+ 12:20:00 +0000
+Message-ID: <E0084.ltt0ghlriwq9@ramsay-capital.example>
+Date: Mon, 16 Nov 2026 12:17:55 +0000
+From: Fiona Ramsay <fiona@ramsay-capital.example>
+To: Kestrel Syndicate Operations <investors@ops.example>
+Subject: Re: Northwind Robotics - final numbers for sign-off
+In-Reply-To: <ops.final.nw.9d2e@ops.example>
+References: <ops.final.nw.9d2e@ops.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+Before I sign off on Northwind Robotics - does the total include Harbour
+Lane's top-up or is that still pending? I want to be sure the figure we give
+the company is the one we can actually fund.
+
+F.

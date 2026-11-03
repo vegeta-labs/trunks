@@ -1,0 +1,25 @@
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=solent-bio.example; dkim=pass header.d=solent-bio.example;
+ dmarc=pass header.from=solent-bio.example
+Received: from mail.solent-bio.example (mail.solent-bio.example [192.0.2.93])
+ by mx.ops.example with ESMTPS id MZN5XTYLRXA5; Wed, 04 Nov 2026 15:58:00
+ +0000
+Message-ID: <E0092.bnez1b8yxpy7@solent-bio.example>
+Date: Wed, 04 Nov 2026 15:55:43 +0000
+From: Aoife Brennan <aoife.brennan@solent-bio.example>
+To: Kestrel Legal <legal@ops.example>
+Subject: Solent - deed of adherence coming through
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello,
+
+Just so you're expecting it: the deed of adherence to the Solent
+Biotherapeutics shareholders' agreement will come from our e-signature
+provider (esign.example) later this week, addressed to the legal inbox.
+No action needed until it arrives.
+
+Kind regards,
+Aoife Brennan
+Company Secretary, Solent Biotherapeutics Ltd

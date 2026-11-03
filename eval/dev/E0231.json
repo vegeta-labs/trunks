@@ -1,0 +1,65 @@
+{
+  "id": "E0231",
+  "family": "F051",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-03T14:10:00Z",
+  "prior_messages": [],
+  "description": "Display-name impersonation of an investor from free-mail asking for a withdrawal refund to a new UK sort code and account.",
+  "classes": [
+    "bank_details",
+    "withdrawal"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "bank_change",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": true,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": true,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "party_role": "investor",
+    "account_last4": "2093",
+    "change_requested": true,
+    "investor": "Oliver Bennett",
+    "consent_evidence": "none"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1500000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-002"
+    ],
+    "account_last4": [
+      "2093"
+    ],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": null,
+    "investor_id": "Northwind Robotics::002",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0002"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": false,
+  "draft_template": "safe_ack",
+  "notes": "UK sort code + 8-digit account -> bank_details rule label, account_last4 2093. consent_evidence none: the sender is not the authenticated investor (free-mail address), so investor_self does not apply (Q1 ruling). \"urgently\" is a pressure word; the case is already high."
+}

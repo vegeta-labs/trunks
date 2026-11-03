@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"fields\":{\"platform\":{\"value\":null,\"confidence\":\"medium\",\"quote\":\"\"},\"document_type\":{\"value\":\"shareholder_resolution\",\"confidence\":\"high\",\"quote\":\"The shareholder resolution approving the Solent Biotherapeutics licensing agreement is ready for signature by the SPV as shareholder.\"},\"deal\":{\"value\":\"Solent Biotherapeutics\",\"confidence\":\"high\",\"quote\":\"Company Secretary, Solent Biotherapeutics\"}}}",
+ "usage": {
+  "inputTokens": 1774,
+  "outputTokens": 162
+ }
+}

@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": null,
+ "raw": "{\"labels\":[{\"class\":\"unreferenced_payment\",\"confidence\":\"high\",\"reason\":\"Funds were remitted by the parent company on the investor's behalf and no reference was quoted; sender asks for allocation.\"},{\"class\":\"payment_query\",\"confidence\":\"medium\",\"reason\":\"Sender states the subscription of GBP 100,000 was paid on 16 October 2026, with no payment confirmation attached.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2006,
+  "outputTokens": 143
+ }
+}

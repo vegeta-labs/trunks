@@ -1,0 +1,56 @@
+{
+  "id": "E0066",
+  "family": "F016",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-02T09:15:00Z",
+  "prior_messages": [],
+  "description": "Investor writes the change as \"from £10k to £15k\"; neither is a valid amount token, so no amounts and new_amount cannot be validated.",
+  "classes": [
+    "commitment_change"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "new_amount": {
+      "void": "£15k is not a valid amount (I-01: the k suffix makes the token invalid)"
+    },
+    "currency": "GBP"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [
+      "NW-001"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C001",
+    "investor_id": "Northwind Robotics::001",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0001"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "commitment_change_ack",
+  "notes": "£10k / £15k fail the C-EXT-3 boundary rule (letter k after the number), so rule_output.amounts is empty. new_amount annotated as void (the model can only quote \"£15k\", which fails I-01). currency GBP from the £ sign. See W2 question on how an unparseable amount field is scored."
+}

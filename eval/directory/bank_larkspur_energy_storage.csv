@@ -1,0 +1,3 @@
+transaction_id,date,amount,payer,reference
+T-LK-0001,2026-10-21,20000.00,J SMITH,LK-001
+T-LK-0002,2026-10-26,25000.00,O GRANT,LK-003
