@@ -44,4 +44,4 @@ The design documents (requirements, technical design, rules and review process, 
 
 ## Licence
 
-Apache-2.0. Part of Vegeta ([GitHub](https://github.com/deal-ops)). Not affiliated with any platform.
+Apache-2.0. Part of Vegeta ([GitHub](https://github.com/vegeta-labs)). Not affiliated with any platform.
