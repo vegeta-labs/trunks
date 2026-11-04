@@ -6,7 +6,7 @@
 - **KYC and verification:** attachment transfer states remain distinct. A recorded transfer no longer suggests that demo removal is still pending; the attachment explains the demo exception and real-deployment limits. Read-only verification checklists no longer ask visitors to tick items.
 - **Inbox navigation:** grouped filters, displayed counts, due-time ordering and warning-signal wording; native Case links and per-history-entry restoration of filters, focus and scroll. Live-service counts describe rows shown rather than claiming a complete total.
 - **Case review:** a short current-result summary precedes email evidence and review panels. Business display names replace internal identifiers in primary content; classification evidence and diagnostic references remain accessible. Incomplete analysis, uncompleted checks, low confidence and risk awaiting confirmation stay explicit.
-- **Validation:** 554 local unit/integration tests passed with 3 environment skips; 22 application and 9 static-demo browser tests passed, plus 3 display-layer mutation checks. Private CI passed application, parser, Compose and coverage checks. Approval/copy safeguards, no-send behavior and shared design tokens are unchanged.
+- **Validation:** 554 local unit/integration tests passed with 3 environment skips; 22 application and 9 static-demo browser tests passed, plus 3 display-layer mutation checks. Application, parser and Compose CI checks passed. The unchanged coverage script passed against their official CI reports (217 required cases); public release-candidate CI is required before publication. Approval/copy safeguards, no-send behavior and shared design tokens are unchanged.
 
 ### Evaluation carried forward from v0.2.0
 
