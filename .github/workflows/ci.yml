@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:16
@@ -72,9 +72,16 @@ jobs:
           for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:8333/ && exit 0; sleep 2; done; exit 1
       - name: Wait for ClamAV
         run: for i in $(seq 1 60); do (echo PING | nc -w 2 localhost 3310 | grep -q PONG) && exit 0; sleep 5; done; exit 1
-      - name: Install Playwright browser
-        timeout-minutes: 14
-        run: timeout 360 npx playwright install --with-deps chromium || timeout 360 npx playwright install --with-deps chromium
+      - name: Install Playwright system dependencies (Chromium)
+        timeout-minutes: 30
+        run: |
+          # Avoid the slow Azure HTTP mirror; keep Ubuntu's signed packages.
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/apt-mirrors.txt
+          # Do not timeout/retry the npm parent while its apt child still owns dpkg's lock.
+          npx playwright install-deps chromium
+      - name: Install Playwright browsers (Chromium)
+        timeout-minutes: 15
+        run: npx playwright install chromium
       - name: Unit, integration, TS-vs-oracle and browser tests (the parser container runs in the parser job)
         run: |
           npx vitest run --exclude parser/container.test.ts --exclude parser/profiles.test.ts --reporter=default --reporter=json --outputFile=test-report.json
@@ -164,9 +171,16 @@ jobs:
         run: sudo cp deploy/apparmor/doi-parser /etc/apparmor.d/doi-parser && sudo apparmor_parser -r -W /etc/apparmor.d/doi-parser
       - name: Build the images
         run: docker compose build
+      - name: Install Playwright system dependencies (Chromium, WebKit)
+        timeout-minutes: 30
+        run: |
+          # Avoid the slow Azure HTTP mirror; keep Ubuntu's signed packages.
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/apt-mirrors.txt
+          # Do not timeout/retry the npm parent while its apt child still owns dpkg's lock.
+          npx playwright install-deps chromium webkit
       - name: Install Playwright browsers (Chromium, WebKit)
-        timeout-minutes: 14
-        run: timeout 600 npx playwright install --with-deps chromium webkit || timeout 600 npx playwright install --with-deps chromium webkit
+        timeout-minutes: 15
+        run: npx playwright install chromium webkit
       - name: The evaluation's export of the demo samples (TC-DEMO-01 compares the demo with it)
         run: EVAL_ACTUAL_DIR=eval-actual npm run eval
       - name: Compose tests
@@ -191,7 +205,7 @@ jobs:
   coverage:
     needs: [check, parser, compose]
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       # check and compose run side by side now: green coverage requires every job to have succeeded, not only the
       # reports it reads (a failed evaluation step in check, a cancelled job) (CI review CI-01)
