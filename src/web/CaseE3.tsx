@@ -228,7 +228,7 @@ function LinksPanel({ caseId, e3, reload }: { caseId: string; e3: E3; reload: (n
         <dt>Deal</dt>
         <dd>{l.deal ?? 'Not linked'}{l.dealConflict && <span className="tag warn">the mail names another deal</span>} <Pick kind="deal" current={l.deal} candidates={l.dealCandidates} /></dd>
         <dt>Ledger</dt>
-        <dd>{l.ledger === 'received' ? 'Received in full (Toolkit ledger)' : l.ledger === 'not_received' ? 'Not received in full (Toolkit ledger)' : l.ledger === 'unknown' ? 'No ledger imported for this deal' : '—'}</dd>
+        <dd>{l.ledger === 'received' ? 'Received in full (Goten ledger)' : l.ledger === 'not_received' ? 'Not received in full (Goten ledger)' : l.ledger === 'unknown' ? 'No ledger imported for this deal' : '—'}</dd>
         <dt>Possible bank lines</dt>
         <dd>{l.bankLines.length ? l.bankLines.map((b) => `${b.transactionId} (${b.ledgerStatus ?? 'not in the ledger'})`).join(', ') : '—'} <span className="meta">shown only; nothing is changed</span></dd>
         <dt>Record data in replies</dt>
