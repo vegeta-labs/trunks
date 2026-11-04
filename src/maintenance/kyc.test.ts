@@ -124,8 +124,8 @@ describe('TC-PRV-03 KYC transfer and replacement', () => {
     messageId = (await k.t.owner.query<{ m: string }>('SELECT message_id AS m FROM "case" WHERE id = $1', [caseId])).rows[0]!.m
     const rows = await k.t.owner.query<{ seq: number; state: string }>('SELECT seq, state FROM kyc_delivery WHERE case_id = $1 ORDER BY seq', [caseId])
     expect(rows.rows).toEqual([{ seq: 1, state: 'pending' }, { seq: 3, state: 'pending' }])
-    const audit = await k.t.owner.query<{ p: { kyc_transfers: number } }>("SELECT payload AS p FROM audit WHERE case_id = $1 AND type = 'stage.classify'", [caseId])
-    expect(audit.rows[0]!.p.kyc_transfers).toBe(2)
+    const audit = await k.t.owner.query<{ p: { transfers: number } }>("SELECT payload AS p FROM audit WHERE case_id = $1 AND type = 'kyc.judged'", [caseId])
+    expect(audit.rows[0]!.p.transfers).toBe(2)
     expect(await canariesLeft()).not.toEqual([]) // the canaries are there before
   })
 

@@ -1,0 +1,54 @@
+{
+  "id": "E0902",
+  "family": "F070",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-05T10:30:00Z",
+  "prior_messages": [],
+  "description": "Inline-image case 3: the same small JPEG logo (300x80, 253 bytes, byte-identical to E0901) referenced by <img src=cid:...> but sent with Content-Disposition: attachment -> STILL possible KYC (C-RED-0 3 c / B.2). Adviser asks when a client's EIS certificate will be issued -> tax_cert_info.",
+  "classes": [
+    "tax_certificates"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "certificate_type": "eis",
+    "deal": "Northwind Robotics"
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [
+      "NW-002"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C045",
+    "investor_id": "Northwind Robotics::002",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0002"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "tax_cert_info",
+  "notes": "Attachment 0 (whitfield-logo.jpg) passes every appendix B check except the disposition: Content-Disposition type is attachment, so the exemption does not apply and C-RED-0 3 makes it possible KYC (content to no model, forwarded). Commitment via reference NW-002 (C-LNK-2); adviser is authenticated and 002 is in her authorised_for, so may_disclose_record true (template is not discloses_record anyway). T-NW-0002 by reference (NW002)."
+}

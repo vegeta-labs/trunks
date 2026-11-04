@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"closing_confirmation\",\"confidence\":\"high\",\"reason\":\"Analyst confirms on the deal lead's behalf that the final allocation is five investors totalling US$120,000 and asks to prepare for closing.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2152,
+  "outputTokens": 88
+ }
+}

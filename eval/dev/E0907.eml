@@ -1,0 +1,59 @@
+Return-Path: <pieter@vandijk-mail.example>
+Received: from mail.vandijk-mail.example (mail.vandijk-mail.example [192.0.2.123])
+ by mx.ops.example with ESMTPS id e0907f070 for <investors@ops.example>;
+ Mon, 09 Nov 2026 15:10:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=vandijk-mail.example; dkim=pass header.d=vandijk-mail.example;
+ dmarc=pass header.from=vandijk-mail.example
+Message-ID: <E0907.f07007inl@vandijk-mail.example>
+Date: Mon, 9 Nov 2026 15:08:20 +0000
+From: "Pieter van Dijk" <pieter@vandijk-mail.example>
+To: investors@ops.example
+Subject: Solent Biotherapeutics - increase commitment
+MIME-Version: 1.0
+Content-Type: multipart/related; boundary="b1_7c4e0a92d3f61b85e2a9c07d4f13b6e8"
+
+--b1_7c4e0a92d3f61b85e2a9c07d4f13b6e8
+Content-Type: multipart/alternative; boundary="b2_7c4e0a92d3f61b85e2a9c07d4f13b6e8"
+
+--b2_7c4e0a92d3f61b85e2a9c07d4f13b6e8
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+Good afternoon,
+
+I would like to increase my commitment to Solent Biotherapeutics to EUR 40,000
+in total. Please let me know what you need from me.
+
+Kind regards,
+Pieter van Dijk
+
+--b2_7c4e0a92d3f61b85e2a9c07d4f13b6e8
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+<html><body>
+<p>Good afternoon,</p>
+<p>I would like to increase my commitment to Solent Biotherapeutics to EUR 40,000 in total. Please let me know what you need from me.</p>
+<p>Kind regards,</p>
+<table cellpadding="0" cellspacing="0" border="0"><tr>
+<td style="padding-right:12px"><img src="cid:pvd-photo-01@vandijk-mail.example" width="78" height="102" alt="Pieter van Dijk"></td>
+<td><b>Pieter van Dijk</b><br>Private investor</td>
+</tr></table>
+</body></html>
+
+--b2_7c4e0a92d3f61b85e2a9c07d4f13b6e8--
+
+--b1_7c4e0a92d3f61b85e2a9c07d4f13b6e8
+Content-Type: image/jpeg; name="pieter-van-dijk.jpg"
+Content-Disposition: inline; filename="pieter-van-dijk.jpg"
+Content-ID: <pvd-photo-01@vandijk-mail.example>
+Content-Transfer-Encoding: base64
+
+/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB
+AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAALCADMAJwBAREA/8QAFAABAAAAAAAA
+AAAAAAAAAAAAAP/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AP/Z
+--b1_7c4e0a92d3f61b85e2a9c07d4f13b6e8--

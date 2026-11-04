@@ -6,8 +6,10 @@ import { runDirectoryRetention, runFileDeletions, runMessageRetention, sweepOrph
 import { FolderSink, kycReminders, runKycDeliveries, runKycReplacements, WebhookSink, type KycSink } from './kyc.ts'
 import type { Db } from '../store/db.ts'
 import { cleanOrphans } from '../store/files.ts'
+import { failureLabel } from '../pipeline/failure.ts'
 
-const log = (what: string) => (e: Error) => console.error(`${what} failed: ${e.message}`)
+// only a fixed code: an error's text may carry values from an email (tech design v0.7.15)
+const log = (what: string) => (e: unknown) => console.error(`${what} failed: reason=${failureLabel(e)}`)
 
 /** Once a day: retention of messages and directory versions, then text blobs nothing refers to. */
 export async function runDaily(d: RetentionDeps, config: Pick<Config, 'retention'>, now = new Date()): Promise<void> {
@@ -35,9 +37,13 @@ const once = (fn: () => Promise<unknown>) => {
 }
 
 /** KYC transfers as the app role, in `serve`: every minute; failed ones once a day until they succeed (R-PRV-03 v0.7.18). */
-export function scheduleKycDeliveries(app: { db: Db } & Omit<RetentionDeps, 'db'>, sink: KycSink | null): void {
-  const quick = once(() => runKycDeliveries(app, sink).catch(log('KYC transfer')))
-  const daily = once(() => runKycDeliveries(app, sink, { includeFailed: true }).catch(log('KYC transfer retry')))
+export function scheduleKycDeliveries(app: { db: Db } & Omit<RetentionDeps, 'db'>, sink: KycSink | null, recheck?: () => Promise<unknown>): void {
+  const send = async (includeFailed: boolean) => {
+    await recheck?.().catch(log('KYC judgement retry'))
+    await runKycDeliveries(app, sink, { includeFailed }).catch(log('KYC transfer'))
+  }
+  const quick = once(() => send(false))
+  const daily = once(() => send(true))
   daily()
   setInterval(quick, 60_000)
   setInterval(daily, 24 * 3600_000)

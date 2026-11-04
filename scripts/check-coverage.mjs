@@ -4,7 +4,7 @@
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 
-const ORDER = ['E1', 'E2', 'E3', 'E4', 'E5']
+const ORDER = ['E1', 'E2', 'E3', 'E4', 'E5', 'E6']
 const current = readFileSync('docs/milestone.txt', 'utf8').trim()
 if (!ORDER.includes(current)) {
   console.log(`invalid milestone "${current}" in docs/milestone.txt (expected one of ${ORDER.join(', ')})`)

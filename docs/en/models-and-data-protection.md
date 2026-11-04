@@ -116,7 +116,7 @@ possible-KYC if any of these hold:
    address, certificate of incorporation, or the listed non-English equivalents.
 2. Its text contains a passport machine-readable line, a KYC word, or two of "date of birth", "place of birth" and
    "nationality".
-3. It is an image.
+3. It is an image, unless it is a small inline signature image (see below).
 4. It is a PDF with no text layer on some or all pages.
 5. It cannot be checked: parsing failed, timed out, was over a limit, was encrypted, was nested too deep, or the type
    is unknown.
@@ -125,8 +125,19 @@ The content of a possible-KYC attachment is **never sent to any model**, local o
 redacted file name and its type. The Case is marked "possible KYC attachment", and the attachment is transferred to
 your KYC target (see [Retention](retention.md)).
 
-Inline images, such as signature logos, count as images. So most emails with a signature image trigger a KYC transfer.
-This is deliberate: the rule errs on the side of caution.
+**Small inline signature images** are the one exception. An image is not caught by rule 3 or rule 5 (its file name is still checked by rule 1) when all of these hold:
+it sits in the email itself (not in an attached email), it has a `Content-ID` that an `<img src="cid:…">` in the HTML
+body points to (and no other part shares that `Content-ID`), it is not marked as an attachment, the virus scan passed,
+it is a single-frame PNG, JPEG or GIF whose file structure passes a strict check (no unlisted chunks or segments, no raw
+embedded image signature, nothing after the end), and its long side, short side and size are within `kyc.inline_image` (defaults: 400 px,
+150 px, 51,200 bytes). The Case shows it as "small inline image (treated as a signature image)".
+
+What this changes: such an image is not transferred and stays in the stored email until normal retention deletes it.
+Its content still reaches no model, because images are never read. The accepted cost: an ID document image
+scaled down to fit the limits (a whole ID card at 238 × 150 px fits the defaults; a card or passport page at about
+470 × 300 px fits the maximum limits and is readable), or data hidden in encoded form in an allowed image's text or metadata (at most 16,384 bytes in total), would also stay in the stored email instead of being transferred. You can widen the limits up to
+1280 px, 300 px and 102,400 bytes, which widens this cost. Measure your own mailbox first with
+`scripts/measure-inline-images.ts` (Gmail, read-only, prints numbers only).
 
 The app does no OCR. The content of images and scans is never read.
 

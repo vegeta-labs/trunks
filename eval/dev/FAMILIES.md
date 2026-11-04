@@ -37,5 +37,6 @@ Development-set families only (the holdout plan is kept in the private holdout r
 | F057 | Prompt injection hidden in HTML (CSS-hidden text, comments) — with twins | 8 | E0264–E0271 | W5 |
 | F060 | Forged or altered payment evidence | 4 | E0286–E0289 | W5 |
 | F062 | Pressure tactics on money-related requests | 4 | E0293–E0296 | W5 |
+| F070 | Inline signature images (C-RED-0 ③ exception, PRD appendix B): exempt Outlook PNG / Apple Mail JPEG / GIF icon vs. attachment disposition, phone photo of a document, unreferenced cid, JPEG hidden in tEXt, 1280×223 banner, 156×204 portrait | 9 | E0900–E0908 | E6 |
 
-Total: 33 families, 178 samples.
+Total: 34 families, 187 samples.

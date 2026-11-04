@@ -19,7 +19,9 @@ import { InProcessParser, SocketParser } from './pipeline/parser-client.ts'
 import { BossQueue, RETRY, STAGES, type StageJob } from './pipeline/queue.ts'
 import { deliverDue } from './pipeline/outbox.ts'
 import { ensureMailboxes, ingestMessage } from './pipeline/ingest.ts'
-import { markFailed, runStage, type StageDeps } from './pipeline/stages.ts'
+import { stageHandler, type StageDeps } from './pipeline/stages.ts'
+import { failureLabel } from './pipeline/failure.ts'
+import { retryDeferredKyc } from './pipeline/kyc-recheck.ts'
 import { rerunFailed } from './pipeline/restart.ts'
 import { catchUp } from './pipeline/catchup.ts'
 import { buildServer } from './server/app.ts'
@@ -81,14 +83,9 @@ async function serve(): Promise<void> {
   const deps: StageDeps = { db, k, files, config, queue, scanner: new Clamd(process.env.CLAMD_HOST ?? 'clamav', Number(process.env.CLAMD_PORT ?? 3310)), parser, llm }
 
   for (const stage of STAGES) {
-    await queue.boss.work<StageJob>(stage, { batchSize: 1, includeMetadata: true }, async ([job]) => {
-      try {
-        await runStage(deps, stage, job!.data)
-      } catch (e) {
-        if (job!.retryCount >= RETRY.retryLimit) await markFailed(deps, stage, job!.data, String(e))
-        throw e
-      }
-    })
+    // only a fixed code reaches the log and the job queue; the error's text goes to the encrypted audit (E6 D2)
+    const handle = stageHandler(deps, stage, RETRY.retryLimit)
+    await queue.boss.work<StageJob>(stage, { batchSize: 1, includeMetadata: true }, async ([job]) => handle(job!))
   }
 
   // the demo emails, once per reset, after the workers are listening (PRD R-DEMO-01; tech design v0.7.11)
@@ -120,7 +117,7 @@ async function serve(): Promise<void> {
         return running
       }
       running = catchUp(deps, adapter, info)
-        .catch((e: Error) => console.error(`catch-up ${m.id} failed: ${e.message}`))
+        .catch((e: unknown) => console.error(`catch-up ${m.id} failed: reason=${failureLabel(e)}`))
         .finally(() => {
           running = null
           if (again) {
@@ -130,7 +127,7 @@ async function serve(): Promise<void> {
         })
       return running
     }
-    await adapter.start(async () => void run()).catch((e: Error) => console.error(`IMAP ${m.id}: ${e.message}`))
+    await adapter.start(async () => void run()).catch((e: unknown) => console.error(`IMAP ${m.id} failed: reason=${failureLabel(e)}`))
     void run()
     setInterval(() => void run(), m.catch_up_minutes * 60_000)
   }
@@ -145,13 +142,13 @@ async function serve(): Promise<void> {
     setInterval(() => {
       if (busy) return
       busy = true
-      void deliverDue({ db, k }, { url: hook.url, secret }).catch((e: Error) => console.error(`webhook delivery failed: ${e.message}`)).finally(() => (busy = false))
+      void deliverDue({ db, k }, { url: hook.url, secret }).catch((e: unknown) => console.error(`webhook delivery failed: reason=${failureLabel(e)}`)).finally(() => (busy = false))
     }, 30_000)
   }
 
   // KYC transfer as the app role (PRD R-PRV-03); retention, file deletions, the orphan clean-up and the KYC
   // replacement run in their own container with the maintenance role (`maintain`, tech design v0.7.11)
-  scheduleKycDeliveries({ db, k, files }, kycSink(config, env))
+  scheduleKycDeliveries({ db, k, files }, kycSink(config, env), () => retryDeferredKyc(deps))
 
   // C-AUD-4: export the chain head daily
   const exportHead = headExporter(() => chainHead(db), config.audit.head_export_path)
@@ -188,7 +185,7 @@ async function maintain(once: boolean): Promise<void> {
     return
   }
   // orphan file clean-up, hourly (tech design §4, §4.1; CC-F5)
-  const sweep = () => cleanOrphans(db, files).catch((e: Error) => console.error(`orphan cleanup failed: ${e.message}`))
+  const sweep = () => cleanOrphans(db, files).catch((e: unknown) => console.error(`orphan cleanup failed: reason=${failureLabel(e)}`))
   void sweep()
   setInterval(() => void sweep(), 3600_000)
   // retention, file deletions, directory versions, unused text (PRD R-PRV-02, C-PRV-1; tech design v0.7.9)

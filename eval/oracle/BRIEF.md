@@ -91,3 +91,24 @@ Extend `selfcheck.py` with every concrete example in TC-RED-04 and the PRD's inl
 
 ## Done when
 `python3 eval/oracle/selfcheck.py` passes and `check_actual.py` handles files with and without `attachments`; report back a short summary and the list of new readings.
+
+# Oracle brief, part 4 (E6)
+
+Same rules as above: read **only** `docs/01_PRD.md` (v0.7.25), `docs/04_TEST_PLAN.md` (v0.7.21), `eval/SCHEMA.md`, this file, the existing files in `eval/oracle/` and the sample files `eval/dev/<id>.eml` / `.json`; never `src/`, `parser/`, `scripts/`, `eval/*.ts` or any TypeScript; never the holdout folder. Python standard library only; do **not** use `html.parser` (PRD appendix B.4). Keep the earlier functions working. Add `# READING:` comments and `READINGS.md` entries for every interpretation.
+
+## Goal
+1. C-RED-0 ③ now has an exception for small inline signature images (PRD v0.7.25, rule text in C-RED-0 ③ ⓐ–ⓕ and the full byte-level rules in **appendix B**). Implement it independently: read the outer parts of the raw `.eml` yourself (B.1 numbering), the Content-ID / disposition rules (B.2), strict base64 (B.3), the token-level HTML scan (B.4), the PNG / JPEG / GIF structure checks with the combined 16,384-byte caps (B.5) and the default thresholds (B.6). Anything uncovered or unreadable fails closed.
+2. C-DRF-6 has a new half sentence (v0.7.24): an empty ledger left by an explicit clear counts as no ledger («未知»). Update `ledger_state` if needed (the current evaluation set has no such case; add a self-check example).
+
+## Functions (add to the CLI)
+30. `inline_signature` `{eml_path, ordinal, scan: "passed"|"blocked"|"over_limit", thresholds?: {max_long_side, max_short_side, max_bytes}}` → `{exempt: bool, reason: str}` (`reason`: the first failed condition, or `"inline_signature"`).
+31. Change `kyc` so that an image attachment for which `inline_signature` is exempt is judged only by ① (test plan §3 v0.7.21: the export's `parse_status` gives ⓓ; the oracle needs the `.eml` path for the rest). Keep the old input shape working (no `.eml` → no exception).
+
+## Consistency check
+Extend `check_actual.py`: for each top-level attachment in `<id>.actual.json`, call `kyc` with the exception using `eval/dev/<id>.eml` and report each mismatch with sample id and ordinal.
+
+## Self-check
+Extend `selfcheck.py` with every concrete example in TC-RED-11 (build the `.eml` and image bytes in the test with the standard library: `zlib` / `struct` for PNG and its CRCs, hand-assembled JPEG and GIF byte sequences — structure only, they need not decode as pictures), the boundaries listed there, and the examples in appendix B.
+
+## Done when
+`python3 eval/oracle/selfcheck.py` passes and `check_actual.py` handles the new check; report back a short summary and the list of new readings.

@@ -107,9 +107,9 @@ describe('checks (C-DRF-1, C-DRF-2, C-FRD-3)', () => {
   })
   it('TC-DRF-09 / TC-DRF-16 template sources', () => {
     const t = (id: string, body: string, o: object = {}) => checkTemplate({ id, subject: 'Re: {case_number}', body, ...o })
-    // strictly by C-DRF-1: an asserts_receipt template takes directory and ledger values only, system ones included
-    expect(checkTemplate({ id: 'payment_received', subject: 'Your payment', body: 'We received {amount}.' }).problems).toEqual(['payment_received asserts receipt and may only use directory or ledger placeholders, not {amount}'])
-    expect(t('payment_received', 'Received {received_amount}.').problems).toEqual(['payment_received asserts receipt and may only use directory or ledger placeholders, not {case_number}'])
+    // strictly by C-DRF-1: an asserts_receipt template takes directory and ledger values only, plus {deployment_name} (v0.7.25)
+    expect(checkTemplate({ id: 'payment_received', subject: 'Your payment', body: 'We received {amount}.' }).problems).toEqual(['payment_received asserts receipt and may only use directory or ledger placeholders and {deployment_name}, not {amount}'])
+    expect(t('payment_received', 'Received {received_amount}.').problems).toEqual(['payment_received asserts receipt and may only use directory or ledger placeholders and {deployment_name}, not {case_number}'])
     expect(t('complaint_ack', 'From {payer_name}').problems).toEqual(['unknown placeholder {payer_name}'])
     expect(t('complaint_ack', 'Not flagged.').problems[0]).toMatch(/internal terms/)
     expect(t('safe_ack', 'Dear {investor_name}').problems).toEqual(['safe_ack may only use system placeholders, not {investor_name}'])
@@ -126,6 +126,19 @@ describe('checks (C-DRF-1, C-DRF-2, C-FRD-3)', () => {
 })
 
 describe('templates that assert receipt (C-DRF-7 v0.7.15)', () => {
+  it('TC-DRF-20 sign-off and payment-reference wording (C-DRF-1 v0.7.25)', async () => {
+    const { readFileSync } = await import('node:fs')
+    const def = readFileSync('config/default/templates.yaml', 'utf8')
+    expect(readFileSync('eval/config/templates.yaml', 'utf8')).toBe(def)
+    const received = def.slice(def.indexOf('- id: payment_received'), def.indexOf('- id: payment_wait'))
+    expect(received.trimEnd().endsWith('{deployment_name}')).toBe(true)
+    for (const id of ['payment_wait', 'payment_need_evidence']) {
+      const block = def.slice(def.indexOf(`- id: ${id}`), def.indexOf('- id:', def.indexOf(`- id: ${id}`) + 5))
+      expect(block).toContain('(your payment reference {reference})')
+    }
+    expect(checkTemplate({ id: 'payment_received', subject: 'Your payment for {deal_name}', body: 'We have received {received_amount}.\n\n{deployment_name}' }).problems).toEqual([])
+    expect(checkTemplate({ id: 'received_thanks', subject: 'Received', body: 'Paid. {case_number}', asserts_receipt: true }).problems).toEqual(['received_thanks asserts receipt and may only use directory or ledger placeholders and {deployment_name}, not {case_number}'])
+  })
   it('TC-DRF-19 a configured asserts_receipt template discloses, is offered or chosen only when received in full; a template outside C-DRF-5 is never offered', () => {
     const meta = checkTemplate({ id: 'received_thanks', subject: 'Received', body: 'We confirm your payment has been received in full.', asserts_receipt: true }).meta
     expect(meta).toMatchObject({ asserts: true, discloses: true })

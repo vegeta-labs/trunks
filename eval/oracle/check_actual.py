@@ -2,7 +2,7 @@
 """PRD §6 «规则一致（实际输入）»: recompute risk and template from the system's
 actual raw inputs and compare with the system's results.
 
-Usage: python3 eval/oracle/check_actual.py [--require-attachments] <dir>
+Usage: python3 eval/oracle/check_actual.py [--require-attachments] [--eml-dir <dir>] <dir>
 
 With --require-attachments (before or after <dir>), a file without an
 `attachments` list (missing or null) is reported as "<id> attachments missing"
@@ -15,7 +15,10 @@ sender), C-LNK-5 (may disclose), C-DRF-6 (ledger state), the C-RSK-2a pressure
 words and the C-RSK-2 account shapes itself, then risk (C-RSK) and template
 (C-DRF-3 to 6). When a file has an `attachments` list (test plan §3, E4,
 v0.7.13), it also recomputes C-RED-0 for every top-level attachment and
-compares it with the system's `maybe_kyc`. Prints one line per mismatch
+compares it with the system's `maybe_kyc`; from E6 (test plan §3 v0.7.21)
+with the C-RED-0 ③ inline-signature exception judged from the raw message
+`<eml-dir>/<id>.eml` (default eval/dev) by PRD appendix B, ⓓ from the
+exported parse_status, default thresholds. Prints one line per mismatch
 ("<id> risk|template ..." or "<id> attachment <ordinal> maybe_kyc ...") and a
 summary; exits 1 on any mismatch, 2 on a usage error. Written only from the
 PRD, the test plan, eval/SCHEMA.md and eval/oracle/BRIEF.md (independent of
@@ -77,7 +80,8 @@ def ledger(a):
     bare = key.split("::", 1)[1] if "::" in key else key
     return O.ledger_state({"ledger": cm["ledger"], "investor_id": bare, "commitment_key": key,
                            "deal_currency": cm.get("deal_currency"),
-                           "cash_due_minor": cm["cash_due_minor"]})["state"]
+                           "cash_due_minor": cm["cash_due_minor"],
+                           "ledger_cleared": cm.get("ledger_cleared")})["state"]
 
 
 def pressure_words(a):
@@ -128,27 +132,56 @@ def recompute(a, classes, calendar):
     return r["final"], tmpl
 
 
-def kyc_mismatches(a):
-    """C-RED-0: (ordinal, system, oracle) for every top-level attachment whose maybe_kyc differs."""
+def kyc_mismatches(a, eml_path=None):
+    """C-RED-0: (ordinal, system, oracle) for every top-level attachment whose maybe_kyc differs.
+
+    With `eml_path` (E6, test plan §3 v0.7.21) the C-RED-0 ③ inline-signature
+    exception is judged from that raw .eml (PRD appendix B)."""
     # READING (R-E4-07): only top-level attachments are compared (a child's
     # own `maybe_kyc`, if exported, is ignored); a missing or non-boolean
     # system `maybe_kyc` is a mismatch. No `attachments` key (or null) = no
     # KYC check for that file; an empty list = nothing to check.
     out = []
     for i, att in enumerate(a.get("attachments") or []):
-        mine = O.kyc(att)["maybe_kyc"]
+        inp = dict(att)
+        if eml_path is not None:
+            inp["eml_path"] = eml_path
+            # READING: R-E6-03. Optional export state, not inferred from a
+            # made-up MIME count/depth cap. See READINGS for the contract gap.
+            inp["mime_failed"] = a.get("mime_failed")
+        mine = O.kyc(inp)["maybe_kyc"]
         theirs = att.get("maybe_kyc")
         if theirs is not mine:
             out.append((att.get("ordinal", i), theirs, mine))
     return out
 
 
+DEFAULT_EML_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "dev")
+
+
+def eml_for(eml_dir, sid):
+    """The sample's raw message `<eml_dir>/<id>.eml`, or None when it does not exist."""
+    # READING (R-E6-12): without the .eml the exception cannot be checked,
+    # so no attachment of that sample is exempt (the E4 check runs as before
+    # and a system `maybe_kyc: false` for an image is reported).
+    p = os.path.join(eml_dir, "%s.eml" % sid)
+    return p if os.path.isfile(p) else None
+
+
 def main(argv):
     args = list(argv[1:])
     require_att = "--require-attachments" in args
     args = [x for x in args if x != "--require-attachments"]
+    eml_dir = DEFAULT_EML_DIR
+    if "--eml-dir" in args:
+        k = args.index("--eml-dir")
+        if k + 1 >= len(args):
+            sys.stderr.write("usage: check_actual.py [--require-attachments] [--eml-dir <dir>] <dir>\n")
+            return 2
+        eml_dir = args[k + 1]
+        del args[k:k + 2]
     if len(args) != 1 or args[0].startswith("--"):
-        sys.stderr.write("usage: check_actual.py [--require-attachments] <dir>\n")
+        sys.stderr.write("usage: check_actual.py [--require-attachments] [--eml-dir <dir>] <dir>\n")
         return 2
     d = args[0]
     classes = _load(os.path.join(d, "classes.json"))
@@ -169,7 +202,7 @@ def main(argv):
             print("%s attachments missing" % sid)
             mism = True
         try:
-            for ordinal, theirs, mine in kyc_mismatches(a):
+            for ordinal, theirs, mine in kyc_mismatches(a, eml_for(eml_dir, sid)):
                 print("%s attachment %s maybe_kyc system=%s oracle=%s" % (sid, ordinal, json.dumps(theirs), json.dumps(mine)))
                 mism = True
         except Exception as e:  # noqa: BLE001 - reported per sample

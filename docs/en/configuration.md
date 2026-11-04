@@ -168,10 +168,18 @@ Where possible-KYC attachments are transferred. Without a target, transfers fail
 
 | Key | Type | Default | Meaning |
 |---|---|---|---|
+| `kyc.inline_image.max_long_side` | positive integer, at most `1280` | `400` | Maximum longer dimension in pixels for the inline signature image exception. |
+| `kyc.inline_image.max_short_side` | positive integer, at most `300` | `150` | Maximum shorter dimension in pixels for the exception. |
+| `kyc.inline_image.max_bytes` | positive integer, at most `102400` | `51200` | Maximum transfer-decoded file size in bytes for the exception. |
 | `kyc.target.kind` | `folder` \| `webhook` | none | The kind of target. |
 | `kyc.target.path` | path | required for `folder` | Folder for the files. In Compose, the `kyc` volume is mounted at `/var/lib/deal-ops-inbox/kyc`. File names are generated (`<case id>-<n>.<ext>`), never the attachment's own name. |
 | `kyc.target.url` | `https://` URL | required for `webhook` | Endpoint for the files. HTTPS only. |
 | `kyc.target.secret_env` | env name | required for `webhook` | Variable with the HMAC signing secret (`X-DealOps-Signature: sha256=…`). |
+
+Increasing these limits leaves larger eligible images in the archive under the normal retention period instead of
+transferring them to the KYC target. Image contents never go to a model. The other MIME, HTML reference, scan and
+structural conditions still apply. Use `scripts/measure-inline-images.ts` to measure a read-only Gmail inbox locally;
+it prints counts, dimensions, byte sizes and fixed judgement codes, without saving mail or printing identifiers.
 
 A webhook transfer succeeds only if the endpoint answers 2xx with a JSON body `{delivery_id, sha256}` and both values
 match what was sent. Each request carries `Idempotency-Key: <delivery_id>`, so the receiver can drop duplicates.

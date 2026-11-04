@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"tax_certificates\",\"confidence\":\"high\",\"reason\":\"Investor requests corrections to a draft EIS3 certificate (name order and share issue date) before issue.\"},{\"class\":\"identity_change\",\"confidence\":\"low\",\"reason\":\"Name correction requested, but it is a display error on the certificate rather than an actual name change.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2358,
+  "outputTokens": 122
+ }
+}

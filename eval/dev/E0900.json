@@ -1,0 +1,66 @@
+{
+  "id": "E0900",
+  "family": "F070",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-04T09:20:00Z",
+  "prior_messages": [],
+  "description": "Inline-image case 1 (Outlook signature): QP HTML with src=3D\"cid:image001.png@...\", VML comment + <![if !vml]> img, PNG 120x40 (141 bytes), inline, base64 -> NOT possible KYC (inline_signature exemption). Corporate investor asks whether its subscription arrived; ledger shows 005 received in full -> payment_received.",
+  "classes": [
+    "payment_query"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "amount": {
+      "minor": 10000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "payment_date": "2026-10-16",
+    "payer_name": "Harbour Lane Group plc",
+    "reference": "NW-005",
+    "uetr": null
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 10000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-005"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C005",
+    "investor_id": "Northwind Robotics::005",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0004"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_received",
+  "notes": "Attachment 0 (image001.png) meets C-RED-0 3 a-f and appendix B: outer part, single Content-ID referenced by the <img> between <![if !vml]> and <![endif]> (the v:imagedata reference sits inside a comment and is ignored, as is the [cid:...] in the plain-text part), disposition inline, base64, valid PNG (IHDR, PLTE, sRGB, pHYs, IDAT, IEND; CRCs correct), 120x40 and well under 51,200 bytes. Filename has no C-RED-0 1 word. T-NW-0004 listed by amount + date (C-LNK-4; bank line has no reference). No disclaimer text, so no pressure words."
+}

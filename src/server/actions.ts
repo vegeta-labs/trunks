@@ -9,7 +9,7 @@ import { appendAudit } from '../store/audit.ts'
 import { loadSnapshot, takeSnapshot } from '../store/directory.ts'
 import type { Json } from '../lib/audit-hash.ts'
 import { resultOf, type ClassifyResult, type Extraction } from '../pipeline/stages.ts'
-import { checkReply, contentSha, effectiveFields, effectiveLabels, emitEvents, render, replyContext, routeOf, taskContactOf, type LinkResult, type RiskStageResult } from '../pipeline/stages-e3.ts'
+import { checkReply, contentSha, effectiveFields, effectiveLabels, emitEvents, render, replyContext, routeOf, syncVerificationTasks, taskContactOf, type LinkResult, type RiskStageResult } from '../pipeline/stages-e3.ts'
 import { restartFrom } from '../pipeline/restart.ts'
 import { lockThreadTo } from '../maintenance/retention.ts'
 import { discardBlocked, retryDelivery } from '../maintenance/kyc.ts'
@@ -512,7 +512,7 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
     const lk = await resultOf<LinkResult>(on(c), cr.id, 'link', cr.processing_generation)
     const bound = binding.bound_contact_blob ? (await getBlobs(c, d.k, [binding.bound_contact_blob])).get(binding.bound_contact_blob)!.toString('utf8') : null
     if (binding.bound_manual_revision !== cr.manual_revision || bound !== (taskContactOf(lk)?.contact.contactId ?? null)) throw new Refused(409, 'this task no longer applies; a new task replaces it')
-    return t
+    return { ...t, cr, lk }
   }
 
   app.post<{ Params: { taskId: string }; Body: { items?: string[] } }>('/api/verification/:taskId/complete', OPTS, async (req, reply) =>
@@ -528,6 +528,22 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
         return { ok: true }
       }),
     ),
+  )
+
+  app.post<{ Params: { taskId: string }; Body: { reason?: string } }>('/api/verification/:taskId/restart', { ...OPTS, preHandler: need('approver') }, async (req, reply) =>
+    run(reply, () => tx(d.db, async (c) => {
+      const t = await loadTask(c, req.params.taskId)
+      if (t.state !== 'open' && t.state !== 'checklist_done') throw new Refused(409, `the task is ${t.state}`)
+      const reason = req.body?.reason
+      if (typeof reason !== 'string' || !reason.trim()) throw new Refused(400, 'a reason is required (C-FRD-5)')
+      const kind = (await c.query<{ kind: string }>('SELECT kind FROM verification_task WHERE id = $1', [t.id])).rows[0]!.kind
+      const labels = await effectiveLabels(on(c), t.cr.id, t.cr.processing_generation)
+      if (!t.lk || !labels.adopted.includes(kind)) throw new Refused(409, 'this task no longer applies (C-FRD-5)')
+      await syncVerificationTasks(c, on(c), t.cr, labels.adopted, t.lk, kind)
+      const replacement = (await c.query<{ replaced_by: string }>('SELECT replaced_by FROM verification_task WHERE id = $1', [t.id])).rows[0]!.replaced_by
+      await appendAudit(c, d.k, [{ actor: req.user!.id, type: 'verification.restarted', caseId: t.case_id, payload: { task_id: t.id, replaced_by: replacement }, detail: { reason } }])
+      return { ok: true, taskId: replacement }
+    })),
   )
 
   app.post<{ Params: { taskId: string } }>('/api/verification/:taskId/approve', { ...OPTS, preHandler: need('approver') }, async (req, reply) =>
@@ -553,7 +569,7 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
         const now = (await c.query<{ now: Date }>('SELECT now() AS now')).rows[0]!.now.toISOString()
         const r = canApprove({ completedBy: t.completed_by!, approver: { id: req.user!.id, role: req.user!.role }, checklistDoneAt: t.completed_at!.toISOString(), now, coolingMs: d.config.verification.cooling_off_hours * 3_600_000, events, currentRoles: roles })
         await audit(c, req.user!.id, 'verification.approval_checked', t.case_id, { task_id: t.id, ok: r.ok, reason: r.ok ? null : r.reason })
-        if (!r.ok) return { refused: r.reason }
+        if (!r.ok) return { refused: `${r.reason} (C-FRD-5)` }
         await c.query(`UPDATE verification_task SET state = 'approved', approved_by = $2, approved_at = now() WHERE id = $1`, [t.id, req.user!.id])
         await audit(c, req.user!.id, 'verification.approved', t.case_id, { task_id: t.id })
         await emitEvents(c, sd, t.case_id)

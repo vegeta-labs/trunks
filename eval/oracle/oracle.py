@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent Python oracle for the Deal Ops Inbox E1, E3 and E4 rules.
+"""Independent Python oracle for the Deal Ops Inbox E1, E3, E4 and E6 rules.
 
 Written only from docs/01_PRD.md, docs/04_TEST_PLAN.md, eval/SCHEMA.md and
 eval/oracle/BRIEF.md. Python 3.11 standard library only.
@@ -2569,7 +2569,13 @@ def may_disclose(inp):
 
 def ledger_state(inp):
     rows = inp.get("ledger")
-    if rows is None:
+    # PRD v0.7.24 C-DRF-6: an empty ledger left by an explicit clear
+    # (R-DIR-04 `clear=yes`) counts as no ledger.
+    # READING: R-E6-11. TC-DIR-09 preserves pre-D9 empty ledgers without
+    # a clear marker. An empty list alone therefore still means a ledger
+    # exists. Optional ledger_cleared=True supplies the explicit-clear
+    # provenance; exports may instead project a cleared ledger to null.
+    if rows is None or (not rows and inp.get("ledger_cleared") is True):
         return {"state": "unknown"}
     inv = inp.get("investor_id")
     key = inp.get("commitment_key")
@@ -3012,6 +3018,31 @@ def kyc(inp):
     # (a phrase never runs across two texts), and «任意两个» counts distinct
     # words over the whole pool — `date of birth` in an outer .eml and
     # `nationality` in the PDF inside it hold ② for the outer attachment.
+    # E6 (PRD v0.7.25 C-RED-0 ③ exception, test plan §3 v0.7.21): with
+    # `eml_path`, a top-level attachment that passes the inline-signature
+    # check is judged only by ①. ⓓ comes from the export's parse_status
+    # (`blocked` / `over_limit` fail it). Without `eml_path` (old input
+    # shape) there is no exception.
+    # READING (R-E6-10): the exception is tried only for a top-level item
+    # with an integer `ordinal` (B.1 numbering) and no `children`; any other
+    # parse_status counts as «扫描通过、未超限» for ⓓ. Output keeps
+    # {maybe_kyc, clauses} and adds `inline_signature` (the reason) when
+    # `eml_path` is given.
+    if inp.get("eml_path"):
+        status = inp.get("parse_status")
+        scan = status if status in ("blocked", "over_limit") else "passed"
+        ok, reason, part = False, "a:children", None
+        if not inp.get("children"):
+            ok, reason, part = _inline_check({"eml_path": inp["eml_path"], "ordinal": inp.get("ordinal"),
+                                              "scan": scan, "thresholds": inp.get("thresholds"),
+                                              "mime_failed": inp.get("mime_failed")})
+        if ok:
+            names = [inp.get("filename") or ""] + _eml_names(part)
+            hit = any(_kyc_word_hits(nm, KYC_WORDS) for nm in names if nm)
+            return {"maybe_kyc": hit, "clauses": ["1"] if hit else [], "inline_signature": reason}
+        res = kyc({k: v for k, v in inp.items() if k not in ("eml_path", "thresholds")})
+        res["inline_signature"] = reason
+        return res
     clauses, texts = set(), []
     _kyc_node(inp, 1, clauses, texts)
     birth = set()
@@ -3023,6 +3054,924 @@ def kyc(inp):
         clauses.add("2")
     out = sorted(clauses)
     return {"maybe_kyc": bool(out), "clauses": out}
+
+
+# ---------------------------------------------------------------------------
+# E6: C-RED-0 ③ exception for small inline signature images (PRD v0.7.25,
+# C-RED-0 ③ ⓐ-ⓕ and appendix B). Everything not covered or not readable is
+# not an exception (fails closed). The HTML scan is written by hand (B.4: no
+# html.parser).
+# ---------------------------------------------------------------------------
+
+import base64 as _b64
+import html as _html_mod
+import zlib as _zlib
+from email.header import decode_header as _decode_header, make_header as _make_header
+
+_AWS = " \t\n\r\x0c"  # «ASCII 空白» (appendix B preamble)
+_AWS_B = b" \t\n\r\x0c"
+_ASCII_LOWER = {c: c + 32 for c in range(0x41, 0x5B)}
+
+
+def _alower(s: str) -> str:
+    """«不区分大小写» only for ASCII letters (appendix B preamble)."""
+    return s.translate(_ASCII_LOWER)
+
+
+def _astrip(s: str) -> str:
+    return s.strip(_AWS)
+
+
+# READING: R-E6-03. B.1 does not specify the system's MIME part-count cap.
+# Do not invent one: independently reject unreadable MIME, and accept an
+# optional mime_failed=True system-state input to veto every exception.
+# The actual export needs that state (or an equivalent upstream guarantee)
+# for cases where the system failed but this independent parser succeeds.
+
+
+class _MimeError(Exception):
+    pass
+
+
+class _Part:
+    __slots__ = ("headers", "body", "children", "type", "path")
+
+    def __init__(self, headers, body):
+        self.headers = headers  # [(lower-case name, raw value as latin-1 str, unfolded)]
+        self.body = body  # raw bytes
+        self.children = []
+        self.type = ""
+
+    def all(self, name):
+        return [v for k, v in self.headers if k == name]
+
+    def first(self, name):
+        for k, v in self.headers:
+            if k == name:
+                return v
+        return None
+
+
+def _split_head_body(raw: bytes):
+    """Header block and body: the body starts after the first empty line."""
+    if raw.startswith(b"\r\n"):
+        return b"", raw[2:]
+    if raw.startswith(b"\n"):
+        return b"", raw[1:]
+    cands = [(i, 3) for i in [raw.find(b"\n\r\n")] if i >= 0] + [(i, 2) for i in [raw.find(b"\n\n")] if i >= 0]
+    if not cands:
+        # READING (R-E6-02): no empty line -> everything is header, empty body.
+        return raw, b""
+    i, k = min(cands)
+    return raw[:i + 1], raw[i + k:]
+
+
+def _parse_headers(block: bytes):
+    """[(name, value)]: raw bytes as latin-1 (no RFC 2047 decoding, B.1), folded lines joined."""
+    out = []
+    for line in block.split(b"\n"):
+        if line.endswith(b"\r"):
+            line = line[:-1]
+        if line == b"":
+            continue
+        if line[:1] in (b" ", b"\t"):
+            if not out:
+                raise _MimeError("continuation line before any header")
+            # RFC 5322 unfolding: remove the line break only, keep the WSP.
+            out[-1][1] += line.decode("latin-1")
+            continue
+        # READING (R-E6-02): a header line without a colon (or with an empty
+        # name) cannot be read -> MIME decoding failure (no exception at all).
+        c = line.find(b":")
+        if c <= 0:
+            raise _MimeError("header line without a name")
+        name = line[:c].rstrip(b" \t").decode("latin-1")
+        if not name:
+            raise _MimeError("empty header name")
+        out.append([_alower(name), line[c + 1:].decode("latin-1")])
+    return [(k, v) for k, v in out]
+
+
+def _split_params(value: str):
+    """Header value split at `;` outside quoted strings: (first part, [(name, value)])."""
+    segs, cur, q, esc = [], [], False, False
+    for ch in value:
+        if esc:
+            cur.append(ch)
+            esc = False
+        elif q and ch == "\\":
+            cur.append(ch)
+            esc = True
+        elif ch == '"':
+            q = not q
+            cur.append(ch)
+        elif ch == ";" and not q:
+            segs.append("".join(cur))
+            cur = []
+        else:
+            cur.append(ch)
+    segs.append("".join(cur))
+    params = []
+    for s in segs[1:]:
+        if "=" not in s:
+            continue
+        k, v = s.split("=", 1)
+        k, v = _alower(_astrip(k)), _astrip(v)
+        if v.startswith('"'):
+            buf, i, esc = [], 1, False
+            while i < len(v):
+                ch = v[i]
+                if esc:
+                    buf.append(ch)
+                    esc = False
+                elif ch == "\\":
+                    esc = True
+                elif ch == '"':
+                    break
+                else:
+                    buf.append(ch)
+                i += 1
+            v = "".join(buf)
+        params.append((k, v))
+    return segs[0], params
+
+
+def _pct_bytes(s: str) -> bytes:
+    out, i = bytearray(), 0
+    while i < len(s):
+        if s[i] == "%" and _is_hex2(s[i + 1:i + 3]):
+            out.append(int(s[i + 1:i + 3], 16))
+            i += 3
+        else:
+            out += s[i].encode("latin-1", "replace")
+            i += 1
+    return bytes(out)
+
+
+def _is_hex2(s: str) -> bool:
+    return len(s) == 2 and all(c in "0123456789abcdefABCDEF" for c in s)
+
+
+def _decode_charset(b: bytes, cs: str) -> str:
+    try:
+        return b.decode(cs or "utf-8", "replace")
+    except LookupError:
+        return b.decode("utf-8", "replace")
+
+
+def _get_param(params, name: str):
+    """RFC 2231-aware parameter value (str) or None; the first of duplicates."""
+    # READING (R-E6-02): an extended `name*` (or `name*0*` / `name*0` sections)
+    # wins over a plain `name` (RFC 2231 §4); duplicates: the first. Without a
+    # charset in the extended value, or an unknown one, UTF-8 with
+    # replacement. A plain value's raw bytes are read as UTF-8.
+    d = {}
+    for k, v in params:
+        d.setdefault(k, v)
+    if name + "*" in d:
+        v = d[name + "*"]
+        parts = v.split("'", 2)
+        if len(parts) == 3:
+            return _decode_charset(_pct_bytes(parts[2]), parts[0])
+        return _decode_charset(_pct_bytes(v), "utf-8")
+    if name + "*0" in d or name + "*0*" in d:
+        buf, cs, i = bytearray(), "utf-8", 0
+        while True:
+            if name + "*%d*" % i in d:
+                v = d[name + "*%d*" % i]
+                if i == 0:
+                    parts = v.split("'", 2)
+                    if len(parts) == 3:
+                        cs, v = parts[0] or "utf-8", parts[2]
+                buf += _pct_bytes(v)
+            elif name + "*%d" % i in d:
+                buf += d[name + "*%d" % i].encode("latin-1", "replace")
+            else:
+                break
+            i += 1
+        return _decode_charset(bytes(buf), cs)
+    if name in d:
+        return d[name].encode("latin-1", "replace").decode("utf-8", "replace")
+    return None
+
+
+def _first_token(value) -> str:
+    """Part before the first `;`, ASCII whitespace trimmed, ASCII lower case (B.1)."""
+    if value is None:
+        return ""
+    return _alower(_astrip(value.split(";", 1)[0]))
+
+
+def _mime_type(p: _Part) -> str:
+    t = _first_token(p.first("content-type"))
+    return t or "text/plain"
+
+
+def _split_multipart(body: bytes, boundary: bytes):
+    """Body parts between `--boundary` lines; MIME error when truncated or malformed."""
+    delim = b"--" + boundary
+    parts, start, pos, n, seen_first = [], None, 0, len(body), False
+    while pos <= n:
+        j = body.find(b"\n", pos)
+        end = n if j < 0 else j
+        line = body[pos:end]
+        if line.endswith(b"\r"):
+            line = line[:-1]
+        stripped = line.rstrip(b" \t")
+        if stripped == delim or stripped == delim + b"--":
+            if start is not None:
+                # The line break before the delimiter belongs to the delimiter.
+                stop = pos
+                if stop > start and body[stop - 1:stop] == b"\n":
+                    stop -= 1
+                    if stop > start and body[stop - 1:stop] == b"\r":
+                        stop -= 1
+                parts.append(body[start:max(start, stop)])
+            seen_first = True
+            if stripped == delim + b"--":
+                return parts
+            start = n if j < 0 else j + 1
+        if j < 0:
+            break
+        pos = j + 1
+    if not seen_first:
+        raise _MimeError("no boundary delimiter")
+    raise _MimeError("no closing boundary (truncated)")
+
+
+def _parse_part(raw: bytes, depth: int, counter: list):
+    counter[0] += 1
+    head, body = _split_head_body(raw)
+    p = _Part(_parse_headers(head), body)
+    p.type = _mime_type(p)
+    if p.type.startswith("multipart/"):
+        _, params = _split_params(p.first("content-type") or "")
+        b = _get_param(params, "boundary")
+        if not b:
+            raise _MimeError("multipart without boundary")
+        for chunk in _split_multipart(body, b.encode("utf-8")):
+            p.children.append(_parse_part(chunk, depth + 1, counter))
+    # message/rfc822 (and every other non-multipart type) is a leaf: not opened (B.1).
+    return p
+
+
+def _walk(p: _Part):
+    yield p
+    for c in p.children:
+        yield from _walk(c)
+
+
+def _filename(p: _Part):
+    """B.1 file name: Content-Disposition `filename` (RFC 2231) if non-empty, else Content-Type `name`."""
+    cd = p.first("content-disposition")
+    if cd is not None:
+        f = _get_param(_split_params(cd)[1], "filename")
+        if f:
+            return f
+    ct = p.first("content-type")
+    if ct is not None:
+        return _get_param(_split_params(ct)[1], "name") or ""
+    return ""
+
+
+def _is_attachment(p: _Part) -> bool:
+    return (_first_token(p.first("content-disposition")) == "attachment" or bool(_filename(p))
+            or p.type == "message/rfc822" or p.type not in ("text/plain", "text/html"))
+
+
+def _cid_middle(value):
+    """B.2 Content-ID shape: `<middle>`, middle non-empty ASCII 0x21-0x7E without `<` `>`; lower-cased."""
+    v = _astrip(value)
+    if len(v) < 3 or v[0] != "<" or v[-1] != ">":
+        return None
+    mid = v[1:-1]
+    if any(not (0x21 <= ord(c) <= 0x7E) or c in "<>" for c in mid):
+        return None
+    return _alower(mid)
+
+
+def _strict_b64(body: bytes):
+    """B.3 strict base64 decoding, or None."""
+    s = bytes(c for c in body if c not in _AWS_B)
+    if len(s) % 4:
+        return None
+    k = len(s) - len(s.rstrip(b"="))
+    if k > 2:
+        return None
+    core = s[:len(s) - k]
+    if any(c not in _B64_ALPHABET for c in core):
+        return None
+    try:
+        return _b64.b64decode(s, validate=True)
+    except Exception:  # noqa: BLE001
+        return None
+
+
+_B64_ALPHABET = frozenset(b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
+
+
+def _qp_decode(body: bytes) -> bytes:
+    """B.4 quoted-printable (RFC 2045): soft breaks removed, =XX decoded, other `=` kept."""
+    out, i, n = bytearray(), 0, len(body)
+    while i < n:
+        c = body[i]
+        if c == 0x3D:  # '='
+            if body[i + 1:i + 3] == b"\r\n":
+                i += 3
+                continue
+            if body[i + 1:i + 2] == b"\n":
+                i += 2
+                continue
+            h = body[i + 1:i + 3]
+            if len(h) == 2 and all(x in b"0123456789abcdefABCDEF" for x in h):
+                out.append(int(h, 16))
+                i += 3
+                continue
+        out.append(c)
+        i += 1
+    return bytes(out)
+
+
+# B.4 charsets. READING (R-E6-04): iso-8859-12 is in the named range but does
+# not exist (Python has no codec), so it falls back to UTF-8 like any other
+# unrecognised name. The charset parameter is read like other parameters
+# (quotes removed, ASCII whitespace trimmed, ASCII case-insensitive).
+_HTML_CHARSETS = {"utf-8": "utf-8", "us-ascii": "ascii"}
+_HTML_CHARSETS.update({"iso-8859-%d" % i: "iso-8859-%d" % i for i in range(1, 16) if i != 12})
+_HTML_CHARSETS.update({"windows-%d" % i: "cp%d" % i for i in range(1250, 1259)})
+
+
+def _html_text(p: _Part):
+    """B.4: an HTML body part as text, or None when its base64 does not decode."""
+    cte = _alower(_astrip(p.first("content-transfer-encoding") or ""))
+    if cte == "base64":
+        b = _strict_b64(p.body)
+        if b is None:
+            return None
+    elif cte == "quoted-printable":
+        b = _qp_decode(p.body)
+    else:
+        b = p.body
+    cs = _get_param(_split_params(p.first("content-type") or "")[1], "charset")
+    codec = _HTML_CHARSETS.get(_alower(_astrip(cs or "")), "utf-8")
+    return b.decode(codec, "replace")
+
+
+_RAW_IGNORE = {"script", "style", "template", "noscript", "textarea", "title", "xmp", "iframe", "noembed",
+               "noframes", "svg", "math"}
+
+
+def _is_alpha(c: str) -> bool:
+    return ("a" <= c <= "z") or ("A" <= c <= "Z")
+
+
+def _scan_tag(s: str, i: int):
+    """Read the tag at s[i] ('<' + letter, or '</' + letter) by the B.4 tokenizer states.
+
+    Returns (name, {attr: first value}, index after '>') or None at end of input."""
+    n = len(s)
+    j = i + 1
+    if s[j] == "/":
+        j += 1
+    k = j
+    while k < n and s[k] not in _AWS and s[k] not in "/>":
+        k += 1
+    name = _alower(s[j:k])
+    attrs = {}
+    p = k
+    while True:
+        while p < n and (s[p] in _AWS or s[p] == "/"):  # before attribute name; `/` separates
+            p += 1
+        if p >= n:
+            return None
+        if s[p] == ">":
+            return name, attrs, p + 1
+        q = p + 1 if s[p] == "=" else p  # WHATWG: a leading `=` belongs to the name
+        while q < n and s[q] not in _AWS and s[q] not in "/=>":
+            q += 1
+        aname = _alower(s[p:q])
+        p = q
+        while p < n and s[p] in _AWS:  # after attribute name
+            p += 1
+        if p >= n:
+            return None
+        if s[p] != "=":
+            attrs.setdefault(aname, "")
+            continue
+        p += 1
+        while p < n and s[p] in _AWS:  # before attribute value
+            p += 1
+        if p >= n:
+            return None
+        c = s[p]
+        if c in "\"'":
+            e = s.find(c, p + 1)
+            if e < 0:
+                return None
+            val, p = s[p + 1:e], e + 1
+        elif c == ">":
+            attrs.setdefault(aname, "")
+            return name, attrs, p + 1
+        else:
+            q = p
+            while q < n and s[q] not in _AWS and s[q] != ">":
+                q += 1
+            val, p = s[p:q], q
+        attrs.setdefault(aname, val)
+
+
+def _end_of_raw(s: str, low: str, start: int, name: str) -> int:
+    """Index after the end tag `</name` (+ ws, `/` or `>`) found from `start`, or -1."""
+    pat = "</" + name
+    i = start
+    while True:
+        i = low.find(pat, i)
+        if i < 0:
+            return -1
+        k = i + len(pat)
+        if k < len(s) and (s[k] in _AWS or s[k] in "/>"):
+            r = _scan_tag(s, i)
+            return -1 if r is None else r[2]
+        i = k
+
+
+def _html_img_srcs(s: str):
+    """B.4 token scan: the first `src` value (raw, may be None) of every `img` start tag."""
+    # READING (R-E6-05): `</` + letter is an end tag read with the same
+    # attribute states (so a `>` inside quotes does not end it); `</>` is
+    # skipped; `</` + anything else is ignored up to the next `>` (WHATWG
+    # bogus comment). A tag cut off by the end of the part is dropped and
+    # nothing after it counts. A raw-text element's start tag that is
+    # self-closing (`<svg/>`) still starts the ignored region (B.4 «开始标记到
+    # 同名结束标记»). The end tag is found by its name (ASCII case-insensitive)
+    # followed by ASCII whitespace, `/` or `>`.
+    out, i, n = [], 0, len(s)
+    low = _alower(s)
+    while True:
+        i = s.find("<", i)
+        if i < 0 or i + 1 >= n:
+            break
+        nx = s[i + 1]
+        if s.startswith("<!--", i):
+            e = s.find("-->", i + 2)  # `<!-->` and `<!--->` are complete comments
+            if e < 0:
+                break
+            i = e + 3
+            continue
+        if nx in "!?":
+            e = s.find(">", i + 2)
+            if e < 0:
+                break
+            i = e + 1
+            continue
+        if nx == "/":
+            if i + 2 < n and _is_alpha(s[i + 2]):
+                r = _scan_tag(s, i)
+                if r is None:
+                    break
+                i = r[2]
+                continue
+            if i + 2 < n and s[i + 2] == ">":
+                i += 3
+                continue
+            e = s.find(">", i + 2)
+            if e < 0:
+                break
+            i = e + 1
+            continue
+        if _is_alpha(nx):
+            r = _scan_tag(s, i)
+            if r is None:
+                break
+            name, attrs, end = r
+            if name == "img":
+                out.append(attrs.get("src"))
+            if name == "plaintext":
+                break
+            if name in _RAW_IGNORE:
+                end = _end_of_raw(s, low, end, name)
+                if end < 0:
+                    break
+            i = end
+            continue
+        i += 1
+    return out
+
+
+def _cid_of_src(v):
+    """B.4: an `img src` value -> the referenced Content-ID (lower case) or None."""
+    if v is None:
+        return None
+    v = _astrip(_html_mod.unescape(v))
+    if _alower(v[:4]) != "cid:":
+        return None
+    rest, out, i = v[4:], bytearray(), 0
+    while i < len(rest):
+        if rest[i] == "%" and _is_hex2(rest[i + 1:i + 3]):
+            out.append(int(rest[i + 1:i + 3], 16))
+            i += 3
+        else:
+            out += rest[i].encode("utf-8", "surrogatepass")
+            i += 1
+    return _alower(out.decode("utf-8", "replace"))
+
+
+class _ImgFail(Exception):
+    pass
+
+
+_IMG_SIGS = (b"\xff\xd8\xff", b"\x89PNG", b"GIF8")
+
+
+def _has_img_sig(b) -> bool:
+    return any(x in b for x in _IMG_SIGS)
+
+
+_PNG_SIG = b"\x89PNG\r\n\x1a\n"
+_PNG_ALLOWED = {b"IHDR", b"PLTE", b"IDAT", b"IEND", b"tRNS", b"gAMA", b"cHRM", b"sRGB", b"iCCP", b"pHYs",
+                b"bKGD", b"sBIT", b"tIME", b"tEXt", b"iTXt", b"eXIf", b"iDOT", b"cICP"}
+_PNG_EXACT = {b"iDOT": 28, b"cICP": 4}
+META_CAP = 16384
+
+
+def _png(d: bytes):
+    p, n = 8, len(d)
+    ihdr, idat, meta_total, meta_all = None, bytearray(), 0, bytearray()
+    first, iend = True, False
+    while p < n:
+        if n - p < 12:
+            raise _ImgFail("png:truncated")
+        length = int.from_bytes(d[p:p + 4], "big")
+        name = d[p + 4:p + 8]
+        if length > n - p - 12:
+            raise _ImgFail("png:length")
+        data = d[p + 8:p + 8 + length]
+        if _zlib.crc32(name + data) != int.from_bytes(d[p + 8 + length:p + 12 + length], "big"):
+            raise _ImgFail("png:crc")
+        p += 12 + length
+        if first and name != b"IHDR":
+            raise _ImgFail("png:first_not_ihdr")
+        first = False
+        if name not in _PNG_ALLOWED:
+            raise _ImgFail("png:chunk_not_allowed")
+        if name in _PNG_EXACT and length != _PNG_EXACT[name]:
+            raise _ImgFail("png:chunk_size")
+        if name == b"IHDR":
+            if ihdr is not None or length != 13:
+                raise _ImgFail("png:ihdr")
+            ihdr = data
+        elif name == b"IDAT":
+            idat += data
+        elif name in (b"tEXt", b"iTXt", b"eXIf", b"iCCP"):
+            if length > META_CAP:
+                raise _ImgFail("png:chunk_over_16384")
+            if name != b"iCCP":
+                meta_total += length
+                if meta_total > META_CAP:
+                    raise _ImgFail("png:text_total_over_16384")
+                if _has_img_sig(data):
+                    raise _ImgFail("png:signature_in_text")
+                meta_all += data
+            if name == b"iTXt":
+                z = data.find(b"\x00")
+                if z < 0 or z + 1 >= len(data):
+                    raise _ImgFail("png:itxt_truncated")
+                # READING (R-E6-06): only compression flag 0 passes; 1 fails by
+                # the text, any other value is not covered and fails too.
+                if data[z + 1] != 0:
+                    raise _ImgFail("png:itxt_compressed")
+        elif name == b"IEND":
+            # READING (R-E6-06): IEND with data is not covered -> fails.
+            if length != 0:
+                raise _ImgFail("png:iend_data")
+            if p != n:
+                raise _ImgFail("png:data_after_iend")
+            iend = True
+            break
+    if not iend:
+        raise _ImgFail("png:no_iend")
+    if ihdr is None:
+        raise _ImgFail("png:no_ihdr")
+    # READING (R-E6-06): the signature check also runs over all tEXt / iTXt /
+    # eXIf data joined (a signature split across two chunks fails too).
+    if _has_img_sig(idat) or _has_img_sig(meta_all):
+        raise _ImgFail("png:signature_in_idat")
+    return int.from_bytes(ihdr[0:4], "big"), int.from_bytes(ihdr[4:8], "big")
+
+
+def _jpeg(d: bytes):
+    p, n = 2, len(d)
+    size, sos, app_total, scan = None, False, 0, bytearray()
+    while True:
+        if p >= n:
+            raise _ImgFail("jpeg:no_eoi")
+        if d[p] != 0xFF:
+            raise _ImgFail("jpeg:expected_marker")
+        while p < n and d[p] == 0xFF:  # fill bytes before a marker
+            p += 1
+        if p >= n:
+            raise _ImgFail("jpeg:no_eoi")
+        m = d[p]
+        p += 1
+        if m == 0xD9:
+            if size is None:
+                raise _ImgFail("jpeg:no_frame_header")
+            if not sos:
+                raise _ImgFail("jpeg:no_sos")
+            if p != n:
+                raise _ImgFail("jpeg:data_after_eoi")
+            break
+        if m == 0xD8:
+            raise _ImgFail("jpeg:second_soi")
+        if 0xD0 <= m <= 0xD7 or m == 0x01:
+            raise _ImgFail("jpeg:rst_outside_scan")
+        if m == 0xDC:
+            raise _ImgFail("jpeg:dnl")
+        is_sof = 0xC0 <= m <= 0xCF and m not in (0xC4, 0xC8, 0xCC)
+        is_app = 0xE0 <= m <= 0xEF
+        if not (is_sof or is_app or m in (0xC4, 0xCC, 0xDB, 0xDD, 0xDA, 0xFE)):
+            raise _ImgFail("jpeg:marker_not_allowed")
+        if n - p < 2:
+            raise _ImgFail("jpeg:truncated")
+        length = int.from_bytes(d[p:p + 2], "big")
+        if length < 2 or length > n - p:
+            raise _ImgFail("jpeg:length")
+        seg = d[p + 2:p + length]
+        p += length
+        if is_sof:
+            if size is not None or sos:
+                raise _ImgFail("jpeg:frame_header")
+            if len(seg) < 5:
+                raise _ImgFail("jpeg:frame_header_short")
+            size = (int.from_bytes(seg[3:5], "big"), int.from_bytes(seg[1:3], "big"))
+        elif is_app or m == 0xFE:
+            icc = m == 0xE2 and seg.startswith(b"ICC_PROFILE\x00")
+            xmp = m == 0xE1 and seg.startswith(b"http://ns.adobe.com/xap/1.0/\x00")
+            if _has_img_sig(seg):
+                raise _ImgFail("jpeg:signature_in_app")
+            if m == 0xE2 and seg.startswith(b"MPF\x00"):
+                raise _ImgFail("jpeg:mpf")
+            if len(seg) > 4096 and (not (icc or xmp) or len(seg) > META_CAP):
+                raise _ImgFail("jpeg:app_segment_size")
+            if not icc:
+                app_total += len(seg)
+                if app_total > META_CAP:
+                    raise _ImgFail("jpeg:app_total_over_16384")
+        elif m == 0xDA:
+            sos = True
+            while True:
+                if p >= n:
+                    raise _ImgFail("jpeg:truncated_scan")
+                b = d[p]
+                if b != 0xFF:
+                    scan.append(b)
+                    p += 1
+                    continue
+                if p + 1 >= n:
+                    raise _ImgFail("jpeg:ff_last_byte")
+                nb = d[p + 1]
+                if nb == 0x00 or 0xD0 <= nb <= 0xD7:
+                    scan += d[p:p + 2]
+                    p += 2
+                    continue
+                if nb == 0xFF:
+                    p += 1
+                    continue
+                break  # this FF starts the next marker
+    if _has_img_sig(scan):
+        raise _ImgFail("jpeg:signature_in_scan")
+    return size
+
+
+def _gif_subblocks(d: bytes, p: int):
+    data = bytearray()
+    while True:
+        if p >= len(d):
+            raise _ImgFail("gif:truncated")
+        ln = d[p]
+        p += 1
+        if ln == 0:
+            return data, p
+        if p + ln > len(d):
+            raise _ImgFail("gif:truncated")
+        data += d[p:p + ln]
+        p += ln
+
+
+def _gif(d: bytes):
+    n = len(d)
+    if n < 13:
+        raise _ImgFail("gif:truncated")
+    w, h, packed = int.from_bytes(d[6:8], "little"), int.from_bytes(d[8:10], "little"), d[10]
+    p = 13
+    if packed & 0x80:
+        p += 3 * (2 ** ((packed & 7) + 1))
+    frames, img = 0, bytearray()
+    while True:
+        if p >= n:
+            raise _ImgFail("gif:no_trailer")
+        b = d[p]
+        p += 1
+        if b == 0x3B:
+            if p != n:
+                raise _ImgFail("gif:data_after_trailer")
+            break
+        if b == 0x2C:
+            frames += 1
+            if frames > 1:
+                raise _ImgFail("gif:more_than_one_frame")
+            if n - p < 9:
+                raise _ImgFail("gif:truncated")
+            left, top = int.from_bytes(d[p:p + 2], "little"), int.from_bytes(d[p + 2:p + 4], "little")
+            fw, fh, pk = int.from_bytes(d[p + 4:p + 6], "little"), int.from_bytes(d[p + 6:p + 8], "little"), d[p + 8]
+            p += 9
+            # READING (R-E6-07): a frame with width or height 0 is not covered -> fails.
+            if fw == 0 or fh == 0:
+                raise _ImgFail("gif:frame_zero")
+            if left + fw > w or top + fh > h:
+                raise _ImgFail("gif:frame_outside_canvas")
+            if pk & 0x80:
+                p += 3 * (2 ** ((pk & 7) + 1))
+            if p >= n:
+                raise _ImgFail("gif:truncated")
+            p += 1  # LZW minimum code size
+            data, p = _gif_subblocks(d, p)
+            img += data
+        elif b == 0x21:
+            if p >= n:
+                raise _ImgFail("gif:truncated")
+            label = d[p]
+            p += 1
+            if label == 0xF9:
+                if p + 6 > n or d[p] != 4 or d[p + 5] != 0:
+                    raise _ImgFail("gif:graphic_control")
+                p += 6
+            elif label in (0xFE, 0xFF, 0x01):
+                data, p = _gif_subblocks(d, p)
+                if len(data) > 4096:
+                    raise _ImgFail("gif:extension_over_4096")
+                if _has_img_sig(data):
+                    raise _ImgFail("gif:signature_in_extension")
+            else:
+                raise _ImgFail("gif:extension_not_allowed")
+        else:
+            raise _ImgFail("gif:block_not_allowed")
+    if _has_img_sig(img):
+        raise _ImgFail("gif:signature_in_image_data")
+    return w, h
+
+
+def _image_size(d: bytes):
+    """B.5: (width, height) or raise _ImgFail."""
+    if d.startswith(_PNG_SIG):
+        w, h = _png(d)
+    elif d.startswith(b"\xff\xd8"):
+        w, h = _jpeg(d)
+    elif d.startswith(b"GIF87a") or d.startswith(b"GIF89a"):
+        w, h = _gif(d)
+    else:
+        raise _ImgFail("signature")
+    if w == 0 or h == 0:
+        raise _ImgFail("zero_size")
+    return w, h
+
+
+INLINE_DEFAULT = {"max_long_side": 400, "max_short_side": 150, "max_bytes": 51200}
+INLINE_HARD_CAP = {"max_long_side": 1280, "max_short_side": 300, "max_bytes": 102400}
+
+
+def inline_thresholds(t):
+    """B.6 `kyc.inline_image`: defaults, or a configuration that must stay within the hard caps."""
+    # READING (R-E6-08): a missing key keeps its default; an unknown key, a
+    # value that is not a positive integer, or a value above the hard cap is
+    # a configuration load error (raised; the CLI reports ok: false).
+    out = dict(INLINE_DEFAULT)
+    if t is None:
+        return out
+    if not isinstance(t, dict):
+        raise ValueError("kyc.inline_image must be an object")
+    for k, v in t.items():
+        if k not in INLINE_HARD_CAP:
+            raise ValueError("kyc.inline_image: unknown key %s" % k)
+        if isinstance(v, bool) or not isinstance(v, int) or v < 1:
+            raise ValueError("kyc.inline_image.%s must be a positive integer" % k)
+        if v > INLINE_HARD_CAP[k]:
+            raise ValueError("kyc.inline_image.%s above the hard cap %d" % (k, INLINE_HARD_CAP[k]))
+        out[k] = v
+    return out
+
+
+def _outer_parts(raw: bytes):
+    """B.1: (attachments in order, HTML body parts, Content-ID counts) of the outer message."""
+    root = _parse_part(raw, 0, [0])
+    atts, html_parts, counts = [], [], {}
+    for p in _walk(root):
+        # B.2 duplicate check: every well-formed Content-ID header of every
+        # outer part (root, containers, body parts, attachments).
+        for v in p.all("content-id"):
+            m = _cid_middle(v)
+            if m is not None:
+                counts[m] = counts.get(m, 0) + 1
+        if p.children or p.type.startswith("multipart/"):
+            continue
+        if _is_attachment(p):
+            atts.append(p)
+        elif p.type == "text/html":
+            html_parts.append(p)
+    return atts, html_parts, counts
+
+
+def _inline_check(inp):
+    """(exempt, reason, attachment part or None) for C-RED-0 ③'s exception."""
+    th = inline_thresholds(inp.get("thresholds"))
+    if inp.get("mime_failed") is True:
+        return False, "mime_failed:system", None
+    try:
+        with open(inp["eml_path"], "rb") as fh:
+            raw = fh.read()
+    except OSError:
+        return False, "mime_unreadable", None
+    try:
+        atts, html_parts, counts = _outer_parts(raw)
+    except (_MimeError, RecursionError) as e:
+        return False, "mime_failed:%s" % e, None
+    ordinal = inp.get("ordinal")
+    # ⓐ: only outer attachments are numbered (B.1); message/rfc822 is a leaf.
+    if isinstance(ordinal, bool) or not isinstance(ordinal, int) or not 0 <= ordinal < len(atts):
+        return False, "a:no_such_attachment", None
+    part = atts[ordinal]
+    # ⓑ
+    cids = part.all("content-id")
+    if len(cids) != 1:
+        return False, "b:content_id_count", part
+    cid = _cid_middle(cids[0])
+    if cid is None:
+        return False, "b:content_id_shape", part
+    if counts.get(cid, 0) >= 2:
+        return False, "b:content_id_duplicate", part
+    refs = set()
+    for hp in html_parts:
+        t = _html_text(hp)
+        if t is not None:
+            refs |= {c for c in map(_cid_of_src, _html_img_srcs(t)) if c is not None}
+    if cid not in refs:
+        return False, "b:not_referenced", part
+    # ⓒ
+    cds = part.all("content-disposition")
+    if len(cds) > 1:
+        return False, "c:disposition_count", part
+    if cds and _first_token(cds[0]) != "inline":
+        return False, "c:disposition", part
+    # ⓓ
+    if inp.get("scan") != "passed":
+        return False, "d:scan", part
+    # ⓔ
+    ctes = part.all("content-transfer-encoding")
+    if len(ctes) != 1 or _alower(_astrip(ctes[0])) != "base64":
+        return False, "e:transfer_encoding", part
+    data = _strict_b64(part.body)
+    if data is None:
+        return False, "e:base64", part
+    try:
+        w, h = _image_size(data)
+    except _ImgFail as e:
+        return False, "e:%s" % e, part
+    # ⓕ
+    if max(w, h) > th["max_long_side"]:
+        return False, "f:long_side", part
+    if min(w, h) > th["max_short_side"]:
+        return False, "f:short_side", part
+    if len(data) > th["max_bytes"]:
+        return False, "f:bytes", part
+    return True, "inline_signature", part
+
+
+def inline_signature(inp):
+    """C-RED-0 ③ exception (PRD appendix B) for the outer attachment `ordinal` of `eml_path`."""
+    ok, reason, _ = _inline_check(inp)
+    return {"exempt": ok, "reason": reason}
+
+
+def _eml_names(part):
+    """File names of the eml part for ①: B.1 file name, Content-Type `name`, and their RFC 2047 decodings."""
+    # READING (R-E6-09): for an exempt image ① is checked on the export's
+    # `filename` and also on the names the oracle reads itself (the
+    # Content-Disposition `filename` and the Content-Type `name`, each as
+    # written and RFC 2047-decoded): any hit holds ① (fails closed).
+    names = [_filename(part)]
+    ct = part.first("content-type")
+    if ct is not None:
+        names.append(_get_param(_split_params(ct)[1], "name") or "")
+    out = []
+    for nm in names:
+        if not nm:
+            continue
+        out.append(nm)
+        try:
+            out.append(str(_make_header(_decode_header(nm))))
+        except Exception:  # noqa: BLE001
+            pass
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -3065,6 +4014,8 @@ FUNCTIONS = {
     "lead_confirmed": lead_confirmed,
     # E4
     "kyc": kyc,
+    # E6
+    "inline_signature": inline_signature,
 }
 
 

@@ -68,29 +68,44 @@ export interface ApproveInput {
 
 export type ApproveResult = { ok: true } | { ok: false; reason: string }
 
-/** C-FRD-5: the cooling-off period and the two-person condition, checked against the whole history. */
-export function canApprove(i: ApproveInput): ApproveResult {
+export interface ApprovalFailure {
+  subject: 'completer' | 'viewer' | 'pair' | 'timing'
+  code: 'same_person' | 'approver_role' | 'cooling' | 'related_created' | 'related_role_granted' | 'related_credential_reset' | 'account_too_new' | 'role_too_new' | 'credentials_reset'
+  reason: string
+}
+
+/** E6: all failures in the existing decision order. Completer checks do not depend on who is viewing. */
+export function approvalFailures(i: ApproveInput): ApprovalFailure[] {
   const t = (iso: string) => Date.parse(iso)
-  if (i.approver.id === i.completedBy) return { ok: false, reason: 'You ticked the checklist, so a different person must approve.' }
-  if (i.approver.role !== 'approver' && i.approver.role !== 'admin') return { ok: false, reason: 'the approver needs the approver role' }
-  if (t(i.now) < t(i.checklistDoneAt) + i.coolingMs) return { ok: false, reason: 'the cooling-off period has not ended' }
+  const failures: ApprovalFailure[] = []
+  const add = (subject: ApprovalFailure['subject'], code: ApprovalFailure['code'], reason: string) => {
+    if (!failures.some((f) => f.subject === subject && f.code === code)) failures.push({ subject, code, reason })
+  }
+  if (i.approver.id === i.completedBy) add('pair', 'same_person', 'You ticked the checklist, so a different person must approve.')
+  if (i.approver.role !== 'approver' && i.approver.role !== 'admin') add('viewer', 'approver_role', 'the approver needs the approver role')
+  if (t(i.now) < t(i.checklistDoneAt) + i.coolingMs) add('timing', 'cooling', 'the cooling-off period has not ended')
   const pair = [i.completedBy, i.approver.id]
   for (const e of i.events) {
-    // at any time: neither created the other's account, granted the other a role or reset the other's credentials
-    if (['created', 'role_granted', 'credential_reset'].includes(e.type) && e.byUser !== null && pair.includes(e.userId) && pair.includes(e.byUser) && e.userId !== e.byUser) {
-      return { ok: false, reason: `one of the two users ${e.type === 'created' ? 'created' : e.type === 'role_granted' ? 'granted a role to' : 'reset the credentials of'} the other` }
+    if ((e.type === 'created' || e.type === 'role_granted' || e.type === 'credential_reset') && e.byUser !== null && pair.includes(e.userId) && pair.includes(e.byUser) && e.userId !== e.byUser) {
+      add('pair', `related_${e.type}`, `one of the two users ${e.type === 'created' ? 'created' : e.type === 'role_granted' ? 'granted a role to' : 'reset the credentials of'} the other`)
     }
   }
   const limit = t(i.checklistDoneAt) - i.coolingMs
-  for (const u of pair) {
+  for (const u of new Set(pair)) {
+    const subject = u === i.completedBy ? 'completer' : 'viewer'
     const mine = i.events.filter((e) => e.userId === u)
     const created = mine.find((e) => e.type === 'created')
-    if (!created || t(created.at) > limit) return { ok: false, reason: 'an account is newer than one cooling-off period before the checklist was done' }
+    if (!created || t(created.at) > limit) add(subject, 'account_too_new', 'an account is newer than one cooling-off period before the checklist was done')
     const role = i.currentRoles[u]
     const granted = mine.filter((e) => e.type === 'role_granted' && e.role === role).map((e) => t(e.at))
-    if (granted.length === 0 || Math.max(...granted) > limit) return { ok: false, reason: 'a role is newer than one cooling-off period before the checklist was done' }
-    // READING: a reset after checklist_done (before the approval) is refused too; the text names the period before it
-    if (mine.some((e) => e.type === 'credential_reset' && t(e.at) > limit && t(e.at) <= t(i.now))) return { ok: false, reason: 'credentials were reset within the cooling-off period' }
+    if (granted.length === 0 || Math.max(...granted) > limit) add(subject, 'role_too_new', 'a role is newer than one cooling-off period before the checklist was done')
+    if (mine.some((e) => e.type === 'credential_reset' && t(e.at) > limit && t(e.at) <= t(i.now))) add(subject, 'credentials_reset', 'credentials were reset within the cooling-off period')
   }
-  return { ok: true }
+  return failures
+}
+
+/** C-FRD-5: same first refusal and same approval decision as before E6. */
+export function canApprove(i: ApproveInput): ApproveResult {
+  const first = approvalFailures(i)[0]
+  return first ? { ok: false, reason: first.reason } : { ok: true }
 }

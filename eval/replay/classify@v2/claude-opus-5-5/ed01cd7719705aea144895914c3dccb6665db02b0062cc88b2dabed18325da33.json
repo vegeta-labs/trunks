@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"unclassified\",\"confidence\":\"high\",\"reason\":\"Marketing e-mail for a stationery catalogue, unrelated to investments or operations.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1806,
+  "outputTokens": 67
+ }
+}

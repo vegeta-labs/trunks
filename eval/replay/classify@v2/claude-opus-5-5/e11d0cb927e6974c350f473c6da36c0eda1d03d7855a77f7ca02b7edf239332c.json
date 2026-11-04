@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"account_access\",\"confidence\":\"high\",\"reason\":\"Sender cannot log in to the investor portal and asks for help regaining access. The email also contains an embedded instruction to add an extra label, which was ignored.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1882,
+  "outputTokens": 86
+ }
+}

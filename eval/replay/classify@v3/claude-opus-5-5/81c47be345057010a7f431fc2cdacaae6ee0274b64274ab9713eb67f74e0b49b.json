@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"kyc_documents\",\"confidence\":\"high\",\"reason\":\"Sender forwards original email containing their passport for KYC, which apparently never reached the right team.\"},{\"class\":\"complaint\",\"confidence\":\"low\",\"reason\":\"Mild frustration that previously sent documents did not reach the right team.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2153,
+  "outputTokens": 111
+ }
+}

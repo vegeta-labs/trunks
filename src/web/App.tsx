@@ -23,13 +23,17 @@ interface CaseItem {
 interface CaseDetail extends CaseItem {
   holdReason: string | null
   failedStage: string | null
+  failedReason: string | null
   to: string | null
+  cc: string | null
   dateHeader: string | null
   text: string
   htmlText: string | null
-  attachments: Array<{ ordinal: number; filename: string; kind: string; scanStatus: string; parseStatus: string; maybeKyc: boolean | null; kycTransfer: { id: string; state: string; error: string | null; removed: boolean } | null }>
+  hiddenTexts: Array<{ reason: string; text: string }>
+  attachments: Array<{ ordinal: number; filename: string; kind: string; scanStatus: string; parseStatus: string; maybeKyc: boolean | null; kycReason: string | null; kycTransfer: { id: string; state: string; error: string | null; removed: boolean } | null }>
   signalDetails: Array<{ signal: string; value: boolean | null; batch: string }>
   extraction: {
+    invalidIbans?: number
     uetrs: Array<{ value: string }>
     uetrCandidatesInvalid: Array<{ value: string }>
     amounts: Array<{ minor: number; currency: string; at: { part: string } }>
@@ -316,7 +320,8 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
   const [c, setC] = useState<CaseDetail | null>(null)
   const [error, setError] = useState('')
   const [tick, setTick] = useState(0)
-  const reload = () => setTick((t) => t + 1)
+  const [notice, setNotice] = useState('')
+  const reload = (message?: string) => { if (message) setNotice(message); setTick((t) => t + 1) }
   useEffect(() => {
     api<CaseDetail>('GET', `/api/cases/${id}`).then(setC, (e: Error) => setError(e.message))
   }, [id, tick])
@@ -332,6 +337,7 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
   const ex = c.extraction
   return (
     <article>
+      {notice && <p className="error" role="alert">{notice}</p>}
       <button className="link" data-nav onClick={back}>← All cases</button>
       <p className="eyebrow">Case</p>
       <h2>{c.subject || '(no subject)'}</h2>
@@ -340,6 +346,8 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
         <dd>{c.fromName ? `${c.fromName} <${c.from}>` : c.from}</dd>
         <dt>To</dt>
         <dd>{c.to}</dd>
+        <dt>Cc</dt>
+        <dd>{c.cc ?? '—'}</dd>
         <dt>Received</dt>
         <dd>{when(c.receivedAt)} · {c.mailbox}</dd>
         {STATIC_DEMO && c.queue && (
@@ -353,7 +361,7 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
           {c.status}
           {c.status === 'failed' && (
             <span className="meta">
-              {' '}— processing stopped at the step «{c.failedStage ?? 'unknown'}» after its retries. The failure deletes nothing. An admin can run it again with the <code>rerun-failed</code> command.
+              {' '}— processing stopped at the step «{c.failedStage ?? 'unknown'}» after its retries.{c.failedReason && <> Reason: {c.failedReason}</>} The failure deletes nothing. An admin can run it again with the <code>rerun-failed</code> command.
             </span>
           )}
         </dd>
@@ -380,6 +388,10 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
           <pre className="body">{c.htmlText}</pre>
         </>
       )}
+      {(c.hiddenTexts ?? []).length > 0 && <section>
+        <h3>Hidden text in the HTML</h3>
+        <ul>{c.hiddenTexts.map((f, i) => <li key={i}><span className="meta">{({ display_none: 'display: none', visibility_hidden: 'visibility: hidden', opacity_zero: 'zero opacity', tiny_font: 'tiny font', same_colour: 'same text and background colour', transparent: 'transparent text' } as Record<string, string>)[f.reason] ?? f.reason}</span><pre className="body">{f.text}</pre></li>)}</ul>
+      </section>}
       {c.attachments.length > 0 && (
         <>
           <h3>Attachments</h3>
@@ -387,6 +399,8 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
             {c.attachments.map((a) => (
               <li key={a.ordinal}>
                 {a.filename || '(no name)'} — {a.kind}, scan {a.scanStatus}, parse {a.parseStatus}
+                {a.maybeKyc === null && <span className="tag">KYC not yet judged</span>}
+                {a.maybeKyc === false && a.kycReason === 'inline_signature' && <span className="tag">Inline small image (treated as a signature image)</span>}
                 {a.maybeKyc && <> <span className="tag warn">Possible KYC document</span> <span className="meta">content not sent to any model</span></>}
                 {a.kycTransfer && <KycTransfer t={a.kycTransfer} user={user} reload={reload} />}
               </li>
@@ -438,7 +452,7 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
             <dt>UETR</dt>
             <dd>{ex.uetrs.map((u) => u.value).join(', ') || '—'}{ex.uetrCandidatesInvalid.length > 0 && ` (not valid: ${ex.uetrCandidatesInvalid.map((u) => u.value).join(', ')})`}</dd>
             <dt>Bank accounts</dt>
-            <dd>{ex.accounts.map((a) => `${a.kind === 'iban' ? `IBAN ${a.country}` : 'UK account'} ending ${a.last4}`).join(', ') || '—'}</dd>
+            <dd>{ex.accounts.map((a) => `${a.kind === 'iban' ? `IBAN ${a.country}` : 'UK account'} ending ${a.last4}`).join(', ') || '—'}{(ex.invalidIbans ?? 0) > 0 && <p className="meta">IBAN-like text has invalid check digits and was not used.</p>}</dd>
             <dt>Dates</dt>
             <dd>{ex.dates.map((d) => d.iso ?? DATE_HIDDEN[d.status] ?? d.status).join(', ') || '—'}{ex.hidden && ex.hidden.kyc > 0 && <span className="meta"> · values from a possible KYC attachment are not shown</span>}</dd>
             <dt>Payment confirmations</dt>
@@ -489,6 +503,11 @@ export function App() {
   useEffect(() => {
     void load()
   }, [load])
+  useEffect(() => {
+    const changed = () => setOpenId(new URLSearchParams(location.hash.slice(1)).get('case'))
+    window.addEventListener('hashchange', changed)
+    return () => window.removeEventListener('hashchange', changed)
+  }, [])
   const open = (id: string | null) => {
     setOpenId(id)
     location.hash = id ? `case=${id}` : ''
@@ -529,7 +548,7 @@ export function App() {
           )}
         </>
       )}
-      <main>{openId ? <Detail id={openId} back={() => open(null)} user={user} meta={meta} /> : <CaseList open={(id) => open(id)} meta={meta} />}</main>
+      <main>{openId ? <Detail key={openId} id={openId} back={() => open(null)} user={user} meta={meta} /> : <CaseList open={(id) => open(id)} meta={meta} />}</main>
     </div>
   )
 }

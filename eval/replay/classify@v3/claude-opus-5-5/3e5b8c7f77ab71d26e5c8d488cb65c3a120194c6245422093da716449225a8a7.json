@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"bank_letter_request\",\"confidence\":\"high\",\"reason\":\"Mortgage lender requires a letter confirming the investment in Northwind Robotics.\"},{\"class\":\"account_access\",\"confidence\":\"high\",\"reason\":\"Investor is locked out of the portal after too many password attempts and asks for unlock.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2155,
+  "outputTokens": 116
+ }
+}

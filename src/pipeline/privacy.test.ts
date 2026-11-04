@@ -4,6 +4,8 @@ import { join } from 'node:path'
 import { createKit, type Kit } from './testkit.ts'
 import { eml } from '../ingest/testmail.ts'
 import { makePdf } from '../../parser/testfiles.ts'
+import { restartFrom } from './restart.ts'
+import { tx } from '../store/db.ts'
 
 // realistic-format fictional values (PRD R-PRV-05, test plan TC-PRV-05a)
 const SECRETS = {
@@ -53,9 +55,14 @@ beforeAll(async () => {
     subject: SECRETS.subject,
     messageId: `<${SECRETS.messageId}>`,
     text: `Please use ${SECRETS.iban}. Sort code ${SECRETS.sortCode}, account ${SECRETS.account}. Passport ${SECRETS.passport}, NI ${SECRETS.nino}. 1 Example Road, London ${SECRETS.postcode}. Call ${SECRETS.phone}.`,
-    attachments: [{ type: 'application/pdf', filename: SECRETS.filename, content: makePdf([`Statement for account ${SECRETS.account} ${SECRETS.ibanCompact}`]) }],
+    attachments: [{ type: 'application/pdf', filename: SECRETS.filename, contentId: `<${SECRETS.ibanCompact}>`, disposition: SECRETS.ibanCompact, content: makePdf([`Statement for account ${SECRETS.account} ${SECRETS.ibanCompact}`]) }],
   }))
   caseId = (r as { caseId: string }).caseId
+  expect((await k.db.query('SELECT content_id_hmac FROM attachment')).rows[0]!.content_id_hmac).toBe(k.k.hmac(`content-id\0${SECRETS.ibanCompact.toLowerCase()}`))
+  await k.drain()
+  // Upgrade/lazy metadata population uses the same at-rest protection as the ingest path.
+  await k.t.owner.query('UPDATE attachment SET content_id_hmac = NULL, disposition = NULL, inline_eligible = NULL')
+  await tx(k.db, (c) => restartFrom(c, k.queue, caseId, 'redact', 'system'))
   await k.drain()
 }, 120_000)
 afterAll(async () => k?.close())
@@ -78,6 +85,10 @@ describe('encryption at rest and audit privacy', () => {
     expect(dump.length).toBeGreaterThan(1000)
     for (const [what, v] of Object.entries(SECRETS)) expect(dump.includes(v), what).toBe(false)
     expect(dump.toLowerCase().includes(SECRETS.email)).toBe(false)
+    expect(dump.toLowerCase().includes(SECRETS.ibanCompact.toLowerCase())).toBe(false)
+    const metadata = (await k.db.query('SELECT content_id_hmac, disposition FROM attachment')).rows[0]!
+    expect(metadata.content_id_hmac).toBe(k.k.hmac(`content-id\0${SECRETS.ibanCompact.toLowerCase()}`))
+    expect(metadata.disposition).toBe('other')
     const root = (k.files as unknown as { root: string }).root
     const all = files(root)
     expect(all.length).toBeGreaterThanOrEqual(2)

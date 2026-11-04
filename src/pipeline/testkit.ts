@@ -89,7 +89,7 @@ export async function createKit(o: { scanner?: Scanner; parser?: ParserClient; c
               await runStage(deps, stage, j.data)
               await boss.boss.complete(stage, j.id)
             } catch (e) {
-              await markFailed(deps, stage, j.data, String(e))
+              await markFailed(deps, stage, j.data, e)
               await boss.boss.fail(stage, j.id)
             }
           }

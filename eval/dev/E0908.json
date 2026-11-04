@@ -1,0 +1,49 @@
+{
+  "id": "E0908",
+  "family": "F070",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-10T10:00:00Z",
+  "prior_messages": [],
+  "description": "Inline-image control: single-frame GIF89a 32x32 icon (620 bytes) with a graphic control extension, cid-referenced, no Content-Disposition and no filename -> NOT possible KYC (inline_signature exemption). Investor complains about slow replies -> complaint_ack.",
+  "classes": [
+    "complaint"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {},
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [],
+    "references": [],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C016",
+    "investor_id": "Northwind Robotics::016",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0012"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "complaint_ack",
+  "notes": "Attachment 0 has no filename and no disposition; it is an attachment part because its type is image/gif (B.1). GIF: logical screen 32x32, 2-colour global table, one GCE (one 4-byte sub-block), one image descriptor inside the canvas, LZW data without image signatures, trailer 3B and nothing after. Sender is C016's first listed address. T-NW-0012 by reference (W4-3)."
+}

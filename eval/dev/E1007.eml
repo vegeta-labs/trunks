@@ -1,0 +1,16 @@
+Authentication-Results: mx.ops.example; spf=pass smtp.mailfrom=jonas.becker@becker-post.example;
+ dkim=pass header.d=becker-post.example; dmarc=pass header.from=becker-post.example
+From: Jonas Becker <jonas.becker@becker-post.example>
+To: investors@ops.example
+Subject: Northwind commitment amount
+Date: Thu, 29 Oct 2026 10:00:00 +0000
+Message-ID: <E1007@becker-post.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+Hello,
+
+Please set my Northwind Robotics commitment (NW-007) to £24,000.
+
+Jonas Becker

@@ -1,0 +1,66 @@
+Return-Path: <grace@whitfield-wealth.example>
+Received: from mail.whitfield-wealth.example (mail.whitfield-wealth.example [192.0.2.145])
+ by mx.ops.example with ESMTPS id e0902f070 for <investors@ops.example>;
+ Thu, 05 Nov 2026 10:30:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=whitfield-wealth.example; dkim=pass header.d=whitfield-wealth.example;
+ dmarc=pass header.from=whitfield-wealth.example
+Message-ID: <E0902.f07002inl@whitfield-wealth.example>
+Date: Thu, 5 Nov 2026 10:27:13 +0000
+From: "Grace Whitfield" <grace@whitfield-wealth.example>
+To: investors@ops.example
+Subject: EIS certificate - Oliver Bennett (NW-002)
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="000000000000a1b2c3062f8d1e40"
+
+--000000000000a1b2c3062f8d1e40
+Content-Type: multipart/related; boundary="000000000000a1b2c2062f8d1e3f"
+
+--000000000000a1b2c2062f8d1e3f
+Content-Type: multipart/alternative; boundary="000000000000a1b2c1062f8d1e3e"
+
+--000000000000a1b2c1062f8d1e3e
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+Dear Investor Relations,
+
+On behalf of my client Oliver Bennett (reference NW-002), could you tell me when
+the EIS certificate for his Northwind Robotics investment is expected to be
+issued? He would like it for his tax return.
+
+Many thanks,
+Grace Whitfield
+Whitfield Wealth
++44 20 7946 0145
+
+--000000000000a1b2c1062f8d1e3e
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Dear Investor Relations,</div><div><br></div><div>On =
+behalf of my client Oliver Bennett (reference NW-002), could you tell me wh=
+en the EIS certificate for his Northwind Robotics investment is expected to=
+ be issued? He would like it for his tax return.</div><div><br></div><div>M=
+any thanks,</div><div><div dir=3D"ltr" class=3D"gmail_signature"><div dir=
+=3D"ltr">Grace Whitfield<div>Whitfield Wealth</div><div>+44 20 7946 0145</d=
+iv><div><img src=3D"cid:ii_m3k9w2a10" alt=3D"Whitfield Wealth" width=3D"150=
+" height=3D"40"><br></div></div></div></div></div>
+
+--000000000000a1b2c1062f8d1e3e--
+
+--000000000000a1b2c2062f8d1e3f
+Content-Type: image/jpeg; name="whitfield-logo.jpg"
+Content-Disposition: attachment; filename="whitfield-logo.jpg"
+Content-Transfer-Encoding: base64
+Content-ID: <ii_m3k9w2a10>
+X-Attachment-Id: ii_m3k9w2a10
+
+/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB
+AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAALCABQASwBAREA/8QAFAABAAAAAAAA
+AAAAAAAAAAAAAP/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/2Q==
+--000000000000a1b2c2062f8d1e3f--
+
+--000000000000a1b2c3062f8d1e40--

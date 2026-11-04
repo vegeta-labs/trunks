@@ -1,0 +1,17 @@
+Authentication-Results: mx.ops.example; spf=pass smtp.mailfrom=priya@ramanfamily.example;
+ dkim=pass header.d=ramanfamily.example; dmarc=pass header.from=ramanfamily.example
+From: Priya Raman <priya@ramanfamily.example>
+To: investors@ops.example
+Subject: Northwind payment arrival
+Date: Thu, 29 Oct 2026 10:00:00 +0000
+Message-ID: <E1001@ramanfamily.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+Hello,
+
+I paid £5,000 on 26 October 2026 for Northwind Robotics using reference NW-003. Could you confirm whether it has arrived?
+The payer name was Priya Raman.
+
+Priya Raman

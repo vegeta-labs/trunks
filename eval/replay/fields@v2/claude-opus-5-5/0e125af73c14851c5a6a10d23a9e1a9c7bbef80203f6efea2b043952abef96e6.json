@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"amount\":{\"value\":\"£5,000\",\"confidence\":\"high\",\"quote\":\"I paid £5,000 on 26 October 2026\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\"I paid £5,000\"},\"payment_date\":{\"value\":\"26 October 2026\",\"confidence\":\"high\",\"quote\":\"I paid £5,000 on 26 October 2026\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\"The payer name was [NAME_1] [NAME_2].\"},\"reference\":{\"value\":\"NW-003\",\"confidence\":\"high\",\"quote\":\"using reference NW-003\"},\"uetr\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 1687,
+  "outputTokens": 249
+ }
+}

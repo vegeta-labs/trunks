@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"payment_query\",\"confidence\":\"high\",\"reason\":\"Sender says they sent £20,000 for Northwind Robotics with reference NW-006 and asks for confirmation it has been matched; no payment confirmation attached.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2144,
+  "outputTokens": 91
+ }
+}

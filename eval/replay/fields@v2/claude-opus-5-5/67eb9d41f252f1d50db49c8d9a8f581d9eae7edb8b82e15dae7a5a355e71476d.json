@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"new_amount\":{\"value\":\"£24,000\",\"confidence\":\"high\",\"quote\":\"Please set my Northwind Robotics commitment (NW-007) to £24,000.\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\"£24,000\"}}}",
+ "usage": {
+  "inputTokens": 1576,
+  "outputTokens": 95
+ }
+}

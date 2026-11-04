@@ -1,0 +1,66 @@
+{
+  "id": "E0905",
+  "family": "F070",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-06T11:00:00Z",
+  "prior_messages": [],
+  "description": "Inline-image case 6: small inline PNG 120x40 (297 bytes) referenced by cid, but a JPEG (FF D8 FF ...) is hidden in a tEXt chunk -> possible KYC (B.5: tEXt data contains an image signature). Solent investor asks whether her payment arrived; ledger shows SB-004 received in full -> payment_received.",
+  "classes": [
+    "payment_query"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "amount": {
+      "minor": 1000000,
+      "currency": "EUR"
+    },
+    "currency": "EUR",
+    "payment_date": "2026-10-20",
+    "payer_name": "Elena Ruiz",
+    "reference": "SB-004",
+    "uetr": null
+  },
+  "rule_output": {
+    "uetrs": [],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1000000,
+        "currency": "EUR"
+      }
+    ],
+    "references": [
+      "SB-004"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": []
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C022",
+    "investor_id": "Solent Biotherapeutics::004",
+    "deal": "Solent Biotherapeutics",
+    "transaction_ids": [
+      "T-SB-0003"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_received",
+  "notes": "Attachment 0 (ruiz-firma.png): outer part, unique Content-Id referenced by the HTML (7bit), inline, base64, PNG chunks IHDR, PLTE, tEXt, IDAT, IEND with correct CRCs, 120x40, small; the tEXt data (keyword Comment) is far below 16,384 bytes but contains FF D8 FF, so B.5 fails and the image stays possible KYC. Not labelled malicious (no malicious_type for data smuggling; no risk rule depends on it). Solent has no planned close date. T-SB-0003 by amount + date and by reference."
+}

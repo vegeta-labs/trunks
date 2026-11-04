@@ -6,7 +6,8 @@ Runs every concrete example in docs/04_TEST_PLAN.md for the E1 oracle rules
 TC-LNK-07, TC-AUD-01 hash part) and the E3 rules (TC-RSK-01-09 rule parts,
 TC-RTE-01-06 and 08, TC-DRF-02-07, 10, 11a/b, 15, TC-LNK-05, 09, TC-FRD-08,
 TC-OUT-07, 08) and the E4 rule C-RED-0 (TC-RED-04, with C-ING-2's unparsed
-XML under ⑤) plus the PRD's inline examples. Each check is
+XML under ⑤), the E6 C-RED-0 ③ inline-signature exception (TC-RED-11, PRD
+appendix B) and C-DRF-6 v0.7.24, plus the PRD's inline examples. Each check is
 named after its TC id (or PRD rule id). Exits non-zero on any failure.
 All example data is fictional (.example domains).
 """
@@ -1212,7 +1213,17 @@ check("TC-DRF-15 exactly cash_due -> received", L(("auto", "001", "GBP", 600000)
 check("TC-DRF-15 other investor not counted", L(("auto", "002", "GBP", 1000000)), "not_received")
 check("TC-DRF-15 short by 1p", L(("auto", "001", "GBP", 999999)), "not_received")
 check("TC-DRF-15 no ledger -> unknown", O.ledger_state(dict(LED, ledger=None))["state"], "unknown")
-check("TC-DRF-15 empty ledger -> not_received", O.ledger_state(dict(LED, ledger=[]))["state"], "not_received")
+# PRD v0.7.24 C-DRF-6: an empty ledger left by an explicit clear counts as no ledger (R-E6-11).
+check("TC-DIR-09 pre-D9 empty ledger without clear marker -> not_received",
+      O.ledger_state(dict(LED, ledger=[]))["state"], "not_received")
+check("TC-DIR-09 pre-D9 empty ledger and zero cash due -> received",
+      O.ledger_state(dict(LED, ledger=[], cash_due_minor=0))["state"], "received")
+check("PRD-C-DRF-6 v0.7.24 cleared (empty) ledger -> unknown",
+      O.ledger_state(dict(LED, ledger=[], ledger_cleared=True))["state"], "unknown")
+check("PRD-C-DRF-6 v0.7.24 cleared ledger with cash due 0 -> unknown",
+      O.ledger_state(dict(LED, ledger=[], ledger_cleared=True, cash_due_minor=0))["state"], "unknown")
+check("PRD-C-DRF-6 v0.7.24 cleared ledger -> payment_need_evidence (C-DRF-4 «未知»)",
+      T(ledger=O.ledger_state(dict(LED, ledger=[], ledger_cleared=True))["state"]), "payment_need_evidence")
 
 # ---------------------------------------------------------------- TC-OUT-07 / 08
 ACT = {"adopted": [], "fields": {}, "confirms_confirmed_by_person": False, "linked_commitment": False, "template": None,
@@ -1333,8 +1344,12 @@ with tempfile.TemporaryDirectory() as td:
     check("CHECK-ACTUAL C-DRF-6 suggested not counted", CA.ledger(dict(base, commitment=sugg)), "not_received")
     check("CHECK-ACTUAL C-DRF-6 ledger null -> unknown",
           CA.ledger(dict(base, commitment=dict(base["commitment"], ledger=None))), "unknown")
-    check("CHECK-ACTUAL C-DRF-6 empty ledger -> not_received",
+    check("CHECK-ACTUAL C-DRF-6 v0.7.24 cleared (empty) ledger -> unknown",
+          CA.ledger(dict(base, commitment=dict(base["commitment"], ledger=[], ledger_cleared=True))), "unknown")
+    check("CHECK-ACTUAL TC-DIR-09 legacy empty ledger remains present",
           CA.ledger(dict(base, commitment=dict(base["commitment"], ledger=[]))), "not_received")
+    check("CHECK-ACTUAL C-DRF-6 v0.7.24 cleared ledger -> payment_need_evidence",
+          A(dict(base, commitment=dict(base["commitment"], ledger=[], ledger_cleared=True)), CLS, CAL)[1], "payment_need_evidence")
     check("CHECK-ACTUAL C-DRF-6 commitment null -> unknown", CA.ledger(dict(base, commitment=None)), "unknown")
     check("CHECK-ACTUAL unknown ledger -> payment_need_evidence",
           A(dict(base, commitment=dict(base["commitment"], ledger=None)), CLS, CAL)[1], "payment_need_evidence")
@@ -1588,6 +1603,601 @@ with tempfile.TemporaryDirectory() as td:
               (1, ["E9102 attachments missing", "E9104 attachments missing"], "4 samples, 2 with mismatches"))
     p = subprocess.run([sys.executable, CAP, "--require-attachments"], capture_output=True, text=True)
     check("CHECK-ACTUAL E4 --require-attachments without dir (usage error)", p.returncode, 2)
+
+# ---------------------------------------------------------------- E6: C-RED-0 ③ inline signature images (TC-RED-11, PRD appendix B)
+import base64  # noqa: E402
+import struct  # noqa: E402
+import zlib  # noqa: E402
+
+E6DIR = tempfile.mkdtemp(prefix="oracle_e6_")
+
+
+def pchunk(name, data):
+    return struct.pack(">I", len(data)) + name + data + struct.pack(">I", zlib.crc32(name + data))
+
+
+def png(w=120, h=40, extra=(), idat=None, tail=b"", iend=True, ihdr=True, after_idat=()):
+    out = b"\x89PNG\r\n\x1a\n"
+    if ihdr:
+        out += pchunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0))
+    for c in extra:
+        out += c if isinstance(c, bytes) else pchunk(*c)
+    if idat is None:
+        idat = zlib.compress(bytes((1 + 3 * min(w, 64)) * min(h, 8)))
+    out += pchunk(b"IDAT", idat)
+    for c in after_idat:
+        out += c if isinstance(c, bytes) else pchunk(*c)
+    if iend:
+        out += pchunk(b"IEND", b"")
+    return out + tail
+
+
+def png_sized(total, w, h, extra=()):
+    base = png(w, h, extra=extra, idat=b"")
+    return png(w, h, extra=extra, idat=b"\x00" * (total - len(base)))
+
+
+def tEXt(n):
+    return (b"tEXt", b"Comment\x00" + b"a" * (n - 8))
+
+
+def jseg(m, data):
+    return bytes([0xFF, m]) + struct.pack(">H", len(data) + 2) + data
+
+
+JFIF = jseg(0xE0, b"JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00")
+DQT = jseg(0xDB, b"\x00" + b"\x01" * 64)
+DHT = jseg(0xC4, b"\x00" + b"\x01" + b"\x00" * 15 + b"\x00")
+SOS = jseg(0xDA, b"\x03\x01\x00\x02\x00\x03\x00\x00\x3f\x00")
+
+
+def sof(w, h, m=0xC0):
+    return jseg(m, b"\x08" + struct.pack(">HH", h, w) + b"\x03\x01\x22\x00\x02\x11\x00\x03\x11\x00")
+
+
+def jpeg(w=300, h=80, app=(), sofm=0xC0, scan=b"\x12\x34\xff\x00\x56\x78", pre=b"", mid=b"", post=b"",
+         end=b"\xff\xd9", tail=b"", head=None):
+    out = b"\xff\xd8" + JFIF
+    for m, data in app:
+        out += jseg(m, data)
+    out += pre + DQT + (sof(w, h, sofm) if head is None else head) + DHT + mid + SOS + scan + post + end + tail
+    return out
+
+
+def gsub(data):
+    out = b""
+    for i in range(0, len(data), 255):
+        out += bytes([len(data[i:i + 255])]) + data[i:i + 255]
+    return out + b"\x00"
+
+
+GCE = b"\x21\xf9\x04\x04\x0a\x00\x00\x00"
+NETSCAPE = b"\x21\xff\x0bNETSCAPE2.0\x03\x01\x00\x00\x00"
+
+
+def gframe(l=0, t=0, w=32, h=32, data=b"\x84\x8f\xa9\xcb\xed\x0f\xa3\x9c\xb4\xda\x8b\xb3\xde\xbc\xfb\x0f"):
+    return b"\x2c" + struct.pack("<HHHH", l, t, w, h) + b"\x00" + b"\x02" + gsub(data)
+
+
+def gif(w=32, h=32, body=None, trailer=b"\x3b", tail=b""):
+    out = b"GIF89a" + struct.pack("<HH", w, h) + b"\x80\x00\x00" + b"\x00\x00\x00\xff\xff\xff"
+    return out + (GCE + gframe() if body is None else body) + trailer + tail
+
+
+CID = "sig1@x.example"
+HTML_REF = '<html><body><p>Kind regards</p><img src="cid:%s" width="120"></body></html>' % CID
+
+
+def hpart(html, ctype="text/html; charset=utf-8", cte=None, extra=(), raw=None):
+    hs = ["Content-Type: " + ctype] + (["Content-Transfer-Encoding: " + cte] if cte else []) + list(extra)
+    body = raw if raw is not None else (base64.encodebytes(html.encode()) if cte == "base64" else html.encode())
+    return ("\r\n".join(hs) + "\r\n\r\n").encode() + body
+
+
+def ipart(data, ctype="image/png", cid="<%s>" % CID, disp="inline", cte="base64", extra=(), body=None):
+    hs = ["Content-Type: " + ctype]
+    for c in ([cid] if isinstance(cid, str) else list(cid or [])):
+        hs.append("Content-ID: " + c)
+    if disp is not None:
+        hs.append("Content-Disposition: " + disp)
+    if cte is not None:
+        hs.append("Content-Transfer-Encoding: " + cte)
+    hs += list(extra)
+    if body is None:
+        body = base64.encodebytes(data) if cte and cte.lower() == "base64" else data
+    return b"\r\n".join(h.encode("latin-1") if isinstance(h, str) else h for h in hs) + b"\r\n\r\n" + body
+
+
+def multi(parts, ctype="multipart/related", boundary="=_b1", close=True, preamble=b""):
+    out = preamble
+    for p in parts:
+        out += b"--" + boundary.encode() + b"\r\n" + p + b"\r\n"
+    if close:
+        out += b"--" + boundary.encode() + b"--\r\n"
+    return ('Content-Type: %s; boundary="%s"\r\n\r\n' % (ctype, boundary)).encode() + out
+
+
+ROOT = (b"From: Jane Doe <jane@investor.example>\r\nTo: ops@fund.example\r\nSubject: Signature\r\n"
+        b"Message-ID: <m1@investor.example>\r\nMIME-Version: 1.0\r\n")
+_n = [0]
+
+
+def write_eml(raw):
+    _n[0] += 1
+    p = os.path.join(E6DIR, "m%04d.eml" % _n[0])
+    with open(p, "wb") as fh:
+        fh.write(raw)
+    return p
+
+
+def mail(*parts, ctype="multipart/related", root=ROOT, close=True, boundary="=_b1"):
+    return root + multi(list(parts), ctype=ctype, close=close, boundary=boundary)
+
+
+def IS(raw, ordinal=0, scan="passed", thresholds=None):
+    inp = {"eml_path": write_eml(raw), "ordinal": ordinal, "scan": scan}
+    if thresholds is not None:
+        inp["thresholds"] = thresholds
+    r = O.inline_signature(inp)
+    return (r["exempt"], r["reason"])
+
+
+def SIG(img, html=HTML_REF, **kw):
+    """Inline image `img` referenced by the HTML part; result for attachment 0."""
+    scan = kw.pop("scan", "passed")
+    th = kw.pop("thresholds", None)
+    return IS(mail(hpart(html), ipart(img, **kw)), scan=scan, thresholds=th)
+
+
+OK6 = (True, "inline_signature")
+
+# --- passes (TC-RED-11)
+P120 = png(120, 40)
+check("TC-RED-11 PNG 120x40 about 200 bytes is small", len(P120) < 250, True)
+check("TC-RED-11 PNG 120x40 inline -> exempt", SIG(P120), OK6)
+check("TC-RED-11 PNG 120x40 without Content-Disposition -> exempt", SIG(P120, disp=None), OK6)
+check("TC-RED-11 JPEG 300x80 -> exempt", SIG(jpeg(), ctype="image/jpeg"), OK6)
+check("TC-RED-11 single-frame GIF 32x32 -> exempt", SIG(gif(), ctype="image/gif", disp=None), OK6)
+check("TC-RED-11 PNG with tEXt / uncompressed iTXt / eXIf -> exempt",
+      SIG(png(extra=[tEXt(100), (b"iTXt", b"XML:com.adobe.xmp\x00\x00\x00\x00\x00<x/>"),
+                     (b"eXIf", b"MM\x00\x2a" + b"\x00" * 60)])), OK6)
+check("TC-RED-11 JPEG with XMP -> exempt",
+      SIG(jpeg(app=[(0xE1, b"http://ns.adobe.com/xap/1.0/\x00<x:xmpmeta/>")]), ctype="image/jpeg"), OK6)
+PROG = jpeg(sofm=0xC2, mid=b"", post=DHT + SOS + b"\x9a\xbc" + DHT + SOS + b"\xde\xf0")
+check("TC-RED-11 progressive JPEG (several scans) -> exempt", SIG(PROG, ctype="image/jpeg"), OK6)
+DRI = jseg(0xDD, b"\x00\x10")
+check("TC-RED-11 JPEG with DRI, RSTn and fill bytes -> exempt",
+      SIG(jpeg(pre=b"\xff\xff", mid=DRI, scan=b"\x12\xff\xd0\x34\xff\xd1\x56\xff\x00", post=b"\xff\xff"),
+          ctype="image/jpeg"), OK6)
+check("TC-RED-11 GIF with NETSCAPE2.0 and graphic control extension -> exempt",
+      SIG(gif(body=NETSCAPE + GCE + gframe()), ctype="image/gif"), OK6)
+check("TC-RED-11 CID: in upper case -> exempt", SIG(P120, html='<IMG SRC="CID:SIG1@X.EXAMPLE">'), OK6)
+check("TC-RED-11 percent-encoded cid -> exempt", SIG(P120, html='<img src="cid:sig1%40x%2Eexample">'), OK6)
+check("TC-RED-11 src with spaces around -> exempt", SIG(P120, html='<img src=" \n cid:sig1@x.example \t">'), OK6)
+check("TC-RED-11 &amp; character reference -> exempt",
+      SIG(P120, cid="<a&b@x.example>", html='<img src="cid:a&amp;b@x.example">'), OK6)
+check("TC-RED-11 application/octet-stream but PNG bytes -> exempt", SIG(P120, ctype="application/octet-stream"), OK6)
+OUTLOOK_HTML = ('<html xmlns:v=3D"urn:schemas-microsoft-com:vml"><body><p class=3DMsoNormal>Kind regards</p>\r\n'
+                '<!--[if gte vml 1]><v:shape style=3D\'width:90pt;height:30pt\'><v:imagedata src=3D"cid:image001.png@01D=\r\n'
+                'B2F5A.6C1B3E50.example" o:title=3D""/></v:shape><![endif]--><![if !vml]><img width=3D120 height=3D40 src=3D"cid:im=\r\n'
+                'age001.png@01DB2F5A.6C1B3E50.example" alt=3D"Logo"><![endif]></body></html>\r\n')
+OUTLOOK_CID = "<image001.png@01DB2F5A.6C1B3E50.example>"
+check("TC-RED-11 Outlook signature (QP HTML, VML comment, <![if !vml]>) -> exempt",
+      IS(mail(hpart(None, ctype='text/html; charset="us-ascii"', cte="quoted-printable", raw=OUTLOOK_HTML.encode()),
+              ipart(P120, cid=OUTLOOK_CID, disp='inline; filename="image001.png"', ctype='image/png; name="image001.png"'))),
+      OK6)
+check("PRD-B.4 Outlook: reference only inside the VML comment -> not referenced",
+      IS(mail(hpart(None, cte="quoted-printable", raw=OUTLOOK_HTML.split("<![if")[0].encode() + b"</body></html>"),
+              ipart(P120, cid=OUTLOOK_CID))), (False, "b:not_referenced"))
+check("TC-RED-11 <img alt=\">\" src=\"cid:x\"> -> exempt", SIG(P120, cid="<x>", html='<img alt=">" src="cid:x">'), OK6)
+check("TC-RED-11 <img/src=cid:x> -> exempt", SIG(P120, cid="<x>", html="<p><img/src=cid:x></p>"), OK6)
+check("TC-RED-11 JPEG ending FF FF D9 -> exempt", SIG(jpeg(end=b"\xff\xff\xd9"), ctype="image/jpeg"), OK6)
+check("TC-RED-11 macOS screenshot PNG with 28-byte iDOT -> exempt", SIG(png(extra=[(b"iDOT", b"\x00" * 28)])), OK6)
+check("PRD-B.5 PNG iDOT not 28 bytes -> fails", SIG(png(extra=[(b"iDOT", b"\x00" * 27)])), (False, "e:png:chunk_size"))
+check("PRD-B.5 PNG cICP 4 bytes passes, 5 fails",
+      [SIG(png(extra=[(b"cICP", b"\x01\x0d\x00\x01" + b"\x00" * k)]))[0] for k in (0, 1)], [True, False])
+
+# --- boundaries (default thresholds)
+check("TC-RED-11 400x150 and 51,200 bytes -> exempt", SIG(png_sized(51200, 400, 150)), OK6)
+check("TC-RED-11 401x150 -> not exempt", SIG(png(401, 150)), (False, "f:long_side"))
+check("TC-RED-11 400x151 -> not exempt", SIG(png(400, 151)), (False, "f:short_side"))
+check("TC-RED-11 51,201 bytes -> not exempt", SIG(png_sized(51201, 400, 150)), (False, "f:bytes"))
+check("TC-RED-11 150x400 (portrait) -> exempt", SIG(png(150, 400)), OK6)
+check("TC-RED-11 tEXt 16,384 bytes -> exempt", SIG(png(extra=[tEXt(16384)])), OK6)
+check("TC-RED-11 tEXt 16,385 bytes -> not exempt", SIG(png(extra=[tEXt(16385)])), (False, "e:png:chunk_over_16384"))
+check("TC-RED-11 two tEXt of 8,192 bytes -> exempt", SIG(png(extra=[tEXt(8192), tEXt(8192)])), OK6)
+ITXT6 = (b"iTXt", b"k\x00\x00\x00\x00\x00")
+check("TC-RED-11 two tEXt of 8,192 plus an iTXt -> not exempt",
+      SIG(png(extra=[tEXt(8192), tEXt(8192), ITXT6])), (False, "e:png:text_total_over_16384"))
+check("PRD-B.5 tEXt 8,192 + 8,186 + iTXt 6 = 16,384 -> exempt", SIG(png(extra=[tEXt(8192), tEXt(8186), ITXT6])), OK6)
+check("PRD-B.5 eXIf counts in the PNG total", SIG(png(extra=[tEXt(16000), (b"eXIf", b"MM\x00\x2a" + b"\x00" * 381)])),
+      (False, "e:png:text_total_over_16384"))
+check("PRD-B.5 iCCP 16,384 not in the total", SIG(png(extra=[(b"iCCP", b"icc\x00\x00" + b"\x01" * 16379), tEXt(16384)])), OK6)
+check("PRD-B.5 iCCP over 16,384 -> fails", SIG(png(extra=[(b"iCCP", b"icc\x00\x00" + b"\x01" * 16380)])),
+      (False, "e:png:chunk_over_16384"))
+XMP = b"http://ns.adobe.com/xap/1.0/\x00"
+JP = lambda app: SIG(jpeg(app=app), ctype="image/jpeg")  # noqa: E731
+# JFIF APP0 data is 14 bytes; it counts in the APPn / COM total.
+# Keep each ordinary APP/COM segment <=4096 so only the combined cap is
+# exercised (a single 4370-byte COM would fail the separate segment cap).
+check("TC-RED-11 JPEG APPn / COM total 16,384 (ICC excluded) -> exempt",
+      JP([(0xE1, XMP + b"x" * (12000 - len(XMP))), (0xFE, b"c" * 4096),
+          (0xE3, b"m" * (16384 - 14 - 12000 - 4096))]), OK6)
+check("TC-RED-11 JPEG APPn / COM total 16,385 -> not exempt",
+      JP([(0xE1, XMP + b"x" * (12000 - len(XMP))), (0xFE, b"c" * 4096),
+          (0xE3, b"m" * (16385 - 14 - 12000 - 4096))]),
+      (False, "e:jpeg:app_total_over_16384"))
+check("TC-RED-11 JPEG APP segment 4,096 bytes (not ICC / XMP) -> exempt", JP([(0xE3, b"m" * 4096)]), OK6)
+check("TC-RED-11 JPEG APP segment 4,097 bytes (not ICC / XMP) -> not exempt", JP([(0xE3, b"m" * 4097)]),
+      (False, "e:jpeg:app_segment_size"))
+check("PRD-B.5 JPEG COM 4,097 bytes -> fails", JP([(0xFE, b"m" * 4097)]), (False, "e:jpeg:app_segment_size"))
+ICC = b"ICC_PROFILE\x00"
+check("PRD-B.5 JPEG ICC 16,000 + XMP 16,000 -> exempt (ICC not in the total)",
+      JP([(0xE2, ICC + b"\x01" * (16000 - len(ICC))), (0xE1, XMP + b"x" * (16000 - len(XMP)))]), OK6)
+check("PRD-B.5 JPEG ICC segment over 16,384 -> fails", JP([(0xE2, ICC + b"\x01" * (16385 - len(ICC)))]),
+      (False, "e:jpeg:app_segment_size"))
+check("PRD-B.5 JPEG XMP segment over 16,384 -> fails", JP([(0xE1, XMP + b"x" * (16385 - len(XMP)))]),
+      (False, "e:jpeg:app_segment_size"))
+check("PRD-B.5 ICC marker on APP1 is not ICC", JP([(0xE1, ICC + b"\x01" * 5000)]), (False, "e:jpeg:app_segment_size"))
+check("PRD-B.5 GIF comment 4,096 bytes passes, 4,097 fails",
+      [SIG(gif(body=b"\x21\xfe" + gsub(b"c" * k) + gframe()), ctype="image/gif")[0] for k in (4096, 4097)],
+      [True, False])
+
+# --- still possibly KYC (TC-RED-11)
+check("TC-RED-11 same image as attachment -> not exempt", SIG(P120, disp="attachment"), (False, "c:disposition"))
+check("TC-RED-11 same image as ATTACHMENT; filename=… -> not exempt", SIG(P120, disp="ATTACHMENT; filename=a.png"),
+      (False, "c:disposition"))
+check("TC-RED-11 Content-Disposition: attachmentx -> not exempt", SIG(P120, disp="attachmentx"), (False, "c:disposition"))
+check("PRD-B.2 empty Content-Disposition -> not exempt", SIG(P120, disp=" ; filename=a.png"), (False, "c:disposition"))
+check("PRD-B.2 two Content-Disposition headers -> not exempt",
+      SIG(P120, extra=["Content-Disposition: inline"]), (False, "c:disposition_count"))
+check("PRD-B.2 Inline (any case) with filename -> exempt", SIG(P120, disp='Inline; filename="logo.png"'), OK6)
+check("TC-RED-11 no Content-ID -> not exempt", SIG(P120, cid=None), (False, "b:content_id_count"))
+check("TC-RED-11 Content-ID: <> with src=\"cid:\" -> not exempt", SIG(P120, cid="<>", html='<img src="cid:">'),
+      (False, "b:content_id_shape"))
+check("TC-RED-11 two Content-ID headers -> not exempt", SIG(P120, cid=["<%s>" % CID, "<%s>" % CID]),
+      (False, "b:content_id_count"))
+check("PRD-B.2 Content-ID without angle brackets -> not exempt", SIG(P120, cid=CID), (False, "b:content_id_shape"))
+check("PRD-B.2 Content-ID with a space inside -> not exempt", SIG(P120, cid="<sig 1@x.example>",
+                                                                   html='<img src="cid:sig%201@x.example">'),
+      (False, "b:content_id_shape"))
+check("TC-RED-11 Content-ID with a non-ASCII byte -> not exempt",
+      SIG(P120, cid=b"Content-ID: <sig\xc3\xa9@x.example>".decode("latin-1")[12:],
+          html='<img src="cid:sig%C3%A9@x.example">'), (False, "b:content_id_shape"))
+check("PRD-B.2 folded Content-ID header -> exempt", SIG(P120, cid="\r\n <%s>" % CID), OK6)
+check("TC-RED-11 HTML does not reference it -> not exempt", SIG(P120, html="<p>Kind regards</p>"),
+      (False, "b:not_referenced"))
+for where, h in [("plain text", "<p>see cid:%s</p>" % CID), ("comment", '<!-- <img src="cid:%s"> -->' % CID),
+                 ("<template>", '<template><img src="cid:%s"></template>' % CID),
+                 ("<noscript>", '<noscript><img src="cid:%s"></noscript>' % CID),
+                 ("<textarea>", '<textarea><img src="cid:%s"></textarea>' % CID),
+                 ("<svg>", '<svg><image href="x"/><img src="cid:%s"></svg>' % CID),
+                 ("<SVG> upper case", '<SVG><img src="cid:%s"></SvG >' % CID),
+                 ("<image>", '<image src=cid:%s>' % CID),
+                 ("srcset", '<img srcset="cid:%s 1x">' % CID),
+                 ("CSS url()", '<div style="background:url(cid:%s)">x</div>' % CID),
+                 ("second src", '<img src="https://x.example/a.png" src="cid:%s">' % CID),
+                 ("<a title=\"<img src='cid:x'>\">", '<a title="<img src=\'cid:%s\'>">x</a>' % CID),
+                 ("after <plaintext>", '<plaintext></plaintext><img src="cid:%s">' % CID),
+                 ("after unclosed <!--", '<!-- open <img src="cid:%s">' % CID),
+                 ("after unclosed <script>", '<script>var a; <img src="cid:%s">' % CID)]:
+    check("TC-RED-11 reference only in %s -> not exempt" % where, SIG(P120, html=h), (False, "b:not_referenced"))
+for name in sorted(O._RAW_IGNORE):
+    check("PRD-B.4 <%s> region ignored" % name,
+          SIG(P120, html='<%s x="1"><img src="cid:%s"></%s>' % (name, CID, name.upper())), (False, "b:not_referenced"))
+check("PRD-B.4 reference after </svg> counts", SIG(P120, html='<svg></svg ><img src="cid:%s">' % CID), OK6)
+check("PRD-B.4 </scriptx> does not end <script>",
+      SIG(P120, html='<script></scriptx><img src="cid:%s">' % CID), (False, "b:not_referenced"))
+check("TC-RED-11 reference after <!--> counts", SIG(P120, html='<!--><img src="cid:%s">' % CID), OK6)
+check("PRD-B.4 reference after <!---> counts", SIG(P120, html='<!---><img src="cid:%s">' % CID), OK6)
+check("PRD-B.4 <![endif]> and <?xml …> are ignored fragments",
+      SIG(P120, html='<?xml version="1.0"?><![if !vml]><img src="cid:%s"><![endif]>' % CID), OK6)
+check("TC-RED-11 only reference in an HTML part with Content-Disposition: attachment -> not exempt",
+      IS(mail(hpart("<p>hi</p>"), hpart(HTML_REF, extra=["Content-Disposition: attachment"]), ipart(P120)), ordinal=1),
+      (False, "b:not_referenced"))
+check("PRD-B.1 HTML part with Content-Disposition: attachment is attachment 0",
+      len(O._outer_parts(mail(hpart("<p>hi</p>"), hpart(HTML_REF, extra=["Content-Disposition: attachment"]),
+                              ipart(P120)))[0]), 2)
+check("TC-RED-11 first HTML part has unclosed <!--, reference in the second -> exempt",
+      IS(mail(hpart("<p>hi <!-- open"), hpart(HTML_REF), ipart(P120))), OK6)
+check("PRD-B.4 base64 HTML part -> exempt", IS(mail(hpart(HTML_REF, cte="base64"), ipart(P120))), OK6)
+check("PRD-B.4 broken base64 HTML part has no references",
+      IS(mail(hpart(None, cte="base64", raw=base64.encodebytes(HTML_REF.encode()) + b"*"), ipart(P120))),
+      (False, "b:not_referenced"))
+check("PRD-B.4 windows-1252 HTML -> exempt",
+      IS(mail(hpart(None, ctype="text/html; charset=WINDOWS-1252", raw=b"\x93Regards\x94 " + HTML_REF.encode()),
+              ipart(P120))), OK6)
+check("TC-RED-11 Content-ID duplicated -> not exempt",
+      IS(mail(hpart(HTML_REF), ipart(P120), ipart(P120))), (False, "b:content_id_duplicate"))
+check("TC-RED-11 Content-ID duplicated in another case (SIG1@X.EXAMPLE) -> not exempt",
+      IS(mail(hpart(HTML_REF), ipart(P120), ipart(b"x", ctype="application/pdf", cid="<SIG1@X.EXAMPLE>"))),
+      (False, "b:content_id_duplicate"))
+check("TC-RED-11 another part has two Content-ID headers, one equal -> not exempt",
+      IS(mail(hpart(HTML_REF), ipart(P120), ipart(P120, cid=["<other@x.example>", "<%s>" % CID]))),
+      (False, "b:content_id_duplicate"))
+check("PRD-B.2 Content-ID in the outer message's own headers counts",
+      IS(ROOT + ("Content-ID: <%s>\r\n" % CID).encode() + multi([hpart(HTML_REF), ipart(P120)])),
+      (False, "b:content_id_duplicate"))
+check("PRD-B.2 Content-ID on the HTML body part counts",
+      IS(mail(hpart(HTML_REF, extra=["Content-ID: <%s>" % CID]), ipart(P120))), (False, "b:content_id_duplicate"))
+INNER = ROOT + multi([hpart(HTML_REF), ipart(P120)], boundary="=_inner")
+check("TC-RED-11 referenced only by HTML in an attached .eml -> not exempt",
+      IS(mail(hpart("<p>see attached</p>"), ipart(P120),
+              ipart(None, ctype="message/rfc822", cid=None, disp="attachment", cte=None, body=INNER),
+              ctype="multipart/mixed")), (False, "b:not_referenced"))
+ATT_EML = mail(hpart(HTML_REF), ipart(None, ctype="message/rfc822", cid=None, disp="attachment", cte=None, body=INNER),
+               ctype="multipart/mixed")
+check("TC-RED-11 image inside an attached .eml is not an outer attachment",
+      (len(O._outer_parts(ATT_EML)[0]), IS(ATT_EML, ordinal=0), IS(ATT_EML, ordinal=1)),
+      (1, (False, "b:content_id_count"), (False, "a:no_such_attachment")))
+check("PRD-B.1 Content-ID inside an attached .eml is not in the duplicate check",
+      IS(mail(hpart(HTML_REF), ipart(P120),
+              ipart(None, ctype="message/rfc822", cid=None, disp="attachment", cte=None, body=INNER),
+              ctype="multipart/mixed")), OK6)
+check("TC-RED-11 quoted-printable image -> not exempt",
+      SIG(P120, cte="quoted-printable", body=b"=89PNG"), (False, "e:transfer_encoding"))
+check("TC-RED-11 binary image -> not exempt", SIG(P120, cte="binary", body=P120), (False, "e:transfer_encoding"))
+check("PRD-B.3 no Content-Transfer-Encoding -> not exempt", SIG(P120, cte=None, body=base64.encodebytes(P120)),
+      (False, "e:transfer_encoding"))
+check("PRD-B.3 BASE64 in upper case -> exempt", SIG(P120, cte=" BASE64 ", body=base64.encodebytes(P120)), OK6)
+check("PRD-B.3 two Content-Transfer-Encoding headers -> not exempt",
+      SIG(P120, extra=["Content-Transfer-Encoding: base64"]), (False, "e:transfer_encoding"))
+B64 = base64.b64encode(P120)
+check("TC-RED-11 base64 with an illegal character -> not exempt", SIG(P120, body=B64[:40] + b"*" + B64[40:]),
+      (False, "e:base64"))
+check("TC-RED-11 base64 padding wrong (= in the middle) -> not exempt", SIG(P120, body=B64[:40] + b"=" + B64[41:]),
+      (False, "e:base64"))
+check("PRD-B.3 base64 length not a multiple of 4 -> not exempt", SIG(P120, body=B64.rstrip(b"=")[:-1]),
+      (False, "e:base64"))
+check("PRD-B.3 base64 with tabs / CRLF / form feed whitespace -> exempt",
+      SIG(P120, body=b"\t".join(B64[i:i + 10] for i in range(0, len(B64), 10)) + b"\x0c\r\n"), OK6)
+check("TC-RED-11 scan blocked -> not exempt", SIG(P120, scan="blocked"), (False, "d:scan"))
+check("TC-RED-11 over limit -> not exempt", SIG(P120, scan="over_limit"), (False, "d:scan"))
+check("TC-RED-11 JPEG 156x204 -> not exempt", SIG(jpeg(156, 204), ctype="image/jpeg"), (False, "f:short_side"))
+P1280 = png(1280, 223)
+check("TC-RED-11 PNG 1280x223 -> not exempt", SIG(P1280), (False, "f:long_side"))
+check("TC-RED-11 APNG (acTL) -> not exempt", SIG(png(extra=[(b"acTL", b"\x00\x00\x00\x02\x00\x00\x00\x00")])),
+      (False, "e:png:chunk_not_allowed"))
+check("TC-RED-11 data after IEND -> not exempt", SIG(png(tail=b"\x00")), (False, "e:png:data_after_iend"))
+check("TC-RED-11 no IEND -> not exempt", SIG(png(iend=False)), (False, "e:png:no_iend"))
+bad_crc = bytearray(P120)
+bad_crc[8 + 8 + 13] ^= 1  # IHDR CRC
+check("TC-RED-11 CRC wrong -> not exempt", SIG(bytes(bad_crc)), (False, "e:png:crc"))
+for nm in (b"zTXt", b"prVt", b"cLLi", b"mDCv"):
+    check("TC-RED-11 PNG with %s -> not exempt" % nm.decode(), SIG(png(extra=[(nm, b"k\x00\x00x")])),
+          (False, "e:png:chunk_not_allowed"))
+check("TC-RED-11 compressed iTXt -> not exempt", SIG(png(extra=[(b"iTXt", b"k\x00\x01\x00\x00\x00" + zlib.compress(b"x"))])),
+      (False, "e:png:itxt_compressed"))
+JPG_SMALL = jpeg()
+check("TC-RED-11 JPEG hidden in tEXt -> not exempt", SIG(png(extra=[(b"tEXt", b"Comment\x00" + JPG_SMALL)])),
+      (False, "e:png:signature_in_text"))
+check("TC-RED-11 JPEG after the IDAT compressed stream -> not exempt",
+      SIG(png(idat=zlib.compress(b"\x00" * 100) + JPG_SMALL)), (False, "e:png:signature_in_idat"))
+check("PRD-B.5 PNG signature split across two tEXt chunks -> not exempt",
+      SIG(png(extra=[(b"tEXt", b"a\x00\x89P"), (b"tEXt", b"NG")])), (False, "e:png:signature_in_idat"))
+check("PRD-B.5 PNG first chunk not IHDR", SIG(png(ihdr=False)), (False, "e:png:first_not_ihdr"))
+check("PRD-B.5 PNG two IHDR", SIG(png(extra=[(b"IHDR", struct.pack(">IIBBBBB", 1, 1, 8, 2, 0, 0, 0))])),
+      (False, "e:png:ihdr"))
+check("PRD-B.5 PNG width 0", SIG(png(0, 40)), (False, "e:zero_size"))
+check("PRD-B.5 PNG chunk length beyond the data", SIG(png(extra=[struct.pack(">I", 100000) + b"tEXt" + b"abc"])),
+      (False, "e:png:length"))
+check("PRD-B.5 PNG cut inside the last chunk", SIG(P120[:-6]), (False, "e:png:truncated"))
+check("TC-RED-11 multi-frame GIF -> not exempt", SIG(gif(body=GCE + gframe() + GCE + gframe()), ctype="image/gif"),
+      (False, "e:gif:more_than_one_frame"))
+check("TC-RED-11 GIF frame outside the canvas -> not exempt", SIG(gif(body=gframe(l=1)), ctype="image/gif"),
+      (False, "e:gif:frame_outside_canvas"))
+check("TC-RED-11 GIF data after the trailer -> not exempt", SIG(gif(tail=b"\x00"), ctype="image/gif"),
+      (False, "e:gif:data_after_trailer"))
+check("TC-RED-11 GIF without trailer -> not exempt", SIG(gif(trailer=b""), ctype="image/gif"), (False, "e:gif:no_trailer"))
+check("TC-RED-11 GIF unlisted extension label -> not exempt",
+      SIG(gif(body=b"\x21\xfa" + gsub(b"abc") + gframe()), ctype="image/gif"), (False, "e:gif:extension_not_allowed"))
+check("PRD-B.5 GIF graphic control with a 5-byte sub-block -> not exempt",
+      SIG(gif(body=b"\x21\xf9\x05\x00\x00\x00\x00\x00\x00" + gframe()), ctype="image/gif"), (False, "e:gif:graphic_control"))
+check("TC-RED-11 GIF image data with a JPEG signature -> not exempt",
+      SIG(gif(body=gframe(data=b"\x01\xff\xd8\xff\x02")), ctype="image/gif"), (False, "e:gif:signature_in_image_data"))
+check("PRD-B.5 GIF comment with a PNG signature -> not exempt",
+      SIG(gif(body=b"\x21\xfe" + gsub(b"\x89PNG") + gframe()), ctype="image/gif"), (False, "e:gif:signature_in_extension"))
+check("PRD-B.5 GIF87a accepted", SIG(b"GIF87a" + gif()[6:], ctype="image/gif"), OK6)
+EXIF_THUMB = b"Exif\x00\x00MM\x00\x2a\x00\x00\x00\x08" + b"\x00" * 20 + jpeg(160, 120)
+check("TC-RED-11 JPEG 300x80 with EXIF thumbnail in APP1 -> not exempt", JP([(0xE1, EXIF_THUMB)]),
+      (False, "e:jpeg:signature_in_app"))
+check("TC-RED-11 EXIF thumbnail 160x120, main 4000x3000 -> not exempt",
+      SIG(jpeg(4000, 3000, app=[(0xE1, EXIF_THUMB)]), ctype="image/jpeg")[0], False)
+check("TC-RED-11 MPF multi-picture JPEG -> not exempt", JP([(0xE2, b"MPF\x00MM\x00\x2a" + b"\x00" * 20)]),
+      (False, "e:jpeg:mpf"))
+check("TC-RED-11 DNL segment -> not exempt", SIG(jpeg(post=jseg(0xDC, b"\x00\x50")), ctype="image/jpeg"),
+      (False, "e:jpeg:dnl"))
+check("TC-RED-11 JPEG height 0 -> not exempt", SIG(jpeg(300, 0), ctype="image/jpeg"), (False, "e:zero_size"))
+check("TC-RED-11 data after EOI -> not exempt", SIG(jpeg(tail=b"\x00"), ctype="image/jpeg"), (False, "e:jpeg:data_after_eoi"))
+check("TC-RED-11 no EOI -> not exempt", SIG(jpeg(end=b""), ctype="image/jpeg"), (False, "e:jpeg:truncated_scan"))
+check("PRD-B.5 JPEG FF as the last byte -> not exempt", SIG(jpeg(end=b"\xff"), ctype="image/jpeg"),
+      (False, "e:jpeg:ff_last_byte"))
+check("TC-RED-11 WebP bytes declared image/png -> not exempt",
+      SIG(b"RIFF\x24\x00\x00\x00WEBPVP8 \x18\x00\x00\x00" + b"\x00" * 24), (False, "e:signature"))
+check("TC-RED-11 Photoshop JPEG with thumbnail in APP13 -> not exempt",
+      JP([(0xED, b"Photoshop 3.0\x008BIM\x04\x0c\x00\x00\x00\x00\x00\x40" + jpeg(80, 60))]),
+      (False, "e:jpeg:signature_in_app"))
+check("PRD-B.5 JPEG second SOI", SIG(jpeg(pre=b"\xff\xd8"), ctype="image/jpeg"), (False, "e:jpeg:second_soi"))
+check("PRD-B.5 JPEG RST outside a scan", SIG(jpeg(pre=b"\xff\xd0"), ctype="image/jpeg"), (False, "e:jpeg:rst_outside_scan"))
+check("PRD-B.5 JPEG TEM (01) outside a scan", SIG(jpeg(pre=b"\xff\x01"), ctype="image/jpeg"),
+      (False, "e:jpeg:rst_outside_scan"))
+check("PRD-B.5 JPEG unlisted markers C8 / F0 / DE",
+      [SIG(jpeg(pre=jseg(m, b"\x00\x00")), ctype="image/jpeg") for m in (0xC8, 0xF0, 0xDE)],
+      [(False, "e:jpeg:marker_not_allowed")] * 3)
+check("PRD-B.5 JPEG two frame headers", SIG(jpeg(pre=sof(300, 80)), ctype="image/jpeg"), (False, "e:jpeg:frame_header"))
+check("PRD-B.5 JPEG frame header after the first SOS",
+      SIG(jpeg(head=b"", post=sof(300, 80) + SOS + b"\x01"), ctype="image/jpeg"), (False, "e:jpeg:frame_header"))
+check("PRD-B.5 JPEG without frame header", SIG(jpeg(head=b""), ctype="image/jpeg"), (False, "e:jpeg:no_frame_header"))
+check("PRD-B.5 JPEG without SOS", SIG(b"\xff\xd8" + DQT + sof(300, 80) + b"\xff\xd9", ctype="image/jpeg"),
+      (False, "e:jpeg:no_sos"))
+check("PRD-B.5 JPEG segment length < 2", SIG(b"\xff\xd8\xff\xfe\x00\x01" + jpeg()[2:], ctype="image/jpeg"),
+      (False, "e:jpeg:length"))
+check("PRD-B.5 JPEG GIF signature in the scan data", SIG(jpeg(scan=b"GIF89a"), ctype="image/jpeg"),
+      (False, "e:jpeg:signature_in_scan"))
+check("PRD-B.5 JPEG signature across two scans", SIG(jpeg(scan=b"\x01GI", post=SOS + b"F8\x02"), ctype="image/jpeg"),
+      (False, "e:jpeg:signature_in_scan"))
+PHONE = jpeg(3024, 4032, app=[(0xE1, b"http://ns.adobe.com/xap/1.0/\x00<x/>")], scan=b"\x11" * 2_000_000)
+check("TC-RED-11 phone ID photo inline, JPEG 3024x4032 about 2 MB -> not exempt",
+      SIG(PHONE, ctype="image/jpeg"), (False, "f:long_side"))
+check("PRD-B.6 PNG 1280x223 with configured 1280 / 300 / 102,400 -> exempt",
+      SIG(P1280, thresholds={"max_long_side": 1280, "max_short_side": 300, "max_bytes": 102400}), OK6)
+for cfg in ({"max_long_side": 1281}, {"max_bytes": 102401}, {"max_short_side": 301}, {"max_bytes": 0},
+            {"max_long_side": "400"}, {"max_px": 10}):
+    try:
+        O.inline_thresholds(cfg)
+        r = "loaded"
+    except ValueError:
+        r = "error"
+    check("TC-RED-11 configuration %s -> load error" % json.dumps(cfg), r, "error")
+check("PRD-B.6 defaults", O.inline_thresholds(None), {"max_long_side": 400, "max_short_side": 150, "max_bytes": 51200})
+
+# --- B.1 numbering, structure headers and MIME failure
+PDFP = ipart(b"%PDF-1.4 x", ctype="application/pdf", cid=None, disp='attachment; filename="invoice.pdf"')
+NUM = mail(hpart(HTML_REF), PDFP, ipart(P120), ctype="multipart/mixed")
+check("PRD-B.1 attachments numbered from 0 in order (PDF 0, image 1)", (IS(NUM, ordinal=1), IS(NUM, ordinal=0)[0]),
+      (OK6, False))
+check("PRD-B.1 ordinal beyond the attachments", IS(NUM, ordinal=2), (False, "a:no_such_attachment"))
+check("PRD-B.1 ordinal must be an integer", O.inline_signature({"eml_path": write_eml(NUM), "ordinal": "1", "scan": "passed"}),
+      {"exempt": False, "reason": "a:no_such_attachment"})
+check("PRD-B.1 text/plain with a file name is an attachment",
+      len(O._outer_parts(mail(hpart("x", ctype="text/plain", extra=['Content-Disposition: inline; filename="a.txt"']),
+                              hpart(HTML_REF), ipart(P120)))[0]), 2)
+check("PRD-B.1 part without Content-Type in multipart/digest is text/plain (body part)",
+      len(O._outer_parts(mail(b"\r\nplain body", ipart(P120), ctype="multipart/digest"))[0]), 1)
+check("PRD-B.1 nested multipart/alternative inside multipart/related -> exempt",
+      IS(ROOT + multi([multi([hpart("plain", ctype="text/plain"), hpart(HTML_REF)], ctype="multipart/alternative",
+                             boundary="=_alt"), ipart(P120)], boundary="=_rel")), OK6)
+check("PRD-B.1 MIME truncated (no closing boundary) -> no exception",
+      IS(mail(hpart(HTML_REF), ipart(P120), close=False))[0], False)
+check("PRD-B.1 multipart without boundary -> no exception",
+      IS(ROOT + b"Content-Type: multipart/related\r\n\r\n--x\r\n\r\n--x--\r\n")[1].startswith("mime_failed"), True)
+check("PRD-B.1 header line without a colon -> no exception",
+      IS(ROOT + b"Broken header line\r\n" + multi([hpart(HTML_REF), ipart(P120)]))[1].startswith("mime_failed"), True)
+check("PRD-B.1 no invented 1,000-part cap in the independent parser",
+      IS(mail(hpart(HTML_REF), ipart(P120), *[hpart("x", ctype="text/plain")] * 1000)), OK6)
+check("PRD-B.1 system MIME failure vetoes otherwise valid inline image",
+      O.inline_signature({"eml_path": write_eml(mail(hpart(HTML_REF), ipart(P120))),
+                          "ordinal": 0, "scan": "passed", "mime_failed": True}),
+      {"exempt": False, "reason": "mime_failed:system"})
+check("PRD-B.1 unreadable file", O.inline_signature({"eml_path": os.path.join(E6DIR, "missing.eml"), "ordinal": 0,
+                                                     "scan": "passed"}), {"exempt": False, "reason": "mime_unreadable"})
+check("PRD-B.1 LF-only line endings -> exempt",
+      IS(mail(hpart(HTML_REF), ipart(P120)).replace(b"\r\n", b"\n")), OK6)
+check("PRD-B.1 RFC 2231 file name", O._filename(O._parse_part(ipart(P120, disp="inline; filename*=UTF-8''passport%2Epng"),
+                                                               0, [0])), "passport.png")
+check("PRD-B.1 Content-Type name when filename is empty",
+      O._filename(O._parse_part(ipart(P120, ctype='image/png; name="logo.png"', disp='inline; filename=""'), 0, [0])),
+      "logo.png")
+check("PRD-B.1 structure headers not RFC 2047-decoded (Content-ID)",
+      SIG(P120, cid="=?UTF-8?Q?<sig1@x.example>?=")[0], False)
+
+# --- kyc with the exception (test plan §3 v0.7.21)
+
+
+def KE(raw, filename="image001.png", kind="image/png", status="unsupported", ordinal=0, **kw):
+    a = dict(att(filename, kind=kind, status=status, text=None, ordinal=ordinal), eml_path=write_eml(raw), **kw)
+    r = O.kyc(a)
+    return (r["maybe_kyc"], r["clauses"])
+
+
+SIGMAIL = mail(hpart(HTML_REF), ipart(P120))
+check("TC-RED-11 kyc: exempt inline PNG -> not possibly KYC", KE(SIGMAIL), NO)
+check("TC-RED-11 kyc: exempt reason reported", O.kyc(dict(att("image001.png", kind="image/png", status="unsupported",
+                                                              text=None, ordinal=0), eml_path=write_eml(SIGMAIL)))
+      ["inline_signature"], "inline_signature")
+check("TC-RED-11 kyc: file name passport.png -> ① only", KE(SIGMAIL, filename="passport.png"), (True, ["1"]))
+check("PRD-C-RED-0 ③ kyc: passport in the .eml file name (RFC 2231) -> ①",
+      KE(mail(hpart(HTML_REF), ipart(P120, disp="inline; filename*=UTF-8''passport.png"))), (True, ["1"]))
+check("PRD-C-RED-0 ③ kyc: passport in an RFC 2047 Content-Type name -> ①",
+      KE(mail(hpart(HTML_REF), ipart(P120, ctype='image/png; name="=?UTF-8?B?cGFzc3BvcnQucG5n?="')),
+         filename="image.png"), (True, ["1"]))
+check("TC-RED-11 kyc: blocked -> ③ ⑤", KE(SIGMAIL, status="blocked"), (True, ["3", "5"]))
+check("TC-RED-11 kyc: over_limit -> ③ ⑤", KE(SIGMAIL, status="over_limit"), (True, ["3", "5"]))
+check("TC-RED-11 kyc: octet-stream PNG exempt (not ⑤)",
+      KE(mail(hpart(HTML_REF), ipart(P120, ctype="application/octet-stream")), kind="application/octet-stream",
+         filename=""), NO)
+check("TC-RED-11 kyc: not-image not_parsed attachment still ⑤",
+      KE(mail(hpart(HTML_REF), ipart(b"PK\x03\x04zipdata", ctype="application/zip")), kind="application/zip",
+         filename="", status="unsupported"), (True, ["5"]))
+check("TC-RED-11 kyc: same image as attachment -> ③", KE(mail(hpart(HTML_REF), ipart(P120, disp="attachment"))),
+      (True, ["3"]))
+check("TC-RED-11 kyc: PNG 1280x223 -> ③", KE(mail(hpart(HTML_REF), ipart(P1280))), (True, ["3"]))
+check("PRD-B.6 kyc: PNG 1280x223 with relaxed thresholds -> exempt",
+      KE(mail(hpart(HTML_REF), ipart(P1280)), thresholds={"max_long_side": 1280, "max_short_side": 300}), NO)
+check("TC-RED-11 kyc: old input shape (no .eml) -> ③", K(att("image001.png", kind="image/png", status="unsupported",
+                                                            text=None, ordinal=0)), (True, ["3"]))
+check("PRD-B.1 kyc: explicit system MIME failure -> no image exception",
+      KE(SIGMAIL, mime_failed=True), (True, ["3"]))
+check("CHECK-ACTUAL B.1 explicit system MIME failure reaches independent kyc",
+      CA.kyc_mismatches({"mime_failed": True, "attachments": [dict(
+          att("image001.png", kind="image/png", status="unsupported", text=None, ordinal=0), maybe_kyc=False)]},
+                        write_eml(SIGMAIL)), [(0, False, True)])
+check("PRD-B.4 invalid HTML transfer-encoding token is read as raw bytes",
+      IS(mail(hpart(HTML_REF, cte="base64; invalid" , raw=base64.encodebytes(HTML_REF.encode())), ipart(P120))),
+      (False, "b:not_referenced"))
+check("PRD-C-RED-0 ③ kyc: no ordinal -> no exception",
+      O.kyc({k: v for k, v in dict(att("image001.png", kind="image/png", status="unsupported", text=None),
+                                    eml_path=write_eml(SIGMAIL)).items() if k != "ordinal"})["maybe_kyc"], True)
+check("PRD-C-RED-0 ③ kyc: wrong ordinal (the HTML is not an attachment) -> no exception",
+      KE(SIGMAIL, ordinal=1), (True, ["3"]))
+
+# CLI
+p = subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "oracle.py")],
+                   input="\n".join(json.dumps(x) for x in [
+                       {"fn": "inline_signature", "input": {"eml_path": write_eml(SIGMAIL), "ordinal": 0, "scan": "passed"}},
+                       {"fn": "inline_signature", "input": {"eml_path": write_eml(SIGMAIL), "ordinal": 0, "scan": "passed",
+                                                            "thresholds": {"max_bytes": 102401}}}]) + "\n",
+                   capture_output=True, text=True)
+lines6 = [json.loads(x) for x in p.stdout.splitlines()]
+check("CLI inline_signature", lines6[0], {"ok": True, "output": {"exempt": True, "reason": "inline_signature"}})
+check("CLI inline_signature configuration over the hard cap -> error", lines6[1]["ok"], False)
+
+# dev samples E0900-E0908 (eval/dev, written by the evaluation-set agent)
+DEV = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "dev")
+if os.path.isfile(os.path.join(DEV, "E0900.eml")):
+    check("TC-RED-11 dev samples E0900-E0908",
+          [O.inline_signature({"eml_path": os.path.join(DEV, "E09%02d.eml" % i), "ordinal": 0, "scan": "passed"})["exempt"]
+           for i in range(9)], [True, True, False, False, False, False, False, False, True])
+
+# check_actual.py with the exception (E6)
+with tempfile.TemporaryDirectory() as td:
+    emd = os.path.join(td, "eml")
+    os.mkdir(emd)
+    with open(os.path.join(td, "classes.json"), "w") as fh:
+        json.dump(CLS, fh)
+    with open(os.path.join(td, "calendar.json"), "w") as fh:
+        json.dump(CAL, fh)
+    IMG = dict(att("image001.png", kind="image/png", status="unsupported", text=None, ordinal=1))
+    PDF = dict(att("invoice.pdf", text=INVOICE, ordinal=0), maybe_kyc=False)
+    for sid, raw, mk in [("E9201", NUM, False), ("E9202", NUM, True), ("E9203", None, False),
+                         ("E9204", mail(hpart(HTML_REF), PDFP, ipart(P120, disp="attachment"), ctype="multipart/mixed"), False)]:
+        if raw is not None:
+            with open(os.path.join(emd, sid + ".eml"), "wb") as fh:
+                fh.write(raw)
+        with open(os.path.join(td, sid + ".actual.json"), "w") as fh:
+            json.dump(dict(E3BASE, id=sid, attachments=[PDF, dict(IMG, maybe_kyc=mk)]), fh)
+    p = subprocess.run([sys.executable, CAP, "--eml-dir", emd, td], capture_output=True, text=True)
+    check("CHECK-ACTUAL E6 inline signature exception from <id>.eml",
+          (p.returncode, [l for l in p.stdout.splitlines() if l.startswith("E92")], p.stdout.strip().splitlines()[-1]),
+          (1, ["E9202 attachment 1 maybe_kyc system=true oracle=false",
+               "E9203 attachment 1 maybe_kyc system=false oracle=true",
+               "E9204 attachment 1 maybe_kyc system=false oracle=true"], "4 samples, 3 with mismatches"))
+    p = subprocess.run([sys.executable, CAP, td, "--eml-dir"], capture_output=True, text=True)
+    check("CHECK-ACTUAL E6 --eml-dir without a value (usage error)", p.returncode, 2)
+    for f in os.listdir(td):
+        if f.endswith(".actual.json"):
+            os.remove(os.path.join(td, f))
+    if os.path.isfile(os.path.join(DEV, "E0900.eml")):
+        with open(os.path.join(td, "E0900.actual.json"), "w") as fh:
+            json.dump(dict(E3BASE, id="E0900", attachments=[dict(att("image001.png", kind="image/png", status="unsupported",
+                                                                      text=None, ordinal=0), maybe_kyc=False)]), fh)
+        p = subprocess.run([sys.executable, CAP, td], capture_output=True, text=True)
+        check("CHECK-ACTUAL E6 default .eml folder eval/dev", (p.returncode, p.stdout.strip().splitlines()[-1]),
+              (0, "1 samples, 0 with mismatches"))
+
+import shutil  # noqa: E402
+shutil.rmtree(E6DIR, ignore_errors=True)
+
 
 # ---------------------------------------------------------------- CLI
 req = "\n".join(json.dumps(x) for x in [{"fn": "uetr", "input": {"text": U1}}, {"fn": "nope", "input": {}}]) + "\n"

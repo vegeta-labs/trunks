@@ -196,7 +196,8 @@ describe('model adapters (tech design §3.2)', () => {
       const e1 = await new OllamaAdapter({ host: `https://127.0.0.1:${port}`, model: 'llama' }).complete(req).catch((e: unknown) => e)
       expect(e1).toBeInstanceOf(SetupError)
       const tls = (async (_u: string, init: RequestInit) => fetch(`https://127.0.0.1:${port}/v1/messages`, init)) as unknown as typeof fetch
-      expect((e1 as Error).message).toBe('cannot connect to ollama (ERR_SSL_WRONG_VERSION_NUMBER)')
+      // OpenSSL may report either code for the same TLS-to-plain-HTTP handshake. Both must remain setup errors.
+      expect((e1 as Error).message).toMatch(/^cannot connect to ollama \(ERR_SSL_(?:WRONG_VERSION_NUMBER|PACKET_LENGTH_TOO_LONG)\)$/)
       // the Anthropic address is fixed, so it has no probe: the error cannot show the request was not sent (F23)
       const e2 = await new AnthropicAdapter({ model: 'm', apiKey: 'test', fetch: tls }).complete(req).catch((e: unknown) => e)
       expect(e2).toBeInstanceOf(Error)

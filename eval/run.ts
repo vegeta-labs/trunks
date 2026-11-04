@@ -99,6 +99,7 @@ async function rawInputs(caseId: string, snap: Awaited<ReturnType<typeof loadSna
   const deal = c ? snap.deals.find((dd) => dd.dealKey === c.dealKey) : undefined
   const bare = new Map(snap.commitments.map((x) => [x.keyHmac, x.investorId]))
   return {
+    mime_failed: (await k.db.query<{ flags: string[] }>('SELECT flags FROM "case" WHERE id = $1', [caseId])).rows[0]!.flags.includes('mime_parse_failed'),
     dmarc_pass: dmarc,
     sender_contacts: matches.map((x) => ({ contact_id: x.contactId, investor_ids: x.investorIds, authorised_for: x.authorisedFor })),
     commitment: c && deal ? { cash_due_minor: c.cashDue, deal_currency: deal.currency, ledger: snap.ledgerDeals.includes(deal.dealKey) ? snap.ledger.filter((l) => l.dealKey === deal.dealKey).map((l) => ({ status: l.status, investor_id: l.commitmentKeyHmac ? (bare.get(l.commitmentKeyHmac) ?? '') : '', currency: l.currency, amount_minor: l.amount })) : null } : null,
@@ -117,7 +118,7 @@ if (!pinned && relative(resolve('eval/dev'), resolve(dir)) === '') setProblems.p
 // the E3 rule-input run changes labels and fields as this user (PRD §6 «规则输入», evaluation only)
 const evalUser = await tx(k.db, (c) => createUser(c, k.k, { username: `eval-${Date.now()}`, role: 'admin', password: null, by: null }))
 const MILESTONE = readFileSync('docs/milestone.txt', 'utf8').trim()
-const e3Enabled = ['E3', 'E4', 'E5'].includes(MILESTONE)
+const e3Enabled = ['E3', 'E4', 'E5', 'E6'].includes(MILESTONE)
 // test plan §3 export for the oracle; EVAL_ACTUAL_DIR keeps it where TC-DEMO-01 compares the demo with it
 const actualDir = process.env.EVAL_ACTUAL_DIR ? (mkdirSync(process.env.EVAL_ACTUAL_DIR, { recursive: true }), process.env.EVAL_ACTUAL_DIR) : mkdtempSync(join(tmpdir(), 'doi-actual-'))
 mkdirSync(actualDir, { recursive: true })
@@ -261,7 +262,7 @@ if (e2e.size) {
   writeFileSync(join(actualDir, 'calendar.json'), JSON.stringify({ timezone: config.deployment.timezone, start: config.routing.working_hours.start, end: config.routing.working_hours.end, holidays: config.routing.holidays }))
   let oracle = { ok: false, text: '' }
   try {
-    oracle = { ok: true, text: execFileSync('python3', ['eval/oracle/check_actual.py', '--require-attachments', actualDir], { encoding: 'utf8' }) }
+    oracle = { ok: true, text: execFileSync('python3', ['eval/oracle/check_actual.py', '--require-attachments', '--eml-dir', dir, actualDir], { encoding: 'utf8' }) }
   } catch (e) {
     oracle = { ok: false, text: String((e as { stdout?: string }).stdout ?? e) }
   }
@@ -287,6 +288,7 @@ if (e2e.size) {
   show('bank change / lookalike', e3.maliciousHigh, '100%')
   show('reply never overreaches', e3.noOverreach, '100%')
   show('injection vs twin', e3.injection, '100%')
+  console.log('injection difference counts (non-exclusive):', JSON.stringify(e3.injection.diagnostics))
   show('risk exact (end to end)', e3.riskE2E, 'report')
   show('template exact (e2e)', e3.templateE2E, 'report')
   show('linking', e3.linking, '≥ 95%')

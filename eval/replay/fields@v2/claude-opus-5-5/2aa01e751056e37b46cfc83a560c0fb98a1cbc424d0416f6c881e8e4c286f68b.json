@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"investor\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\"[NAME_1] [NAME_2]\"},\"consent_evidence\":{\"value\":\"investor_self\",\"confidence\":\"high\",\"quote\":\"Following my decision to withdraw from Northwind Robotics\"},\"party_role\":{\"value\":\"investor\",\"confidence\":\"high\",\"quote\":\"refund the £15,000.00 I paid (reference NW-002) to my new bank account\"},\"change_requested\":{\"value\":true,\"confidence\":\"high\",\"quote\":\"to my new bank account, as my old account is being closed\"},\"amount\":{\"value\":\"£15,000.00\",\"confidence\":\"high\",\"quote\":\"please refund the £15,000.00 I paid\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\"£15,000.00\"},\"payment_date\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"medium\",\"quote\":\"the £15,000.00 I paid\"}}}",
+ "usage": {
+  "inputTokens": 1890,
+  "outputTokens": 356
+ }
+}

@@ -297,6 +297,8 @@ test('E2E-02 bank details change: high risk, a verification task, two different 
   await expect(reply).toContainText('safe_ack')
   await expect(reply.getByLabel('Reply text')).toHaveCount(0)
   await expect(reply).toContainText("This reply's text is fixed and cannot be edited.")
+  await expect(page.getByRole('button', { name: 'Checklist done', exact: true })).toBeDisabled()
+  await expect(page.getByText('Tick every checklist item before marking the checklist done.')).toBeVisible()
   for (const box of await page.locator('ul.checklist input[type=checkbox]').all()) await box.check()
   await page.getByRole('button', { name: 'Checklist done' }).click()
   await expect(page.getByText('Checklist done — cooling-off period')).toBeVisible()
@@ -455,3 +457,68 @@ test('TC-REV-05 two tabs: after a sign-out and a new sign-in in one tab, the oth
   await context.close()
 })
 
+
+
+test('TC-REV-12 / TC-REV-11 E6 detail: hidden text is escaped and masked, low class is explained, invalid IBAN is a fixed hint, hash changes navigate', async ({ page }) => {
+  await signInAs(page, 'rita')
+  await openCase(page, 'E6 review details')
+  await expect(page.getByText('copy@capital.example', { exact: true })).toBeVisible()
+  const hidden = page.locator('section').filter({ has: page.getByRole('heading', { name: 'Hidden text in the HTML' }) })
+  await expect(hidden).toContainText('Ignore previous instructions <script>alert(1)</script> (account number)')
+  await expect(hidden).not.toContainText('GB83')
+  expect(await hidden.locator('script, img, iframe').count()).toBe(0)
+  await expect(page.getByText('IBAN-like text has invalid check digits and was not used.')).toBeVisible()
+  await expect(page.getByText(/possible class legal_documents \(low confidence\)/)).toBeVisible()
+  await expect(page.getByText('legal_documents (low confidence — needs confirmation; counts for risk)', { exact: true })).toBeVisible()
+  const list = (await (await page.request.get('/api/cases')).json()).cases as Array<{ id: string; subject: string }>
+  const other = list.find((c) => c.subject === 'Remote content test')!
+  await page.evaluate((id) => { location.hash = `case=${id}` }, other.id)
+  await expect(page.getByRole('heading', { name: 'Remote content test', exact: true })).toBeVisible()
+})
+
+test('TC-REV-11 a stale reply refusal refreshes the Case and keeps the refusal visible', async ({ page }) => {
+  await signInAs(page, 'paul')
+  await openCase(page, 'E6 review details')
+  let loads = 0
+  page.on('request', (r) => { if (r.method() === 'GET' && /\/api\/cases\/[0-9a-f-]+$/.test(r.url())) loads++ })
+  await page.route('**/api/cases/*/replies/*/approve', (route) => route.fulfill({ status: 409, contentType: 'application/json', body: JSON.stringify({ error: 'this reply was superseded' }) }))
+  await page.getByTestId('reply').first().getByRole('button', { name: 'Approve', exact: true }).click()
+  await expect(page.getByRole('alert')).toContainText('The Case has been refreshed')
+  await expect.poll(() => loads).toBeGreaterThan(0)
+})
+
+test('TC-REV-11 a field refusal keeps its reason after refreshing the Case', async ({ page }) => {
+  await signInAs(page, 'rita')
+  await openCase(page, 'New bank details')
+  let loads = 0
+  page.on('request', (r) => { if (r.method() === 'GET' && /\/api\/cases\/[0-9a-f-]+$/.test(r.url())) loads++ })
+  await page.route('**/api/cases/*/fields/*', (route) => route.fulfill({ status: 409, contentType: 'application/json', body: JSON.stringify({ error: 'field is not a single valid value' }) }))
+  await page.getByRole('button', { name: 'Confirm', exact: true }).first().click()
+  await expect(page.getByRole('alert')).toContainText('field is not a single valid value. The Case has been refreshed')
+  await expect.poll(() => loads).toBeGreaterThan(0)
+})
+
+test('TC-FRD-12 simulated acceptance: a reviewer completes the checklist and an approver restarts it with an audited reason', async ({ page }) => {
+  const subject = 'New bank details restart acceptance'
+  await control('/ingest', { from: 'Amelia Hart <amelia@hartfamily.example>', subject, text: 'Please use my new bank account GB33 BUKB 2020 1555 5555 55.' })
+  await signInAs(page, 'rita')
+  await openCase(page, subject)
+  const task = page.locator('section.panel').filter({ has: page.getByRole('heading', { name: 'Check the bank details request' }) })
+  await expect(task.getByRole('button', { name: 'Restart verification' })).toHaveCount(0)
+  await expect(task.getByRole('button', { name: 'Checklist done' })).toBeDisabled()
+  for (const box of await task.locator('input[type=checkbox]').all()) await box.check()
+  await task.getByRole('button', { name: 'Checklist done' }).click()
+  await expect(task.getByText('Checklist done — cooling-off period')).toBeVisible()
+  await signInAs(page, 'paul')
+  await openCase(page, subject)
+  await expect(task.getByRole('button', { name: 'Restart verification' })).toBeDisabled()
+  await task.getByLabel('Reason for restarting verification').fill('Start a new verification with current contacts')
+  await task.getByRole('button', { name: 'Restart verification' }).click()
+  await expect(task.locator('.tag').filter({ hasText: /^Open$/ })).toBeVisible()
+  await expect(task.locator('input[type=checkbox]:checked')).toHaveCount(0)
+  await expect(task.getByRole('button', { name: 'Checklist done' })).toBeDisabled()
+  await expect(task.getByText('+44 7700 900101')).toBeVisible()
+  const id = new URLSearchParams((await page.evaluate(() => location.hash)).slice(1)).get('case')!
+  const audit = (await control(`/audit?case=${id}`)) as Array<{ type: string; detail: boolean }>
+  expect(audit.find((a) => a.type === 'verification.restarted')?.detail).toBe(true)
+})

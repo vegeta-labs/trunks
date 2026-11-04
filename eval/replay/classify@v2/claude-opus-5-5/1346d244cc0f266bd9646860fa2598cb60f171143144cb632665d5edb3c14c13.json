@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"account_access\",\"confidence\":\"high\",\"reason\":\"Sender cannot log in to the investor portal; password reset link keeps expiring.\"},{\"class\":\"complaint\",\"confidence\":\"low\",\"reason\":\"Says they 'still' cannot log in, suggesting mild frustration with an ongoing issue.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 1939,
+  "outputTokens": 115
+ }
+}

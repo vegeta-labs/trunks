@@ -1,6 +1,6 @@
 // KYC transfer and replacement (PRD R-PRV-03, C-PRV-2 v0.7.18; tech design §3.3 KycSink, §4.1, §5, v0.7.9).
 // Transfers run as the app role: one row per possible-KYC attachment, created when C-RED-0's judgement is saved
-// (classify), tried at once and again a few times, then once a day until it succeeds. Once every possible-KYC attachment
+// (redact), tried at once and again a few times, then once a day until it succeeds. Once every possible-KYC attachment
 // of a message is delivered, the maintenance role replaces the archive in five recorded steps and continues the Case
 // from `extract` through enqueue_kyc_continuation.
 import { createHash, createHmac, randomUUID } from 'node:crypto'
@@ -159,15 +159,16 @@ export interface KycDeps {
 
 /** The attachment's bytes: its own object, or (over the size limit, never stored alone) its part of the archive. */
 async function attachmentBytes(d: KycDeps, c: Tx, attachmentId: string): Promise<{ content: Buffer; kind: string; scan: string }> {
-  const a = (await c.query<{ ordinal: number; kind: string; file_ref: string | null; scan_status: string; message_id: string }>(
-    'SELECT ordinal, kind, file_ref, scan_status, message_id FROM attachment WHERE id = $1', [attachmentId],
+  const a = (await c.query<{ ordinal: number; kind: string; file_ref: string | null; scan_status: string; message_id: string; mime_version: number }>(
+    'SELECT a.ordinal, a.kind, a.file_ref, a.scan_status, a.message_id, m.mime_version FROM attachment a JOIN message m ON m.id = a.message_id WHERE a.id = $1', [attachmentId],
   )).rows[0]
   if (!a) throw new KycError('attachment_gone')
   if (a.file_ref) return { content: await d.files.get(a.file_ref).catch(() => { throw new KycError('file_unavailable') }), kind: a.kind, scan: a.scan_status }
-  const f = (await c.query<{ file_ref: string }>("SELECT file_ref FROM message_file WHERE message_id = $1 AND kind = 'original'", [a.message_id])).rows[0]
+  const f = (await c.query<{ file_ref: string; sha256: string }>("SELECT file_ref, sha256 FROM message_file WHERE message_id = $1 ORDER BY kind = 'kyc_stripped' DESC, created_at DESC LIMIT 1", [a.message_id])).rows[0]
   if (!f) throw new KycError('archive_gone')
   const raw = await d.files.get(f.file_ref)
-  const m = decodeMime(raw, { maxAttachmentBytes: Number.MAX_SAFE_INTEGER, maxTotalBytes: Number.MAX_SAFE_INTEGER })
+  if (sha256(raw) !== f.sha256) throw new KycError('archive_changed')
+  const m = decodeMime(raw, { maxAttachmentBytes: Number.MAX_SAFE_INTEGER, maxTotalBytes: Number.MAX_SAFE_INTEGER, legacyOrdinals: a.mime_version === 1 })
   const part = m.attachments.find((x) => x.ordinal === a.ordinal)
   if (!part?.content) throw new KycError('part_unavailable')
   return { content: part.content, kind: a.kind, scan: a.scan_status }
@@ -276,7 +277,8 @@ export async function replaceableMessages(db: Db): Promise<string[]> {
     `SELECT d.message_id FROM kyc_delivery d
       GROUP BY d.message_id
      HAVING bool_and(d.state IN ('delivered', 'discarded'))
-        AND NOT EXISTS (SELECT 1 FROM kyc_replacement r WHERE r.message_id = d.message_id AND r.step = 5)
+        AND (EXISTS (SELECT 1 FROM kyc_replacement r WHERE r.message_id = d.message_id AND r.step < 5)
+             OR EXISTS (SELECT 1 FROM attachment a WHERE a.message_id = d.message_id AND a.maybe_kyc AND NOT a.source_deleted))
         AND NOT EXISTS (SELECT 1 FROM attachment a WHERE a.message_id = d.message_id AND a.maybe_kyc AND NOT a.source_deleted
                           AND NOT EXISTS (SELECT 1 FROM kyc_delivery x WHERE x.attachment_id = a.id AND x.state IN ('delivered', 'discarded')))`,
   )
@@ -310,26 +312,47 @@ export async function replaceMessage(d: KycDeps, messageId: string, hooks: Repla
 
 async function replaceLocked(d: KycDeps, messageId: string, hooks: ReplaceHooks): Promise<'done' | 'skipped'> {
   if (!(await replaceableMessages(d.db)).includes(messageId)) return 'skipped'
-  let row = (await d.db.query<{ step: number; original_file_ref: string; original_sha256: string; stripped_file_ref: string | null; stripped_sha256: string | null }>(
-    'SELECT step, original_file_ref, original_sha256, stripped_file_ref, stripped_sha256 FROM kyc_replacement WHERE message_id = $1', [messageId],
+  let row = (await d.db.query<{ round: number; step: number; original_file_ref: string; original_sha256: string; stripped_file_ref: string | null; stripped_sha256: string | null }>(
+    'SELECT round, step, original_file_ref, original_sha256, stripped_file_ref, stripped_sha256 FROM kyc_replacement WHERE message_id = $1 AND step < 5 ORDER BY round DESC LIMIT 1', [messageId],
   )).rows[0]
   if (!row) {
-    const orig = (await d.db.query<{ file_ref: string; sha256: string }>("SELECT file_ref, sha256 FROM message_file WHERE message_id = $1 AND kind = 'original'", [messageId])).rows[0]
+    const orig = (await d.db.query<{ file_ref: string; sha256: string }>("SELECT file_ref, sha256 FROM message_file WHERE message_id = $1 ORDER BY kind = 'kyc_stripped' DESC, created_at DESC LIMIT 1", [messageId])).rows[0]
     if (!orig) return 'skipped'
-    await d.db.query('INSERT INTO kyc_replacement (message_id, step, original_file_ref, original_sha256) VALUES ($1, 0, $2, $3) ON CONFLICT (message_id) DO NOTHING', [messageId, orig.file_ref, orig.sha256])
-    row = { step: 0, original_file_ref: orig.file_ref, original_sha256: orig.sha256, stripped_file_ref: null, stripped_sha256: null }
+    const round = Number((await d.db.query<{ n: number }>('SELECT coalesce(max(round), 0) + 1 AS n FROM kyc_replacement WHERE message_id = $1', [messageId])).rows[0]!.n)
+    await d.db.query('INSERT INTO kyc_replacement (message_id, round, step, original_file_ref, original_sha256) VALUES ($1, $2, 0, $3, $4)', [messageId, round, orig.file_ref, orig.sha256])
+    row = { round, step: 0, original_file_ref: orig.file_ref, original_sha256: orig.sha256, stripped_file_ref: null, stripped_sha256: null }
   }
-  const kycAtts = (await d.db.query<{ id: string; ordinal: number; file_ref: string | null }>(
-    'SELECT id, ordinal, file_ref FROM attachment WHERE message_id = $1 AND maybe_kyc AND NOT source_deleted ORDER BY ordinal', [messageId],
+  const kycAtts = (await d.db.query<{ id: string; ordinal: number; file_ref: string | null; sha256: string; delivery_state: string; delivery_sha256: string }>(
+    `SELECT a.id, a.ordinal, a.file_ref, a.sha256, d.state AS delivery_state, d.sha256 AS delivery_sha256
+       FROM attachment a LEFT JOIN kyc_delivery d ON d.attachment_id = a.id
+       WHERE a.message_id = $1 AND a.maybe_kyc AND NOT a.source_deleted ORDER BY a.ordinal`, [messageId],
   )).rows
 
+  // The advisory lock prevents new promotions after this check. Never strip an attachment before its receipt.
+  if (kycAtts.length && (await d.db.query(`SELECT 1 FROM attachment a WHERE a.id = ANY($1::uuid[]) AND
+      NOT EXISTS (SELECT 1 FROM kyc_delivery d WHERE d.attachment_id = a.id AND d.state IN ('delivered', 'discarded'))`,
+      [kycAtts.map((a) => a.id)])).rowCount) return 'skipped'
+
+  let stripped: Buffer | null = null
+  if (row.step < 4) {
+    // Re-prove the identities on a step-③ resume too; a persisted copy is not a new transfer receipt.
+    const raw = await d.files.get(row.original_file_ref)
+    if (sha256(raw) !== row.original_sha256) throw new Error('original MIME hash changed before KYC replacement')
+    const version = (await d.db.query<{ mime_version: number }>('SELECT mime_version FROM message WHERE id = $1', [messageId])).rows[0]!.mime_version
+    const expectedHashes = new Map(kycAtts.map((a) => {
+      const hash = a.sha256 || a.delivery_sha256
+      if (!hash || a.delivery_state === 'delivered' && a.delivery_sha256 !== hash) throw new Error('KYC delivery does not match the attachment identity')
+      return [a.ordinal, hash] as const
+    }))
+    stripped = stripAttachments(raw, new Set(kycAtts.map((a) => a.ordinal)), {
+      legacyOrdinals: version === 1, expectedHashes,
+    })
+  }
   if (row.step < 3) {
     // ① a copy without the possible-KYC parts, written under an intent (cleaned up if we never get to ③)
-    const raw = await d.files.get(row.original_file_ref)
-    const stripped = stripAttachments(raw, new Set(kycAtts.map((a) => a.ordinal)))
-    const hash = sha256(stripped)
+    const hash = sha256(stripped!)
     const objKey = objectKey(d.k, messageId, hash)
-    const intent = await writeWithIntent(d.db, d.files, objKey, 'kyc_stripped', stripped)
+    const intent = await writeWithIntent(d.db, d.files, objKey, 'kyc_stripped', stripped!)
     await hooks.afterStep?.(1)
     // ② read back and check
     const back = await d.files.get(objKey)
@@ -341,12 +364,12 @@ async function replaceLocked(d: KycDeps, messageId: string, hooks: ReplaceHooks)
       // the orphan clean-up may have taken it while we paused (round 4 F2): under the lock it must be there and whole
       const now = await d.files.getSealed(objKey).then((b) => (b ? d.files.get(objKey) : null))
       if (!now || sha256(now) !== hash) {
-        await d.files.put(objKey, stripped)
+        await d.files.put(objKey, stripped!)
         if (sha256(await d.files.get(objKey)) !== hash) throw new Error('the KYC-stripped copy did not read back identically')
       }
       const exists = await c.query("SELECT 1 FROM message_file WHERE message_id = $1 AND kind = 'kyc_stripped' AND file_ref = $2", [messageId, objKey])
       if (!exists.rowCount) await c.query("INSERT INTO message_file (id, message_id, kind, sha256, file_ref) VALUES ($1, $2, 'kyc_stripped', $3, $4)", [randomUUID(), messageId, hash, objKey])
-      await c.query('UPDATE kyc_replacement SET step = 3, stripped_file_ref = $2, stripped_sha256 = $3 WHERE message_id = $1', [messageId, objKey, hash])
+      await c.query('UPDATE kyc_replacement SET step = 3, stripped_file_ref = $2, stripped_sha256 = $3 WHERE message_id = $1 AND round = $4', [messageId, objKey, hash, row!.round])
       await c.query('DELETE FROM file_write_intent WHERE id = $1', [intent])
     })
     row = { ...row, step: 3, stripped_file_ref: objKey, stripped_sha256: hash }
@@ -354,6 +377,10 @@ async function replaceLocked(d: KycDeps, messageId: string, hooks: ReplaceHooks)
   }
 
   if (row.step < 4) {
+    const expected = sha256(stripped!)
+    if (!row.stripped_file_ref || row.stripped_sha256 !== expected || sha256(await d.files.get(row.stripped_file_ref)) !== expected) {
+      throw new Error('KYC-stripped copy changed before source deletion')
+    }
     // the lock that keeps retention away must still be held before anything is deleted (R2); a later run resumes
     if (hooks.lockLost?.()) throw new Error('the replacement lock was lost')
     // ④ delete: the original archive (all versions), the attachments' files, their texts, quotes and intermediate
@@ -442,12 +469,12 @@ async function replaceLocked(d: KycDeps, messageId: string, hooks: ReplaceHooks)
           await c.query(`DELETE FROM "${tbl}" WHERE ${where}`, [cs.id])
         }
       }
-      await c.query("DELETE FROM message_file WHERE message_id = $1 AND kind = 'original'", [messageId])
+      await c.query("DELETE FROM message_file WHERE message_id = $1 AND file_ref = $2", [messageId, row!.original_file_ref])
       await c.query('UPDATE attachment SET source_deleted = true, file_ref = NULL WHERE id = ANY ($1::uuid[])', [ids])
       // blobs still referred to elsewhere (none expected) make this fail and roll the whole step back
       if (blobs.size) await c.query('DELETE FROM secret_blob WHERE id = ANY ($1::uuid[])', [[...blobs]])
       if (cs) await c.query('SELECT enqueue_kyc_continuation($1, $2)', [cs.id, cs.processing_generation])
-      await c.query('UPDATE kyc_replacement SET step = 4 WHERE message_id = $1', [messageId])
+      await c.query('UPDATE kyc_replacement SET step = 4 WHERE message_id = $1 AND round = $2', [messageId, row!.round])
     })
     row = { ...row, step: 4 }
     await hooks.afterStep?.(4)
@@ -457,8 +484,8 @@ async function replaceLocked(d: KycDeps, messageId: string, hooks: ReplaceHooks)
   await tx(d.db, async (c) => {
     const caseId = (await c.query<{ id: string }>('SELECT id FROM "case" WHERE message_id = $1', [messageId])).rows[0]?.id ?? null
     const n = (await c.query<{ n: number }>('SELECT count(*)::int AS n FROM kyc_delivery WHERE message_id = $1', [messageId])).rows[0]!.n
-    await appendAudit(c, d.k, [{ actor: 'system', type: 'kyc.replaced', caseId, payload: { message: messageId, original_sha256: row!.original_sha256, stripped_sha256: row!.stripped_sha256 ?? '', attachments: n } }])
-    await c.query('UPDATE kyc_replacement SET step = 5, finished_at = now() WHERE message_id = $1', [messageId])
+    await appendAudit(c, d.k, [{ actor: 'system', type: 'kyc.replaced', caseId, payload: { message: messageId, round: row!.round, original_sha256: row!.original_sha256, stripped_sha256: row!.stripped_sha256 ?? '', attachments: n } }])
+    await c.query('UPDATE kyc_replacement SET step = 5, finished_at = now() WHERE message_id = $1 AND round = $2', [messageId, row!.round])
   })
   return 'done'
 }

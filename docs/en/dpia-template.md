@@ -138,6 +138,7 @@ These are the software defaults. You may change the two configurable values.
 | The current directory version of each kind | kept while current | [to complete] |
 | Audit rows (no personal data) | kept forever | [to complete] |
 | Possible-KYC attachments in the app | deleted once every possible-KYC attachment of the email has been transferred; kept with a daily reminder while a transfer fails | [to complete] |
+| Small inline signature images (within `kyc.inline_image`) | not transferred; kept in the stored email under the email's retention. An ID image scaled down to fit the limits, or encoded data hidden in an allowed image, would be kept the same way | [to complete: confirm the limits suit your mailbox] |
 | Files at your KYC target | outside the software | [to complete] |
 | Cases on hold (and earlier Cases in the same thread) | kept until the hold is cleared | [to complete: who may set a hold, and when] |
 | Demo data | reset at every demo start | not applicable to production |

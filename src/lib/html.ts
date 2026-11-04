@@ -305,6 +305,7 @@ const INHERITING = new Set(['inherit', 'unset', 'currentcolor'])
 const REVERTING = new Set(['revert', 'revert-layer'])
 
 export interface HiddenFinding {
+  text: string
   reason: 'display_none' | 'visibility_hidden' | 'opacity_zero' | 'tiny_font' | 'same_colour' | 'transparent'
 }
 
@@ -313,23 +314,33 @@ export interface HiddenFinding {
  * font size ≤ 1px, text colour equal to the background colour. Comments do not count (C-SIG-1.8 scans them).
  */
 export function hiddenText(html: string): HiddenFinding[] {
+  return hiddenTextView(html).findings.map(({ reason, text }) => ({ reason, text }))
+}
+
+/** Shared text stream and source ranges for masking values split across text nodes. */
+export function hiddenTextView(html: string): { text: string; findings: Array<HiddenFinding & { start: number; end: number }> } {
   const doc = parse(html, { scriptingEnabled: false }) as unknown as PNode
   const rules = stylesheetRules(doc)
-  const found: HiddenFinding[] = []
+  const found: Array<HiddenFinding & { start: number; end: number }> = []
+  let text = ''
   const ancestors: PNode[] = []
   // `<body link>` sets the colour of links (the HTML Standard's rendering section)
   let linkDefault = '#0000ee'
   const walk = (n: PNode, ctx: { hidden: HiddenFinding['reason'] | null; colour: string | null; bg: string | null }) => {
     if (n.nodeName === '#comment') return
     if (n.nodeName === '#text') {
+      const start = text.length
+      text += n.value ?? ''
       if ((n.value ?? '').trim() === '') return
-      if (ctx.hidden) found.push({ reason: ctx.hidden })
-      else if (ctx.colour && ctx.colour === (ctx.bg ?? '#ffffff')) found.push({ reason: 'same_colour' })
+      if (ctx.hidden) found.push({ reason: ctx.hidden, text: n.value ?? '', start, end: text.length })
+      else if (ctx.colour && ctx.colour === (ctx.bg ?? '#ffffff')) found.push({ reason: 'same_colour', text: n.value ?? '', start, end: text.length })
       return
     }
     if (n.tagName && NOT_SHOWN.has(n.tagName)) {
       return
     }
+    const block = n.tagName !== undefined && BLOCK.has(n.tagName)
+    if (block) text += '\n'
     const st = styleOf(n, rules, ancestors)
     let hidden = ctx.hidden
     if (!hidden && st.get('display') === 'none') hidden = 'display_none'
@@ -369,10 +380,11 @@ export function hiddenText(html: string): HiddenFinding[] {
       walk(c, { hidden: h, colour, bg })
       ancestors.pop()
     }
+    if (block) text += '\n'
   }
   // a page without colours is black text on white
   walk(doc, { hidden: null, colour: '#000000', bg: '#ffffff' })
-  return found
+  return { text, findings: found }
 }
 
 /** Plain-text view of an HTML body: text nodes only, block elements on new lines; nothing hidden is dropped. */

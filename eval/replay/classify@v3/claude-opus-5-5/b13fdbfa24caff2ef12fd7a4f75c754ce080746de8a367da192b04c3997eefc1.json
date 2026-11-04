@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"withdrawal\",\"confidence\":\"high\",\"reason\":\"Adviser states the investor has decided to withdraw from Northwind Robotics before closing and asks for the withdrawal to be processed.\"},{\"class\":\"payment_query\",\"confidence\":\"medium\",\"reason\":\"States the investor has already paid £15,000, with no payment confirmation, and asks for it to be returned.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2206,
+  "outputTokens": 137
+ }
+}

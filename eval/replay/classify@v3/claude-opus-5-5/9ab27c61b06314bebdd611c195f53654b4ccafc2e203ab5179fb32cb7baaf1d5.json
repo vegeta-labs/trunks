@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"payment_query\",\"confidence\":\"high\",\"reason\":\"Investor says they paid £5,000 on 21 October with reference NW-003 and asks how to trace it since it hasn't been confirmed.\"},{\"class\":\"complaint\",\"confidence\":\"low\",\"reason\":\"Mild frustration that over a week has passed without hearing anything.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2703,
+  "outputTokens": 124
+ }
+}

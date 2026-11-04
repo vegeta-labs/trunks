@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { CLASS_FIELDS_KNOWN, ENGLAND_WALES_HOLIDAYS } from './constants.ts'
 import { checkTemplate, REQUIRED_TEMPLATES, type TemplateMeta } from '../lib/draft.ts'
 import { MIN_COOLING_HOURS } from '../lib/verification.ts'
+import { INLINE_DEFAULTS } from '../lib/kyc.ts'
 
 const ID = z.string().regex(/^[a-z][a-z0-9_]*$/, 'lower-case letters, digits and _')
 const HHMM = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'HH:MM')
@@ -128,12 +129,17 @@ export const DeploymentFile = z.strictObject({
   // R-PRV-03, C-PRV-2: where possible-KYC attachments are transferred; absent → transfers fail and are reminded daily
   kyc: z
     .strictObject({
+      inline_image: z.strictObject({
+        max_long_side: z.number().int().positive().max(1280).default(400),
+        max_short_side: z.number().int().positive().max(300).default(150),
+        max_bytes: z.number().int().positive().max(102400).default(51200),
+      }).default(INLINE_DEFAULTS),
       target: z.discriminatedUnion('kind', [
         z.strictObject({ kind: z.literal('folder'), path: z.string().min(1) }),
         z.strictObject({ kind: z.literal('webhook'), url: z.string().url().refine((u) => u.startsWith('https://'), 'an https:// address'), secret_env: z.string().regex(/^[A-Z][A-Z0-9_]*$/) }),
       ]).optional(),
     })
-    .default({}),
+    .default({ inline_image: INLINE_DEFAULTS }),
   // the model provider (tech design §3.2, PRD R-PRV-01); absent → no model step can run
   model: z
     .strictObject({

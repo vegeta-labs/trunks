@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"unreferenced_payment\",\"confidence\":\"high\",\"reason\":\"Sender states the Northwind subscription payment of £50,000 was sent without a reference and asks to match it.\"},{\"class\":\"payment_query\",\"confidence\":\"high\",\"reason\":\"Investor says they have paid (no confirmation attached) and asks for it to be matched to their commitment.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2143,
+  "outputTokens": 130
+ }
+}

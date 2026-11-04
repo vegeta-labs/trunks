@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"fee_or_terms_change\",\"confidence\":\"high\",\"reason\":\"Company proposes changing the instrument from SAFEs to Series Seed Preferred equity for the SPV subscription.\"},{\"class\":\"legal_documents\",\"confidence\":\"low\",\"reason\":\"Change to a priced round implies new legal documentation, though none is sent yet.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2187,
+  "outputTokens": 128
+ }
+}

@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"investor\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\"I act for [NAME_1] [NAME_2] on his Northwind Robotics commitment (NW-002).\"},\"consent_evidence\":{\"value\":\"none\",\"confidence\":\"medium\",\"quote\":\"I will send his signed instruction separately.\"},\"amount\":{\"value\":\"£15,000\",\"confidence\":\"high\",\"quote\":\"return the £15,000 he has already paid\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\"return the £15,000 he has already paid\"},\"payment_date\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"medium\",\"quote\":\"return the £15,000 he has already paid\"},\"reference\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"uetr\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 1902,
+  "outputTokens": 324
+ }
+}

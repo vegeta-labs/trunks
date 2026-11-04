@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"withdrawal\",\"confidence\":\"high\",\"reason\":\"Investor states decision to withdraw from Northwind Robotics and requests refund of £15,000.\"},{\"class\":\"bank_details\",\"confidence\":\"high\",\"reason\":\"Provides new bank account details (sort code, account number) for the refund as old account is closing.\"},{\"class\":\"payment_query\",\"confidence\":\"medium\",\"reason\":\"Sender states they paid £15,000 with reference NW-002, without attaching a payment confirmation.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2183,
+  "outputTokens": 174
+ }
+}

@@ -38,7 +38,7 @@ the retention table there apply here too.
 |---|---|---|
 | Does the processing actually help? | It classifies, extracts, links and flags risk, and prepares template replies. A person reviews and decides. | [to complete] |
 | Is there a less intrusive way? | Configurable: only chosen mailboxes and labels or folders; a local model instead of a hosted one; shorter retention; no event webhook | [to complete] |
-| Is only the data needed processed? | The model receives redacted text only. Possible-KYC attachment content goes to no model. Exports and events carry a fixed list of fields, and bank accounts as the last four digits. Images and scans are never read (no OCR). | [to complete] |
+| Is only the data needed processed? | The model receives redacted text only. Possible-KYC attachment content goes to no model. Exports and events carry a fixed list of fields, and bank accounts as the last four digits. Images and scans are never read (no OCR). Small inline signature images within `kyc.inline_image` stay in the stored email instead of being transferred (so would an ID image scaled down to fit the limits). | [to complete] |
 | How long is data kept? | Defaults: 5 years per email from receipt; KYC attachments removed from the app after transfer; audit rows (no personal data) kept. See the DPIA, section 4. | [to complete] |
 
 ### 2.1 Connections and retention covered by this assessment

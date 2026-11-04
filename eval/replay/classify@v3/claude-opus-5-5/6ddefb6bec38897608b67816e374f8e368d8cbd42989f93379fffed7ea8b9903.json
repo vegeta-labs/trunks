@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"bank_letter_request\",\"confidence\":\"medium\",\"reason\":\"Investor's wealth manager requests a confirmation of holding showing company, shares and investment date.\"},{\"class\":\"other_known\",\"confidence\":\"low\",\"reason\":\"Request for a holding confirmation for a third-party adviser, not strictly a bank request.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2162,
+  "outputTokens": 121
+ }
+}

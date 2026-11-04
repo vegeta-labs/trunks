@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"amount\":{\"value\":\"GBP 100,000.00\",\"confidence\":\"high\",\"quote\":\"sent GBP 100,000.00 on\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\"sent GBP 100,000.00 on\"},\"payment_date\":{\"value\":\"16 October 2026\",\"confidence\":\"high\",\"quote\":\"16 October 2026\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2] Group plc\",\"confidence\":\"high\",\"quote\":\"Our parent company, [NAME_1] [NAME_2] Group plc, sent GBP 100,000.00\"},\"reference\":{\"value\":\"NW-005\",\"confidence\":\"medium\",\"quote\":\"Our investor reference is NW-005.\"},\"uetr\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"third_party_payer\":{\"value\":\"[NAME_1] [NAME_2] Group plc\",\"confidence\":\"high\",\"quote\":\"Our parent company, [NAME_1] [NAME_2] Group plc, sent GBP 100,000.00\"}}}",
+ "usage": {
+  "inputTokens": 2039,
+  "outputTokens": 354
+ }
+}

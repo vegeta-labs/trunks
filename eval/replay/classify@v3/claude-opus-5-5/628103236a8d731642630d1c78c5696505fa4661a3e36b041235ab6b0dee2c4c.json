@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"other_known\",\"confidence\":\"high\",\"reason\":\"Investor asks about paying in euros and currency conversion to sterling for the commitment.\"},{\"class\":\"bank_details\",\"confidence\":\"low\",\"reason\":\"Asks how payment should be sent (currency of payment instructions).\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2169,
+  "outputTokens": 107
+ }
+}

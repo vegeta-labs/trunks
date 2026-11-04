@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"tax_certificates\",\"confidence\":\"high\",\"reason\":\"Accountant asks when the EIS3 certificate for the client's Northwind Robotics investment will be issued and requests a copy.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2196,
+  "outputTokens": 81
+ }
+}

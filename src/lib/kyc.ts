@@ -1,6 +1,10 @@
 // PRD C-RED-0 (v0.7.8): which attachments may be KYC documents. Decided by code before any model call; the content
 // of such an attachment never goes to any model, only its (redacted) file name and type.
 import { findPhrases, normaliseText } from './text.ts'
+import type { ImageFacts } from './image-header.ts'
+
+export const INLINE_DEFAULTS = { max_long_side: 400, max_short_side: 150, max_bytes: 51200 }
+export interface InlineLimits { max_long_side: number; max_short_side: number; max_bytes: number }
 
 const WORDS = [
   'passport', 'driving', 'licence', 'license', 'utility', 'bank statement', 'proof of address', 'poa', 'id card', 'identity',
@@ -32,13 +36,27 @@ export interface KycInput {
   kind: string // pdf | txt | csv | eml | docx | xml | image | other
   parseStatus: string // parsed | not_parsed | over_limit | failed | timeout | blocked | pending
   text: string
+  scanStatus?: string
+  inline?: { eligible: boolean; contentId: string | null; disposition: string | null; htmlReferenced: boolean } | null
+  imageFacts?: ImageFacts | null
+  inlineLimits?: InlineLimits
   facts: { pagesWithoutText?: number; encrypted?: boolean; tooDeep?: boolean; signalTexts?: string[]; nested?: Array<{ filename: string; kind: string; result: { status: string; text: string; facts: KycInput['facts'] } }> } | null
+}
+
+/** Only the narrow image exception skips the usual not-parsed check (B.1–6). */
+export function inlineSignature(a: KycInput): boolean {
+  const f = a.imageFacts, l = a.inlineLimits ?? INLINE_DEFAULTS
+  return a.kind === 'image' && !hasWord(a.filename) && a.scanStatus === 'clean' &&
+    a.parseStatus === 'not_parsed' && a.inline?.eligible === true && a.inline.htmlReferenced && !!a.inline.contentId &&
+    (a.inline.disposition === null || a.inline.disposition === 'inline') && f?.code === 'ok' && f.format !== null &&
+    f.width > 0 && f.height > 0 && Math.max(f.width, f.height) <= l.max_long_side &&
+    Math.min(f.width, f.height) <= l.max_short_side && f.bytes <= l.max_bytes
 }
 
 /** The reason an attachment may be KYC (C-RED-0 ① to ⑤), or null when it may go to a model. */
 export function kycReason(a: KycInput): string | null {
   if (hasWord(a.filename)) return 'file_name'
-  if (a.kind === 'image') return 'image'
+  if (a.kind === 'image') return inlineSignature(a) ? null : 'image'
   // ⑤ a check that could not be completed: anything not parsed, encrypted, nested too deep
   if (a.parseStatus !== 'parsed') return `not_checked:${a.parseStatus}`
   if (a.facts?.encrypted) return 'not_checked:encrypted'

@@ -5,12 +5,21 @@ import { createHash } from 'node:crypto'
 import iconv from 'iconv-lite'
 import libmime from 'libmime'
 import { decode as qpDecode } from 'libqp'
+import { asciiLower, asciiTrim, contentId, htmlCidReferences, strictBase64 } from '../lib/inline-image.ts'
 
 export const MIME_LIMITS = { maxParts: 1000, maxDepth: 20, maxHeaderBytes: 256 * 1024 }
 
 export type AttachmentKind = 'pdf' | 'txt' | 'csv' | 'eml' | 'docx' | 'xml' | 'image' | 'other'
 
+export interface InlineMetadata {
+  contentId: string | null
+  disposition: string | null
+  htmlReferenced: boolean
+  eligible: boolean // all B.1–4 MIME conditions, including unique headers, strict base64 and successful MIME walk
+}
+
 export interface DecodedAttachment {
+  partStart?: number // physical MIME position, used only to reconcile pre-E6 ordinals
   ordinal: number
   filename: string // as declared (may be empty); never used as a path
   contentType: string
@@ -19,6 +28,7 @@ export interface DecodedAttachment {
   content: Buffer | null // null when over the single-attachment limit
   sha256: string | null
   overLimit: boolean
+  inline: InlineMetadata
 }
 
 export interface DecodedMessage {
@@ -26,6 +36,7 @@ export interface DecodedMessage {
   rawHeaders: Array<[string, string]> // the same, not RFC 2047 decoded (address parsing must see the raw form)
   text: string | null
   html: string | null
+  htmlParts: string[] // B.4: separately decoded parts, never joined for the reference scanner
   attachments: DecodedAttachment[]
   failure: null | 'truncated' | 'bad_boundary' | 'too_many_parts' | 'too_deep' | 'header_too_large'
 }
@@ -50,9 +61,9 @@ export function parseHeaders(head: string, decodeWords = true): Array<[string, s
   for (const line of head.replace(/\r?\n[ \t]+/g, ' ').split(/\r?\n/)) {
     const i = line.indexOf(':')
     if (i <= 0) continue
-    const name = line.slice(0, i).trim()
+    const name = decodeWords ? line.slice(0, i).trim() : line.slice(0, i)
     // header bytes are read as latin1; 8-bit headers are treated as UTF-8
-    const raw = Buffer.from(line.slice(i + 1).trim(), 'latin1').toString('utf8')
+    const raw = Buffer.from(decodeWords ? line.slice(i + 1).trim() : asciiTrim(line.slice(i + 1)), 'latin1').toString('utf8')
     let value = raw
     if (decodeWords) {
       try {
@@ -94,10 +105,11 @@ function toText(buf: Buffer, charset: string | undefined): string {
   }
 }
 
-function filenameOf(h: Array<[string, string]>, params: Record<string, string>): string {
+function filenameOf(h: Array<[string, string]>, params: Record<string, string>, legacy = false): string {
   const d = header(h, 'content-disposition')
   const dp = d ? (libmime.parseHeaderValue(d).params as Record<string, string>) : {}
-  const name = dp.filename ?? params.name ?? ''
+  const name = legacy ? dp.filename ?? params.name ?? '' : dp.filename || params.name || ''
+  if (!legacy) return name // B.1: RFC 2231 parameters, without a second RFC 2047 decoding pass
   try {
     return libmime.decodeWords(name)
   } catch {
@@ -132,6 +144,8 @@ interface Ctx {
   // KYC replacement (C-PRV-2): where each attachment's part lies in the raw message
   spans?: Map<number, { start: number; end: number; bodyStart: number }>
   base?: Buffer
+  ids: Map<string, number>
+  legacyOrdinals?: boolean
 }
 
 class Stop extends Error {
@@ -147,14 +161,20 @@ function walk(buf: Buffer, depth: number, ctx: Ctx, h?: Array<[string, string]>)
   if (depth > MIME_LIMITS.maxDepth) throw new Stop('too_deep')
   const { head, body } = h ? { head: '', body: buf } : splitHead(buf)
   if (head.length > MIME_LIMITS.maxHeaderBytes) throw new Stop('header_too_large')
+  const rawHeaders = h ?? parseHeaders(head, false)
   const headers = h ?? parseHeaders(head)
+  for (const [n, value] of rawHeaders) {
+    const id = n.toLowerCase() === 'content-id' ? contentId(value) : null
+    if (id) ctx.ids.set(id, (ctx.ids.get(id) ?? 0) + 1)
+  }
   if (depth === 0) {
     ctx.out.headers = headers
     ctx.out.rawHeaders = h ? headers : parseHeaders(head, false)
   }
-  const ct = contentType(headers)
-  const disposition = (header(headers, 'content-disposition') ?? '').toLowerCase()
-  const filename = filenameOf(headers, ct.params)
+  const ct = contentType(ctx.legacyOrdinals ? headers : rawHeaders)
+  if (!ctx.legacyOrdinals) ct.type = asciiLower(asciiTrim((header(rawHeaders, 'content-type') ?? 'text/plain').split(';')[0]!)) || 'text/plain'
+  const disposition = ctx.legacyOrdinals ? (header(headers, 'content-disposition') ?? '').toLowerCase() : asciiLower(asciiTrim((header(rawHeaders, 'content-disposition') ?? '').split(';')[0]!))
+  const filename = filenameOf(ctx.legacyOrdinals ? headers : rawHeaders, ct.params, ctx.legacyOrdinals)
 
   if (ct.type.startsWith('multipart/')) {
     const b = ct.params.boundary
@@ -196,7 +216,8 @@ function walk(buf: Buffer, depth: number, ctx: Ctx, h?: Array<[string, string]>)
     return
   }
 
-  const isAttachment = disposition.startsWith('attachment') || filename !== '' || ct.type === 'message/rfc822' || !(ct.type === 'text/plain' || ct.type === 'text/html')
+  const isAttachment = (ctx.legacyOrdinals ? disposition.startsWith('attachment') : disposition === 'attachment') || filename !== '' || ct.type === 'message/rfc822' || !(ct.type === 'text/plain' || ct.type === 'text/html')
+  const partStart = ctx.base ? buf.byteOffset - ctx.base.byteOffset : undefined
   if (isAttachment && ctx.spans && ctx.base) {
     const start = buf.byteOffset - ctx.base.byteOffset
     ctx.spans.set(ctx.out.attachments.length, { start, end: start + buf.length, bodyStart: body.byteOffset - ctx.base.byteOffset })
@@ -207,19 +228,36 @@ function walk(buf: Buffer, depth: number, ctx: Ctx, h?: Array<[string, string]>)
     if (ct.type === 'text/plain' && /flowed/i.test(ct.params.format ?? '')) s = libmime.decodeFlowed(s, /yes/i.test(ct.params.delsp ?? ''))
     // every inline text part is body, in order: a reader's client shows them all (self-test RK-F3)
     if (ct.type === 'text/plain') ctx.out.text = ctx.out.text === null ? s : `${ctx.out.text}\n\n${s}`
-    else ctx.out.html = ctx.out.html === null ? s : `${ctx.out.html}\n${s}`
+    else {
+      ctx.out.html = ctx.out.html === null ? s : `${ctx.out.html}\n${s}`
+      const encs = rawHeaders.filter(([n]) => n.toLowerCase() === 'content-transfer-encoding')
+      const enc = asciiLower(asciiTrim(encs[0]?.[1] ?? ''))
+      const bytes = enc === 'base64' ? encs.length === 1 ? strictBase64(body.toString('latin1')) : null : enc === 'quoted-printable' ? qpDecode(body.toString('latin1')) : body
+      const charset = asciiLower(ct.params.charset ?? '')
+      const allowed = /^(utf-8|us-ascii|iso-8859-(?:[1-9]|1[0-5])|windows-125[0-8])$/.test(charset)
+      if (bytes) ctx.out.htmlParts.push(toText(bytes, allowed ? charset : 'utf-8'))
+    }
     return
+  }
+  const ids = rawHeaders.filter(([n]) => n.toLowerCase() === 'content-id')
+  const ds = rawHeaders.filter(([n]) => n.toLowerCase() === 'content-disposition')
+  const encs = rawHeaders.filter(([n]) => n.toLowerCase() === 'content-transfer-encoding')
+  const id = ids.length === 1 ? contentId(ids[0]![1]) : null
+  const inline: InlineMetadata = {
+    contentId: id, disposition: ds.length ? disposition : null, htmlReferenced: false,
+    eligible: id !== null && (ds.length === 0 || ds.length === 1 && disposition === 'inline') && encs.length === 1 &&
+      body.length <= ctx.maxAttachment * 1.5 + 4096 && asciiLower(asciiTrim(encs[0]![1])) === 'base64' && strictBase64(body.toString('latin1')) !== null,
   }
   const estimate = estimateSize(body, headers)
   // decode unless the encoded body is clearly too large (base64 with line breaks is ~1.37× the decoded size)
   if (body.length > ctx.maxAttachment * 1.5 + 4096) {
-    ctx.out.attachments.push({ ordinal: ctx.out.attachments.length, filename, contentType: ct.type, kind: attachmentKind(filename, ct.type, null), size: estimate, content: null, sha256: null, overLimit: true })
+    ctx.out.attachments.push({ ordinal: ctx.out.attachments.length, filename, contentType: ct.type, kind: attachmentKind(filename, ct.type, null), size: estimate, content: null, sha256: null, overLimit: true, inline: { ...inline, eligible: false }, partStart })
     return
   }
-  ctx.out.attachments.push(att(ctx, filename, ct.type, decodeBody(body, headers)))
+  ctx.out.attachments.push({ ...att(ctx, filename, ct.type, decodeBody(body, ctx.legacyOrdinals ? headers : rawHeaders), inline), partStart })
 }
 
-function att(ctx: Ctx, filename: string, type: string, content: Buffer): DecodedAttachment {
+function att(ctx: Ctx, filename: string, type: string, content: Buffer, inline: InlineMetadata): DecodedAttachment {
   const over = content.length > ctx.maxAttachment
   return {
     ordinal: ctx.out.attachments.length,
@@ -230,6 +268,7 @@ function att(ctx: Ctx, filename: string, type: string, content: Buffer): Decoded
     content: over ? null : content,
     sha256: over ? null : sha(content),
     overLimit: over,
+    inline,
   }
 }
 
@@ -237,9 +276,9 @@ function att(ctx: Ctx, filename: string, type: string, content: Buffer): Decoded
  * Decode a raw message. Never throws: a structural problem stops decoding and sets `failure` (TC-ING-11);
  * whatever was decoded before the stop is kept. Attachments beyond the total limit are marked over limit in order.
  */
-export function decodeMime(raw: Buffer, limits: { maxAttachmentBytes: number; maxTotalBytes: number }): DecodedMessage {
-  const out: DecodedMessage = { headers: [], rawHeaders: [], text: null, html: null, attachments: [], failure: null }
-  const ctx: Ctx = { parts: 0, maxAttachment: limits.maxAttachmentBytes, out }
+export function decodeMime(raw: Buffer, limits: { maxAttachmentBytes: number; maxTotalBytes: number; legacyOrdinals?: boolean }): DecodedMessage {
+  const out: DecodedMessage = { headers: [], rawHeaders: [], text: null, html: null, htmlParts: [], attachments: [], failure: null }
+  const ctx: Ctx = { parts: 0, maxAttachment: limits.maxAttachmentBytes, out, ids: new Map(), base: raw, legacyOrdinals: limits.legacyOrdinals }
   try {
     walk(raw, 0, ctx)
   } catch (e) {
@@ -250,6 +289,20 @@ export function decodeMime(raw: Buffer, limits: { maxAttachmentBytes: number; ma
     const head = splitHead(raw).head.slice(0, MIME_LIMITS.maxHeaderBytes)
     out.headers = parseHeaders(head)
     out.rawHeaders = parseHeaders(head, false)
+  }
+  const refs = new Set(out.htmlParts.flatMap((html) => [...htmlCidReferences(html)]))
+  for (const a of out.attachments) {
+    a.inline.htmlReferenced = a.inline.contentId !== null && refs.has(a.inline.contentId)
+    a.inline.eligible &&= !out.failure && ctx.ids.get(a.inline.contentId!) === 1 && a.inline.htmlReferenced
+  }
+  if (limits.legacyOrdinals) {
+    // Keep persisted identities, but only current B.1–4 parsing can prove an image exception.
+    const current = decodeMime(raw, { ...limits, legacyOrdinals: false })
+    for (const a of out.attachments) {
+      const part = current.attachments.find((p) => p.partStart === a.partStart)
+      a.inline = part?.inline ?? { contentId: null, disposition: null, htmlReferenced: false, eligible: false }
+      if (part) a.filename = part.filename
+    }
   }
   let total = 0
   for (const a of out.attachments) {
@@ -274,9 +327,9 @@ export const REMOVED_PART = Buffer.from(
  * ones decodeMime assigns. When the whole message is the attachment, only its body is emptied. Throws when an ordinal
  * cannot be located: no copy is better than a copy that still holds the document.
  */
-export function stripAttachments(raw: Buffer, ordinals: ReadonlySet<number>): Buffer {
-  const out: DecodedMessage = { headers: [], rawHeaders: [], text: null, html: null, attachments: [], failure: null }
-  const ctx: Ctx = { parts: 0, maxAttachment: Number.MAX_SAFE_INTEGER, out, spans: new Map(), base: raw }
+export function stripAttachments(raw: Buffer, ordinals: ReadonlySet<number>, options: { legacyOrdinals?: boolean; expectedHashes?: ReadonlyMap<number, string> } = {}): Buffer {
+  const out: DecodedMessage = { headers: [], rawHeaders: [], text: null, html: null, htmlParts: [], attachments: [], failure: null }
+  const ctx: Ctx = { parts: 0, maxAttachment: Number.MAX_SAFE_INTEGER, out, spans: new Map(), base: raw, ids: new Map(), legacyOrdinals: options.legacyOrdinals }
   try {
     walk(raw, 0, ctx)
   } catch (e) {
@@ -288,6 +341,8 @@ export function stripAttachments(raw: Buffer, ordinals: ReadonlySet<number>): Bu
   const spans = [...ordinals].map((o) => {
     const s = ctx.spans!.get(o)
     if (!s) throw new Error(`attachment ${o} not found in the message`)
+    const expected = options.expectedHashes?.get(o)
+    if (options.expectedHashes && (!expected || out.attachments[o]?.sha256 !== expected)) throw new Error('attachment identity changed before KYC replacement')
     return s
   })
   spans.sort((a, b) => b.start - a.start) // from the end, so earlier offsets stay valid

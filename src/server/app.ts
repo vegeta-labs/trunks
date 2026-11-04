@@ -169,7 +169,7 @@ export async function buildServer(d: ServerDeps): Promise<FastifyInstance> {
   })
   app.get<{ Params: { id: string } }>('/api/cases/:id', async (req, reply) => {
     if (!/^[0-9a-f-]{36}$/.test(req.params.id)) return reply.code(404).send({ error: 'not found' })
-    const c = await caseDetail(d, req.params.id)
+    const c = await caseDetail(d, req.params.id, req.user!)
     return c ?? reply.code(404).send({ error: 'not found' })
   })
 
@@ -243,7 +243,7 @@ export async function buildServer(d: ServerDeps): Promise<FastifyInstance> {
  * file deletions that keep failing (tech design §4.1), mailboxes whose subscription or token needs attention (R-ING-02).
  */
 /** Shown at the top of every demo page (PRD R-DEMO-01 v0.7.22; D11, V3b). */
-export const DEMO_NOTICE = 'Demo: fictional data only, received at fixed past times (deadlines may show as overdue). The directory is the evaluation set\'s fictional one, not the Toolkit sample. KYC attachments are transferred to a folder but, unlike a real deployment, the stored email is not replaced.'
+export const DEMO_NOTICE = 'Demo: fictional data only, received at fixed past times (deadlines may show as overdue). Example email dates are fictional and may be later than today. The directory is the evaluation set\'s fictional one, not the Toolkit sample. KYC attachments are transferred to a folder but, unlike a real deployment, the stored email is not replaced.'
 
 export async function operationalWarnings(db: Db, opts: { demo?: boolean } = {}): Promise<string[]> {
   const r = (await db.query<{ kyc: number; files: number; stuck: number }>(
@@ -251,7 +251,8 @@ export async function operationalWarnings(db: Db, opts: { demo?: boolean } = {})
             (SELECT count(*)::int FROM file_deletion_job WHERE attempts > 0) AS files,
             (SELECT count(DISTINCT d.message_id)::int FROM kyc_delivery d
               WHERE NOT EXISTS (SELECT 1 FROM kyc_delivery x WHERE x.message_id = d.message_id AND x.state NOT IN ('delivered', 'discarded'))
-                AND NOT EXISTS (SELECT 1 FROM kyc_replacement r WHERE r.message_id = d.message_id AND r.step = 5)
+                AND (EXISTS (SELECT 1 FROM kyc_replacement r WHERE r.message_id = d.message_id AND r.step < 5)
+                     OR EXISTS (SELECT 1 FROM attachment a WHERE a.message_id = d.message_id AND a.maybe_kyc AND NOT a.source_deleted))
                 AND (SELECT coalesce(max(delivered_at), max(created_at)) FROM kyc_delivery y WHERE y.message_id = d.message_id) < now() - interval '1 hour') AS stuck`,
   )).rows[0]!
   const out: string[] = []

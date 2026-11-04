@@ -1,3 +1,4 @@
+import { storedDisposition } from '../lib/inline-image.ts'
 // `ingest` (tech design §6): bounded MIME decode, archive, de-duplication (C-ING-1), thread (C-ING-3), directory
 // snapshot (C-LNK-0), metadata signals (C-SIG-1 1–6, 9), Case, cursor — one transaction under a global serial lock.
 import { createHash, randomUUID } from 'node:crypto'
@@ -184,8 +185,8 @@ export async function ingestMessage(
       subject: headerValue(decoded, 'subject') ?? null, date: headerValue(decoded, 'date') ?? null, message_id: msgIdHeader ?? null,
     })
     await c.query(
-      `INSERT INTO message (id, mailbox_id, dedupe_key_hmac, received_at, observed_seq, from_addr_hmac, message_id_hmac, header_blob, thread_id, raw_sha256, raw_sans_msgid_sha256, collision)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+      `INSERT INTO message (id, mailbox_id, dedupe_key_hmac, received_at, observed_seq, from_addr_hmac, message_id_hmac, header_blob, thread_id, raw_sha256, raw_sans_msgid_sha256, collision, mime_version)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 2)`,
       [messageId, mailbox.id, dedupeHmac, serverReceivedAt, seq, fromHmac, msgId ? k.hmac(`msgid\0${msgId}`) : null, headerBlob, threadId, rawSha, sansSha, collision],
     )
     await c.query('INSERT INTO message_file (id, message_id, kind, sha256, file_ref) VALUES ($1, $2, $3, $4, $5)', [randomUUID(), messageId, 'original', rawSha, rawKey])
@@ -196,10 +197,10 @@ export async function ingestMessage(
     for (const a of atts) {
       if (a.overLimit) flags.push('attachment_over_limit')
       await c.query(
-        `INSERT INTO attachment (id, message_id, parent_id, ordinal, depth, name_blob, kind, size, sha256, file_ref, scan_status, parse_status)
-         VALUES ($1, $2, NULL, $3, 1, $4, $5, $6, $7, $8, $9, $10)`,
+        `INSERT INTO attachment (id, message_id, parent_id, ordinal, depth, name_blob, kind, size, sha256, file_ref, scan_status, parse_status, content_id_hmac, disposition, html_referenced, inline_eligible)
+         VALUES ($1, $2, NULL, $3, 1, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
         [a.id, messageId, a.ordinal, await putBlob(c, k, a.filename), a.kind, a.size, a.sha256 ?? '', a.content && a.sha256 ? objectKey(k, a.id, a.sha256) : null,
-          a.overLimit ? 'skipped' : 'pending', a.overLimit ? 'over_limit' : 'pending'],
+          a.overLimit ? 'skipped' : 'pending', a.overLimit ? 'over_limit' : 'pending', a.inline.contentId ? k.hmac(`content-id\0${a.inline.contentId}`) : null, storedDisposition(a.inline.disposition), a.inline.htmlReferenced, a.inline.eligible],
       )
     }
 

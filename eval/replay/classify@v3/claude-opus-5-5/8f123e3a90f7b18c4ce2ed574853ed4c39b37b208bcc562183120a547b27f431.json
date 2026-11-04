@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"legal_documents\",\"confidence\":\"high\",\"reason\":\"Company secretary announces a deed of adherence to the shareholders' agreement will be sent for e-signature later this week.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2185,
+  "outputTokens": 76
+ }
+}

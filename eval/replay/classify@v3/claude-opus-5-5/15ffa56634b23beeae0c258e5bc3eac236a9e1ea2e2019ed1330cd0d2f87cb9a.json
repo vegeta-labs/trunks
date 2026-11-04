@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"unclassified\",\"confidence\":\"high\",\"reason\":\"Generic industry newsletter with articles and event info; no investor, deal or payment request.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2523,
+  "outputTokens": 65
+ }
+}

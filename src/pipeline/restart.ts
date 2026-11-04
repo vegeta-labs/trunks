@@ -25,7 +25,7 @@ export async function restartFrom(c: Tx, queue: Queue, caseId: string, stage: St
   }
   const next = gen + 1
   await c.query(
-    `UPDATE "case" SET processing_generation = $2, manual_revision = manual_revision + $3, generation_by = $4, status = CASE WHEN status = 'failed' THEN 'processing' ELSE status END, failed_stage = NULL,
+    `UPDATE "case" SET processing_generation = $2, manual_revision = manual_revision + $3, generation_by = $4, status = CASE WHEN status = 'failed' THEN 'processing' ELSE status END, failed_stage = NULL, failed_reason = NULL,
        risk_hold = CASE WHEN $5 THEN COALESCE(risk_hold, risk) ELSE risk_hold END WHERE id = $1`,
     [caseId, next, by === 'person' ? 1 : 0, by, by === 'person' && o.hold !== false],
   )

@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"closing_confirmation\",\"confidence\":\"high\",\"reason\":\"Deal lead questions the final closing total before signing off on Northwind Robotics.\"},{\"class\":\"commitment_change\",\"confidence\":\"medium\",\"reason\":\"Mentions an investor's top-up that may still be pending.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2137,
+  "outputTokens": 109
+ }
+}

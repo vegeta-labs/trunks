@@ -58,7 +58,7 @@ attachment is transferred to your target in `kyc.target`:
 
 How transfers run:
 
-- A transfer starts as soon as the KYC decision is saved. Each attachment is transferred once.
+- A transfer starts as soon as the KYC decision is saved at the redaction step, before classification. A later model failure does not delay it. Each attachment is transferred once.
 - A failed transfer is tried again a few times, then once a day until it succeeds. An admin can retry it from the Case
   page. Every retry is audited.
 - While a transfer has failed, the review UI shows a reminder and a reminder is audited daily.
@@ -87,6 +87,11 @@ step 3. The Case is then processed again without the deleted content, and a pers
 hash and the transfer record of each KYC attachment remain.
 
 If any transfer of the email has failed, nothing is replaced and the originals are kept.
+
+If a later run newly identifies another attachment as possible KYC after replacement has finished, that attachment
+is transferred too. Once all transfers succeed, another recorded replacement round removes it from the current
+archive copy. A judgement change during a replacement is recorded as pending. The app checks pending decisions at startup and every minute, and reprocesses them after the round finishes and the lock is available; a restart does not lose the retry. Previously withheld or
+removed attachments are never reclassified as safe by reprocessing the stripped copy.
 
 **In the demo,** KYC attachments are transferred to a folder on the demo volume but the stored email is **not**
 replaced. Replacing it would change what the recorded model replies were made from. A real deployment always replaces.

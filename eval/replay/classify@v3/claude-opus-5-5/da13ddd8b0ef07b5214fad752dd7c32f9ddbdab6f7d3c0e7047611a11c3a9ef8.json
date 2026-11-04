@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"unreferenced_payment\",\"confidence\":\"high\",\"reason\":\"Payment was made from the investor's company rather than personally, and the sender says they forgot to add the reference.\"},{\"class\":\"payment_query\",\"confidence\":\"high\",\"reason\":\"Sender states the £20,000 commitment was paid on 4 November 2026, without attaching a payment confirmation.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2169,
+  "outputTokens": 133
+ }
+}

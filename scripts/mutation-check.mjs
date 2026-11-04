@@ -13,6 +13,10 @@ import { execSync } from 'node:child_process'
 //   which gives payment_received only when the ledger says received, and payment_received discloses, so it is never in the
 //   generic list; the check is defence in depth (E3 self-test).
 // - accounts.ts, the length check inside ibanValid: every string it is called on is a shape of exactly that length.
+// E6 equivalent: removing only the source_deleted early-continue in ensureKycJudgement cannot change a decision:
+// source_deleted implies a saved true, which the independent monotonicity guard preserves; createDeliveries also excludes it.
+// E6 equivalent: disabling both readiness-query guards still cannot strip an undelivered attachment:
+// replaceLocked rechecks every selected attachment receipt under the replacement advisory lock.
 // a mutant may name its own test command (the database tests for the pipeline and the review actions)
 const DB = 'npx vitest run src/pipeline/e3.test.ts --reporter=dot'
 const R4 = 'npx vitest run src/maintenance/retention.test.ts --reporter=dot'
@@ -94,7 +98,7 @@ const MUTANTS = [
   ['src/lib/classify.ts', "if (i.esignInvite) out.add('legal_documents')", '', 'e-sign invite not legal_documents (C-CLS-4)'],
   ['src/lib/classify.ts', '.max(4),', '.max(5),', 'five labels accepted (C-CLS-1)'],
   ['src/lib/classify.ts', 'reason: z.string().max(200)', 'reason: z.string().max(201)', 'reason over 200 characters (C-CLS-1)'],
-  ['src/lib/kyc.ts', "  if (a.kind === 'image') return 'image'\n", '', 'images not KYC (C-RED-0 ③)'],
+  ['src/lib/kyc.ts', "  if (a.kind === 'image') return inlineSignature(a) ? null : 'image'\n", '', 'images not KYC (C-RED-0 ③)'],
   ['src/lib/kyc.ts', "  if (a.parseStatus !== 'parsed') return `not_checked:${a.parseStatus}`\n", '', 'unchecked attachments sent (C-RED-0 ⑤)'],
   ['src/lib/kyc.ts', "  if (a.facts?.encrypted) return 'not_checked:encrypted'\n", '', 'encrypted attachments sent (C-RED-0 ⑤)'],
   ['src/lib/kyc.ts', "  if (a.facts?.tooDeep) return 'not_checked:too_deep'\n", '', 'too-deep nesting sent (C-RED-0 ⑤)'],
@@ -190,7 +194,7 @@ const MUTANTS = [
   ['src/lib/link.ts', "(l.status === 'auto' || l.status === 'confirmed') && l.commitmentKeyHmac", "(l.status !== 'rejected') && l.commitmentKeyHmac", 'unmatched rows counted as received'],
   ['src/lib/link.ts', 'conflict: i.deal !== null && i.deal !== dealOf(commitment.dealKey)', 'conflict: false', 'deal conflict not shown'],
   ['src/lib/link.ts', 'if (byRef.length === 1) {', 'if (byRef.length >= 1) {', 'two reference matches linked to the first'],
-  ['src/lib/verification.ts', "if (['created', 'role_granted', 'credential_reset'].includes(e.type)", "if (['created', 'role_granted'].includes(e.type)", 'a credential reset by the other person allowed'],
+  ['src/lib/verification.ts', "if ((e.type === 'created' || e.type === 'role_granted' || e.type === 'credential_reset')", "if ((e.type === 'created' || e.type === 'role_granted')", 'a credential reset by the other person allowed'],
   ['src/lib/verification.ts', 'if (t(i.now) < t(i.checklistDoneAt) + i.coolingMs)', 'if (t(i.now) < t(i.checklistDoneAt))', 'no cooling-off period'],
   ['src/lib/verification.ts', "if (i.approver.role !== 'approver' && i.approver.role !== 'admin')", 'if (false)', 'a reviewer may approve'],
   ['src/lib/verification.ts', 'task.manualRevision !== now.manualRevision || task.contactId !== now.contactId ||', 'task.manualRevision !== now.manualRevision ||', 'a contact change keeps the task'],
@@ -292,7 +296,6 @@ const MUTANTS = [
   ['src/maintenance/retention.ts', '      if (next.rowCount) {', '      if (false) {', 'a cleared thread link not audited', R4],
   ['src/maintenance/retention.ts', '\n   OR v.id = (SELECT w.id FROM directory_version w WHERE w.kind = v.kind AND w.deal_key IS NOT DISTINCT FROM v.deal_key ORDER BY w.imported_at DESC, w.id DESC LIMIT 1))', ')', 'the current directory version counted as unreferenced (E5)', R4],
   ['src/maintenance/retention.ts', 'b.created_at < $1 AND ${unused} LIMIT 1000)`, [new Date(now.getTime() - DAY_MS)])', 'b.created_at < $1 AND ${unused} LIMIT 1000)`, [now])', 'a fresh unreferenced blob swept (review #11)', R4],
-  ['src/maintenance/kyc.ts', "HAVING bool_and(d.state IN ('delivered', 'discarded'))\n        AND NOT EXISTS (SELECT 1 FROM kyc_replacement r WHERE r.message_id = d.message_id AND r.step = 5)\n        AND NOT EXISTS (SELECT 1 FROM attachment a WHERE", "HAVING bool_or(d.state IN ('delivered', 'discarded'))\n        AND NOT EXISTS (SELECT 1 FROM kyc_replacement r WHERE r.message_id = d.message_id AND r.step = 5)\n        AND NOT EXISTS (SELECT 1 FROM attachment a WHERE false AND", 'replaced while one transfer has failed (C-PRV-2; both redundant checks off)', K4],
   ['src/maintenance/kyc.ts', 'if (ack?.delivery_id !== meta.deliveryId || ack?.sha256 !== meta.sha256)', 'if (false)', 'any 2xx counted as a receipt (E4)', K4],
   ['src/maintenance/kyc.ts', 'const QUICK_ATTEMPTS = 3', 'const QUICK_ATTEMPTS = 1', 'failed after one attempt', K4],
   ['src/maintenance/kyc.ts', "const LATER_STAGES = ['extract', 'redact',", "const LATER_STAGES = ['redact',", 'the old extraction kept after the KYC deletion', K4],
@@ -362,6 +365,39 @@ const MUTANTS = [
   ['src/pipeline/restart.ts', "> STAGES.indexOf('reply') ? 'reply' : row.failed_stage", "> STAGES.indexOf('reply') ? row.failed_stage : row.failed_stage", 'a re-run after route keeps the old generation\'s draft, which cannot be approved (Codex E5 round 5 F1)', E5C],
   ['src/server/app.ts', '({ oidc: !!d.oidc })', '({ oidc: true })', 'the organisation sign-in offered without OIDC (E5 acceptance G4)', E5S],
   ['scripts/public-export.ts', "(^|[^a-z0-9])${n.replace", "${n.replace", 'a forbidden name inside an ordinary word reported, hiding real hits (E5)', E5P],
+  // E6 appendix B, write-before-model judgment, second replacement and verification restart.
+  ["src/maintenance/kyc.ts", "sha256(await d.files.get(row.stripped_file_ref)) !== expected", "false", "E6 XR3 missing stripped copy is ignored on resume", "npx vitest run src/pipeline/kyc-e6.test.ts --reporter=dot"],
+  ["src/maintenance/kyc.ts", "legacyOrdinals: a.mime_version === 1", "legacyOrdinals: false", "E6 XR2 archive transfer uses the wrong ordinal", "npx vitest run src/pipeline/kyc-e6.test.ts --reporter=dot"],
+  ["src/maintenance/kyc.ts", "if (!hash || a.delivery_state === 'delivered' && a.delivery_sha256 !== hash)", "if (!hash)", "E6 XR2 successful receipt does not bind to the selected attachment", "npx vitest run src/pipeline/kyc-e6.test.ts --reporter=dot"],
+  ["src/maintenance/kyc.ts", "legacyOrdinals: version === 1", "legacyOrdinals: false", "E6 XR upgrade strips with new ordinals", "npx vitest run src/pipeline/kyc-e6.test.ts --reporter=dot"],
+  ["src/ingest/mime.ts", "if (options.expectedHashes && (!expected || out.attachments[o]?.sha256 !== expected))", "if (false)", "E6 XR attachment identity guard removed", "npx vitest run src/ingest/inline-image.test.ts --reporter=dot"],
+  ["src/ingest/mime.ts", "if (!legacy) return name", "if (!legacy) return libmime.decodeWords(name)", "E6 XR filename receives a second decoding pass", "npx vitest run src/ingest/inline-image.test.ts --reporter=dot"],
+  ["src/pipeline/ingest.ts", "a.inline.contentId ? k.hmac(`content-id\\0${a.inline.contentId}`) : null", "a.inline.contentId", "E6 XR ingest stores raw Content-ID", "npx vitest run src/pipeline/privacy.test.ts --reporter=dot"],
+  ["src/pipeline/stages.ts", "j.inline?.contentId ? k.hmac(`content-id\\0${j.inline.contentId}`) : null", "j.inline?.contentId ?? null", "E6 XR lazy judgment stores raw Content-ID", "npx vitest run src/pipeline/privacy.test.ts --reporter=dot"],
+  ["src/web/CaseE3.tsx", "reload(notice)", "reload()", "E6 field action drops the refusal notice on refresh", "npx playwright test -g 'TC-REV-11 a field refusal'"],
+  ["src/lib/inline-image.ts", "const end = v.length -", "if (!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(v)) return null\n  const end = v.length -", "E6 base64 validation exhausts the stack on ordinary large attachments", "npx vitest run src/lib/inline-image.test.ts src/ingest/inline-image.test.ts --reporter=dot"],
+  ["src/lib/image-header.ts", "if (pngCrc(b.subarray(p + 4, p + 8 + n)) !==", "if (false && pngCrc(b.subarray(p + 4, p + 8 + n)) !==", "E6 PNG CRC ignored", "npx vitest run src/lib/image-header.test.ts src/lib/inline-image.test.ts src/ingest/inline-image.test.ts --reporter=dot"],
+  ["src/lib/image-header.ts", "if (metadata > 16384 || containsImage(data))", "if (metadata > 32768 || containsImage(data))", "E6 PNG total metadata cap ignored", "npx vitest run src/lib/image-header.test.ts src/lib/inline-image.test.ts src/ingest/inline-image.test.ts --reporter=dot"],
+  ["src/lib/image-header.ts", "if (name === 'IEND') {\n        if (p !== b.length)", "if (name === 'IEND') {\n        if (false)", "E6 trailing data allowed", "npx vitest run src/lib/image-header.test.ts src/lib/inline-image.test.ts src/ingest/inline-image.test.ts --reporter=dot"],
+  ["src/lib/image-header.ts", "if (++frames !== 1 || p + 9 > b.length)", "if (p + 9 > b.length)", "E6 animated GIF allowed", "npx vitest run src/lib/image-header.test.ts src/lib/inline-image.test.ts src/ingest/inline-image.test.ts --reporter=dot"],
+  ["src/lib/image-header.ts", "if (!w || !h || x + w > out.width || y + h > out.height)", "if (!w || !h)", "E6 GIF frame beyond canvas allowed", "npx vitest run src/lib/image-header.test.ts src/lib/inline-image.test.ts src/ingest/inline-image.test.ts --reporter=dot"],
+  ["src/lib/image-header.ts", "if (metadata > 16384) return bad('jpeg_metadata_total')", "if (metadata > 32768) return bad('jpeg_metadata_total')", "E6 JPEG combined metadata cap ignored", "npx vitest run src/lib/image-header.test.ts src/lib/inline-image.test.ts src/ingest/inline-image.test.ts --reporter=dot"],
+  ["src/lib/inline-image.ts", "if (!closing && ignored.has(tag))", "if (false && ignored.has(tag))", "E6 template/raw text references accepted", "npx vitest run src/lib/image-header.test.ts src/lib/inline-image.test.ts src/ingest/inline-image.test.ts --reporter=dot"],
+  ["src/lib/kyc.ts", "a.inline?.eligible === true", "true", "E6 unproven MIME allowed", "npx vitest run src/lib/image-header.test.ts src/lib/inline-image.test.ts src/ingest/inline-image.test.ts --reporter=dot"],
+  ["src/lib/kyc.ts", "Math.max(f.width, f.height) <= l.max_long_side", "Math.max(f.width, f.height) <= l.max_long_side + 1", "E6 long-side boundary widened", "npx vitest run src/lib/image-header.test.ts src/lib/inline-image.test.ts src/ingest/inline-image.test.ts --reporter=dot"],
+  ["src/lib/kyc.ts", "Math.min(f.width, f.height) <= l.max_short_side", "Math.min(f.width, f.height) <= l.max_short_side + 1", "E6 short-side boundary widened", "npx vitest run src/lib/image-header.test.ts src/lib/inline-image.test.ts src/ingest/inline-image.test.ts --reporter=dot"],
+  ["src/lib/kyc.ts", "f.bytes <= l.max_bytes", "f.bytes <= l.max_bytes + 1", "E6 byte boundary widened", "npx vitest run src/lib/image-header.test.ts src/lib/inline-image.test.ts src/ingest/inline-image.test.ts --reporter=dot"],
+  ["src/pipeline/stages.ts", "raw.maybeKyc === true ? raw.kycReason ?? 'previously_judged' : fresh.reason", "fresh.reason", "E6 saved KYC true ignored", "npx vitest run src/pipeline/kyc-e6.test.ts --reporter=dot"],
+  ["src/pipeline/stages.ts", "if (prep.kycJudgements) await ensureKycJudgement", "if (stage === 'classify' && prep.kycJudgements) await ensureKycJudgement", "E6 judgment delayed until classify", "npx vitest run src/pipeline/kyc-e6.test.ts --reporter=dot"],
+  ["src/pipeline/stages.ts", "mayPromote = got && !", "mayPromote = !", "E6 advisory lock ignored", "npx vitest run src/pipeline/kyc-e6.test.ts --reporter=dot"],
+  ["src/maintenance/kyc.ts", "AND step < 5 ORDER BY round DESC LIMIT 1", "ORDER BY round DESC LIMIT 1", "E6 finished round prevents next replacement", "npx vitest run src/pipeline/kyc-e6.test.ts --reporter=dot"],
+  ["src/server/actions.ts", "if (t.state !== 'open' && t.state !== 'checklist_done')", "if (false)", "E6 old verification task may restart", "npx vitest run src/lib/verification.test.ts src/pipeline/e3.test.ts --reporter=dot"],
+  ["src/lib/verification.ts", "if (!created || t(created.at) > limit)", "if (false)", "E6 new completer account allowed", "npx vitest run src/lib/verification.test.ts src/pipeline/e3.test.ts --reporter=dot"],
+  ["src/ingest/mime.ts", "decodeWords ? line.slice(i + 1).trim() : asciiTrim(line.slice(i + 1))", "line.slice(i + 1).trim()", "E6 structure-header VT erased", "npx vitest run src/ingest/inline-image.test.ts --reporter=dot"],
+  ["src/lib/inline-image.ts", "const refs = new Set<string>()", "html = html.replaceAll('\\0', '')\n  const refs = new Set<string>()", "E6 HTML NUL removed by entity decoder", "npx vitest run src/lib/inline-image.test.ts --reporter=dot"],
+  ["src/pipeline/kyc-recheck.ts", "const next = await restartFrom(c, d.queue, row.id, 'redact', 'system')", "const next = { generation: row.processing_generation }", "E6 pending judgement never scheduled", "npx vitest run src/pipeline/kyc-e6.test.ts --reporter=dot"],
+  ["src/server/cases.ts", "redactor.redactAll([...parts.map((part) => normalise(part).text), n.text]).at(-1)!", "redactor.redactAll([n.text]).at(-1)!", "E6 cross-part hidden values exposed", "npx vitest run src/pipeline/e3.test.ts -t TC-REV-12 --reporter=dot"],
+
   ['src/web/App.tsx', '{on.length === 0 && <p className="meta">', '{true && <p className="meta">', '«No warning signals» beside fired signals (R-REV-02 v0.7.25)', W],
   ['src/web/App.tsx', '{unknown.length > 0 && <ul', '{false && <ul', 'unchecked signals hidden (R-REV-02 v0.7.25)', W],
   ['src/web/App.tsx', '`No warning signals; ${unknown.length} could not be checked`', "'No warning signals'", 'unchecked signals not counted (R-REV-02 v0.7.25)', W],
@@ -374,7 +410,7 @@ const MUTANTS = [
 ]
 
 // the parity test with the Python oracle is a separate CI step; its result must not count as a catch here
-const RUN = 'npx vitest run src/lib scripts eval/metrics.test.ts eval/metrics-e3.test.ts src/adapters/llm --exclude src/lib/oracle.test.ts --reporter=dot'
+const RUN = 'npx vitest run src/lib scripts eval/metrics.test.ts eval/metrics-e3.test.ts src/adapters/llm --exclude src/lib/oracle.test.ts --exclude scripts/public-export.test.ts --reporter=dot'
 try {
   execSync(RUN, { stdio: 'ignore' })
 } catch {
@@ -385,7 +421,9 @@ try {
 let survived = 0
 // MUTANTS_ONLY=src/server,src/pipeline runs the mutants of those paths only (a re-check after fixes)
 const ONLY = process.env.MUTANTS_ONLY?.split(',') ?? null
-for (const [file, from, to, what, cmd = RUN] of MUTANTS.filter(([f]) => !ONLY || ONLY.some((p) => f.startsWith(p)))) {
+const MATCH = process.env.MUTANTS_MATCH ?? ''
+const selected = MUTANTS.filter(([f, , , what]) => (!ONLY || ONLY.some((p) => f.startsWith(p))) && what.includes(MATCH))
+for (const [file, from, to, what, cmd = RUN] of selected) {
   const orig = readFileSync(file, 'utf8')
   if (orig.split(from).length !== 2) {
     console.log(`SETUP ${file}: original text not found exactly once (${what})`)
@@ -404,6 +442,6 @@ for (const [file, from, to, what, cmd = RUN] of MUTANTS.filter(([f]) => !ONLY ||
   console.log(`${caught ? 'caught  ' : 'SURVIVED'} ${file}: ${what}`)
   if (!caught) survived++
 }
-const ran = MUTANTS.filter(([f]) => !ONLY || ONLY.some((p) => f.startsWith(p))).length
+const ran = selected.length
 console.log(`${ran - survived} / ${ran} caught`)
 process.exit(survived ? 1 : 0)

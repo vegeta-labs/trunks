@@ -164,6 +164,15 @@ Further checks:
   account, a new role or a reset therefore waits one cooling-off period before it counts. On a new deployment the
   first approval is possible only after about two cooling-off periods (default about 48 hours).
 
+The Case shows all conditions that block approval, separating the checklist completer's account history from your
+own eligibility and the cooling-off period (C-FRD-5). If the completer's account or role was too new when the checklist
+was done, waiting longer cannot fix that task. An approver or admin can choose **Restart verification** on an open or
+checklist-done task and must give a reason. This invalidates the old task and regenerates an open checklist using the
+contact on file; completion of the new checklist starts a new cooling-off period. Approved tasks cannot be restarted.
+The Case's manual revision does not change. A Case being reprocessed, or an obsolete task binding, is refused.
+The reason is encrypted audit detail and is never put in an event. If the only approver has a forbidden account-history
+relationship with every possible completer, restarting cannot solve it; close the Case instead.
+
 Completing a task only records that the process was followed. The app changes no record because of it.
 
 ## 8. Known limits
@@ -175,8 +184,9 @@ Completing a task only records that the process was followed. The app changes no
 | Two-person control can be bypassed by one person who controls the identity provider or all admin accounts. | Make sure two different people manage their own accounts. |
 | Model output varies between model versions. | Changing the model means changing the configuration. Measure again with the evaluation set. |
 | Look-alike domain detection can give false positives. | It only raises risk; it never blocks. |
-| Inline signature images count as possible-KYC. | Most emails with images trigger a KYC transfer and a replacement of the stored email. |
+| Small inline signature images are not treated as possible-KYC (within `kyc.inline_image`). | They stay in the stored email under normal retention and are not transferred; so would an ID document scaled down to fit the limits, or encoded data hidden in an allowed image's text or metadata (at most 16,384 bytes in total). Wider limits widen this. Their content never reaches a model. Other images still count as possible-KYC. |
 | No OCR. | Image and scan content is never read. |
+| PostgreSQL's own server log can record the `DETAIL` of a constraint error, which may hold values from an email. The app's own error logs carry only fixed reason codes. | Keep the database log under the same access control and retention as the database. |
 | Gmail's handling of forged `Authentication-Results` must be checked by you. | See the pre-go-live check in [Mailboxes](mailboxes.md#before-going-live-gmail-authentication-headers). |
 | Microsoft 365 and Gmail Pub/Sub were tested only against simulated services. | Test with your own tenant before going live. |
 | The AppArmor profile needs AppArmor 4 (for example Ubuntu 24.04). Docker Desktop on macOS ignores AppArmor. | On macOS the parser runs with seccomp and bubblewrap but without AppArmor. |

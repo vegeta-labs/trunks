@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { canApprove, CHECKLIST, invalidated, phoneOnFile, taskContact, type ApproveInput, type UserEvent } from './verification.ts'
+import { approvalFailures, canApprove, CHECKLIST, invalidated, phoneOnFile, taskContact, type ApproveInput, type UserEvent } from './verification.ts'
 
 const H = 3_600_000
 const day = 24 * H
@@ -69,5 +69,22 @@ describe('task binding and content (C-FRD-4, C-FRD-5)', () => {
     expect(taskContact(null, false, 'Amelia Hart', all)).toBe(null) // no impersonation signal
     expect(taskContact(null, null, 'Amelia Hart', all)).toBe(null) // unknown is not true
     expect(taskContact(null, true, 'Someone Else', all)).toBe(null)
+  })
+})
+
+
+describe('TC-FRD-12 all approval failures', () => {
+  it('reports completer failures during cooling, independently of the viewer, with no account timestamps', () => {
+    const events = history.map((e) => e.userId === 'alice' ? { ...e, at: '2026-10-29T09:30:00Z' } : e)
+    const input = { ...base, now: '2026-10-29T11:00:00Z', events }
+    const failures = approvalFailures(input)
+    expect(failures.filter((f) => f.subject === 'completer').map((f) => f.code)).toEqual(['account_too_new', 'role_too_new'])
+    expect(failures.some((f) => f.code === 'cooling')).toBe(true)
+    const self = approvalFailures({ ...input, approver: { id: 'alice', role: 'reviewer' } })
+    expect(self.filter((f) => f.subject === 'completer')).toEqual(failures.filter((f) => f.subject === 'completer'))
+    expect(self.some((f) => f.code === 'same_person')).toBe(true)
+    expect(JSON.stringify(failures)).not.toContain('2026-')
+    expect(canApprove(input)).toMatchObject({ ok: false, reason: 'the cooling-off period has not ended' })
+    expect(approvalFailures(base)).toEqual([])
   })
 })

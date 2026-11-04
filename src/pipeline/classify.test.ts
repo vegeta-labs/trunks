@@ -44,7 +44,7 @@ describe('classify stage (C-CLS, C-RED-0)', () => {
     expect(JSON.stringify(row)).not.toContain('wire_fraud')
   }, 60_000)
 
-  it('TC-CLS-04a / TC-CLS-05 model labels high + medium adopted, low kept for risk; rule labels added (IBAN in the body)', async () => {
+  it('TC-CLS-04a / TC-CLS-05 / TC-CLS-09 model labels high + medium adopted, low kept for risk; rule labels added (IBAN in the body)', async () => {
     llm.reply = (v) =>
       v.startsWith('classify')
         ? '{"labels":[{"class":"payment_query","confidence":"high","reason":"a"},{"class":"identity_change","confidence":"medium","reason":"b"},{"class":"complaint","confidence":"low","reason":"c"}],"language":"en"}'

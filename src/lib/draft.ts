@@ -66,7 +66,8 @@ export function checkTemplate(t: TemplateDef, extraInternal: readonly string[] =
   if (t.id === SAFE_ACK) for (const p of placeholders) if (PLACEHOLDER_SOURCE[p] !== 'system') problems.push(`safe_ack may only use system placeholders, not {${p}}`)
   if (t.id === NOTIFY_OLD_CONTACT) for (const p of placeholders) if (PLACEHOLDER_SOURCE[p] !== 'system' && p !== 'contact_name') problems.push(`notify_old_contact may only use system placeholders and {contact_name}, not {${p}}`)
   const asserts = t.asserts_receipt === true || ASSERTS_RECEIPT.includes(t.id)
-  if (asserts) for (const p of placeholders) if (!['directory', 'ledger'].includes(PLACEHOLDER_SOURCE[p] ?? '')) problems.push(`${t.id} asserts receipt and may only use directory or ledger placeholders, not {${p}}`)
+  // the deployment's own name may sign it off (C-DRF-1 v0.7.25): a fixed configuration value, not from the email
+  if (asserts) for (const p of placeholders) if (!['directory', 'ledger'].includes(PLACEHOLDER_SOURCE[p] ?? '') && p !== 'deployment_name') problems.push(`${t.id} asserts receipt and may only use directory or ledger placeholders and {deployment_name}, not {${p}}`)
   const terms = [...matchedPhrases(t.subject, [...INTERNAL_TERMS, ...extraInternal]), ...matchedPhrases(t.body, [...INTERNAL_TERMS, ...extraInternal])]
   if (terms.length) problems.push(`internal terms in the template text: ${[...new Set(terms)].join(', ')}`)
   // notify_old_contact goes to the contact's own address on file and may name them; it is not a Case reply (C-FRD-4)

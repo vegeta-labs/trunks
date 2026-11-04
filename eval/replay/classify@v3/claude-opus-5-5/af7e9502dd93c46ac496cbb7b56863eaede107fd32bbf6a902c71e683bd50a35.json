@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"payment_query\",\"confidence\":\"high\",\"reason\":\"Sender says she sent the £5,000 second instalment for NW-008 on 2 November and asks whether it has arrived.\"},{\"class\":\"identity_change\",\"confidence\":\"high\",\"reason\":\"Investor changed her surname after marriage and asks for it to be used on documents and the share register.\"},{\"class\":\"kyc_documents\",\"confidence\":\"low\",\"reason\":\"Offers to send a copy of the marriage certificate if needed.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2207,
+  "outputTokens": 171
+ }
+}

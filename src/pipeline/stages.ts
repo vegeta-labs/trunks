@@ -1,3 +1,4 @@
+import { storedDisposition } from '../lib/inline-image.ts'
 // Pipeline stages after `ingest` (tech design §6): scan → parse → content_signals → extract → redact.
 // Each stage computes outside the transaction, then publishes under `SELECT … FOR UPDATE` on the Case row: a job whose
 // generation is stale is dropped; a repeated input identity reuses the stored result (stage_run unique key).
@@ -13,7 +14,8 @@ import { loadSnapshot } from '../store/directory.ts'
 import type { Scanner } from '../adapters/scan/clamd.ts'
 import type { ParserClient } from './parser-client.ts'
 import { STAGES, type Queue, type Stage, type StageJob } from './queue.ts'
-import { decodeMime } from '../ingest/mime.ts'
+import { decodeMime, type InlineMetadata } from '../ingest/mime.ts'
+import { imageHeader, type ImageFacts } from '../lib/image-header.ts'
 import type { TaskResult } from '../../parser/task.ts'
 import { htmlToText } from '../lib/html.ts'
 import { hasHiddenText, htmlScanTexts, injectionMarkers, domainOf } from '../lib/signals.ts'
@@ -21,7 +23,7 @@ import { fromOriginal, normalise, toOriginal } from '../lib/text.ts'
 import { extractUetrs } from '../lib/uetr.ts'
 import { extractAmounts, mt103 } from '../lib/amounts.ts'
 import { findReferences } from '../lib/references.ts'
-import { distinctAccounts, extractAccounts } from '../lib/accounts.ts'
+import { distinctAccounts, extractAccounts, invalidIbanCount } from '../lib/accounts.ts'
 import { extractDates } from '../lib/dates.ts'
 import { detectEsign, linkDomains } from '../lib/esign.ts'
 import { Redactor } from '../lib/redact.ts'
@@ -30,7 +32,8 @@ import { readFileSync } from 'node:fs'
 import { createDeliveries } from '../maintenance/kyc.ts'
 import { toJSONSchema, type z } from 'zod'
 import { adoptLabels, adoptedClasses, classificationSchema, maskUnknownPlaceholders, riskClasses, ruleLabels, type Classification, type Label } from '../lib/classify.ts'
-import { kycReason } from '../lib/kyc.ts'
+import { inlineSignature, kycReason } from '../lib/kyc.ts'
+import { failureCode, originalText, sanitised, tagged } from './failure.ts'
 import { LlmOutputError, SetupError, type LlmAdapter, type LlmRequest } from '../adapters/llm/types.ts'
 import { inputSha } from '../adapters/llm/replay.ts'
 import { CLASS_TEXT, FIELD_TEXT } from './prompts/catalogue.ts'
@@ -50,7 +53,7 @@ export interface StageDeps {
 
 const sha256 = (s: string | Buffer) => createHash('sha256').update(s).digest('hex')
 const PARSEABLE = new Set(['pdf', 'txt', 'csv', 'eml', 'docx', 'xml'])
-export const PIPELINE_VERSION = 'e3.1' // bump when stage logic changes (part of the input identity)
+export const PIPELINE_VERSION = 'e6.1' // bump when stage logic changes (part of the input identity)
 
 export interface Applied {
   audit: Record<string, Json>
@@ -60,6 +63,7 @@ export interface Applied {
 
 export interface Prepared {
   inputHash: string
+  kycJudgements?: KycJudgement[]
   result?: unknown // stored with the stage run (stage_run.result_blob)
   apply(c: Tx, caseRow: CaseRow): Promise<Applied>
 }
@@ -90,10 +94,18 @@ interface AttRow {
   scan_status: string
   parse_status: string
   source_deleted: boolean
+  kyc_recheck_pending: boolean
+  maybe_kyc: boolean | null
+  kyc_reason: string | null
+  content_id_hmac: string | null
+  disposition: string | null
+  html_referenced: boolean | null
+  inline_eligible: boolean | null
+  image_facts: ImageFacts | null
 }
 
 const attachments = async (c: Pick<Tx, 'query'>, messageId: string) =>
-  (await c.query<AttRow>('SELECT id, ordinal, kind, name_blob, file_ref, scan_status, parse_status, source_deleted FROM attachment WHERE message_id = $1 ORDER BY ordinal', [messageId])).rows
+  (await c.query<AttRow>('SELECT id, ordinal, kind, name_blob, file_ref, scan_status, parse_status, source_deleted, kyc_recheck_pending, maybe_kyc, kyc_reason, content_id_hmac, disposition, html_referenced, inline_eligible, image_facts FROM attachment WHERE message_id = $1 ORDER BY ordinal', [messageId])).rows
 
 export interface MessageView {
   headers: Array<[string, string]>
@@ -103,16 +115,17 @@ export interface MessageView {
   text: string // plain body, or the HTML body as text when there is no plain part
   htmlText: string // the HTML body as text ('' when there is none); extracted and redacted too (self-test RK-F2)
   html: string | null
-  attachments: Array<{ id: string; ordinal: number; kind: string; filename: string; parseStatus: string; scanStatus: string; text: string; facts: TaskResult['facts'] | null }>
+  attachments: Array<{ id: string; ordinal: number; kind: string; filename: string; parseStatus: string; scanStatus: string; text: string; facts: TaskResult['facts'] | null; inline: InlineMetadata | null; imageFacts: ImageFacts | null; maybeKyc: boolean | null; kycReason: string | null; sourceDeleted: boolean }>
 }
 
 /** Bodies come from the archived original; attachment texts from the parser's output. */
-export async function loadMessage(deps: Pick<StageDeps, 'db' | 'k' | 'files' | 'config'>, messageId: string): Promise<MessageView> {
+export async function loadMessage(deps: Pick<StageDeps, 'db' | 'k' | 'files' | 'config'>, messageId: string, judgeImages = false): Promise<MessageView> {
   const { db, k, files, config } = deps
-  const f = (await db.query<{ file_ref: string }>(`SELECT file_ref FROM message_file WHERE message_id = $1 ORDER BY kind = 'kyc_stripped' DESC LIMIT 1`, [messageId])).rows[0]
+  const f = (await db.query<{ file_ref: string }>(`SELECT file_ref FROM message_file WHERE message_id = $1 ORDER BY kind = 'kyc_stripped' DESC, created_at DESC LIMIT 1`, [messageId])).rows[0]
   const raw = await files.get(f!.file_ref)
-  const m = decodeMime(raw, { maxAttachmentBytes: config.attachments.max_attachment_bytes, maxTotalBytes: config.attachments.max_total_bytes })
-  const hdr = (await getJson<{ subject: string | null; from: string | null; from_name: string | null }>(db, k, (await db.query<{ header_blob: string }>('SELECT header_blob FROM message WHERE id = $1', [messageId])).rows[0]!.header_blob))!
+  const meta = (await db.query<{ header_blob: string; mime_version: number }>('SELECT header_blob, mime_version FROM message WHERE id = $1', [messageId])).rows[0]!
+  const m = decodeMime(raw, { maxAttachmentBytes: config.attachments.max_attachment_bytes, maxTotalBytes: config.attachments.max_total_bytes, legacyOrdinals: meta.mime_version === 1 })
+  const hdr = (await getJson<{ subject: string | null; from: string | null; from_name: string | null }>(db, k, meta.header_blob))!
   const atts = await attachments(db, messageId)
   const texts = (await db.query<{ attachment_id: string; text_blob: string; facts_blob: string | null }>('SELECT attachment_id, text_blob, facts_blob FROM attachment_text WHERE attachment_id = ANY($1::uuid[])', [atts.map((a) => a.id)])).rows
   const blobs = await getBlobs(db, k, [...atts.map((a) => a.name_blob), ...texts.flatMap((t) => [t.text_blob, t.facts_blob]).filter((x): x is string => !!x)])
@@ -125,14 +138,22 @@ export async function loadMessage(deps: Pick<StageDeps, 'db' | 'k' | 'files' | '
     text: m.text ?? (m.html ? htmlToText(m.html) : ''),
     htmlText: m.text !== null && m.html ? htmlToText(m.html) : '',
     html: m.html,
-    attachments: atts.map((a) => {
+    attachments: await Promise.all(atts.map(async (a) => {
       const t = byAtt.get(a.id)
+      const part = m.attachments.find((p) => p.ordinal === a.ordinal)
+      const inline: InlineMetadata | null = a.inline_eligible === null ? part?.inline ?? null : {
+        contentId: a.content_id_hmac, disposition: a.disposition, htmlReferenced: a.html_referenced === true, eligible: a.inline_eligible,
+      }
+      const imageFacts = a.image_facts ?? (judgeImages && a.kind === 'image' && !a.source_deleted ? imageHeader(
+        (a.file_ref ? await files.get(a.file_ref).catch(() => null) : part?.content) ?? Buffer.alloc(0),
+      ) : null)
       return {
-        id: a.id, ordinal: a.ordinal, kind: a.kind, filename: blobs.get(a.name_blob)!.toString('utf8'), parseStatus: a.parse_status, scanStatus: a.scan_status,
+        id: a.id, ordinal: a.ordinal, kind: a.kind, filename: meta.mime_version === 1 && !a.source_deleted && part ? part.filename : blobs.get(a.name_blob)!.toString('utf8'), parseStatus: a.parse_status, scanStatus: a.scan_status,
         text: t && !a.source_deleted ? blobs.get(t.text_blob)!.toString('utf8') : '',
+        inline, imageFacts, maybeKyc: a.maybe_kyc, kycReason: a.kyc_reason, sourceDeleted: a.source_deleted,
         facts: t?.facts_blob && !a.source_deleted ? (JSON.parse(blobs.get(t.facts_blob)!.toString('utf8')) as TaskResult['facts']) : null,
       }
-    }),
+    })),
   }
 }
 
@@ -224,6 +245,8 @@ export interface Provenance {
 }
 
 export interface Extraction {
+  invalidIbans?: number // absent in older saved results; no invalid account value is retained
+
   uetrs: Array<{ value: string; at: Provenance[] }>
   uetrCandidatesInvalid: Array<{ value: string; at: Provenance[] }>
   multipleUetrs: boolean
@@ -258,6 +281,7 @@ async function prepExtract(d: StageDeps, cr: CaseRow): Promise<Prepared> {
     ...m.attachments.filter((a) => a.text !== '').map((a) => ({ part: `attachment_text:${a.ordinal}`, text: a.text })),
   ]
   const ex: Extraction = { uetrs: [], uetrCandidatesInvalid: [], multipleUetrs: false, amounts: [], references: [], accounts: [], dates: [], evidence: [], esign: { esignInvite: false, platform: null } }
+  ex.invalidIbans = parts.reduce((n, p) => n + invalidIbanCount(normalise(p.text).text), 0)
   const refs = new Map<string, Provenance[]>()
   for (const p of parts) {
     const n = normalise(p.text)
@@ -332,7 +356,7 @@ export interface Redaction {
 }
 
 async function prepRedact(d: StageDeps, cr: CaseRow): Promise<Prepared> {
-  const m = await loadMessage(d, cr.message_id)
+  const m = await loadMessage(d, cr.message_id, true)
   const dir = await loadSnapshot(d.db, d.k, cr.snapshot_id)
   const r = new Redactor({ contactNames: dir.contacts.map((p) => p.name) })
   // all parts at once: a value found in one part is replaced in every part (C-RED-1, v0.7.3)
@@ -365,6 +389,7 @@ async function prepRedact(d: StageDeps, cr: CaseRow): Promise<Prepared> {
   return {
     inputHash: sha256(JSON.stringify([m.subject, m.fromName, m.text, m.htmlText, m.attachments.map((a) => [a.filename, a.text]), cr.snapshot_id])),
     result: out,
+    kycJudgements: judgeAttachments(d, m),
     async apply(c) {
       for (const [placeholder, value] of r.map) {
         await c.query('INSERT INTO redaction_map (message_id, placeholder, value_blob, source_attachment_id) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING', [
@@ -399,24 +424,81 @@ const clean = neutraliseBlockTags
 export interface ModelView {
   user: string
   kyc: Array<{ ordinal: number; reason: string }>
+  judgements: KycJudgement[]
+}
+
+export interface KycJudgement {
+  id: string
+  ordinal: number
+  reason: string | null
+  label: string | null
+  inline: InlineMetadata | null
+  imageFacts: ImageFacts | null
+}
+
+function judgeAttachments(d: Pick<StageDeps, 'config'>, m: MessageView): KycJudgement[] {
+  return m.attachments.map((a) => {
+    const input = { ...a, inlineLimits: d.config.kyc.inline_image }
+    const reason = kycReason(input)
+    return { id: a.id, ordinal: a.ordinal, reason, label: reason ?? (inlineSignature(input) ? 'inline_signature' : null), inline: a.inline, imageFacts: a.imageFacts }
+  })
+}
+
+/** Called after the generation check, under the Case row lock, including both in-transaction reuse paths. */
+export async function ensureKycJudgement(c: Tx, k: Keyring, cr: CaseRow, judgements: KycJudgement[]): Promise<void> {
+  const rows = await attachments(c, cr.message_id)
+  const promote = rows.some((a) => !a.source_deleted && a.maybe_kyc !== true && judgements.some((j) => j.id === a.id && j.reason !== null))
+  let mayPromote = true
+  if (promote) {
+    // Try, never wait: maintenance holds the same advisory lock and later needs the Case row lock.
+    const got = (await c.query<{ ok: boolean }>('SELECT pg_try_advisory_xact_lock(hashtextextended($1, 7340009)) AS ok', [cr.message_id])).rows[0]!.ok
+    mayPromote = got && !(await c.query('SELECT 1 FROM kyc_replacement WHERE message_id = $1 AND step < 5', [cr.message_id])).rowCount
+  }
+  let changed = 0, deferred = 0
+  for (const j of judgements) {
+    const a = rows.find((r) => r.id === j.id)
+    if (!a || a.source_deleted) continue // judging the stripped copy never undoes an earlier decision
+    if (j.imageFacts || j.inline) await c.query(
+      `UPDATE attachment SET image_facts = coalesce(image_facts, $2::jsonb),
+         content_id_hmac = CASE WHEN inline_eligible IS NULL THEN $3 ELSE content_id_hmac END,
+         disposition = CASE WHEN inline_eligible IS NULL THEN $4 ELSE disposition END,
+         html_referenced = coalesce(html_referenced, $5), inline_eligible = coalesce(inline_eligible, $6) WHERE id = $1`,
+      [a.id, j.imageFacts ? JSON.stringify(j.imageFacts) : null, j.inline?.contentId ? k.hmac(`content-id\0${j.inline.contentId}`) : null, storedDisposition(j.inline?.disposition ?? null), j.inline?.htmlReferenced ?? false, j.inline?.eligible ?? false],
+    )
+    if (a.maybe_kyc === true || a.maybe_kyc === false && j.reason === null) {
+      if (a.kyc_recheck_pending) await c.query('UPDATE attachment SET kyc_recheck_pending = false WHERE id = $1', [a.id])
+      continue
+    }
+    if (j.reason !== null && !mayPromote) {
+      await c.query('UPDATE attachment SET kyc_recheck_pending = true WHERE id = $1', [a.id])
+      deferred++; continue
+    }
+    await c.query('UPDATE attachment SET maybe_kyc = $2, kyc_reason = $3, kyc_recheck_pending = false WHERE id = $1', [a.id, j.reason !== null, j.label])
+    changed++
+  }
+  const transfers = await createDeliveries(c, cr.id, cr.message_id)
+  if (changed || transfers) await appendAudit(c, k, [{ actor: 'system', type: 'kyc.judged', caseId: cr.id, payload: { judged: changed, transfers } }])
+  if (deferred) await appendAudit(c, k, [{ actor: 'system', type: 'kyc.reclassify_deferred', caseId: cr.id, payload: { attachments: deferred } }])
 }
 
 /** The model's input: redacted text only; a possible-KYC attachment contributes its redacted name and type (C-RED-0). */
 async function modelView(d: StageDeps, cr: CaseRow, generation: number): Promise<ModelView> {
   const red = await resultOf<Redaction>(d, cr.id, 'redact', generation)
   if (!red) throw new Error('no redaction for this generation')
-  const m = await loadMessage(d, cr.message_id)
+  const m = await loadMessage(d, cr.message_id, true)
+  const judgements = judgeAttachments(d, m)
   const kyc: ModelView['kyc'] = []
   const parts = [`<subject>${clean(red.subject)}</subject>`, `<from_name>${clean(red.fromName)}</from_name>`, `<body>${clean(red.body)}</body>`]
   if (red.bodyHtml.trim() !== '' && red.bodyHtml !== red.body) parts.push(`<body_html_text>${clean(red.bodyHtml)}</body_html_text>`)
   for (const a of red.attachments) {
     const raw = m.attachments.find((x) => x.ordinal === a.ordinal)!
-    const reason = kycReason({ filename: raw.filename, kind: raw.kind, parseStatus: raw.parseStatus, text: raw.text, facts: raw.facts })
+    const fresh = judgements.find((j) => j.ordinal === a.ordinal)!
+    const reason = raw.maybeKyc === true ? raw.kycReason ?? 'previously_judged' : fresh.reason
     if (reason) kyc.push({ ordinal: a.ordinal, reason })
-    const content = reason ? '[content withheld: possible KYC document]' : clean(a.text)
+    const content = reason ? '[content withheld: possible KYC document]' : raw.kind === 'image' ? '[image: not read]' : clean(a.text)
     parts.push(`<attachment number="${a.ordinal + 1}" name="${clean(a.filename).replace(/"/g, "'")}" type="${raw.kind}">${content}</attachment>`)
   }
-  return { user: `<email>\n${parts.join('\n')}\n</email>`, kyc }
+  return { user: `<email>\n${parts.join('\n')}\n</email>`, kyc, judgements }
 }
 
 export async function resultOf<T>(d: Pick<StageDeps, 'db' | 'k'>, caseId: string, stage: Stage, generation: number): Promise<T | null> {
@@ -438,7 +520,7 @@ export interface ModelCall<T> {
 const MAX_RAW = 64 * 1024
 
 async function callModel<S extends z.ZodType>(d: StageDeps, caseId: string, req: LlmRequest<S>): Promise<ModelCall<z.infer<S>>> {
-  if (!d.llm) throw new Error('no model configured (model in deployment.yaml)')
+  if (!d.llm) throw new SetupError('no model configured (model in deployment.yaml)')
   const llm = d.llm
   const sha = inputSha(req)
   const attempts: ModelCall<z.infer<S>>['attempts'] = []
@@ -524,7 +606,7 @@ async function callModelLocked<S extends z.ZodType>(d: StageDeps, caseId: string
   return { parsed: null, attempts }
 }
 
-export const CLASSIFY_PROMPT = 'classify@v2'
+export const CLASSIFY_PROMPT = 'classify@v3'
 
 export interface ClassifyResult {
   labels: Label[]
@@ -558,11 +640,8 @@ async function prepClassify(d: StageDeps, cr: CaseRow): Promise<Prepared> {
   return {
     inputHash: sha256(JSON.stringify([view.user, system, rules, d.llm?.id])),
     result: out,
+    kycJudgements: view.judgements,
     async apply(c) {
-      for (const k of view.kyc) await c.query('UPDATE attachment SET maybe_kyc = true WHERE message_id = $1 AND ordinal = $2', [cr.message_id, k.ordinal])
-      await c.query('UPDATE attachment SET maybe_kyc = false WHERE message_id = $1 AND maybe_kyc IS NULL', [cr.message_id])
-      // R-PRV-03 v0.7.18: the transfer starts when the judgement is saved; one per attachment, never again on a re-run
-      const transfers = await createDeliveries(c, cr.id, cr.message_id)
       for (const l of labels) {
         await c.query(
           'INSERT INTO case_label (case_id, generation, class_id, source, confidence, adopted, reason_blob) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT DO NOTHING',
@@ -570,7 +649,7 @@ async function prepClassify(d: StageDeps, cr: CaseRow): Promise<Prepared> {
         )
       }
       return {
-        audit: { adopted: out.adopted, model_failed: out.modelFailed, attempts: call.attempts.length, kyc_attachments: view.kyc.length, kyc_transfers: transfers, model: d.llm?.id ?? null, prompt: CLASSIFY_PROMPT },
+        audit: { adopted: out.adopted, model_failed: out.modelFailed, attempts: call.attempts.length, kyc_attachments: view.kyc.length, model: d.llm?.id ?? null, prompt: CLASSIFY_PROMPT },
         // the model's replies are kept in audit_detail, never in the audit row itself (TC-AUD-06b); TC-CLS-01: both attempts
         // the exact request with its schema, and its attempts (tech design §5, round 2 F9)
         detail: { requests: [{ system, user: view.user, prompt: CLASSIFY_PROMPT, schema: toJSONSchema(classificationSchema(ids)) as Json, attempts: call.attempts.map((a) => ({ raw: a.raw, error: a.error, detail: a.detail, reused: a.reused })) }], labels: labels as unknown as Json },
@@ -629,6 +708,7 @@ async function prepFields(d: StageDeps, cr: CaseRow): Promise<Prepared> {
   })
   const out: FieldsResult = { classes: cls.adopted, fields: res, modelFailed: call?.failed ?? false }
   return {
+    kycJudgements: view.judgements,
     inputHash: sha256(JSON.stringify([view.user, system, cls.adopted, ex, cr.snapshot_id, d.llm?.id])),
     result: out,
     async apply(c) {
@@ -665,7 +745,9 @@ const PREP: Record<Stage, (d: StageDeps, cr: CaseRow) => Promise<Prepared>> = {
 }
 
 /** Run one stage for one Case. Returns what happened (for tests and logs). */
-export async function runStage(d: StageDeps, stage: Stage, job: StageJob): Promise<'published' | 'reused' | 'stale'> {
+export async function runStage(deps: StageDeps, stage: Stage, job: StageJob): Promise<'published' | 'reused' | 'stale'> {
+  // adapter failures carry a fixed code (failure.ts); their own text never reaches a log or the job queue
+  const d: StageDeps = { ...deps, files: tagged(deps.files, 'storage_error'), scanner: tagged(deps.scanner, 'scanner_unavailable'), parser: tagged(deps.parser, 'parser_unavailable') }
   const before = await caseRow(d.db, job.caseId)
   if (before.processing_generation !== job.generation) return 'stale'
   const next = STAGES[STAGES.indexOf(stage) + 1]
@@ -687,6 +769,7 @@ export async function runStage(d: StageDeps, stage: Stage, job: StageJob): Promi
   return tx(d.db, async (c) => {
     const cr = await caseRow(c, job.caseId, true)
     if (cr.processing_generation !== job.generation) return 'stale' // a newer generation owns the Case now
+    if (prep.kycJudgements) await ensureKycJudgement(c, d.k, cr, prep.kycJudgements)
     // the Case row lock serialises workers of the same Case, so check-then-insert is safe
     if ((await publishedFor(c)).rowCount) {
       await finish(c)
@@ -715,13 +798,35 @@ export async function runStage(d: StageDeps, stage: Stage, job: StageJob): Promi
   })
 }
 
+/**
+ * The job handler of one stage (tech design v0.7.15, E6 D2): every failed attempt writes one log line with a fixed
+ * reason code; after the last retry the Case is marked failed; what goes on to the job queue (pg-boss stores it) is a
+ * new error carrying only the code.
+ */
+export function stageHandler(deps: StageDeps, stage: Stage, retryLimit: number, log: (line: string) => void = (l) => console.error(l)) {
+  return async (job: { data: StageJob; retryCount: number }): Promise<void> => {
+    try {
+      await runStage(deps, stage, job.data)
+    } catch (e) {
+      log(`step failed case=${job.data.caseId} step=${stage} reason=${failureCode(e)} attempt=${job.retryCount + 1}`)
+      if (job.retryCount >= retryLimit) {
+        try { await markFailed(deps, stage, job.data, e) }
+        catch (recordError) { log(`step failure recording failed case=${job.data.caseId} step=${stage} reason=${failureCode(recordError)}`) }
+      }
+      throw sanitised(e)
+    }
+  }
+}
+
 /** After the last retry: the Case shows "processing failed"; the original mail is untouched (tech design §6). */
-export async function markFailed(d: Pick<StageDeps, 'db' | 'k'>, stage: Stage, job: StageJob, error: string): Promise<void> {
+export async function markFailed(d: Pick<StageDeps, 'db' | 'k'>, stage: Stage, job: StageJob, error: unknown): Promise<void> {
+  const reason = failureCode(error)
   await tx(d.db, async (c) => {
     const cr = await caseRow(c, job.caseId, true)
     if (cr.processing_generation !== job.generation) return
-    await c.query(`UPDATE "case" SET status = 'failed', failed_stage = $2 WHERE id = $1`, [cr.id, stage])
-    await appendAudit(c, d.k, [{ actor: 'system', type: 'stage.failed', caseId: cr.id, payload: { stage, generation: job.generation }, detail: { error: error.slice(0, 500) } }])
+    await c.query(`UPDATE "case" SET status = 'failed', failed_stage = $2, failed_reason = $3 WHERE id = $1`, [cr.id, stage, reason])
+    // the reason code in plain text; the error's own text only in the encrypted detail (tech design v0.7.15)
+    await appendAudit(c, d.k, [{ actor: 'system', type: 'stage.failed', caseId: cr.id, payload: { stage, generation: job.generation, reason }, detail: { error: originalText(error).slice(0, 500) } }])
   })
 }
 

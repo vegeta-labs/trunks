@@ -75,11 +75,11 @@ What the demo does:
   afterwards (a real deployment replaces it; see [Retention](retention.md)).
 - **Every `up` resets the demo database.** Changes you make in the demo do not survive.
 - The emails keep their original receive times, so some deadlines show as overdue. Some demo emails are dated a few
-  days after today's date in the fictional data.
+  days after today's date in the fictional data; the example dates are fictional and may be later than today.
 - **A successful verification approval takes two days in the demo.** The demo accounts are created again at every
   `up`, and an approval needs accounts and roles older than one cooling-off period (24 hours) when the checklist is
   done, and then the task's own 24 hours. A checklist ticked within a day of `up` can therefore never be approved;
-  you see the refusal instead. To see an approval, leave the demo running without another `up`, tick a checklist more
+  you see the refusal instead. Use **Restart verification** with a reason to replace that checklist, then complete it after the accounts are old enough. To see an approval, leave the demo running without another `up`, tick a checklist more
   than 24 hours after the start, and approve as `demo-approver` 24 hours later. See
   [Users and two-person control](users-and-directory.md#users-and-two-person-control).
 
@@ -249,8 +249,21 @@ Common causes:
 
 Find the cause from the step and the table: for `scan` and `parse`, `docker compose ps` and
 `docker compose logs clamav` or `docker compose logs parser` show it; for `classify` and `fields`, check the model
-settings and the API key, and that the app can reach the provider. This version writes no log line and shows no
-reason for a failed step (the reason is kept only in the encrypted audit detail). **If the fix changed a
+settings and the API key, and that the app can reach the provider. Every failed attempt writes a log line with a
+fixed reason code. The Case and API show its fixed sentence; the exception text stays in encrypted audit detail.
+
+| Code | Meaning |
+|---|---|
+| `model_setup` | Check the model configuration, credentials and connection. |
+| `replay_missing` | A required replay recording is missing. |
+| `parser_unavailable` | The attachment parser could not be used. |
+| `scanner_unavailable` | The virus scanner could not be used. |
+| `storage_error` | The file store could not be used. |
+| `database_error` | A database operation failed. |
+| `internal` | An unexpected internal error occurred. |
+
+The job queue stores the fixed code too. A successful restart or KYC continuation clears the previous failure code.
+PostgreSQL's own server logs may contain constraint-error details; manage those under the database log policy. **If the fix changed a
 secret or the configuration** (for example a new model API key in `secrets/anthropic_api_key`), recreate the app
 first, because it reads them only when it starts:
 

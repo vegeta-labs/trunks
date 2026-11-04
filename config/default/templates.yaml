@@ -39,14 +39,14 @@ templates:
 
       We have received {received_amount} for {deal_name} (reference {reference}). Your commitment of {cash_due} is paid in full.
 
-      Kind regards
+      {deployment_name}
 
   - id: payment_wait
     subject: "Re: {case_number}"
     body: |
       Dear {contact_name},
 
-      Thank you for letting us know about your payment for {deal_name} (reference {reference}). Bank transfers can take a few working days to arrive. We will check again and contact you if it has not reached us.
+      Thank you for letting us know about your payment for {deal_name} (your payment reference {reference}). Bank transfers can take a few working days to arrive. We will check again and contact you if it has not reached us.
 
       {deployment_name}
 
@@ -55,7 +55,7 @@ templates:
     body: |
       Dear {contact_name},
 
-      Thank you for your email about your payment for {deal_name} (reference {reference}). We have not been able to match it yet. Please send us the payment confirmation from your bank (MT103 or pacs.008), including the UETR, so that we can trace it.
+      Thank you for your email about your payment for {deal_name} (your payment reference {reference}). We have not been able to match it yet. Please send us the payment confirmation from your bank (MT103 or pacs.008), including the UETR, so that we can trace it.
 
       {deployment_name}
 

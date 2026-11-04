@@ -1,0 +1,79 @@
+Return-Path: <fiona@ramsay-capital.example>
+Received: from mail.ramsay-capital.example (mail.ramsay-capital.example [192.0.2.140])
+ by mx.ops.example with ESMTPS id e0901f070 for <investors@ops.example>;
+ Wed, 04 Nov 2026 14:05:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=ramsay-capital.example; dkim=pass header.d=ramsay-capital.example;
+ dmarc=pass header.from=ramsay-capital.example
+Message-ID: <E0901.f07001inl@ramsay-capital.example>
+Date: Wed, 4 Nov 2026 14:02:51 +0000
+From: "Fiona Ramsay" <fiona@ramsay-capital.example>
+To: investors@ops.example
+Subject: Re: Northwind Robotics - final closing numbers
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="Apple-Mail=_3C1E9A70-5D2B-4F86-A1C3-0E7B9D2F4A61"
+X-Mailer: Apple Mail (2.3826.400.131.1.6)
+
+--Apple-Mail=_3C1E9A70-5D2B-4F86-A1C3-0E7B9D2F4A61
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+	charset=us-ascii
+
+Hi team,
+
+Yes - I confirm the final closing numbers for Northwind Robotics as set out in
+your summary of 3 November. Please go ahead on that basis.
+
+Best,
+Fiona
+
+Fiona Ramsay
+Managing Partner, Ramsay Capital
++44 20 7946 0140
+
+--Apple-Mail=_3C1E9A70-5D2B-4F86-A1C3-0E7B9D2F4A61
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="Apple-Mail=_8B4F2D16-0A9C-4E3B-95D7-6C1A8E0F3B27"
+
+
+--Apple-Mail=_8B4F2D16-0A9C-4E3B-95D7-6C1A8E0F3B27
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html;
+	charset=us-ascii
+
+<html><head><meta http-equiv=3D"content-type" content=3D"text/html; charset=
+=3Dus-ascii"></head><body style=3D"overflow-wrap: break-word; -webkit-nbsp-=
+mode: space; line-break: after-white-space;">Hi team,<div><br></div><div>Ye=
+s - I confirm the final closing numbers for Northwind Robotics as set out i=
+n your summary of 3 November. Please go ahead on that basis.</div><div><br>=
+</div><div>Best,</div><div>Fiona</div><div><br><div>
+<div dir=3D"auto" style=3D"caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0); =
+letter-spacing: normal; text-align: start; text-indent: 0px; text-transform=
+: none; white-space: normal; word-spacing: 0px; -webkit-text-stroke-width: =
+0px; text-decoration: none; overflow-wrap: break-word; -webkit-nbsp-mode: s=
+pace; line-break: after-white-space;"><div><b>Fiona Ramsay</b></div><div>Ma=
+naging Partner, Ramsay Capital</div><div>+44 20 7946 0140</div><div><img al=
+t=3D"Ramsay Capital" src=3D"cid:7F3D4E21.1A2D3E4F@ramsay-capital.example" w=
+idth=3D"150" height=3D"40"></div></div>
+</div>
+<br></div></body></html>
+
+--Apple-Mail=_8B4F2D16-0A9C-4E3B-95D7-6C1A8E0F3B27
+Content-Disposition: inline;
+	filename=ramsay-logo.jpg
+Content-Type: image/jpeg;
+	x-unix-mode=0644;
+	name="ramsay-logo.jpg"
+Content-Id: <7F3D4E21.1A2D3E4F@ramsay-capital.example>
+Content-Transfer-Encoding: base64
+
+/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB
+AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAALCABQASwBAREA/8QAFAABAAAAAAAA
+AAAAAAAAAAAAAP/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/2Q==
+
+--Apple-Mail=_8B4F2D16-0A9C-4E3B-95D7-6C1A8E0F3B27--
+
+--Apple-Mail=_3C1E9A70-5D2B-4F86-A1C3-0E7B9D2F4A61--

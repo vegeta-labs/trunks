@@ -1,0 +1,90 @@
+Return-Path: <sophie.laurent@laurent-mail.example>
+Received: from mail.laurent-mail.example (mail.laurent-mail.example [192.0.2.30])
+ by mx.ops.example with ESMTPS id e0904f070 for <investors@ops.example>;
+ Fri, 06 Nov 2026 08:45:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=laurent-mail.example; dkim=pass header.d=laurent-mail.example;
+ dmarc=pass header.from=laurent-mail.example
+Message-ID: <E0904.f07004inl@laurent-mail.example>
+Date: Fri, 6 Nov 2026 08:43:30 +0000
+From: "Sophie Laurent" <sophie.laurent@laurent-mail.example>
+To: investors@ops.example
+Subject: Northwind portal login
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	boundary="_004_PR3P195MB0761A9C2E1D4B7F80A3C6E5D9B21PR3P195MB0761EURP_";
+	type="multipart/alternative"
+Content-Language: fr-FR
+X-MS-Has-Attach: yes
+
+--_004_PR3P195MB0761A9C2E1D4B7F80A3C6E5D9B21PR3P195MB0761EURP_
+Content-Type: multipart/alternative;
+	boundary="_000_PR3P195MB0761A9C2E1D4B7F80A3C6E5D9B21PR3P195MB0761EURP_"
+
+--_000_PR3P195MB0761A9C2E1D4B7F80A3C6E5D9B21PR3P195MB0761EURP_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+Bonjour,
+
+I still cannot log in to the investor portal for Northwind Robotics. The
+password reset link says it has expired every time I click it. Could someone
+help?
+
+Merci,
+Sophie Laurent
+
+--_000_PR3P195MB0761A9C2E1D4B7F80A3C6E5D9B21PR3P195MB0761EURP_
+Content-Type: text/html; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii">
+<style type=3D"text/css"> P {margin-top:0;margin-bottom:0;} </style>
+</head>
+<body dir=3D"ltr">
+<div class=3D"elementToProof" style=3D"font-family: Aptos, Aptos_EmbeddedFo=
+nt, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 12pt; c=
+olor: rgb(0, 0, 0);">
+Bonjour,</div>
+<div class=3D"elementToProof" style=3D"font-family: Aptos, Aptos_EmbeddedFo=
+nt, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 12pt; c=
+olor: rgb(0, 0, 0);">
+<br>
+</div>
+<div class=3D"elementToProof" style=3D"font-family: Aptos, Aptos_EmbeddedFo=
+nt, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 12pt; c=
+olor: rgb(0, 0, 0);">
+I still cannot log in to the investor portal for Northwind Robotics. The pa=
+ssword reset link says it has expired every time I click it. Could someone =
+help?</div>
+<div class=3D"elementToProof" style=3D"font-family: Aptos, Aptos_EmbeddedFo=
+nt, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 12pt; c=
+olor: rgb(0, 0, 0);">
+<br>
+</div>
+<div id=3D"Signature" class=3D"elementToProof" style=3D"font-family: Aptos,=
+ Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; f=
+ont-size: 12pt; color: rgb(0, 0, 0);">
+Merci,<br>
+Sophie Laurent</div>
+</body>
+</html>
+
+--_000_PR3P195MB0761A9C2E1D4B7F80A3C6E5D9B21PR3P195MB0761EURP_--
+
+--_004_PR3P195MB0761A9C2E1D4B7F80A3C6E5D9B21PR3P195MB0761EURP_
+Content-Type: image/png; name="image001.png"
+Content-Description: image001.png
+Content-Disposition: inline; filename="image001.png"; size=141;
+	creation-date="Fri, 06 Nov 2026 08:43:29 GMT";
+	modification-date="Fri, 06 Nov 2026 08:43:29 GMT"
+Content-ID: <image001.png@01DB4F10.2A7C9E40.example>
+Content-Transfer-Encoding: base64
+
+iVBORw0KGgoAAAANSUhEUgAAAHgAAAAoAQMAAAAPJKxmAAAABlBMVEUfOl////8vppBAAAAAAXNS
+R0IArs4c6QAAAAlwSFlzAAAOxAAADsQBlSsOGwAAACBJREFUeNpjYKA14D/wBwlRnc/8wR4JMVCd
+P+LdT1sAAP0GxHUE99dlAAAAAElFTkSuQmCC
+
+--_004_PR3P195MB0761A9C2E1D4B7F80A3C6E5D9B21PR3P195MB0761EURP_--

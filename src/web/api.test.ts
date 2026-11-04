@@ -9,6 +9,7 @@ describe('error texts shown to people (D8)', () => {
     expect(withoutRuleIds('not a matched reference (C-EXT-2)')).toBe('not a matched reference')
     expect(withoutRuleIds('a rule label cannot be removed (C-CLS-5)')).toBe('a rule label cannot be removed')
     expect(withoutRuleIds('wrong current password, or the new one is too short (12+) or unchanged')).toBe('wrong current password, or the new one is too short (12+) or unchanged')
+    expect(withoutRuleIds('the cooling-off period has not ended (C-FRD-5)')).toBe('the cooling-off period has not ended (C-FRD-5)')
     expect(withoutRuleIds('the task is open')).toBe('the task is open')
   })
 })

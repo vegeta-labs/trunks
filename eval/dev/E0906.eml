@@ -1,0 +1,74 @@
+Return-Path: <office@nordhaven-fo.example>
+Received: from mail.nordhaven-fo.example (mail.nordhaven-fo.example [192.0.2.125])
+ by mx.ops.example with ESMTPS id e0906f070 for <investors@ops.example>;
+ Mon, 09 Nov 2026 09:30:00 +0000
+Authentication-Results: mx.ops.example; spf=pass
+ smtp.mailfrom=nordhaven-fo.example; dkim=pass header.d=nordhaven-fo.example;
+ dmarc=pass header.from=nordhaven-fo.example
+Message-ID: <E0906.f07006inl@nordhaven-fo.example>
+Date: Mon, 9 Nov 2026 09:27:55 +0000
+From: "Nordhaven Family Office Ltd" <office@nordhaven-fo.example>
+To: investors@ops.example
+Subject: Investment confirmation letter - Solent Biotherapeutics
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="multipart/alternative";
+	boundary="----=_NextPart_001_0A3F_01DB5014.6C2E8B90"
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_001_0A3F_01DB5014.6C2E8B90
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_002_0A40_01DB5014.6C2E8B90"
+
+
+------=_NextPart_002_0A40_01DB5014.6C2E8B90
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Dear Investor Services,
+
+Our bank has asked for a letter confirming our investment in Solent
+Biotherapeutics (reference SB-007) for its annual review. Could you please
+provide one, addressed to the family office?
+
+With kind regards,
+Office Manager
+Nordhaven Family Office Ltd
++44 20 7946 0125
+
+------=_NextPart_002_0A40_01DB5014.6C2E8B90
+Content-Type: text/html;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+<html><head><meta http-equiv=3D"Content-Type" content=3D"text/html; charset=
+=3Dutf-8"></head>
+<body>
+<p>Dear Investor Services,</p>
+<p>Our bank has asked for a letter confirming our investment in Solent Biot=
+herapeutics (reference SB-007) for its annual review. Could you please prov=
+ide one, addressed to the family office?</p>
+<p>With kind regards,<br>Office Manager<br>Nordhaven Family Office Ltd<br>+=
+44 20 7946 0125</p>
+<p><img src=3D"cid:banner@nordhaven-fo.example" width=3D"640" height=3D"112=
+" alt=3D"Nordhaven Family Office" style=3D"display:block;width:640px;height=
+:112px"></p>
+</body></html>
+
+------=_NextPart_002_0A40_01DB5014.6C2E8B90--
+
+------=_NextPart_001_0A3F_01DB5014.6C2E8B90
+Content-Type: image/png;
+	name="nordhaven-banner.png"
+Content-Transfer-Encoding: base64
+Content-ID: <banner@nordhaven-fo.example>
+
+iVBORw0KGgoAAAANSUhEUgAABQAAAADfAQMAAACTeuzpAAAABlBMVEUfOl////8vppBAAAAAsUlE
+QVR42u3OoQ0AMAwEsey/dCqVFAX3I/nQQVeHV4CAgICAgICAgICAgICAgICAgHuBt7eZBwgICAgI
+CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgI
+CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICPjlOjxAQEBAQEBAQEBAQEBAQEBA
+QMCxA0pZbGmK3sb0AAAAAElFTkSuQmCC
+
+------=_NextPart_001_0A3F_01DB5014.6C2E8B90--

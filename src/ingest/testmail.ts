@@ -4,6 +4,8 @@ export interface Part {
   filename?: string
   content: Buffer | string
   encoding?: 'base64' | '7bit' | 'quoted-printable'
+  disposition?: string
+  contentId?: string
 }
 
 const b64 = (b: Buffer) => b.toString('base64').replace(/.{76}/g, '$&\r\n')
@@ -34,7 +36,7 @@ export function eml(o: {
     const buf = typeof a.content === 'string' ? Buffer.from(a.content) : a.content
     const enc = a.encoding ?? 'base64'
     const body = enc === 'base64' ? b64(buf) : buf.toString('utf8')
-    parts.push(`Content-Type: ${a.type}${a.filename ? `; name="${a.filename}"` : ''}\r\nContent-Disposition: attachment${a.filename ? `; filename="${a.filename}"` : ''}\r\nContent-Transfer-Encoding: ${enc}\r\n\r\n${body}`)
+    parts.push(`Content-Type: ${a.type}${a.filename ? `; name="${a.filename}"` : ''}\r\nContent-Disposition: ${a.disposition ?? 'attachment'}${a.filename ? `; filename="${a.filename}"` : ''}\r\n${a.contentId ? `Content-ID: ${a.contentId}\r\n` : ''}Content-Transfer-Encoding: ${enc}\r\n\r\n${body}`)
   }
   const boundary = `b-doi-${Math.random().toString(36).slice(2)}`
   const body = `--${boundary}\r\n${parts.join(`\r\n--${boundary}\r\n`)}\r\n--${boundary}--\r\n`

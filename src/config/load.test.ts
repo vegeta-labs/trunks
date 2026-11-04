@@ -89,7 +89,7 @@ describe('R-CFG-01 configuration checks', () => {
     expect([...c.templateMeta.values()].filter((m) => m.discloses).map((m) => m.id).sort()).toEqual(['commitment_change_ack', 'exit_info', 'payment_need_evidence', 'payment_received', 'payment_wait', 'withdrawal_ack'])
     let d = copy()
     edit(d, 'templates.yaml', (s) => s.replace('We have received {received_amount}', 'We have received {amount}'))
-    expect(err(d)).toMatch(/payment_received asserts receipt and may only use directory or ledger placeholders, not \{amount\}/)
+    expect(err(d)).toMatch(/payment_received asserts receipt and may only use directory or ledger placeholders and \{deployment_name\}, not \{amount\}/)
     d = copy()
     edit(d, 'templates.yaml', (s) => s.replace('Thank you for your email. We have received it', 'Dear {investor_name}. We have received it'))
     expect(err(d)).toMatch(/safe_ack may only use system placeholders, not \{investor_name\}/)
@@ -123,4 +123,16 @@ describe('R-CFG-01 configuration checks', () => {
     edit(d, 'deployment.yaml', (s) => s.slice(0, s.indexOf('\n# the model provider')) + '\n')
     expect(() => startModel(loadConfig(d))).toThrow(/model is required/)
   })
+})
+
+
+it('TC-RED-11 inline image thresholds default conservatively and reject values beyond every hard cap', () => {
+  expect(loadConfig('config/default').kyc.inline_image).toEqual({ max_long_side: 400, max_short_side: 150, max_bytes: 51200 })
+  for (const [key, cap] of [['max_long_side', 1280], ['max_short_side', 300], ['max_bytes', 102400]] as const) {
+    const d = copy()
+    edit(d, 'deployment.yaml', (s) => s + `\nkyc:\n  inline_image:\n    ${key}: ${cap}\n`)
+    expect(err(d)).toBeNull()
+    edit(d, 'deployment.yaml', (s) => s.replace(`${key}: ${cap}`, `${key}: ${cap + 1}`))
+    expect(err(d)).toContain(`kyc.inline_image.${key}`)
+  }
 })

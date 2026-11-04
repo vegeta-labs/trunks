@@ -1,0 +1,16 @@
+Authentication-Results: mx.ops.example; spf=pass smtp.mailfrom=amelia@hartfamily.example;
+ dkim=pass header.d=hartfamily.example; dmarc=pass header.from=hartfamily.example
+From: Amelia Hart <amelia@hartfamily.example>
+To: investors@ops.example
+Subject: Formal service complaint
+Date: Thu, 29 Oct 2026 10:00:00 +0000
+Message-ID: <E1009@hartfamily.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+Hello,
+
+I am dissatisfied with the repeated delays and unanswered messages from your team. Please record this as a formal service complaint and arrange a response from a senior manager.
+
+Amelia Hart

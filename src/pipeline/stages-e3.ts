@@ -470,7 +470,7 @@ const noticeProblems = (config: Config, subject: string, text: string, onFile: s
 export const taskContactOf = (lk: LinkResult | null) =>
   !lk ? null : lk.taskContact === undefined ? (lk.contact ? { contact: lk.contact, impersonated: false } : null) : lk.taskContact
 
-async function syncVerificationTasks(c: Tx, d: StageDeps, cr: CaseRow, adopted: readonly string[], lk: LinkResult): Promise<Record<string, string>> {
+export async function syncVerificationTasks(c: Tx, d: Pick<StageDeps, 'k' | 'config'>, cr: Pick<CaseRow, 'id' | 'manual_revision'>, adopted: readonly string[], lk: LinkResult, forceKind?: string): Promise<Record<string, string>> {
   const done: Record<string, string> = {}
   // C-FRD-4 v0.7.21: the task contact; results saved before it have none and fall back to the linked contact
   const who = taskContactOf(lk)
@@ -491,7 +491,7 @@ async function syncVerificationTasks(c: Tx, d: StageDeps, cr: CaseRow, adopted: 
     )).rows[0]
     if (live) {
       const bound = live.bound_contact_blob ? (await getBlobs(c, d.k, [live.bound_contact_blob])).get(live.bound_contact_blob)!.toString('utf8') : null
-      if (!invalidated({ state: live.state, manualRevision: live.bound_manual_revision, contactId: bound, checklist: live.checklist }, now)) {
+      if (kind !== forceKind && !invalidated({ state: live.state, manualRevision: live.bound_manual_revision, contactId: bound, checklist: live.checklist }, now)) {
         // a kept task's notice is checked again: the internal terms may have changed with the configuration
         const b = await getBlobs(c, d.k, [live.notify_subject_blob, live.notify_text_blob, ...(live.notify_recipient_blob ? [live.notify_recipient_blob] : [])])
         const text = (x: string | null) => (x ? b.get(x)!.toString('utf8') : null)

@@ -117,3 +117,6 @@ export function distinctAccounts(t: string, hits: AccountHit[]): AccountHit[] {
 
 /** Distinct last-4 values (rule output `account_last4`). */
 export const accountLast4 = (hits: AccountHit[]) => [...new Set(hits.map((h) => h.last4))]
+
+/** E6 review hint: a count only, never retain or display the invalid account value. */
+export const invalidIbanCount = (text: string): number => ibanShapes(text).filter((h) => !ibanValid(text.slice(h.start, h.end))).length

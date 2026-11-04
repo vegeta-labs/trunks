@@ -3,6 +3,7 @@
 // copies the approved reply into their own mail client (decision 5).
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
 import { api, ApiError, type SessionUser } from './api.ts'
+import type { ApprovalFailure } from '../lib/verification.ts'
 import { STATIC_DEMO } from './static-demo.ts'
 
 /** The static demo is read-only: change controls are not rendered at all (PRD R-DEMO-02 v0.7.25). */
@@ -45,7 +46,7 @@ export interface E3 {
   allowedTemplates: string[]
   replies: Array<{ id: string; templateId: string; source: string; edited: boolean; recipient: string | null; subject: string; text: string; status: string; checkOk: boolean; problems: string[]; removed: number; bodyEditable: boolean; createdAt: string; outOfDate: boolean }>
   allowedRecipients: string[]
-  verification: Array<{ id: string; kind: string; state: string; checklist: Array<{ id: string; text: string; checked: boolean }>; phone: string | null; notifyRecipient: string | null; notifySubject: string | null; notifyText: string | null; notifyProblems: string[]; completedBy: string | null; coolingUntil: string | null; approvedBy: string | null; impersonatedContact: string | null }>
+  verification: Array<{ id: string; kind: string; state: string; checklist: Array<{ id: string; text: string; checked: boolean }>; phone: string | null; notifyRecipient: string | null; notifySubject: string | null; notifyText: string | null; notifyProblems: string[]; completedBy: string | null; coolingUntil: string | null; approvedBy: string | null; impersonatedContact: string | null; approvalFailures: ApprovalFailure[] }>
   due: { at: string | null; state: string | null; followUpAt: string | null }
   assignee: string | null
   outcome: string | null
@@ -88,7 +89,7 @@ function writeClipboard(value: string): Promise<boolean> {
 }
 const when = (iso: string) => new Date(iso).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })
 
-function useAction(reload: () => void) {
+function useAction(reload: (notice?: string) => void) {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const run = async (fn: () => Promise<unknown>) => {
@@ -98,7 +99,9 @@ function useAction(reload: () => void) {
       await fn()
       reload()
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'The action failed')
+      if (e instanceof ApiError && e.status === 409) {
+        reload(`${e.message}. The Case has been refreshed; check the current details.`)
+      } else setError(e instanceof ApiError ? e.message : 'The action failed')
     } finally {
       setBusy(false)
     }
@@ -114,7 +117,7 @@ const Panel = ({ title, children }: { title: string; children: ReactNode }) => (
   </section>
 )
 
-export function E3Panels({ caseId, e3, user, meta, reload }: { caseId: string; e3: E3; user: SessionUser; meta: Meta | null; reload: () => void }) {
+export function E3Panels({ caseId, e3, user, meta, reload }: { caseId: string; e3: E3; user: SessionUser; meta: Meta | null; reload: (notice?: string) => void }) {
   return (
     <>
       {!e3.complete && <p className="banner" role="status">Reprocessing after a change… approving and copying wait until it finishes.</p>}
@@ -136,7 +139,7 @@ export function E3Panels({ caseId, e3, user, meta, reload }: { caseId: string; e
 }
 
 /** «Hold» (PRD R-REV-07): retention keeps the Case and the earlier Cases of its thread; approver and admin, with a reason. */
-export function HoldPanel({ caseId, hold, reason, user, reload }: { caseId: string; hold: boolean; reason: string | null; user: SessionUser; reload: () => void }) {
+export function HoldPanel({ caseId, hold, reason, user, reload }: { caseId: string; hold: boolean; reason: string | null; user: SessionUser; reload: (notice?: string) => void }) {
   const [why, setWhy] = useState('')
   const a = useAction(reload)
   if (!hold && user.role === 'reviewer') return null
@@ -154,7 +157,7 @@ export function HoldPanel({ caseId, hold, reason, user, reload }: { caseId: stri
   )
 }
 
-function RiskPanel({ caseId, e3, user, reload }: { caseId: string; e3: E3; user: SessionUser; reload: () => void }) {
+function RiskPanel({ caseId, e3, user, reload }: { caseId: string; e3: E3; user: SessionUser; reload: (notice?: string) => void }) {
   const [level, setLevel] = useState('')
   const [reason, setReason] = useState('')
   const a = useAction(reload)
@@ -176,7 +179,7 @@ function RiskPanel({ caseId, e3, user, reload }: { caseId: string; e3: E3; user:
           )}
         </div>
       )}
-      {e3.risk.floor && <p className="meta">Class floor: {e3.risk.floor.classes.join(', ')} → {e3.risk.floor.level}</p>}
+      {e3.risk.floor && <p className="meta">Class floor: {e3.risk.floor.classes.map((c) => e3.low.includes(c) ? `possible class ${c} (low confidence)` : c).join(', ')} → {e3.risk.floor.level}</p>}
       {e3.risk.clauses.length > 0 && (
         <ul className="signals">
           {e3.risk.clauses.map((c) => <li key={c} className="on">{CLAUSE_TEXT[c] ?? c}</li>)}
@@ -200,7 +203,7 @@ function RiskPanel({ caseId, e3, user, reload }: { caseId: string; e3: E3; user:
   )
 }
 
-function LinksPanel({ caseId, e3, reload }: { caseId: string; e3: E3; reload: () => void }) {
+function LinksPanel({ caseId, e3, reload }: { caseId: string; e3: E3; reload: (notice?: string) => void }) {
   const a = useAction(reload)
   const l = e3.links
   if (!l) return null
@@ -240,7 +243,7 @@ function LinksPanel({ caseId, e3, reload }: { caseId: string; e3: E3; reload: ()
   )
 }
 
-export function LabelsPanel({ caseId, e3, meta, reload }: { caseId: string; e3: E3; meta: Meta | null; reload: () => void }) {
+export function LabelsPanel({ caseId, e3, meta, reload }: { caseId: string; e3: E3; meta: Meta | null; reload: (notice?: string) => void }) {
   const [add, setAdd] = useState('')
   const [reason, setReason] = useState('')
   const a = useAction(reload)
@@ -254,7 +257,7 @@ export function LabelsPanel({ caseId, e3, meta, reload }: { caseId: string; e3: 
             {e3.ruleLabels.includes(c) ? <span className="meta"> (rule)</span> : STATIC_DEMO ? null : <button className="link" aria-label={`Remove ${c}`} onClick={() => change({ remove: [c] })}> ×</button>}
           </li>
         ))}
-        {e3.low.map((c) => <li key={c} className="tag confirm">{c} (low, counts for risk)</li>)}
+        {e3.low.map((c) => <li key={c} className="tag confirm">{c} (low confidence — needs confirmation; counts for risk)</li>)}
       </ul>
       {e3.removed.length > 0 && (
         <ul className="removed">
@@ -277,12 +280,12 @@ export function LabelsPanel({ caseId, e3, meta, reload }: { caseId: string; e3: 
   )
 }
 
-export function FieldActions({ caseId, field, confirmed, reload }: { caseId: string; field: string; confirmed: boolean; reload: () => void }) {
+export function FieldActions({ caseId, field, confirmed, reload }: { caseId: string; field: string; confirmed: boolean; reload: (notice?: string) => void }) {
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState('')
-  const a = useAction(() => {
+  const a = useAction((notice) => {
     setEditing(false)
-    reload()
+    reload(notice)
   })
   if (confirmed) return <span className="tag ok">confirmed</span>
   if (STATIC_DEMO) return null
@@ -304,7 +307,7 @@ export function FieldActions({ caseId, field, confirmed, reload }: { caseId: str
 // PRD R-DEMO-02 v0.7.25: the demo shows no approval controls, so it says how a reply leaves a real deployment
 export const DEMO_REPLY_NOTE = 'In a real deployment a reviewer approves this reply and sends it from their own mail client; the app cannot send.'
 
-function RepliesPanel({ caseId, e3, reload }: { caseId: string; e3: E3; reload: () => void }) {
+function RepliesPanel({ caseId, e3, reload }: { caseId: string; e3: E3; reload: (notice?: string) => void }) {
   if (e3.replies.length === 0) return <Panel title="Reply">{STATIC_DEMO && <p className="meta">{DEMO_REPLY_NOTE}</p>}<p className="meta">No reply is drafted for this Case.</p></Panel>
   return (
     <Panel title="Reply">
@@ -314,7 +317,7 @@ function RepliesPanel({ caseId, e3, reload }: { caseId: string; e3: E3; reload: 
   )
 }
 
-function ReplyCard({ caseId, r, e3, reload }: { caseId: string; r: E3['replies'][number]; e3: E3; reload: () => void }) {
+function ReplyCard({ caseId, r, e3, reload }: { caseId: string; r: E3['replies'][number]; e3: E3; reload: (notice?: string) => void }) {
   const [text, setText] = useState(r.text)
   const a = useAction(reload)
   const url = `/api/cases/${caseId}/replies/${r.id}`
@@ -438,13 +441,17 @@ function ReplyCard({ caseId, r, e3, reload }: { caseId: string; r: E3['replies']
   )
 }
 
-function VerificationPanel({ task, user, reload }: { caseId: string; task: E3['verification'][number]; user: SessionUser; reload: () => void }) {
+function VerificationPanel({ task, user, reload }: { caseId: string; task: E3['verification'][number]; user: SessionUser; reload: (notice?: string) => void }) {
   const [ticked, setTicked] = useState<string[]>(task.checklist.filter((c) => c.checked).map((c) => c.id))
   const a = useAction(reload)
+  const [restartReason, setRestartReason] = useState('')
+  const failures = task.approvalFailures ?? []
+  const completerFailures = failures.filter((f) => f.subject === 'completer')
+  const otherFailures = failures.filter((f) => f.subject !== 'completer' && f.subject !== 'timing')
   const STATE: Record<string, string> = { open: 'Open', checklist_done: 'Checklist done — cooling-off period', approved: 'Approved by a second person' }
   return (
     <Panel title={task.kind === 'bank_details' ? 'Check the bank details request' : 'Check the change of identity details'}>
-      <p><span className="tag">{STATE[task.state] ?? task.state}</span>{task.coolingUntil && task.state === 'checklist_done' && <span className="meta"> second approval from {when(task.coolingUntil)}</span>}</p>
+      <p><span className="tag">{STATE[task.state] ?? task.state}</span>{task.coolingUntil && task.state === 'checklist_done' && completerFailures.length === 0 && otherFailures.length === 0 && <span className="meta"> second approval from {when(task.coolingUntil)}</span>}</p>
       <dl className="facts">
         {task.impersonatedContact && (
           <>
@@ -455,6 +462,11 @@ function VerificationPanel({ task, user, reload }: { caseId: string; task: E3['v
         <dt>Phone on file</dt>
         <dd>{task.phone}</dd>
       </dl>
+      {task.state === 'checklist_done' && (completerFailures.length > 0 || otherFailures.length > 0) && <div className="banner" role="status">
+        <p>{completerFailures.length ? 'With the current account history, this task cannot be approved (C-FRD-5).' : 'You cannot approve this task (C-FRD-5).'}</p>
+        <ul>{(completerFailures.length ? completerFailures : otherFailures).map((f) => <li key={`${f.subject}-${f.code}`}>{f.reason} (C-FRD-5)</li>)}</ul>
+      </div>}
+      {task.state === 'open' && ticked.length < task.checklist.length && <p className="meta">Tick every checklist item before marking the checklist done.</p>}
       <ul className="checklist">
         {task.checklist.map((c) => (
           <li key={c.id}>
@@ -478,13 +490,17 @@ function VerificationPanel({ task, user, reload }: { caseId: string; task: E3['v
         {task.state === 'open' && <button disabled={a.busy || ticked.length < task.checklist.length} onClick={() => void a.run(() => api('POST', `/api/verification/${task.id}/complete`, { items: ticked }))}>Checklist done</button>}
         {task.state === 'checklist_done' && user.role !== 'reviewer' && <button disabled={a.busy} onClick={() => void a.run(() => api('POST', `/api/verification/${task.id}/approve`))}>Approve as the second person</button>}
       </div>
+      {(task.state === 'open' || task.state === 'checklist_done') && user.role !== 'reviewer' && <div className="inline-form">
+        <input aria-label="Reason for restarting verification" placeholder="Reason for restarting" value={restartReason} onChange={(e) => setRestartReason(e.target.value)} />
+        <button className="secondary" disabled={a.busy || !restartReason.trim()} onClick={() => void a.run(() => api('POST', `/api/verification/${task.id}/restart`, { reason: restartReason }))}>Restart verification</button>
+      </div>}
       </Change>
       <Err text={a.error} />
     </Panel>
   )
 }
 
-function RoutingPanel({ caseId, e3, meta, reload }: { caseId: string; e3: E3; meta: Meta | null; reload: () => void }) {
+function RoutingPanel({ caseId, e3, meta, reload }: { caseId: string; e3: E3; meta: Meta | null; reload: (notice?: string) => void }) {
   const [outcome, setOutcome] = useState('')
   const a = useAction(reload)
   const users = meta?.users ?? []
