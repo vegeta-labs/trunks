@@ -10,9 +10,15 @@ Trunks is part of Vegeta, software for SPV and syndicate operations teams. It is
 
 **A person reviews everything. The agent never sends email, never writes to a mailbox, never moves money and never changes business records.** Emailed bank details are never applied, and an emailed payment confirmation never counts as received.
 
+**Website:** https://vegeta-ops.vercel.app/inbox/
+
 ## Try it
 
-The demo runs on your machine with fictional data, recorded model replies and no outbound connections:
+[Open the online read-only demo](https://vegeta-ops.vercel.app/inbox/demo/) to explore a fictional, pre-recorded snapshot. It has no live mailbox or model connection and cannot change records.
+
+### Full local demo
+
+The local deployment includes the server and review workflow. The demo runs on your machine with fictional data, recorded model replies and no outbound connections:
 
 ```sh
 docker compose build

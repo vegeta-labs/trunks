@@ -1,15 +1,15 @@
-# Deal Ops — 界面设计规则（Toolkit、Inbox、网站共用）
+# Vegeta — 界面设计规则（Goten、Trunks、网站共用）
 
 版本 **v0.3.4**（2026-11-03，§4 加下拉框、信号列表、Case 详情两栏；负责人 2026-11-03：「按建议」）· v0.3.3（2026-11-02，网站搬到单独的仓库，改路径）· v0.3.2（2026-11-02，§11.3 第 ②、③ 步标为完成）· v0.3.1（2026-10-30，§11.2 措辞与 v0.3 对齐）· v0.3（2026-10-30，网站冻结、作为视觉基准；负责人：「方案1，按建议」）· v0.2（2026-10-30）· 状态：**已批准**（负责人 2026-10-30：「批准 v0.2，先做第①步」） · 负责人决定（2026-10-30）：「整个项目与网站、还有之前实现的仓库里的页面设计保持统一设计规则」→「按建议做，先写规则文档」
 
 ## 1. 目的和范围
 
-Deal Ops 的三个界面用**同一套设计规则**：
+Vegeta 的三个界面用**同一套设计规则**，当前官网为 https://vegeta-ops.vercel.app/ ：
 
 | 界面 | 仓库 | 性质 |
 |---|---|---|
-| Deal Ops Toolkit（对账、关闭、分配） | `deal-ops-toolkit`（`src/`） | 工作界面 |
-| Deal Ops Inbox 审核界面 | 本仓库（`src/web/`） | 工作界面 |
+| Goten — Deal Calculations（对账、关闭、分配） | `deal-ops-toolkit`（`src/`） | 工作界面 |
+| Trunks — Operations Inbox 审核界面 | 本仓库（`src/web/`） | 工作界面 |
 | 项目网站 | 网站仓库 `deal-ops-site-dev`（私有开发仓库，本地 （本机路径，未公开），网页在 `site/`）；公开仓库 `deal-ops-site`，Vercel 从它部署 | 介绍页 |
 
 网站 2026-11-02 起不在 Toolkit 仓库里（拆仓库方案 S7）：网址不变（https://deal-ops-toolkit-site.vercel.app），线上文件与搬家前逐字节相同。下文「网站仓库」都指 `deal-ops-site-dev`。
@@ -97,7 +97,7 @@ Deal Ops 的三个界面用**同一套设计规则**：
 | 信号列表 | 触发的信号是小标签（胶囊形，风险色 `--warn-bg` / `--warn`），没能检查的用 `--muted` 并写明；没有触发的收进折叠段「All signals」；一个都没有触发时写「No warning signals」（v0.3.4） |
 | 段落小标签 | 等宽字，11–12px，大写，字距约 0.14em，`--muted` 色；用在页面标题上方（「STEP 1 OF 3」）和侧栏分组（「WORKFLOW」） |
 | 页面标题 | h2 32px 细字（300），上方可有段落小标签，下方一行 `--muted` 说明 |
-| 面包屑 | 顶部一行，`--muted`，当前页 `--text-strong`（「Deal Ops Toolkit / Reconciliation」） |
+| 面包屑 | 顶部一行，`--muted`，当前页 `--text-strong`（「Goten / Reconciliation」） |
 | 侧栏导航项 | 圆角矩形（`--radius-nav`），`--border` 细边；当前项 `--surface-3` 底加粗边；右侧可带数字胶囊（待处理数） |
 | 分段控件 | 胶囊形容器，选中项实心（如深浅色选择「System / Light / Dark」） |
 | 汇总数字卡 | 一行多张，圆角 12px，`--surface` 底；上方 12px `--muted` 说明，下方大号等宽数字（金额两位小数） |
