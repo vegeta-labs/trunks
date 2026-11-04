@@ -5,6 +5,7 @@ import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
 import { api, ApiError, type SessionUser } from './api.ts'
 import type { ApprovalFailure } from '../lib/verification.ts'
 import { STATIC_DEMO } from './static-demo.ts'
+import { displayName, RISK_NOTE } from './presentation.ts'
 
 /** The static demo is read-only: change controls are not rendered at all (PRD R-DEMO-02 v0.7.25). */
 const Change = ({ children }: { children: ReactNode }) => (STATIC_DEMO ? null : <>{children}</>)
@@ -68,6 +69,7 @@ const CLAUSE_TEXT: Record<string, string> = {
   'C-RSK-2a:pressure': 'Pressure words in a payment or account mail (+1)',
   'C-RSK-2a:closing': 'Planned close within 3 working days (+1)',
 }
+export const riskReasonText = (clause: string) => CLAUSE_TEXT[clause] ?? clause
 const PROBLEM_TEXT = (p: string) =>
   p.startsWith('internal_terms:') ? `Internal wording not allowed in a reply: ${p.slice(15).split('|').join(', ')}` : ({ placeholder_left: 'A value is missing', no_recipient: 'No recipient', recipient_not_allowed: 'This recipient is not allowed' } as Record<string, string>)[p] ?? p
 const STATUS_TEXT: Record<string, string> = { draft: 'Draft', approved: 'Approved, waiting to be sent by a person', sent: 'Marked as sent', rejected: 'Rejected' }
@@ -117,19 +119,26 @@ const Panel = ({ title, children }: { title: string; children: ReactNode }) => (
   </section>
 )
 
-export function E3Panels({ caseId, e3, user, meta, reload }: { caseId: string; e3: E3; user: SessionUser; meta: Meta | null; reload: (notice?: string) => void }) {
+export function actionText(a: E3['actions'][number]): string {
+  if (a.action === 'none') return 'No action needed'
+  if (a.action === 'forward_kyc_documents') return 'Review KYC hand-off status in Attachments'
+  if (a.action === 'mark_withdrawn') return (a.details ?? a.action).replace(' in Deal Ops Toolkit (consent:', ' in Goten (consent:').replace('(consent: investor_cc)', '(investor consent recorded in Cc)')
+  return a.details ?? a.action
+}
+
+export function E3Panels({ caseId, e3, user, meta, reload, signals }: { caseId: string; e3: E3; user: SessionUser; meta: Meta | null; reload: (notice?: string) => void; signals?: ReactNode }) {
   return (
     <>
       {!e3.complete && <p className="banner" role="status">Reprocessing after a change… approving and copying wait until it finishes.</p>}
       <RiskPanel caseId={caseId} e3={e3} user={user} reload={reload} />
+      {signals}
       <LinksPanel caseId={caseId} e3={e3} reload={reload} />
-      <Panel title="Suggested actions">
-        <ul className="actions">
-          {e3.actions.map((a) => (
-            // D8: «none» is the internal name of «nothing to do»; it is not shown beside the text
-            <li key={a.action}>{a.action === 'none' ? 'No action needed' : <>{a.action === 'mark_withdrawn' ? a.details?.replace(' in Deal Ops Toolkit (consent:', ' in Goten — Deal Calculations (consent:') ?? a.action : a.details ?? a.action} <span className="meta mono">{a.action}</span></>}</li>
-          ))}
-        </ul>
+      <Panel title="Suggested next steps">
+        {!e3.complete ? <p>Next steps will be available when analysis finishes.</p> : <ul className="actions">
+          {e3.actions.map((a) => <li key={a.action}>{actionText(a)}<details><summary>Action reference</summary><code>{a.action}</code></details></li>)}
+        </ul>}
+        {e3.actions.some((a) => a.action === 'mark_withdrawn') && <p className="meta">Trunks does not update Goten.</p>}
+        {STATIC_DEMO && <p className="meta">Suggested only — no action is performed here.</p>}
       </Panel>
       {e3.verification.map((t) => <VerificationPanel key={t.id} caseId={caseId} task={t} user={user} reload={reload} />)}
       <RepliesPanel caseId={caseId} e3={e3} reload={reload} />
@@ -144,8 +153,8 @@ export function HoldPanel({ caseId, hold, reason, user, reload }: { caseId: stri
   const a = useAction(reload)
   if (!hold && user.role === 'reviewer') return null
   return (
-    <Panel title="Hold">
-      {hold ? <p><span className="tag warn">On hold</span> <span className="meta">{reason}</span></p> : <p className="meta">Not on hold. A hold keeps this Case and the earlier Cases of its thread past the retention period.</p>}
+    <Panel title="Retention hold">
+      {hold ? <p><span className="tag warn">Retention hold active</span> <span className="meta">{reason}</span></p> : <details><summary>No retention hold</summary><p className="meta">A retention hold keeps this case and earlier cases in its thread beyond the normal retention period.</p></details>}
       {user.role !== 'reviewer' && !STATIC_DEMO && (
         <div className="inline-form">
           <input aria-label={hold ? 'Reason for removing the hold' : 'Reason for the hold'} placeholder="Reason" value={why} onChange={(e) => setWhy(e.target.value)} />
@@ -164,8 +173,9 @@ function RiskPanel({ caseId, e3, user, reload }: { caseId: string; e3: E3; user:
   if (!e3.risk) return null
   return (
     <Panel title="Risk">
+      <p className="meta">{RISK_NOTE}</p>
       <p>
-        <span className={`tag risk-${e3.risk.final}`}>{e3.risk.final}</span> <span className="meta">computed by the rules: {e3.risk.computed}{e3.risk.adjustment ? `; a person's adjustment to ${e3.risk.adjustment.level} is ${e3.risk.adjustment.state}` : ''}</span>
+        <span className={`tag risk-${e3.risk.final}`}>{e3.risk.final[0]!.toUpperCase() + e3.risk.final.slice(1)} risk</span> <span className="meta">computed by the rules: {e3.risk.computed}{e3.risk.adjustment ? `; a person's adjustment to ${e3.risk.adjustment.level} is ${e3.risk.adjustment.state}` : ''}</span>
       </p>
       {e3.pendingRisk && <p className="meta" role="status">After the re-run: {e3.pendingRisk}</p>}
       {e3.risk.held && (
@@ -179,7 +189,7 @@ function RiskPanel({ caseId, e3, user, reload }: { caseId: string; e3: E3; user:
           )}
         </div>
       )}
-      {e3.risk.floor && <p className="meta">Class floor: {e3.risk.floor.classes.map((c) => e3.low.includes(c) ? `possible class ${c} (low confidence)` : c).join(', ')} → {e3.risk.floor.level}</p>}
+      {e3.risk.floor && <p className="meta">Class floor: {e3.risk.floor.classes.map((c) => e3.low.includes(c) ? `possible ${displayName(c)} (low confidence)` : displayName(c)).join(', ')} → {e3.risk.floor.level}</p>}
       {e3.risk.clauses.length > 0 && (
         <ul className="signals">
           {e3.risk.clauses.map((c) => <li key={c} className="on">{CLAUSE_TEXT[c] ?? c}</li>)}
@@ -219,7 +229,7 @@ function LinksPanel({ caseId, e3, reload }: { caseId: string; e3: E3; reload: (n
       </select>
     ) : null
   return (
-    <Panel title="Links">
+    <Panel title="Related records">
       <dl className="facts">
         <dt>Sender</dt>
         <dd>{l.contact ? `${l.contact.name} (${l.contact.id})` : 'Not linked'} {l.authenticatedSender ? <span className="tag ok">authenticated sender</span> : <span className="tag">not authenticated</span>} <Pick kind="contact" current={l.contact?.id ?? null} candidates={l.contactCandidates} /></dd>
@@ -228,9 +238,9 @@ function LinksPanel({ caseId, e3, reload }: { caseId: string; e3: E3; reload: (n
         <dt>Deal</dt>
         <dd>{l.deal ?? 'Not linked'}{l.dealConflict && <span className="tag warn">the mail names another deal</span>} <Pick kind="deal" current={l.deal} candidates={l.dealCandidates} /></dd>
         <dt>Ledger</dt>
-        <dd>{l.ledger === 'received' ? 'Received in full (Goten ledger)' : l.ledger === 'not_received' ? 'Not received in full (Goten ledger)' : l.ledger === 'unknown' ? 'No ledger imported for this deal' : '—'}</dd>
+        <dd>{l.ledger === 'received' ? 'Paid in full · Imported Goten ledger' : l.ledger === 'not_received' ? 'Not fully received · Imported Goten ledger' : l.ledger === 'unknown' ? 'No ledger imported for this deal' : '—'}</dd>
         <dt>Possible bank lines</dt>
-        <dd>{l.bankLines.length ? l.bankLines.map((b) => `${b.transactionId} (${b.ledgerStatus ?? 'not in the ledger'})`).join(', ') : '—'} <span className="meta">shown only; nothing is changed</span></dd>
+        <dd>{l.bankLines.length ? l.bankLines.map((b) => `${b.transactionId} (${b.ledgerStatus ?? 'not in the ledger'})`).join(', ') : 'No matching bank lines found'} <span className="meta">shown only; nothing is changed</span></dd>
         <dt>Record data in replies</dt>
         <dd>{l.mayDisclose ? 'allowed' : 'not allowed (generic replies only)'}</dd>
       </dl>
@@ -249,15 +259,15 @@ export function LabelsPanel({ caseId, e3, meta, reload }: { caseId: string; e3: 
   const a = useAction(reload)
   const change = (body: object) => void a.run(() => api('POST', `/api/cases/${caseId}/labels`, { ...body, reason }))
   return (
-    <Panel title="Classes">
+    <Panel title="Email type">
       <ul className="tags plain">
         {e3.adopted.map((c) => (
           <li key={c} className="tag">
-            {c}
+            {displayName(c)}
             {e3.ruleLabels.includes(c) ? <span className="meta"> (rule)</span> : STATIC_DEMO ? null : <button className="link" aria-label={`Remove ${c}`} onClick={() => change({ remove: [c] })}> ×</button>}
           </li>
         ))}
-        {e3.low.map((c) => <li key={c} className="tag confirm">{c} (low confidence — needs confirmation; counts for risk)</li>)}
+        {e3.low.map((c) => <li key={c} className="tag confirm">{displayName(c)} (low confidence — needs confirmation; counts for risk)</li>)}
       </ul>
       {e3.removed.length > 0 && (
         <ul className="removed">
@@ -269,7 +279,7 @@ export function LabelsPanel({ caseId, e3, meta, reload }: { caseId: string; e3: 
       <div className="inline-form">
         <select aria-label="Add a class" value={add} onChange={(e) => setAdd(e.target.value)}>
           <option value="">Add a class…</option>
-          {(meta?.classes ?? []).filter((c) => !e3.adopted.includes(c.id)).map((c) => <option key={c.id} value={c.id}>{c.id}</option>)}
+          {(meta?.classes ?? []).filter((c) => !e3.adopted.includes(c.id)).map((c) => <option key={c.id} value={c.id}>{displayName(c.id)}</option>)}
         </select>
         <button className="secondary" disabled={!add || a.busy} onClick={() => change({ add: [add] })}>Add</button>
         <input aria-label="Reason for the class change" placeholder="Reason (needed when it lowers the risk)" value={reason} onChange={(e) => setReason(e.target.value)} />
@@ -305,13 +315,14 @@ export function FieldActions({ caseId, field, confirmed, reload }: { caseId: str
 }
 
 // PRD R-DEMO-02 v0.7.25: the demo shows no approval controls, so it says how a reply leaves a real deployment
-export const DEMO_REPLY_NOTE = 'In a real deployment a reviewer approves this reply and sends it from their own mail client; the app cannot send.'
+export const DEMO_REPLY_NOTE = 'In a real deployment, approve and copy the reply, then send it from your own mail client. Trunks cannot send email.'
 
 function RepliesPanel({ caseId, e3, reload }: { caseId: string; e3: E3; reload: (notice?: string) => void }) {
   if (e3.replies.length === 0) return <Panel title="Reply">{STATIC_DEMO && <p className="meta">{DEMO_REPLY_NOTE}</p>}<p className="meta">No reply is drafted for this Case.</p></Panel>
   return (
     <Panel title="Reply">
-      <p className="meta">Templates are chosen by the rules{e3.autoTemplate ? ` (now: ${e3.autoTemplate})` : ''}. {STATIC_DEMO ? DEMO_REPLY_NOTE : 'Nothing is sent from here: copy the approved reply into your mail client, then mark it as sent.'}</p>
+      <p className="meta">{STATIC_DEMO ? DEMO_REPLY_NOTE : 'Nothing is sent from here: copy the approved reply into your mail client, then mark it as sent.'}</p>
+      <details><summary>How replies are prepared</summary><p>Templates are chosen by the rules{e3.autoTemplate ? ` (now: ${e3.autoTemplate})` : ''}. Reply subjects use a fixed template.</p></details>
       {e3.replies.map((r) => <ReplyCard key={r.id} caseId={caseId} r={r} e3={e3} reload={reload} />)}
     </Panel>
   )
@@ -385,7 +396,7 @@ function ReplyCard({ caseId, r, e3, reload }: { caseId: string; r: E3['replies']
   return (
     <div className="card reply" data-testid="reply" data-copies-answered={progress.answered} data-copies-done={progress.done}>
       <p>
-        <span className="tag">{r.templateId}</span> <span className="tag">{r.outOfDate ? 'Out of date — work on the current draft' : (STATUS_TEXT[r.status] ?? r.status)}</span>
+        <span className="tag">{displayName(r.templateId)}</span> <span className="tag">{r.outOfDate ? 'Out of date — work on the current draft' : (STATUS_TEXT[r.status] ?? r.status)}</span>
         {r.source === 'person' && <span className="tag">chosen by a person</span>} {r.edited && <span className="tag">edited</span>}
       </p>
       <dl className="facts">
@@ -398,13 +409,14 @@ function ReplyCard({ caseId, r, e3, reload }: { caseId: string; r: E3['replies']
           ) : (r.recipient ?? '—')}
         </dd>
         <dt>Subject</dt>
-        <dd>{r.subject} <span className="meta">(set by the template; the subject of the sender's mail is never repeated)</span></dd>
+        <dd>{r.subject}</dd>
       </dl>
       {r.status === 'draft' && r.bodyEditable && !r.outOfDate && !STATIC_DEMO ? (
         <textarea aria-label="Reply text" value={text} rows={Math.min(14, text.split('\n').length + 2)} onChange={(e) => setText(e.target.value)} />
       ) : (
         <pre className="body">{r.text}</pre>
       )}
+      <details><summary>Template reference</summary><code>{r.templateId}</code></details>
       {!r.bodyEditable && r.status === 'draft' && <p className="meta">This reply's text is fixed and cannot be edited.</p>}
       {r.removed > 0 && <p className="meta">{r.removed} sentence{r.removed > 1 ? 's were' : ' was'} left out because a value is missing.</p>}
       {r.problems.length > 0 && <ul className="flags">{r.problems.map((p) => <li key={p}>{PROBLEM_TEXT(p)}</li>)}</ul>}
@@ -466,7 +478,8 @@ function VerificationPanel({ task, user, reload }: { caseId: string; task: E3['v
         <p>{completerFailures.length ? 'With the current account history, this task cannot be approved (C-FRD-5).' : 'You cannot approve this task (C-FRD-5).'}</p>
         <ul>{(completerFailures.length ? completerFailures : otherFailures).map((f) => <li key={`${f.subject}-${f.code}`}>{f.reason} (C-FRD-5)</li>)}</ul>
       </div>}
-      {task.state === 'open' && ticked.length < task.checklist.length && <p className="meta">Tick every checklist item before marking the checklist done.</p>}
+      {STATIC_DEMO && <p className="meta">This demo shows the verification checklist. In a real deployment, a reviewer completes it before the cooling-off period and second-person approval.</p>}
+      {!STATIC_DEMO && task.state === 'open' && ticked.length < task.checklist.length && <p className="meta">Tick every checklist item before marking the checklist done.</p>}
       <ul className="checklist">
         {task.checklist.map((c) => (
           <li key={c.id}>
@@ -526,7 +539,7 @@ function RoutingPanel({ caseId, e3, meta, reload }: { caseId: string; e3: E3; me
       <div className="inline-form">
         <select aria-label="Queue" value="" onChange={(e) => e.target.value && void a.run(() => api('PUT', `/api/cases/${caseId}/assignment`, { queue: e.target.value }))}>
           <option value="">Move to queue…</option>
-          {(meta?.queues ?? []).map((q) => <option key={q} value={q}>{q}</option>)}
+          {(meta?.queues ?? []).map((q) => <option key={q} value={q}>{displayName(q)}</option>)}
         </select>
         <select aria-label="Owner" value={e3.assignee ?? ''} onChange={(e) => void a.run(() => api('PUT', `/api/cases/${caseId}/assignment`, { assignee: e.target.value || null }))}>
           <option value="">No owner</option>

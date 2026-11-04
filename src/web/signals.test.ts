@@ -23,12 +23,12 @@ describe('TC-REV-10 signals display', () => {
   })
   it('none fired, all checked: «No warning signals»', () => {
     const h = html(full())
-    expect(visible(h)).toContain('<p class="meta">No warning signals</p>')
+    expect(visible(h)).toContain('<p class="meta">No warning signals detected.</p>')
     expect(visible(h)).not.toContain('sig-')
   })
   it('none fired, some unchecked: they are listed and counted, never hidden', () => {
     const h = html(full({ auth_fail: null, lookalike_domain: null }))
-    expect(visible(h)).toContain('No warning signals; 2 could not be checked')
+    expect(visible(h)).toContain('No warning signals detected. 2 checks could not be completed.')
     expect(visible(h)).toContain('<li class="tag sig-unknown">Authentication failed (SPF, DKIM or DMARC): could not be checked</li>')
     expect(visible(h)).toContain('Domain looks like a known contact domain: could not be checked')
   })
@@ -40,7 +40,7 @@ describe('TC-REV-10 signals display', () => {
   })
   it('only the first batch written (processing, or failed before the content step): the rest are not checked (self-test F1)', () => {
     const h = html(full().filter((s) => s.signal !== 'hidden_text' && s.signal !== 'injection_markers'))
-    expect(visible(h)).toContain('No warning signals; 2 could not be checked')
+    expect(visible(h)).toContain('No warning signals detected. 2 checks could not be completed.')
     expect(visible(h)).toContain('Instruction-like phrases in the mail: could not be checked')
     expect(h).toContain('Hidden text in the HTML: not checked')
     expect(h).toContain('<summary>All signals (9)</summary>')

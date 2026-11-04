@@ -1,8 +1,9 @@
 // Review UI (PRD R-REV-01 to R-REV-05). Mail content is shown as plain text only (tech design T9).
-import { Fragment, useCallback, useEffect, useState, type FormEvent } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { api, ApiError, csrf, withoutRuleIds, type SessionUser } from './api.ts'
 import { snapshotInfo, STATIC_DEMO } from './static-demo.ts'
-import { E3Panels, FieldActions, HoldPanel, LabelsPanel, type E3, type Meta } from './CaseE3.tsx'
+import { caseStatus, DEMO_DATES, displayName, transferText } from './presentation.ts'
+import { actionText, riskReasonText, E3Panels, FieldActions, HoldPanel, LabelsPanel, type E3, type Meta } from './CaseE3.tsx'
 
 interface CaseItem {
   id: string
@@ -167,88 +168,75 @@ function ChangePassword({ onDone }: { onDone: () => void }) {
   )
 }
 
-function CaseList({ open, meta }: { open: (id: string) => void; meta: Meta | null }) {
+interface ListView { status: string; queue: string; risk: string; scroll: number; lastId: string | null }
+function CaseList({ meta, view, setView }: { meta: Meta | null; view: ListView; setView: (v: ListView) => void }) {
   const [cases, setCases] = useState<CaseItem[] | null>(null)
-  const [status, setStatus] = useState('')
-  const [queue, setQueue] = useState('')
-  const [risk, setRisk] = useState('')
+  const [error, setError] = useState('')
+  const { status, queue, risk } = view
+  const restore = useRef(true)
   useEffect(() => {
+    let active = true
+    setError('')
     const q = new URLSearchParams(Object.entries({ status, queue, risk }).filter(([, v]) => v))
-    void api<{ cases: CaseItem[] }>('GET', `/api/cases${q.size ? `?${q}` : ''}`).then((r) => setCases(r.cases))
+    void api<{ cases: CaseItem[] }>('GET', `/api/cases${q.size ? `?${q}` : ''}`).then((r) => { if (active) setCases(r.cases) }, () => { if (active) setError('Cases could not be loaded. Try again.') })
+    return () => { active = false }
   }, [status, queue, risk])
+  useEffect(() => {
+    if (!cases || !restore.current) return
+    restore.current = false
+    const frame = requestAnimationFrame(() => {
+      if (view.lastId) document.getElementById(`case-${view.lastId}`)?.focus({ preventScroll: true })
+      window.scrollTo(0, view.scroll)
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [cases, view.lastId, view.scroll])
+  const filtered = Boolean(status || queue || risk)
+  const filter = (key: 'status' | 'queue' | 'risk', value: string) => setView({ ...view, [key]: value, scroll: 0, lastId: null })
   const now = Date.now()
   return (
     <section>
-      <div className="toolbar">
-        <div>
-          <p className="eyebrow">Inbox</p>
-          <h2>Cases</h2>
-        </div>
-        <label className="inline">
-          Status{' '}
-          <select value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="">All</option>
-            <option value="processing">Processing</option>
-            <option value="open">Open</option>
-            <option value="failed">Processing failed</option>
-            <option value="approved">Approved, to send</option>
-            <option value="sent">Sent</option>
-            <option value="closed">Closed</option>
-          </select>
-        </label>
-        <label className="inline">
-          Queue{' '}
-          <select value={queue} onChange={(e) => setQueue(e.target.value)}>
-            <option value="">All</option>
-            {(meta?.queues ?? []).map((q) => <option key={q} value={q}>{q}</option>)}
-          </select>
-        </label>
-        <label className="inline">
-          Risk{' '}
-          <select value={risk} onChange={(e) => setRisk(e.target.value)}>
-            <option value="">All</option>
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
-          </select>
-        </label>
-        {/* the static demo has no server to export from (self-test F5) */}
-        {!STATIC_DEMO && (
-          <span className="meta">
-            <a href="/api/export/cases.csv">Cases CSV</a> · <a href="/api/export/actions.csv">Actions CSV</a>
-          </span>
-        )}
+      <p className="eyebrow">Inbox</p>
+      <div className="list-heading"><h2>Cases</h2><span className="meta" role="status">{cases && (STATIC_DEMO ? `${cases.length} of ${snapshotInfo()?.caseCount ?? cases.length} cases` : `${cases.length} cases shown`)}</span></div>
+      <p className="meta">Open a case to review the email, risk reasons and suggested next steps.</p>
+      <div className="toolbar filters">
+        <label><span id="status-filter-label">Status</span><select aria-labelledby="status-filter-label" value={status} onChange={(e) => filter('status', e.target.value)}>
+          <option value="">All statuses</option>
+          {['processing', 'open', 'failed', 'approved', 'sent', 'closed'].map((v) => <option key={v} value={v}>{caseStatus(v)}</option>)}
+        </select></label>
+        <label><span id="queue-filter-label">Queue</span><select aria-labelledby="queue-filter-label" value={queue} onChange={(e) => filter('queue', e.target.value)}>
+          <option value="">All queues</option>
+          {(meta?.queues ?? []).map((q) => <option key={q} value={q}>{displayName(q)}</option>)}
+        </select></label>
+        <label><span id="risk-filter-label">Risk</span><select aria-labelledby="risk-filter-label" value={risk} onChange={(e) => filter('risk', e.target.value)}>
+          <option value="">All risk levels</option>
+          {['high', 'medium', 'low'].map((v) => <option key={v} value={v}>{v[0]!.toUpperCase() + v.slice(1)}</option>)}
+        </select></label>
+        {filtered && <button className="link" onClick={() => setView({ ...view, status: '', queue: '', risk: '', scroll: 0, lastId: null })}>Clear filters</button>}
+        {!STATIC_DEMO && <span className="meta"><a href="/api/export/cases.csv">Cases CSV</a> · <a href="/api/export/actions.csv">Actions CSV</a></span>}
       </div>
-      {cases === null ? (
-        <p>Loading…</p>
-      ) : cases.length === 0 ? (
-        <p>No cases.</p>
-      ) : (
-        <ul className="cases">
-          {cases.map((c) => (
-            <li key={c.id}>
-              <button className="row" data-nav onClick={() => open(c.id)}>
-                <span className="subject">{c.subject || '(no subject)'}</span>
-                <span className="meta">
-                  {c.fromName ? `${c.fromName} · ` : ''}
-                  {/* D8: a monospace address tells I from l (hartfamiIy) */}
-                  <span className="mono">{c.from ?? 'unknown sender'}</span> · {c.mailbox} · {when(c.receivedAt)}
-                </span>
-                <span className="tags">
-                  {c.hold && <span className="tag warn">on hold</span>}
-                  {c.risk && <span className={`tag risk-${c.risk}`}>risk {c.risk}</span>}
-                  <span className={`tag status-${c.status}`}>{c.status}</span>
-                  {c.queue && <span className="tag">{c.queue}</span>}
-                  {c.dueAt && c.status !== 'closed' && <span className={`tag ${Date.parse(c.dueAt) < now ? 'bad' : ''}`}>{Date.parse(c.dueAt) < now ? 'overdue' : `due ${when(c.dueAt)}`}</span>}
-                  {c.signals.length > 0 && <span className="tag warn">{c.signals.length} signal{c.signals.length > 1 ? 's' : ''}</span>}
-                  {c.flags.map((f) => (
-                    <span key={f} className="tag warn">{FLAG_TEXT[f] ?? f}</span>
-                  ))}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
+      <p className="meta list-note">Sorted by risk, then due time.</p>
+      {STATIC_DEMO && <p className="meta list-note">{DEMO_DATES}</p>}
+      {error ? <p className="error" role="alert">{error}</p> : cases === null ? <p>Loading…</p> : cases.length === 0 ? <p>{filtered ? 'No cases match these filters.' : 'No cases yet.'}</p> : (
+        <ul className="cases">{cases.map((c) => {
+          const signal = Object.keys(SIGNAL_TEXT).find((k) => c.signals.includes(k)) ?? c.signals[0]
+          return <li key={c.id}><a className="row" id={`case-${c.id}`} href={`#case=${encodeURIComponent(c.id)}`} onClick={(e) => {
+            if (!e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey && e.button === 0) setView({ ...view, scroll: window.scrollY, lastId: c.id })
+          }}>
+            <span className="row-heading"><span className="subject">{c.subject || '(no subject)'}</span><span aria-hidden="true">→</span></span>
+            <span className="meta">{c.fromName ? `${c.fromName} · ` : ''}<span className="mono">{c.from ?? 'unknown sender'}</span></span>
+            <span className="meta">{c.mailbox} · Received {when(c.receivedAt)}</span>
+            <span className="tags">
+              {c.risk && <span className={`tag risk-${c.risk}`}>{c.risk[0]!.toUpperCase() + c.risk.slice(1)} risk</span>}
+              {c.hold && <span className="tag warn">retention hold</span>}
+              <span className={`tag status-${c.status}`}>{caseStatus(c.status)}</span>
+              {c.queue && <span className="tag">{displayName(c.queue)}</span>}
+              {c.dueAt && c.status !== 'closed' && <span className={`tag ${Date.parse(c.dueAt) < now ? 'bad' : ''}`}>{Date.parse(c.dueAt) < now ? 'Overdue · ' : ''}Due {when(c.dueAt)}</span>}
+              {c.signals.length > 0 && <span className="tag warn">{c.signals.length} warning signal{c.signals.length > 1 ? 's' : ''}</span>}
+              {c.flags.map((f) => <span key={f} className="tag warn">{FLAG_TEXT[f] ?? f}</span>)}
+            </span>
+            {signal && <span className="meta">Warning signal: {SIGNAL_TEXT[signal] ?? signal}</span>}
+          </a></li>
+        })}</ul>
       )}
     </section>
   )
@@ -259,7 +247,7 @@ function KycTransfer({ t, user, reload }: { t: { id: string; state: string; erro
   const [error, setError] = useState('')
   const [reason, setReason] = useState('')
   const blocked = t.state === 'failed' && t.error === 'infected'
-  const text = t.state === 'discarded' ? `blocked by the virus scan; handled by hand${t.removed ? ', removed from this system' : ''}` : blocked ? 'blocked by the virus scan; not transferred' : t.removed ? 'transferred; removed from this system' : t.state === 'delivered' ? 'transferred; removal pending' : t.state === 'failed' ? `transfer failed (${t.error ?? 'error'})` : 'transfer pending'
+  const text = transferText(t, STATIC_DEMO)
   return (
     <>
       {' '}<span className={`tag ${t.state === 'failed' ? 'bad' : ''}`}>{text}</span>
@@ -299,7 +287,7 @@ export function Signals({ details }: { details: CaseDetail['signalDetails'] }) {
         <>
           {on.length > 0 && <ul className="plain signal-tags">{on.map((s) => <li key={s.signal} className="tag sig-on">{text(s)}</li>)}</ul>}
           {unknown.length > 0 && <ul className="plain signal-tags">{unknown.map((s) => <li key={s.signal} className="tag sig-unknown">{text(s)}: could not be checked</li>)}</ul>}
-          {on.length === 0 && <p className="meta">{unknown.length ? `No warning signals; ${unknown.length} could not be checked` : 'No warning signals'}</p>}
+          {on.length === 0 && <p className="meta">{unknown.length ? `No warning signals detected. ${unknown.length} checks could not be completed.` : 'No warning signals detected.'}</p>}
           <details>
             <summary>All signals ({all.length})</summary>
             <ul className="signals">
@@ -332,7 +320,10 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
       return () => clearTimeout(t)
     }
   }, [c])
-  if (error) return <p className="error">{error}</p>
+  useEffect(() => {
+    if (c) { document.getElementById('case-title')?.focus({ preventScroll: true }); window.scrollTo(0, 0) }
+  }, [c?.id])
+  if (error) return <div><button className="link" data-nav onClick={back}>← All cases</button><p className="error" role="alert">This case could not be loaded. {error}</p></div>
   if (!c) return <p>Loading…</p>
   const ex = c.extraction
   return (
@@ -340,10 +331,10 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
       {notice && <p className="error" role="alert">{notice}</p>}
       <button className="link" data-nav onClick={back}>← All cases</button>
       <p className="eyebrow">Case</p>
-      <h2>{c.subject || '(no subject)'}</h2>
+      <h2 id="case-title" tabIndex={-1}>{c.subject || '(no subject)'}</h2>
       <dl className="facts">
         <dt>From</dt>
-        <dd>{c.fromName ? `${c.fromName} <${c.from}>` : c.from}</dd>
+        <dd className="mono">{c.fromName ? `${c.fromName} <${c.from}>` : c.from}</dd>
         <dt>To</dt>
         <dd>{c.to}</dd>
         <dt>Cc</dt>
@@ -353,16 +344,14 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
         {STATIC_DEMO && c.queue && (
           <>
             <dt>Queue</dt>
-            <dd>{c.queue}</dd>
+            <dd>{displayName(c.queue)}</dd>
           </>
         )}
         <dt>Status</dt>
         <dd>
-          {c.status}
+          {caseStatus(c.status)}
           {c.status === 'failed' && (
-            <span className="meta">
-              {' '}— processing stopped at the step «{c.failedStage ?? 'unknown'}» after its retries.{c.failedReason && <> Reason: {c.failedReason}</>} The failure deletes nothing. An admin can run it again with the <code>rerun-failed</code> command.
-            </span>
+            <><p className="error">Processing failed. Results may be incomplete. Ask an administrator to retry.</p><details><summary>Technical details</summary><p>Processing stopped at {c.failedStage ?? 'unknown'} after its retries. {c.failedReason} The failure deletes nothing. An administrator can use <code>rerun-failed</code>.</p></details></>
           )}
         </dd>
       </dl>
@@ -371,14 +360,16 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
           {c.flags.map((f) => <li key={f}>{FLAG_TEXT[f] ?? f}</li>)}
         </ul>
       )}
-      {/* B3 (界面规则 v0.3.4): two columns from 1024px — the side column (signals, risk, links, replies, tasks) comes
-          first in the page, so a narrow screen keeps it above the mail; the wide grid puts the mail on the left */}
+      <section className="case-summary" aria-label="Case summary">
+        <p>{c.risk ? <span className={`tag risk-${c.risk}`}>{c.risk[0]!.toUpperCase() + c.risk.slice(1)} risk</span> : 'Risk not available'} {c.dueAt && <span className="meta">Due {when(c.dueAt)}</span>}</p>
+        {!c.e3 ? <p>Analysis is not available yet.</p> : !c.e3.complete || c.status === 'processing' ? <p className="banner" role="status">Analysis is being updated. Wait for the current results before reviewing next steps.</p> : <>
+          {c.e3.risk && <p className="meta">{c.e3.risk.clauses.length ? c.e3.risk.clauses.slice(0, 2).map(riskReasonText).join(' · ') : c.e3.risk.floor ? `Handling requirement: ${c.e3.risk.floor.classes.map(displayName).join(', ')}` : 'Review the risk details below.'}</p>}
+          <p><strong>Next step:</strong> {c.e3.actions.map((a) => actionText(a)).join(' · ') || 'No suggested next step.'}</p>
+        </>}
+        {c.e3?.risk?.held && <p className="banner">A lower risk is awaiting confirmation. The current risk remains {c.e3.risk.held}.</p>}
+        {c.e3?.pendingRisk && <p className="banner">Risk after reprocessing: {c.e3.pendingRisk}. Review the current result below.</p>}
+      </section>
       <div className="case-grid">
-      <div className="case-side">
-      <Signals details={c.signalDetails} />
-      <HoldPanel caseId={c.id} hold={c.hold} reason={c.holdReason} user={user} reload={reload} />
-      {c.e3 && <E3Panels caseId={c.id} e3={c.e3} user={user} meta={meta} reload={reload} />}
-      </div>
       <div className="case-main">
       <h3>Message (plain text)</h3>
       <pre className="body">{c.text}</pre>
@@ -403,14 +394,17 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
                 {a.maybeKyc === false && a.kycReason === 'inline_signature' && <span className="tag">Inline small image (treated as a signature image)</span>}
                 {a.maybeKyc && <> <span className="tag warn">Possible KYC document</span> <span className="meta">content not sent to any model</span></>}
                 {a.kycTransfer && <KycTransfer t={a.kycTransfer} user={user} reload={reload} />}
+                {STATIC_DEMO && a.kycTransfer?.state === 'delivered' && !a.kycTransfer.removed && <p className="meta">This snapshot records a transfer to the demo folder; no transfer runs in this browser demo. Removal is not demonstrated: the sample attachment remains in the demo’s stored email.</p>}
               </li>
             ))}
           </ul>
+          {c.attachments.some((a) => a.maybeKyc) && <details><summary>KYC handling in a real deployment</summary><p>Once all possible-KYC attachments in an email have been dealt with, maintenance replaces them with placeholders and removes the app’s stored copies. This does not remove files from your mailbox, KYC destination or backups.</p></details>}
         </>
       )}
       {c.labels.length > 0 && (
         <>
-          <h3>Classification</h3>
+          {c.labels.some((l) => !l.adopted) && <p className="confirm">Some email types need confirmation. Review the classification evidence.</p>}
+          <details><summary>Classification evidence</summary>
           {/* model text is plain text: React never renders it as HTML or Markdown (TC-REV-02) */}
           <ul className="labels">
             {c.labels.map((l) => (
@@ -419,17 +413,17 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
                 {l.reason !== null && <div className="meta">{l.reason}</div>}
               </li>
             ))}
-          </ul>
+          </ul></details>
         </>
       )}
       {c.e3 && <LabelsPanel caseId={c.id} e3={c.e3} meta={meta} reload={reload} />}
       {c.fields.length > 0 && (
         <>
-          <h3>Fields</h3>
+          <h3>Key details</h3>
           <dl className="facts fields">
             {c.fields.map((f) => (
               <Fragment key={f.field}>
-                <dt>{f.field}</dt>
+                <dt>{displayName(f.field)}</dt>
                 <dd className={f.needsConfirmation ? 'confirm' : ''}>
                   {f.status === 'multiple' ? f.candidates.join(' · ') : (f.value ?? '—')}
                   {f.status !== 'ok' && <span className="meta"> ({FIELD_STATUS[f.status] ?? f.status}{f.reason ? `: ${withoutRuleIds(f.reason)}` : ''})</span>}
@@ -443,7 +437,9 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
       )}
       {ex && (
         <>
-          <h3>Extracted by rules</h3>
+          {(ex.invalidIbans ?? 0) > 0 && <p className="confirm">IBAN-like text has invalid check digits and was not used.</p>}
+          {ex.evidence.length > 0 && <p className="confirm">Payment documents are the sender’s confirmation, not proof of receipt.</p>}
+          <details><summary>Details extracted by rules</summary>
           <dl className="facts">
             <dt>Amounts</dt>
             <dd>{ex.amounts.map((a) => money(a.minor, a.currency)).join(', ') || '—'}</dd>
@@ -452,7 +448,7 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
             <dt>UETR</dt>
             <dd>{ex.uetrs.map((u) => u.value).join(', ') || '—'}{ex.uetrCandidatesInvalid.length > 0 && ` (not valid: ${ex.uetrCandidatesInvalid.map((u) => u.value).join(', ')})`}</dd>
             <dt>Bank accounts</dt>
-            <dd>{ex.accounts.map((a) => `${a.kind === 'iban' ? `IBAN ${a.country}` : 'UK account'} ending ${a.last4}`).join(', ') || '—'}{(ex.invalidIbans ?? 0) > 0 && <p className="meta">IBAN-like text has invalid check digits and was not used.</p>}</dd>
+            <dd>{ex.accounts.map((a) => `${a.kind === 'iban' ? `IBAN ${a.country}` : 'UK account'} ending ${a.last4}`).join(', ') || '—'}</dd>
             <dt>Dates</dt>
             <dd>{ex.dates.map((d) => d.iso ?? DATE_HIDDEN[d.status] ?? d.status).join(', ') || '—'}{ex.hidden && ex.hidden.kyc > 0 && <span className="meta"> · values from a possible KYC attachment are not shown</span>}</dd>
             <dt>Payment confirmations</dt>
@@ -463,9 +459,14 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
             </dd>
             <dt>E-signature invite</dt>
             <dd>{ex.esign.esignInvite ? ex.esign.platform : 'no'}</dd>
-          </dl>
+          </dl></details>
         </>
       )}
+      </div>
+      <div className="case-side">
+        {c.e3 && <E3Panels caseId={c.id} e3={c.e3} user={user} meta={meta} reload={reload} signals={<Signals details={c.signalDetails} />} />}
+        {!c.e3 && <Signals details={c.signalDetails} />}
+        <HoldPanel caseId={c.id} hold={c.hold} reason={c.holdReason} user={user} reload={reload} />
       </div>
       </div>
     </article>
@@ -476,6 +477,17 @@ export function App() {
   const [user, setUser] = useState<SessionUser | null | undefined>(undefined)
   const [warnings, setWarnings] = useState<string[]>([])
   const [openId, setOpenId] = useState<string | null>(() => new URLSearchParams(location.hash.slice(1)).get('case'))
+  const [listView, setListView] = useState<ListView>({ status: '', queue: '', risk: '', scroll: 0, lastId: null })
+  const viewRef = useRef(listView)
+  const entrySequence = useRef(0)
+  const currentEntry = useRef<string | null>(null)
+  const entries = useRef(new Map<string, { hash: string; view: ListView }>())
+  const updateListView = (v: ListView) => {
+    viewRef.current = v
+    setListView(v)
+    const entry = currentEntry.current && entries.current.get(currentEntry.current)
+    if (entry) entry.view = v
+  }
   const [meta, setMeta] = useState<Meta | null>(null)
   // a sign-out that did not go through (the static demo refuses it) says so (Codex E5 round 2 F3)
   const [signOutError, setSignOutError] = useState('')
@@ -504,12 +516,29 @@ export function App() {
     void load()
   }, [load])
   useEffect(() => {
-    const changed = () => setOpenId(new URLSearchParams(location.hash.slice(1)).get('case'))
+    const previousRestoration = history.scrollRestoration
+    history.scrollRestoration = 'manual'
+    const changed = () => {
+      const state = history.state as { trunksEntry?: string } | null
+      const entry = state?.trunksEntry ? entries.current.get(state.trunksEntry) : undefined
+      if (entry && entry.hash === location.hash) {
+        currentEntry.current = state!.trunksEntry!
+        viewRef.current = entry.view
+        setListView(entry.view)
+      } else {
+        const key = String(++entrySequence.current)
+        entries.current.set(key, { hash: location.hash, view: viewRef.current })
+        currentEntry.current = key
+        // Only an opaque navigation key goes into history; case view data stays in memory.
+        history.replaceState({ ...(state && typeof state === 'object' ? state : {}), trunksEntry: key }, '')
+      }
+      setOpenId(new URLSearchParams(location.hash.slice(1)).get('case'))
+    }
+    changed()
     window.addEventListener('hashchange', changed)
-    return () => window.removeEventListener('hashchange', changed)
+    return () => { window.removeEventListener('hashchange', changed); history.scrollRestoration = previousRestoration }
   }, [])
   const open = (id: string | null) => {
-    setOpenId(id)
     location.hash = id ? `case=${id}` : ''
   }
   if (user === undefined) return <p className="narrow">Loading…</p>
@@ -524,12 +553,16 @@ export function App() {
         // role or Sign out, since the snapshot has no sign-in
         <div className="demo-bar">
           <p>
-            <a href="/inbox/">← Trunks</a> · Demo with fictional data · read-only · v{snapshotInfo()?.version ?? '?'}
+            <a href="/inbox/">← About Trunks</a> · Demo · Fictional data · View only
           </p>
           <details>
             <summary>About this demo</summary>
-            {warnings.map((w) => <p key={w}>{w}</p>)}
+            <p>This demo shows precomputed results for {snapshotInfo()?.caseCount ?? 'the sample'} fictional emails. No live mailbox or model is connected.</p>
+            <p>Browse cases and filter the inbox. Editing, approvals and workflow changes are unavailable in this demo.</p>
+            <p>Deals, investors and contacts are fictional. Dates within the sample emails are fictional and may differ from the received dates.</p>
+            <p className="meta">Demo version: v{snapshotInfo()?.version ?? 'unknown'} · Snapshot built: {snapshotInfo()?.built_at ? new Date(snapshotInfo()!.built_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' }) + ' UTC' : 'unknown'}</p>
           </details>
+          {warnings.filter((w) => !w.startsWith('Read-only snapshot of the demo, built ') && !w.startsWith('Demo: fictional data only, received at fixed past times ')).map((w) => <p className="error" role="alert" key={w}>{w}</p>)}
         </div>
       ) : (
         <>
@@ -548,7 +581,7 @@ export function App() {
           )}
         </>
       )}
-      <main>{openId ? <Detail key={openId} id={openId} back={() => open(null)} user={user} meta={meta} /> : <CaseList open={(id) => open(id)} meta={meta} />}</main>
+      <main>{STATIC_DEMO && <p className="product-name">Trunks <span className="meta">— Operations Inbox · Vegeta</span></p>}{openId ? <Detail key={openId} id={openId} back={() => open(null)} user={user} meta={meta} /> : <CaseList meta={meta} view={listView} setView={updateListView} />}</main>
     </div>
   )
 }

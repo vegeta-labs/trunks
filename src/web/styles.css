@@ -97,12 +97,12 @@ a.secondary { font-size: 13px; }
 
 /* ---------- case list ---------- */
 ul.cases { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
-button.row {
+a.row {
   display: grid; gap: 4px; width: 100%; min-height: 0; text-align: left; font-weight: 400;
   color: var(--text); background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius-box); padding: 12px 16px;
 }
-button.row:hover { background: var(--surface-3); text-decoration: none; }
+a.row:hover { background: var(--surface-3); text-decoration: none; }
 .subject { font-weight: 600; color: var(--text-strong); overflow-wrap: anywhere; }
 .meta { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
 
@@ -172,3 +172,25 @@ details summary { cursor: pointer; color: var(--link); }
   * { transition: none !important; }
 }
 ul.removed { list-style: none; padding: 0; margin: 4px 0 0; }
+
+/* Product review v0.3.5: group task controls and lead with a short case summary. */
+.product-name { font-weight: 600; margin: 0 0 16px; }
+.list-heading, .row-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.list-heading h2 { margin-bottom: 4px; }
+.filters { justify-content: flex-start; align-items: flex-end; gap: 16px; margin: 16px 0 8px; }
+.filters label { min-width: 150px; }
+.filters button.link, button.link[data-nav] { min-height: 40px; }
+.list-note { margin: 4px 0 8px; }
+a.row { text-decoration: none; }
+a.row:hover { text-decoration: none; }
+.case-summary { padding: 16px; margin: 16px 0; border: 1px solid var(--border); border-radius: var(--radius-box); background: var(--surface); }
+.case-summary p { overflow-wrap: anywhere; }
+summary { min-height: 40px; padding: 8px 0; }
+.case-main details > summary { font-size: 14px; }
+@media (max-width: 480px) {
+  .filters { gap: 12px; }
+  .filters label { min-width: 0; flex: 1 1 140px; }
+  .filters select { width: 100%; }
+  .list-heading { align-items: baseline; }
+}
+.demo-bar > p > a { display: inline-flex; align-items: center; min-height: 40px; }

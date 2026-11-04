@@ -18,7 +18,10 @@ const snapshot = (): Snapshot => {
   if (!s) throw new Error('the demo snapshot (data/snapshot.js) is missing')
   return s
 }
-export const snapshotInfo = (): Snapshot['info'] | null => (globalThis as { DOI_DEMO?: Snapshot }).DOI_DEMO?.info ?? null
+export const snapshotInfo = (): (Snapshot['info'] & { caseCount: number }) | null => {
+  const s = (globalThis as { DOI_DEMO?: Snapshot }).DOI_DEMO
+  return s ? { ...s.info, caseCount: s.cases.length } : null
+}
 
 /** The answer the API would give, from the snapshot; `null` for a change, which the caller refuses. */
 export function staticAnswer(method: string, url: string): { status: number; data: unknown } | null {

@@ -66,7 +66,7 @@ test('TC-REV-02 model reasons and field values containing Markdown images and li
   })
   await signIn(page)
   await page.getByText('Model text test').click()
-  await expect(page.getByRole('heading', { name: 'Classification' })).toBeVisible()
+  await page.getByText('Classification evidence', { exact: true }).click()
   await expect(page.getByText('![pixel](https://evil.example/p.png)', { exact: false })).toBeVisible()
   expect(await page.locator('main img, main a[href*="evil"]').count()).toBe(0)
   await page.waitForTimeout(300)
@@ -76,6 +76,7 @@ test('TC-REV-02 model reasons and field values containing Markdown images and li
 test('TC-RED-09a in the review UI [NAME_n] shows the name; [ACCOUNT_n] never the number; a field holding an account placeholder is void', async ({ page }) => {
   await signIn(page)
   await page.getByText('Model text test').click()
+  await page.getByText('Classification evidence', { exact: true }).click()
   await expect(page.locator('ul.labels')).toContainText('Amelia paid into (account number)')
   await expect(page.locator('dl.fields')).toContainText('Amelia Hart')
   // (the original mail above shows the IBAN by design, R-REV-02; model text never does)
@@ -345,10 +346,11 @@ test('E2E-04 removing a class that lowers the risk needs an approver; risk and r
 
 test('TC-REV-09 wording and display (D8): class floor, subject note, monospace address, no rule ids, removed class, no Reject on an out-of-date draft', async ({ page }) => {
   await signInAs(page, 'rita')
-  await expect(page.locator('button.row .mono', { hasText: 'amelia@hartfamily.example' }).first()).toBeVisible()
+  await expect(page.locator('a.row .mono', { hasText: 'amelia@hartfamily.example' }).first()).toBeVisible()
   await openCase(page, 'New bank details')
-  await expect(page.getByText('Class floor: bank_details → high')).toBeVisible()
-  await expect(page.getByTestId('reply').first()).toContainText("set by the template; the subject of the sender's mail is never repeated")
+  await expect(page.getByText('Class floor: Bank details → high')).toBeVisible()
+  await page.getByText('How replies are prepared', { exact: true }).click()
+  await expect(page.getByText(/Reply subjects use a fixed template/)).toBeVisible()
   // a reviewer cannot lower the risk: the refusal is the plain sentence, without «(C-RSK-3)»
   await page.getByLabel('Set risk').selectOption('low')
   await page.getByRole('button', { name: 'Apply' }).click()
@@ -364,7 +366,7 @@ test('TC-REV-09 wording and display (D8): class floor, subject note, monospace a
   await expect(old).toContainText('Out of date')
   await expect(old.getByRole('button', { name: 'Reject' })).toHaveCount(0)
   const actions = page.locator('ul.actions')
-  await expect(actions).toHaveText('No action needed')
+  await expect(actions.locator('li').first()).toContainText('No action needed')
 })
 
 test('TC-REV-10 display (R-REV-02 v0.7.25, 界面规则 v0.3.4): signals fired or folded, two columns from 1024px, one at 375px, room for the select arrow in both themes', async ({ page }) => {
@@ -385,8 +387,8 @@ test('TC-REV-10 display (R-REV-02 v0.7.25, 界面规则 v0.3.4): signals fired o
   const side = await page.locator('.case-side').boundingBox()
   expect(main!.x + main!.width).toBeLessThanOrEqual(side!.x)
   expect(Math.abs(main!.y - side!.y)).toBeLessThan(2)
-  for (const h of ['Risk', 'Links', 'Reply', 'Check the bank details request']) await expect(page.locator('.case-side').getByRole('heading', { name: h })).toBeVisible()
-  for (const h of ['Message (plain text)', 'Classes']) await expect(page.locator('.case-main').getByRole('heading', { name: h })).toBeVisible()
+  for (const h of ['Risk', 'Related records', 'Reply', 'Check the bank details request']) await expect(page.locator('.case-side').getByRole('heading', { name: h })).toBeVisible()
+  for (const h of ['Message (plain text)', 'Email type']) await expect(page.locator('.case-main').getByRole('heading', { name: h })).toBeVisible()
   // the select arrow keeps its distance from the edge, light and dark
   for (const scheme of ['light', 'dark'] as const) {
     await page.emulateMedia({ colorScheme: scheme })
@@ -421,7 +423,7 @@ test('TC-REV-10 display (R-REV-02 v0.7.25, 界面规则 v0.3.4): signals fired o
   await page.setViewportSize({ width: 375, height: 740 })
   const m = await page.locator('.case-main').boundingBox()
   const s = await page.locator('.case-side').boundingBox()
-  expect(s!.y + s!.height).toBeLessThanOrEqual(m!.y + 1)
+  expect(m!.y + m!.height).toBeLessThanOrEqual(s!.y + 1)
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375)
 })
 
@@ -468,8 +470,8 @@ test('TC-REV-12 / TC-REV-11 E6 detail: hidden text is escaped and masked, low cl
   await expect(hidden).not.toContainText('GB83')
   expect(await hidden.locator('script, img, iframe').count()).toBe(0)
   await expect(page.getByText('IBAN-like text has invalid check digits and was not used.')).toBeVisible()
-  await expect(page.getByText(/possible class legal_documents \(low confidence\)/)).toBeVisible()
-  await expect(page.getByText('legal_documents (low confidence — needs confirmation; counts for risk)', { exact: true })).toBeVisible()
+  await expect(page.getByText(/possible Legal documents \(low confidence\)/)).toBeVisible()
+  await expect(page.getByText('Legal documents (low confidence — needs confirmation; counts for risk)', { exact: true })).toBeVisible()
   const list = (await (await page.request.get('/api/cases')).json()).cases as Array<{ id: string; subject: string }>
   const other = list.find((c) => c.subject === 'Remote content test')!
   await page.evaluate((id) => { location.hash = `case=${id}` }, other.id)
@@ -521,4 +523,18 @@ test('TC-FRD-12 simulated acceptance: a reviewer completes the checklist and an 
   const id = new URLSearchParams((await page.evaluate(() => location.hash)).slice(1)).get('case')!
   const audit = (await control(`/audit?case=${id}`)) as Array<{ type: string; detail: boolean }>
   expect(audit.find((a) => a.type === 'verification.restarted')?.detail).toBe(true)
+})
+
+test('TC-REV-13 live list count describes the capped response, not a total', async ({ page }) => {
+  await signIn(page)
+  await page.route('**/api/cases', async (route) => {
+    const response = await route.fetch()
+    const body = await response.json()
+    const sample = body.cases[0]
+    body.cases = Array.from({ length: 50 }, (_, i) => ({ ...sample, id: `synthetic-${i}`, subject: `Synthetic capped case ${i}` }))
+    await route.fulfill({ response, json: body })
+  })
+  await page.reload()
+  await expect(page.getByRole('status')).toHaveText('50 cases shown')
+  await expect(page.locator('a.row')).toHaveCount(50)
 })

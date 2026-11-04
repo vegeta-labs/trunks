@@ -1,5 +1,41 @@
 # Changelog
 
+## v0.2.2 (2026-11-04): clearer demo boundaries and case review flow
+
+- **Demo guidance:** fictional data and view-only access stay visible. About explains precomputed results and unavailable editing/approval workflows; build metadata is kept for version tracing. Internal evaluation-directory and sample-comparison notes no longer interrupt the public demo.
+- **KYC and verification:** attachment transfer states remain distinct. A recorded transfer no longer suggests that demo removal is still pending; the attachment explains the demo exception and real-deployment limits. Read-only verification checklists no longer ask visitors to tick items.
+- **Inbox navigation:** grouped filters, displayed counts, due-time ordering and warning-signal wording; native Case links and per-history-entry restoration of filters, focus and scroll. Live-service counts describe rows shown rather than claiming a complete total.
+- **Case review:** a short current-result summary precedes email evidence and review panels. Business display names replace internal identifiers in primary content; classification evidence and diagnostic references remain accessible. Incomplete analysis, uncompleted checks, low confidence and risk awaiting confirmation stay explicit.
+- **Validation:** 554 local unit/integration tests passed with 3 environment skips; 22 application and 9 static-demo browser tests passed, plus 3 display-layer mutation checks. Private CI passed application, parser, Compose and coverage checks. Approval/copy safeguards, no-send behavior and shared design tokens are unchanged.
+
+### Evaluation carried forward from v0.2.0
+
+The following held-out results were **measured on v0.2.0**, on a held-out set of 121 emails with Claude Opus 5.5. They are quoted unchanged under the G3 patch-release rule, not a new measurement. Classification, extraction, linking, risk, template selection, reply preparation, runtime configuration and evaluation inputs are unchanged. The enumerated non-UI differences are agent guidance, presentation-only requirements and test-plan documentation, and root package-version metadata. The validator’s consumed PRD field inventory is unchanged; presentation requirements and test-plan additions do not change the business judgement rules, runtime model inputs or metric thresholds. Development evaluation on recorded model replies is required again for this release.
+
+| Metric | Threshold | Result |
+|---|---|---|
+| Classification, macro F1 (¹) | ≥ 0.85 | 0.965 |
+| Fields extracted by rules | 100% | 100% (121/121) |
+| Field recall | ≥ 0.90 | 93.1% (326/350) |
+| Field precision | ≥ 0.90 | 95.2% (320/336) |
+| Fields that should stay empty | ≥ 0.95 | 100% (36/36) |
+| Contact, commitment and deal all linked correctly, samples with one unambiguous answer | ≥ 0.95 | 99.2% (119/120) |
+| Risk never underestimated | 100% | 100% (121/121) |
+| High-risk emails rated high | 100% | 100% (79/79) |
+| Emails annotated as malicious bank-detail changes or look-alike senders rated high | 100% | 100% (25/25) |
+| Replies never disclose more than allowed | 100% | 100% (121/121) |
+| Prompt injection does not change the judgement (vs. a clean twin) | 100% | 100% (15/15) |
+| Risk and template from the rules, given the annotated categories and fields | 100% | 100% (121/121) |
+| Rule consistency against the independent implementation, using actual inputs | 100% | 100% (121/121) |
+
+(¹) Over the categories whose risk floor is not high, excluding `unclassified` and categories with no example. Macro F1 rounded to six decimal places is 0.964884 across 10 eligible categories. High-risk categories are measured by the risk rows. Reported without a threshold: exact end-to-end risk 99.2% (120/121), exact end-to-end reply template 95.9% (116/121). A person still reviews every Case and reply.
+
+The original prerelease failure and subsequent fresh-set PASS remain recorded in the v0.2.0 section. No consumed held-out set is rerun or reused as a new measurement.
+
+### Scope and limits
+
+This release changes product presentation only. Microsoft 365 and Gmail push notifications (Pub/Sub) were tested only against simulated services. Gmail polling was tested on one personal Gmail account. No new production-mail-volume, clean-machine, model or mailbox measurement is claimed.
+
 ## v0.2.1 (2026-11-04): Trunks product branding
 
 - **Product name:** Trunks — Operations Inbox, part of Vegeta. The sign-in screen, review header, browser title, demo navigation and current user documentation use the confirmed product names.
