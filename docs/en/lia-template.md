@@ -1,6 +1,6 @@
 # Legitimate interests assessment (LIA): template
 
-**For the organisation that deploys Deal Ops Inbox**, if it relies on legitimate interests (UK GDPR Article 6(1)(f))
+**For the organisation that deploys Trunks**, if it relies on legitimate interests (UK GDPR Article 6(1)(f))
 for some or all of the processing. The structure follows the three-part test: purpose, necessity and balancing.
 
 - Facts about the **software** are filled in.

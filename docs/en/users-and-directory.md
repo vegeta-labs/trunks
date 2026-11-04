@@ -113,7 +113,7 @@ mind:
 ## 3. Directory
 
 The directory is what the app links emails to: your deals, the commitments of each deal, the bank lines and ledger
-of each deal, and your contacts. You import it as CSV files. Files exported by Deal Ops Toolkit import unchanged, except a file without data rows,
+of each deal, and your contacts. You import it as CSV files. Files exported by Goten — Deal Calculations, the companion browser tool in Vegeta, import unchanged, except a file without data rows,
 which is refused (see below).
 
 - Each import is a **new version** of that list. It replaces the current version of the same kind (for commitments,
@@ -138,9 +138,9 @@ deal's currency, for example `10000.00`, `10,000` or `£10,000.00`.
 |---|---|---|
 | Deals | **`name`** (`deal`, `deal name`), **`currency`** (`ccy`), `close_date` (`planned_close_date`, `planned close`), `reference_prefix` | `currency` must be one of `deployment.currencies`. A name cannot contain `::`. |
 | Contacts | `contact_id` (`id`), **`name`**, **`email`**, `phone`, **`role`**, `deal`, `investor_id`, `authorised_for` | `role` is one of `investor`, `lead`, `company`, `seller`, `adviser`, `other`. `email` and `deal` may hold several values separated by `;`. `investor_id` and `authorised_for` hold commitment keys `<deal name>::<investor_id>`, several separated by `;`; a bare id without the deal name is an error. `phone` is the number on file that verification tasks tell you to call. A `deal` name is not checked against the deals list. |
-| Commitments (per deal) | `investor_id` (`id`), **`name`** (`investor name`, `investor`), `email`, **`reference`** (`payment reference`, `ref`), **`cash_due`** (`cash due`, `amount due`, `expected`), `scheme` | The Deal Ops Toolkit commitments file. |
+| Commitments (per deal) | `investor_id` (`id`), **`name`** (`investor name`, `investor`), `email`, **`reference`** (`payment reference`, `ref`), **`cash_due`** (`cash due`, `amount due`, `expected`), `scheme` | The Goten commitments file. |
 | Bank lines (per deal) | `transaction_id` (`id`, `transaction id`), **`date`** (`value date`, `booking date`), **`amount`** (`credit`, `paid in`), `payer` (`counterparty`, `from`), `reference` (`description`, `narrative`) | Your bank statement export for the deal's account. Shown on Cases only; nothing is changed. |
-| Ledger (per deal) | `transaction_id`, **`date`**, **`amount`**, `payer`, `reference`, **`status`**, `investor_id`, `investor_name`, `decided_by`, `withdrawn_on`, `currency` | The Deal Ops Toolkit reconciliation export, exact column names. Rows with status `auto` or `confirmed` count as received. An empty `currency` means the deal's currency. A negative amount, or two different rows with the same `transaction_id`, is an error. |
+| Ledger (per deal) | `transaction_id`, **`date`**, **`amount`**, `payer`, `reference`, **`status`**, `investor_id`, `investor_name`, `decided_by`, `withdrawn_on`, `currency` | The Goten reconciliation export, exact column names. Rows with status `auto` or `confirmed` count as received. An empty `currency` means the deal's currency. A negative amount, or two different rows with the same `transaction_id`, is an error. |
 
 Without an id column, contacts, commitments and bank lines get a stable id from the file version and the row number.
 A repeated id is an error.

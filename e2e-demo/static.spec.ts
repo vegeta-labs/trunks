@@ -17,8 +17,8 @@ test('TC-DEMO-04 / TC-DEMO-02 static demo: readable under the site CSP, thin bar
   // notes folded into «About this demo» (TC-DEMO-02: still on the page, shown when opened)
   const bar = page.locator('.demo-bar')
   const version = JSON.parse(readFileSync('dist-demo/snapshot-info.json', 'utf8')).version as string
-  await expect(bar.locator('p').first()).toHaveText(`← Deal Ops Inbox · Demo with fictional data · read-only · v${version}`)
-  await expect(page.getByRole('link', { name: '← Deal Ops Inbox' })).toHaveAttribute('href', '/inbox/')
+  await expect(bar.locator('p').first()).toHaveText(`← Trunks · Demo with fictional data · read-only · v${version}`)
+  await expect(page.getByRole('link', { name: '← Trunks' })).toHaveAttribute('href', '/inbox/')
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex')
   const about = bar.locator('details')
   await expect(about.getByText(/Demo: fictional data only/)).toBeHidden()

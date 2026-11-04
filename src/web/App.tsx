@@ -101,7 +101,7 @@ function Login({ onDone }: { onDone: (u: SessionUser) => void }) {
   }
   return (
     <main className="narrow">
-      <h1>Deal Ops Inbox</h1>
+      <h1>Trunks — Operations Inbox</h1>
       <form onSubmit={submit} className="card">
         <label>
           Username
@@ -514,7 +514,7 @@ export function App() {
   }
   if (user === undefined) return <p className="narrow">Loading…</p>
   // the static demo has no sign-in: a snapshot that did not load is said so, never a sign-in form (self-test F4)
-  if (STATIC_DEMO && (user === null || user.mustChangePassword)) return <p className="narrow" role="alert">The demo snapshot could not be loaded. <a href="/inbox/">← Deal Ops Inbox</a></p>
+  if (STATIC_DEMO && (user === null || user.mustChangePassword)) return <p className="narrow" role="alert">The demo snapshot could not be loaded. <a href="/inbox/">← Trunks</a></p>
   if (user === null) return <Login onDone={(u) => setUser(u)} />
   if (user.mustChangePassword) return <ChangePassword onDone={() => setUser({ ...user, mustChangePassword: false })} />
   return (
@@ -524,7 +524,7 @@ export function App() {
         // role or Sign out, since the snapshot has no sign-in
         <div className="demo-bar">
           <p>
-            <a href="/inbox/">← Deal Ops Inbox</a> · Demo with fictional data · read-only · v{snapshotInfo()?.version ?? '?'}
+            <a href="/inbox/">← Trunks</a> · Demo with fictional data · read-only · v{snapshotInfo()?.version ?? '?'}
           </p>
           <details>
             <summary>About this demo</summary>
@@ -534,7 +534,7 @@ export function App() {
       ) : (
         <>
           <header>
-            <strong>Deal Ops Inbox</strong>
+            <strong>Trunks — Operations Inbox</strong>
             <span className="who">
               {user.username} ({user.role}){' '}
               <button className="link" onClick={() => void api('POST', '/api/logout').then(() => setUser(null), (e) => setSignOutError(e instanceof ApiError ? e.message : 'Sign-out failed'))}>Sign out</button>

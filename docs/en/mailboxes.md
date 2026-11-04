@@ -315,7 +315,7 @@ Test-ServicePrincipalAuthorization -Identity '<app-id>' -Resource 'not-designate
 Setting up the scope and the role assignment (example):
 
 ```powershell
-New-ServicePrincipal -AppId '<app-id>' -ObjectId '<enterprise application object id>' -DisplayName 'Deal Ops Inbox'
+New-ServicePrincipal -AppId '<app-id>' -ObjectId '<enterprise application object id>' -DisplayName 'Trunks — Operations Inbox'
 New-ManagementScope -Name 'Deal Ops Inbox mailboxes' -RecipientRestrictionFilter "PrimarySmtpAddress -eq 'legal@capital.example'"
 New-ManagementRoleAssignment -App '<app-id>' -Role 'Application Mail.Read' -CustomResourceScope 'Deal Ops Inbox mailboxes'
 ```

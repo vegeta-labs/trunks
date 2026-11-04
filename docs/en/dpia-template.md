@@ -1,6 +1,6 @@
 # Data protection impact assessment (DPIA): template
 
-**For the organisation that deploys Deal Ops Inbox** (the controller). The structure follows the usual UK GDPR
+**For the organisation that deploys Trunks** (the controller). The structure follows the usual UK GDPR
 DPIA steps.
 
 - Facts about the **software** are filled in. They describe what the software does, as built.
@@ -28,7 +28,7 @@ retention or connect a new outbound target.
 
 ### 2.1 Nature: what the software does
 
-Deal Ops Inbox is self-hosted. It runs on infrastructure you control. The project's authors receive no data, and the
+Trunks is self-hosted. It runs on infrastructure you control. The project's authors receive no data, and the
 software contains no analytics or telemetry.
 
 For each inbound email in the configured mailboxes, the software:

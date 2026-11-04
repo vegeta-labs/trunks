@@ -41,7 +41,7 @@ test('TC-REV-01 / E2E-03 a mail with remote images, scripts and CSS: the page ma
   await page.waitForTimeout(500)
   expect(outside).toEqual([])
   expect(dialogs).toBe(0)
-  expect(await page.title()).toBe('Deal Ops Inbox')
+  expect(await page.title()).toBe('Trunks — Operations Inbox | Vegeta')
 })
 
 test('E2E-06 the case list and the detail are usable at 375px', async ({ page }) => {

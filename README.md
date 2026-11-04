@@ -1,6 +1,6 @@
-# Deal Ops Inbox
+# Trunks — Operations Inbox
 
-An open-source, self-hosted, **read-only** email agent for investment-operations inboxes (SPV, syndicate, small fund and fund-administration teams). For each inbound email it:
+Trunks is part of Vegeta, software for SPV and syndicate operations teams. It is an open-source, self-hosted, **read-only** email agent for investment-operations inboxes. For each inbound email it:
 
 - classifies it and extracts the key facts (amounts, references, dates);
 - links it to the deal, the investor and the contact in your directory;
@@ -38,4 +38,4 @@ The design documents (requirements, technical design, rules and review process, 
 
 ## Licence
 
-Apache-2.0. Part of the [Deal Ops](https://github.com/deal-ops) project. Not affiliated with any platform.
+Apache-2.0. Part of Vegeta ([GitHub](https://github.com/deal-ops)). Not affiliated with any platform.

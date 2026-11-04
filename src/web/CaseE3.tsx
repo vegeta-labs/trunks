@@ -127,7 +127,7 @@ export function E3Panels({ caseId, e3, user, meta, reload }: { caseId: string; e
         <ul className="actions">
           {e3.actions.map((a) => (
             // D8: «none» is the internal name of «nothing to do»; it is not shown beside the text
-            <li key={a.action}>{a.action === 'none' ? 'No action needed' : <>{a.details ?? a.action} <span className="meta mono">{a.action}</span></>}</li>
+            <li key={a.action}>{a.action === 'none' ? 'No action needed' : <>{a.action === 'mark_withdrawn' ? a.details?.replace(' in Deal Ops Toolkit (consent:', ' in Goten — Deal Calculations (consent:') ?? a.action : a.details ?? a.action} <span className="meta mono">{a.action}</span></>}</li>
           ))}
         </ul>
       </Panel>
