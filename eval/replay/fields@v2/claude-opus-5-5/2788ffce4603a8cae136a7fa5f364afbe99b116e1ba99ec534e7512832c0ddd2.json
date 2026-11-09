@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"d53fe8a9-1e34-4665-ba66-c93739f5d35c\",\"confidence\":\"high\",\"quote\":\"{121:d53fe8a9-1e34-4665-ba66-c93739f5d35c}\"},\"amount\":{\"value\":\"GBP9000,00\",\"confidence\":\"medium\",\"quote\":\":32A:261104GBP9000,00\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\":32A:261104GBP9000,00\"},\"value_date\":{\"value\":\"261104\",\"confidence\":\"high\",\"quote\":\":32A:261104GBP9000,00\"},\"payer_name\":{\"value\":\"LUCIA FERNANDEZ\",\"confidence\":\"high\",\"quote\":\"LUCIA FERNANDEZ\"},\"reference\":{\"value\":\"NW-008 FERNANDEZ\",\"confidence\":\"high\",\"quote\":\":70:NW-008 FERNANDEZ\"},\"new_amount\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"party_role\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 1971,
+  "outputTokens": 362
+ }
+}

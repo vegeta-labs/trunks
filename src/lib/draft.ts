@@ -34,10 +34,11 @@ export const DEFAULT_TEMPLATE: Readonly<Record<string, string>> = {
 }
 export const PAYMENT_CLASSES = ['payment_query', 'payment_evidence']
 export const PAYMENT_TEMPLATES = ['payment_need_reference', 'payment_received', 'payment_wait', 'payment_need_evidence']
+export const EVIDENCE_RECEIVED = 'payment_evidence_received' // C-DRF-4 v0.7.28; optional, so a deployment's own template set still loads
 // C-DRF-5 lists; the loader also marks any template that uses a directory or ledger placeholder (C-DRF-1)
-export const DISCLOSES_RECORD = ['payment_received', 'payment_wait', 'payment_need_evidence', 'exit_info', 'withdrawal_ack', 'commitment_change_ack']
+export const DISCLOSES_RECORD = ['payment_received', 'payment_wait', 'payment_need_evidence', EVIDENCE_RECEIVED, 'exit_info', 'withdrawal_ack', 'commitment_change_ack']
 export const ASSERTS_RECEIPT = ['payment_received']
-const DRF5_TEMPLATES = new Set([SAFE_ACK, ...PAYMENT_TEMPLATES, ...Object.values(DEFAULT_TEMPLATE)])
+const DRF5_TEMPLATES = new Set([SAFE_ACK, ...PAYMENT_TEMPLATES, EVIDENCE_RECEIVED, ...Object.values(DEFAULT_TEMPLATE)])
 /** Template ids the configuration must provide. */
 export const REQUIRED_TEMPLATES = [...new Set([SAFE_ACK, NOTIFY_OLD_CONTACT, ...PAYMENT_TEMPLATES, ...Object.values(DEFAULT_TEMPLATE)])]
 
@@ -112,6 +113,7 @@ export interface SelectInput {
   payment: { date: string | null; status: 'ok' | 'unknown' | 'invalid' } | null
   receivedDate: string
   holidays: ReadonlySet<string>
+  evidenceSupportsTracing?: boolean // C-DRF-4 v0.7.28
   mayDisclose: boolean
   templates: ReadonlyMap<string, TemplateMeta>
 }
@@ -130,13 +132,13 @@ export function primaryClass(classes: readonly ClassFloor[], adopted: readonly s
 }
 
 /** C-DRF-4 */
-export function paymentTemplate(i: Pick<SelectInput, 'linkedCommitment' | 'ledger' | 'payment' | 'receivedDate' | 'holidays'>): string {
+export function paymentTemplate(i: Pick<SelectInput, 'linkedCommitment' | 'ledger' | 'payment' | 'receivedDate' | 'holidays' | 'evidenceSupportsTracing' | 'templates'>): string {
   if (!i.linkedCommitment) return 'payment_need_reference'
   if (i.ledger === 'received') return 'payment_received'
-  if (i.ledger !== 'not_received') return 'payment_need_evidence'
   const p = i.payment
-  if (p && p.status === 'ok' && workingDaysAfter({ holidays: i.holidays }, p.date!, i.receivedDate) < 5) return 'payment_wait'
-  return 'payment_need_evidence'
+  if (i.ledger === 'not_received' && p && p.status === 'ok' && workingDaysAfter({ holidays: i.holidays }, p.date!, i.receivedDate) < 5) return 'payment_wait'
+  // C-DRF-4 v0.7.28: do not ask again for a confirmation already attached; only a message that passes every check counts
+  return i.evidenceSupportsTracing === true && i.templates.has(EVIDENCE_RECEIVED) ? EVIDENCE_RECEIVED : 'payment_need_evidence'
 }
 
 export function selectTemplate(i: SelectInput): Selection {
@@ -163,7 +165,7 @@ export function allowedManualTemplates(i: SelectInput): string[] {
     if ((m.asserts || id === 'payment_received') && i.ledger !== 'received') return false
     return true
   }
-  const ofClasses = i.adopted.flatMap((c) => (PAYMENT_CLASSES.includes(c) ? [paymentTemplate(i)] : DEFAULT_TEMPLATE[c] ? [DEFAULT_TEMPLATE[c]!] : []))
+  const ofClasses = i.adopted.flatMap((c) => (PAYMENT_CLASSES.includes(c) ? (paymentTemplate(i) === EVIDENCE_RECEIVED ? [EVIDENCE_RECEIVED, 'payment_need_evidence'] : [paymentTemplate(i)]) : DEFAULT_TEMPLATE[c] ? [DEFAULT_TEMPLATE[c]!] : []))
   // only the C-DRF-5 templates without discloses_record, not anything else a deployment configured (C-DRF-7)
   const generic = [...i.templates.values()].filter((m) => DRF5_TEMPLATES.has(m.id) && !m.discloses).map((m) => m.id)
   return [...new Set([...ofClasses, ...generic])].filter(ok)

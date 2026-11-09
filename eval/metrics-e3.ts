@@ -1,7 +1,7 @@
 // PRD §6 E3 metrics (v0.7.12): rule metrics over the rule-input run, end-to-end safety metrics over the real run,
 // end-to-end exact metrics reported only, linking. The rule-consistency metric comes from the oracle (check_actual.py).
 import Papa from 'papaparse'
-import type { Metric } from './metrics.ts'
+import { canonicalJson, type Metric } from './metrics.ts'
 
 type Level = 'low' | 'medium' | 'high'
 const R: Record<Level, number> = { low: 0, medium: 1, high: 2 }
@@ -63,13 +63,13 @@ const count = <T>(items: T[], ok: (x: T) => boolean | null, label: (x: T) => str
 export function normTyped(v: unknown): unknown {
   if (v === undefined || v === null) return null
   if (typeof v === 'object' && v !== null && 'void' in v) return { void: true }
-  if (typeof v === 'object' && v !== null && 'multiple' in v) return { multiple: [...(v as { multiple: unknown[] }).multiple].map((x) => JSON.stringify(normTyped(x))).sort() }
+  if (typeof v === 'object' && v !== null && 'multiple' in v) return { multiple: [...(v as { multiple: unknown[] }).multiple].map((x) => canonicalJson(normTyped(x))).sort() }
   // enum arrays compare as sets; an empty one is an empty field, as the output writes it (self-review S6)
-  if (Array.isArray(v)) return v.length ? [...new Set(v.map((x) => JSON.stringify(x)))].sort() : null
+  if (Array.isArray(v)) return v.length ? [...new Set(v.map((x) => canonicalJson(x)))].sort() : null
   return v
 }
 
-export const DISCLOSING = ['payment_received', 'payment_wait', 'payment_need_evidence', 'exit_info', 'withdrawal_ack', 'commitment_change_ack']
+export const DISCLOSING = ['payment_received', 'payment_wait', 'payment_need_evidence', 'payment_evidence_received', 'exit_info', 'withdrawal_ack', 'commitment_change_ack']
 // every typed field a rule or an event reads (appendix A), enum arrays included (Codex round 3 F24)
 export const TYPED = ['amount', 'new_amount', 'currency', 'payment_date', 'value_date', 'consent_evidence', 'change_type', 'from_payer', 'to_payer', 'confirms', 'party_role', 'account_last4', 'change_fields', 'document_types', 'deal', 'reference']
 
@@ -184,7 +184,7 @@ export function scoreE3(anns: E3Annotation[], e2e: Map<string, E3Output>, rules:
   const rp = anns.filter((a) => rules.has(a.id)).map((a) => ({ a, o: rules.get(a.id)! }))
   const lab = (p: { a: E3Annotation; o: { risk: string; template: string | null } }) => `${p.a.id} risk ${p.o.risk}/${p.a.expected_risk} template ${p.o.template}/${p.a.draft_template}`
   const set = (xs: string[]) => JSON.stringify([...new Set(xs)].sort())
-  const eq = (x: unknown, y: unknown) => JSON.stringify(normTyped(x)) === JSON.stringify(normTyped(y))
+  const eq = (x: unknown, y: unknown) => canonicalJson(normTyped(x)) === canonicalJson(normTyped(y))
   // Safe aggregate diagnostics: no case IDs, labels, field names or model text. Multiple causes may count one pair.
   // These explain the existing score; they do not relax any PRD §6 comparison or change the pass threshold.
   const diagnostics = { missingTwin: 0, adoptedLabels: 0, lowLabels: 0, risk: 0, template: 0, typedFields: 0 }

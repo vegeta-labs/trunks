@@ -18,9 +18,12 @@ v0.7.13), it also recomputes C-RED-0 for every top-level attachment and
 compares it with the system's `maybe_kyc`; from E6 (test plan §3 v0.7.21)
 with the C-RED-0 ③ inline-signature exception judged from the raw message
 `<eml-dir>/<id>.eml` (default eval/dev) by PRD appendix B, ⓓ from the
-exported parse_status, default thresholds. Prints one line per mismatch
-("<id> risk|template ..." or "<id> attachment <ordinal> maybe_kyc ...") and a
-summary; exits 1 on any mismatch, 2 on a usage error. Written only from the
+exported parse_status, default thresholds. When a file has `f1_input` (test
+plan §3 v0.7.26), it also recomputes C-CLS-4a, the rule labels, the C-RSK-2
+mismatch and the C-DRF-4 step, reading raw XML from the same .eml, and compares
+`rule_labels` as well. Prints one line per mismatch ("<id> risk|template|
+rule_labels ..." or "<id> attachment <ordinal> maybe_kyc ...") and a summary;
+exits 1 on any mismatch, 2 on a usage error. Written only from the
 PRD, the test plan, eval/SCHEMA.md and eval/oracle/BRIEF.md (independent of
 the TypeScript).
 """
@@ -104,10 +107,101 @@ def account_present(a):
     return False
 
 
-def recompute(a, classes, calendar):
+def f1_attachments(f1, eml_path):
+    """The export's attachments with the raw XML read from the .eml (B.1 ordinals)."""
+    out = []
+    for att in f1.get("attachments") or []:
+        item = dict(att, top_level=True)
+        # Test plan §3: in f1_input only `parsed` meets M1; the oracle's own
+        # value for that is `ok`. Every other value stays as it is.
+        if item.get("parse_status") == "parsed":
+            item["parse_status"] = "ok"
+        item["xml"] = None
+        # READING (R-F1-25): the raw file is taken for an attachment whose
+        # type is XML; bytes that are not strict UTF-8 cannot be read, so the
+        # message does not qualify (C.0).
+        if eml_path is not None and O._att_type(att.get("kind"), att.get("filename")) == "xml" and att.get("ordinal") is not None:
+            raw = O.raw_attachment(eml_path, att["ordinal"])
+            try:
+                item["xml"] = raw.decode("utf-8") if raw is not None else None
+            except UnicodeDecodeError:
+                item["xml"] = None
+        out.append(item)
+    return out
+
+
+def _evidence_flags(f1, atts):
+    """(attachment evidence parsed, evidence anywhere): C-CLS-4 and D7."""
+    parsed = False
+    for att in atts:
+        if O.mt103({"text": att.get("text") or ""})["items"]:
+            parsed = True
+        if isinstance(att.get("xml"), str):
+            p = O.pacs008({"xml": att["xml"]})
+            if p.get("parsed") and any(i["minor"] is not None for i in p["items"]):
+                parsed = True
+    # PRD C-CLS-4: «正文» includes the HTML body's text.
+    anywhere = parsed or any(O.mt103({"text": t or ""})["items"] for t in (f1.get("body"), f1.get("body_html")))
+    return parsed, anywhere
+
+
+def _contact_for_exemption(a):
+    """The authenticated contact with `deals`, `investor_ids`, `authorised_for` (test plan §3)."""
+    c = sender_contact(a)
+    if c is None:
+        return None
+    return {"deals": c.get("deals") or [], "investor_ids": c.get("investor_ids") or [], "authorised_for": c.get("authorised_for") or []}
+
+
+def recompute_f1(a, eml_path, calendar):
+    """{exemption, labels, mismatch, tracing} from `f1_input`."""
+    f1 = a["f1_input"]
+    atts = f1_attachments(f1, eml_path)
+    ro = a.get("rule_output") or {}
+    # Test plan §3: each item is {reference, deal}; deal null when not in the directory (E3 then fails).
+    ref_deals = [r["deal"] for r in f1.get("references") or []]
+    # `prior_bank_rule` is false in the first generation these exports describe (BRIEF part 5).
+    common = {"subject": f1.get("subject"), "body": f1.get("body"), "body_html": f1.get("body_html")}
+    ex = O._exemption_detail(dict(common, attachments=atts, currencies=None, signals=a.get("signals") or {},
+                                  dmarc_pass=a.get("dmarc_pass"), sender_contact=_contact_for_exemption(a),
+                                  reference_deals=ref_deals, blocked_or_over_limit=bool(ro.get("blocked_or_over_limit")),
+                                  model_labels=f1.get("model_labels"), prior_bank_rule=False,
+                                  mime_parse_failed=a.get("mime_failed") is True,
+                                  receiving_accounts=f1.get("receiving_accounts") or {}))
+    parsed, anywhere = _evidence_flags(f1, atts)
+    labels = set(O.rule_labels(dict(common, attachment_texts=[{"ordinal": x.get("ordinal"), "text": x.get("text")} for x in atts],
+                                    esign_invite=bool(f1.get("esign_invite")), payment_evidence_parsed=parsed, evidence_anywhere=anywhere,
+                                    exempt_attachment=ex["attachment"], prior_bank_rule=False))["labels"])
+    benes = []
+    for x in atts:
+        r = O.payment_message(dict(x, currencies=None))
+        if r["structured"]:
+            benes.extend(r["beneficiaries"])
+    mismatch = O.beneficiary_mismatch({"structured_beneficiaries": benes, "linked_deal": f1.get("link_deal"),
+                                       "receiving_accounts": f1.get("receiving_accounts") or {},
+                                       "exempted_deal": ex["deal"]})["hit"]
+    if mismatch:
+        labels.add("bank_details")
+    cm = a.get("commitment") or {}
+    recv = O._Cal(calendar).local_date(a["received_at"]).isoformat()
+    tracing = O.evidence_supports_tracing({"attachments": atts, "deal_currency": cm.get("deal_currency"),
+                                           "cash_due_minor": cm.get("cash_due_minor"), "received_at_date": recv,
+                                           "mime_parse_failed": a.get("mime_failed") is True})["ok"]
+    return {"exemption": ex, "labels": labels, "mismatch": mismatch, "tracing": tracing}
+
+
+def recompute(a, classes, calendar, f1=None):
     ro = a.get("rule_output") or {}
     fields = a.get("fields") or {}
     adopted = list(a.get("classes") or [])
+    if f1 is not None:
+        # READING (R-F1-29): adopted = the system's labels without its rule
+        # labels, plus the oracle's rule labels; `unclassified` only when
+        # nothing else is left (C-CLS-2).
+        sys_rule = set(a.get("rule_labels") or [])
+        adopted = [c for c in adopted if c not in sys_rule and c != "unclassified"]
+        adopted = adopted + [c for c in sorted(f1["labels"]) if c not in adopted]
+        adopted = adopted or ["unclassified"]
     # READING (R-E3-26): set B is `amounts_body`, set A is
     # rule_output.amounts_attachment.
     r = O.risk({
@@ -119,6 +213,7 @@ def recompute(a, classes, calendar):
         "pressure_text": None, "pressure_words": pressure_words(a),
         "planned_close_date": a.get("planned_close_date"), "received_at": a["received_at"],
         "calendar": calendar, "adjustment": None,
+        "evidence_beneficiary_mismatch": bool(f1 and f1["mismatch"]),
     })
     links = a.get("links") or {}
     tmpl = O.template({
@@ -128,6 +223,7 @@ def recompute(a, classes, calendar):
         "evidence_value_dates": ro.get("evidence_value_dates") or [],
         "value_date": fields.get("value_date"), "payment_date": fields.get("payment_date"),
         "received_at": a["received_at"], "calendar": calendar,
+        "evidence_supports_tracing": bool(f1 and f1["tracing"]),
     })["template"]
     return r["final"], tmpl
 
@@ -192,8 +288,16 @@ def main(argv):
         a = _load(path)
         sid = a.get("id") or os.path.basename(path).split(".")[0]
         mism = False
+        f1 = None
         try:
-            risk, tmpl = recompute(a, classes, calendar)
+            if a.get("f1_input") is not None:
+                f1 = recompute_f1(a, eml_for(eml_dir, sid), calendar)
+                if f1["labels"] != set(a.get("rule_labels") or []):
+                    print("%s rule_labels system=%s oracle=%s exemption=%s" % (
+                        sid, json.dumps(sorted(a.get("rule_labels") or [])), json.dumps(sorted(f1["labels"])),
+                        json.dumps({k: f1["exemption"][k] for k in ("applied", "deal", "reason")})))
+                    mism = True
+            risk, tmpl = recompute(a, classes, calendar, f1)
         except Exception as e:  # noqa: BLE001 - reported per sample
             print("%s error %s: %s" % (sid, type(e).__name__, e))
             risk = tmpl = None

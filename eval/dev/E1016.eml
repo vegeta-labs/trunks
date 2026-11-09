@@ -1,0 +1,43 @@
+Return-Path: <chen.wei@chenwei-family.example>
+Received: from mail.chenwei-family.example (mail.chenwei-family.example
+ [192.0.2.225]) by mx.ops.example with ESMTPS id e02721f0a6 for
+ <investors@ops.example>; Tue, 20 Oct 2026 16:40:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=chenwei-family.example;
+ dkim=pass header.d=chenwei-family.example;
+ dmarc=pass header.from=chenwei-family.example
+Message-ID: <E1016.f0f4c9656ac2@chenwei-family.example>
+Date: Tue, 20 Oct 2026 16:37:37 +0000
+From: "Chen Wei" <chen.wei@chenwei-family.example>
+To: investors@ops.example
+Subject: Wire confirmation NW-009
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="===============16151915906064250057=="
+
+--===============16151915906064250057==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+Attached is the wire confirmation for my Northwind subscription, reference =
+NW-009 (=C2=A330,000.00).
+
+Thanks,
+Chen Wei
+
+--===============16151915906064250057==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="wire_confirmation.txt"
+
+ezM6ezEyMTphY2U2NTJhNS05NTlhLTRmMzYtOTc0ZS1hZDc2ZmIzNGQ0NDB9fQ0KezQ6DQo6MjA6
+Q1dGLVBNVC0xMDE5Qg0KOjIzQjpDUkVEDQo6MzJBOjI2MTAxOUdCUDMwMDAwLDAwDQo6NTBLOi9H
+QjMwUVpCSzIyNTQ0MDcyNTQyNjI1DQpDSEVOIFdFSQ0KOjU5Oi9HQjQ2UVpCSzc4NjA3MjIyNTc4
+ODM4DQpOT1JUSFdJTkQgUk9CT1RJQ1MgU1BWIExQDQo6NzA6TlctMDA5IENIRU4NCjo3MUE6U0hB
+DQotfQ0K
+
+--===============16151915906064250057==--

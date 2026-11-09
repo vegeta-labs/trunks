@@ -1,0 +1,58 @@
+Return-Path: <m.vogel@vogel-familie.example>
+Received: from mail.vogel-familie.example (mail.vogel-familie.example
+ [192.0.2.23]) by mx.ops.example with ESMTPS id 16b342aa44 for
+ <investors@ops.example>; Tue, 03 Nov 2026 10:50:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=vogel-familie.example;
+ dkim=pass header.d=vogel-familie.example;
+ dmarc=pass header.from=vogel-familie.example
+Message-ID: <E1017.7f4d4235a130@vogel-familie.example>
+Date: Tue, 03 Nov 2026 10:47:09 +0000
+From: "Matthias Vogel" <m.vogel@vogel-familie.example>
+To: investors@ops.example
+Subject: Remittance advice SB-003
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============1635724388726689090=="
+
+--===============1635724388726689090==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Please find the remittance advice attached for the balance of my Solent com=
+mitment (SB-003).
+
+Mit freundlichen Gr=C3=BC=C3=9Fen
+Matthias Vogel
+
+--===============1635724388726689090==
+Content-Type: application/xml
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="pacs008_vogel.xml"
+
+PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPERvY3VtZW50IHhtbG5zPSJ1
+cm46aXNvOnN0ZDppc286MjAwMjI6dGVjaDp4c2Q6cGFjcy4wMDguMDAxLjA4Ij4KICA8RklUb0ZJ
+Q3N0bXJDZHRUcmY+CiAgICA8R3JwSGRyPgogICAgICA8TXNnSWQ+UVpCSy1NU0ctVkdMLTEwMjY8
+L01zZ0lkPgogICAgICA8Q3JlRHRUbT4yMDI2LTEwLTI2VDA4OjEyOjQ0WjwvQ3JlRHRUbT4KICAg
+ICAgPE5iT2ZUeHM+MTwvTmJPZlR4cz4KICAgICAgPFN0dGxtSW5mPgogICAgICAgIDxTdHRsbU10
+ZD5DTFJHPC9TdHRsbU10ZD4KICAgICAgPC9TdHRsbUluZj4KICAgIDwvR3JwSGRyPgogICAgPENk
+dFRyZlR4SW5mPgogICAgICA8UG10SWQ+CiAgICAgICAgPEluc3RySWQ+SU5TVFItMTwvSW5zdHJJ
+ZD4KICAgICAgICA8RW5kVG9FbmRJZD5WT0dFTC1TQi0yPC9FbmRUb0VuZElkPgogICAgICAgIDxV
+RVRSPmIyOGJhMzM0LWZjNDYtNDk0NC05NzU0LTg2NTkxZDljZTJhZDwvVUVUUj4KICAgICAgPC9Q
+bXRJZD4KICAgICAgPEludHJCa1N0dGxtQW10IENjeT0iRVVSIj4xMDAwMC4wMDwvSW50ckJrU3R0
+bG1BbXQ+CiAgICAgIDxJbnRyQmtTdHRsbUR0PjIwMjYtMTAtMjY8L0ludHJCa1N0dGxtRHQ+CiAg
+ICAgIDxDaHJnQnI+U0hBUjwvQ2hyZ0JyPgogICAgICA8RGJ0cj48Tm0+TUFUVEhJQVMgVk9HRUw8
+L05tPjwvRGJ0cj4KICAgICAgPERidHJBY2N0PjxJZD48SUJBTj5ERTg2UVpCSzI4MjY3NTUxNTE2
+NTkyPC9JQkFOPjwvSWQ+PC9EYnRyQWNjdD4KICAgICAgPERidHJBZ3Q+PEZpbkluc3RuSWQ+PEJJ
+Q0ZJPlFaQktHQjJMWFhYPC9CSUNGST48L0Zpbkluc3RuSWQ+PC9EYnRyQWd0PgogICAgICA8Q2R0
+ckFndD48RmluSW5zdG5JZD48QklDRkk+UVpCS0dCMkxYWFg8L0JJQ0ZJPjwvRmluSW5zdG5JZD48
+L0NkdHJBZ3Q+CiAgICAgIDxDZHRyPjxObT5TT0xFTlQgQklPVEhFUkFQRVVUSUNTIFNQVjwvTm0+
+PC9DZHRyPgogICAgICA8Q2R0ckFjY3Q+PElkPjxJQkFOPkdCMzlRWkJLNzA0MDQ4MDA2NzQ0NTA8
+L0lCQU4+PC9JZD48L0NkdHJBY2N0PgogICAgICA8Um10SW5mPjxVc3RyZD5TQi0wMDMgQkFMQU5D
+RTwvVXN0cmQ+PC9SbXRJbmY+CiAgICA8L0NkdFRyZlR4SW5mPgogIDwvRklUb0ZJQ3N0bXJDZHRU
+cmY+CjwvRG9jdW1lbnQ+Cg==
+
+--===============1635724388726689090==--

@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"payment_evidence\",\"confidence\":\"high\",\"reason\":\"MT103 attached showing GBP 9,000 payment to Northwind Robotics SPV with reference NW-008.\"},{\"class\":\"commitment_change\",\"confidence\":\"medium\",\"reason\":\"Investor says they overpaid and asks for the excess to be refunded, effectively adjusting the paid amount versus commitment.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2304,
+  "outputTokens": 142
+ }
+}

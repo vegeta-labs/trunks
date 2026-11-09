@@ -1,0 +1,55 @@
+Return-Path: <pieter@vandijk-mail.example>
+Received: from mail.vandijk-mail.example (mail.vandijk-mail.example
+ [192.0.2.30]) by mx.ops.example with ESMTPS id 1d55a63aa4 for
+ <investors@ops.example>; Mon, 09 Nov 2026 11:35:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=vandijk-mail.example;
+ dkim=pass header.d=vandijk-mail.example;
+ dmarc=pass header.from=vandijk-mail.example
+Message-ID: <E1027.f3d6f4ee1f5f@vandijk-mail.example>
+Date: Mon, 09 Nov 2026 11:32:51 +0000
+From: "Pieter van Dijk" <pieter@vandijk-mail.example>
+To: investors@ops.example
+Subject: Solent SB-005 pacs.008
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============2113778370926073588=="
+
+--===============2113778370926073588==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Attached is the pacs.008 for my Solent subscription.
+
+Pieter van Dijk
+
+--===============2113778370926073588==
+Content-Type: application/xml
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="pacs008_vandijk.xml"
+
+PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPERvY3VtZW50IHhtbG5zPSJ1
+cm46aXNvOnN0ZDppc286MjAwMjI6dGVjaDp4c2Q6cGFjcy4wMDguMDAxLjA4Ij4KICA8RklUb0ZJ
+Q3N0bXJDZHRUcmY+CiAgICA8R3JwSGRyPgogICAgICA8TXNnSWQ+UVpCSy1NU0ctVkRLLTExMDY8
+L01zZ0lkPgogICAgICA8Q3JlRHRUbT4yMDI2LTExLTA2VDA4OjEyOjQ0WjwvQ3JlRHRUbT4KICAg
+ICAgPE5iT2ZUeHM+MTwvTmJPZlR4cz4KICAgICAgPFN0dGxtSW5mPgogICAgICAgIDxTdHRsbU10
+ZD5DTFJHPC9TdHRsbU10ZD4KICAgICAgPC9TdHRsbUluZj4KICAgIDwvR3JwSGRyPgogICAgPENk
+dFRyZlR4SW5mPgogICAgICA8UG10SWQ+CiAgICAgICAgPEluc3RySWQ+SU5TVFItMTwvSW5zdHJJ
+ZD4KICAgICAgICA8RW5kVG9FbmRJZD5WQU5ESUpLLVNCLTE8L0VuZFRvRW5kSWQ+CiAgICAgICAg
+PFVFVFI+MGQ4ZTI3ZjctNzEwNS00ZWY2LWEzNWMtM2Q5N2JhNDZlYWUzPC9VRVRSPgogICAgICA8
+L1BtdElkPgogICAgICA8SW50ckJrU3R0bG1BbXQgQ2N5PSJFVVIiPjMwMDAwLjAwPC9JbnRyQmtT
+dHRsbUFtdD4KICAgICAgPEludHJCa1N0dGxtRHQ+MjAyNi0xMS0wNjwvSW50ckJrU3R0bG1EdD4K
+ICAgICAgPENocmdCcj5TSEFSPC9DaHJnQnI+CiAgICAgIDxEYnRyPjxObT5QSUVURVIgVkFOIERJ
+Sks8L05tPjwvRGJ0cj4KICAgICAgPERidHJBZ3Q+PEZpbkluc3RuSWQ+PEJJQ0ZJPlFaQktHQjJM
+WFhYPC9CSUNGST48L0Zpbkluc3RuSWQ+PC9EYnRyQWd0PgogICAgICA8Q2R0ckFndD48RmluSW5z
+dG5JZD48QklDRkk+UVpCS0dCMkxYWFg8L0JJQ0ZJPjwvRmluSW5zdG5JZD48L0NkdHJBZ3Q+CiAg
+ICAgIDxDZHRyPjxObT5TT0xFTlQgQklPVEhFUkFQRVVUSUNTIFNQVjwvTm0+PC9DZHRyPgogICAg
+ICA8Q2R0ckFjY3Q+PElkPjxJQkFOPkdCMzlRWkJLNzA0MDQ4MDA2NzQ0NTA8L0lCQU4+PC9JZD48
+L0NkdHJBY2N0PgogICAgICA8Um10SW5mPjxVc3RyZD5TQi0wMDUgTkVYVCBUUkFOQ0hFIFRPIE5M
+MTdRWkJLNjM0MTI0MTU2ODwvVXN0cmQ+PC9SbXRJbmY+CiAgICA8L0NkdFRyZlR4SW5mPgogIDwv
+RklUb0ZJQ3N0bXJDZHRUcmY+CjwvRG9jdW1lbnQ+Cg==
+
+--===============2113778370926073588==--

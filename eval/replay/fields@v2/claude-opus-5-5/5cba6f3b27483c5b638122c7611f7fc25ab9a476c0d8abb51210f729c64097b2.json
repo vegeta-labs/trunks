@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"change_requested\":{\"value\":false,\"confidence\":\"medium\",\"quote\":\"Please refund the overpayment to the sender shown on the attached MT103.\"}}}",
+ "usage": {
+  "inputTokens": 1599,
+  "outputTokens": 59
+ }
+}

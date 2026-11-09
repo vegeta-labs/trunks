@@ -1,0 +1,41 @@
+Return-Path: <wang.fang@wangfang-home.example>
+Received: from mail.wangfang-home.example (mail.wangfang-home.example
+ [192.0.2.83]) by mx.ops.example with ESMTPS id 52e605a541 for
+ <investors@ops.example>; Thu, 05 Nov 2026 08:45:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=wangfang-home.example;
+ dkim=pass header.d=wangfang-home.example;
+ dmarc=pass header.from=wangfang-home.example
+Message-ID: <E1022.3cec3b0edd3a@wangfang-home.example>
+Date: Thu, 05 Nov 2026 08:42:18 +0000
+From: "Wang Fang" <wang.fang@wangfang-home.example>
+To: investors@ops.example
+Subject: Solent SB-006 MT103
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============5973468163075796027=="
+
+--===============5973468163075796027==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+=E4=BD=A0=E5=A5=BD=EF=BC=8C
+
+=E4=BB=A5=E5=90=8E=E8=AF=B7=E4=BB=98=E5=88=B0=E9=99=84=E4=BB=B6=E9=87=8C=E7=
+=9A=84=E8=BF=99=E4=B8=AA=E8=B4=A6=E6=88=B7=E3=80=82
+
+Wang Fang
+
+--===============5973468163075796027==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Wang.txt"
+
+ezM6ezEyMToxMGNhOGYzOC1mZmIzLTRhOWYtYTc1MS1hZDUxNDBkMTExNjl9fQ0KezQ6DQo6MjA6
+V0ZHLVBNVC0xMTA0DQo6MjNCOkNSRUQNCjozMkE6MjYxMTA0RVVSMjUwMDAsMDANCjo1MEs6L0dC
+NjRRWkJLNTAzNDAxMjkzMjUxNDENCldBTkcgRkFORw0KOjU5Oi9HQjM5UVpCSzcwNDA0ODAwNjc0
+NDUwDQpTT0xFTlQgQklPVEhFUkFQRVVUSUNTIFNQVg0KOjcwOlNCLTAwNiBXQU5HDQo6NzFBOlNI
+QQ0KLX0NCg==
+
+--===============5973468163075796027==--

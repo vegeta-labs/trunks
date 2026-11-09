@@ -1,0 +1,45 @@
+Return-Path: <chen.wei@chenwei-family.example>
+Received: from mail.chenwei-family.example (mail.chenwei-family.example [192.0.2.15])
+ by mx.ops.example with ESMTPS id ba142d42e7 for <investors@ops.example>;
+ Wed, 21 Oct 2026 09:15:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=chenwei-family.example;
+ dkim=pass header.d=chenwei-family.example;
+ dmarc=pass header.from=chenwei-family.example
+Message-ID: <E1044.891431ee5107@chenwei-family.example>
+Date: Wed, 21 Oct 2026 09:12:30 +0000
+From: "Chen Wei" <chen.wei@chenwei-family.example>
+To: investors@ops.example
+Subject: =?utf-8?b?TlctMDA5IOS7mOasvuehruiupCBNVDEwMw==?=
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============7494773369199205473=="
+
+--===============7494773369199205473==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+=E6=82=A8=E5=A5=BD=EF=BC=8C
+
+=E9=99=84=E4=BB=B6=E6=98=AF=E6=88=91=E4=B8=BA Northwind Robotics =E8=AE=A4=
+=E8=B4=AD=E4=BB=98=E6=AC=BE=E7=9A=84 MT103 (=E5=A4=87=E6=B3=A8=E5=8F=B7 NW-=
+009)=EF=BC=8C=E6=AC=BE=E9=A1=B9=E5=B7=B2=E4=BA=8E10=E6=9C=8819=E6=97=A5=E4=
+=BB=8E=E6=88=91=E7=9A=84=E9=93=B6=E8=A1=8C=E6=B1=87=E5=87=BA=E3=80=82=E8=AF=
+=B7=E6=9F=A5=E6=94=B6=E3=80=82
+
+=E8=B0=A2=E8=B0=A2=EF=BC=81
+Chen Wei
+
+--===============7494773369199205473==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_ChenWei.txt"
+
+ezM6ezEyMTo4NGUwZGViNi1mOWU4LTQ4Y2MtYWQyOS0wNmYwOWZjOWVjMDd9fQ0KezQ6DQo6MjA6
+Q1dFLU5XLTEwMTkNCjoyM0I6Q1JFRA0KOjMyQToyNjEwMTlHQlAzMDAwMCwwMA0KOjUwSzovR0Iz
+MlFaQksxNjc3NjkzMDE5MTE1Mw0KQ0hFTiBXRUkNCk1BTkNIRVNURVINCjo1OTovR0I0MVFaQks3
+OTEzNzIxMTk4MTMxMg0KTk9SVEhXSU5EIFJPQk9USUNTIFNQViBMUA0KOjcwOk5XLTAwOSBDSEVO
+IFdFSQ0KOjcxQTpTSEENCi19DQo=
+
+--===============7494773369199205473==--

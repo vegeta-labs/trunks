@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"8491500e-e51e-4285-aa6d-ff9a4300309e\",\"confidence\":\"high\",\"quote\":\"{121:8491500e-e51e-4285-aa6d-ff9a4300309e}\"},\"amount\":{\"value\":\"GBP9000,00\",\"confidence\":\"high\",\"quote\":\":32A:261105GBP9000,00\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\":32A:261105GBP9000,00\"},\"value_date\":{\"value\":\"261105\",\"confidence\":\"high\",\"quote\":\":32A:261105GBP9000,00\"},\"payer_name\":{\"value\":\"[NAME_1] KWAME [NAME_2]\",\"confidence\":\"high\",\"quote\":\":50K:[NAME_1] KWAME [NAME_2]\"},\"reference\":{\"value\":\"NW-016 BALANCE\",\"confidence\":\"high\",\"quote\":\":70:NW-016 BALANCE\"},\"party_role\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"change_requested\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 1964,
+  "outputTokens": 364
+ }
+}

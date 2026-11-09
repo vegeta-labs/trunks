@@ -1,0 +1,73 @@
+{
+  "id": "E1048",
+  "family": "F122",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-12T11:05:00Z",
+  "prior_messages": [],
+  "description": "Reply to an ops reminder with the quoted reminder; the investor sends the MT103 for the rest of the commitment -> payment_evidence only, medium, payment_evidence_received.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "873bd569-9da3-4afd-b4de-883eecf3434d",
+    "amount": {
+      "minor": 500000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-11-02",
+    "payer_name": "LUCIA FERNANDEZ",
+    "reference": "NW-008"
+  },
+  "rule_output": {
+    "uetrs": [
+      "873bd569-9da3-4afd-b4de-883eecf3434d"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 500000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-008"
+    ],
+    "account_last4": [
+      "6388",
+      "8838"
+    ],
+    "evidence_value_dates": [
+      "2026-11-02"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C008",
+    "investor_id": "Northwind Robotics::008",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0006"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_evidence_received",
+  "notes": "Quoted reminder and reply both have only £5,000.00, the :32A: amount, so no amount mismatch and one amount value. Ledger T-NW-0006 2,500 of 7,500 -> not received in full. Value date Mon 2026-11-02, received Thu 2026-11-12: 3,4,5,6,9,10,11,12 Nov = 8 working days >= 5; one M1/M2 MT103, one {121:}, GBP, 5,000 <= cash due 7,500 -> payment_evidence_received. C-LNK-4: T-NW-0006 by reference \"NW-008 part 1\". Close date 2026-11-20 is 6 working days after receipt (> 3). The reminder is an ops mail, not in prior_messages (the deployment did not receive it). :50K: name written without accent."
+}

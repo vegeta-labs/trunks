@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"49d21e30-edfd-4808-bc62-af768cef47d9\",\"confidence\":\"high\",\"quote\":\"{121:49d21e30-edfd-4808-bc62-af768cef47d9}\"},\"amount\":{\"value\":\"£5,000.00\",\"confidence\":\"high\",\"quote\":\"The £5,000.00 (reference NW-003) was sent on 9 November\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\":32A:261109GBP5000,00\"},\"value_date\":{\"value\":\"261109\",\"confidence\":\"high\",\"quote\":\":32A:261109GBP5000,00\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\":50K:/[ACCOUNT_1]\\n[NAME_1] [NAME_2]\"},\"reference\":{\"value\":{\"candidates\":[{\"value\":\"NW-003\",\"quote\":\"The £5,000.00 (reference NW-003)\"},{\"value\":\"NW-003 [NAME_2]\",\"quote\":\":70:NW-003 [NAME_2]\"}]},\"confidence\":\"medium\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 1933,
+  "outputTokens": 386
+ }
+}

@@ -24,6 +24,16 @@ export interface SystemOutput {
   fields: Record<string, SystemField>
 }
 
+/** JSON with object keys in sorted order: PRD §6 compares by value, so `{currency, minor}` equals `{minor, currency}`. */
+export function canonicalJson(v: unknown): string {
+  if (Array.isArray(v)) return `[${v.map((x) => (x === undefined ? 'null' : canonicalJson(x))).join(',')}]`
+  if (typeof v === 'object' && v !== null) {
+    const o = v as Record<string, unknown>
+    return `{${Object.keys(o).filter((k) => o[k] !== undefined).sort().map((k) => `${JSON.stringify(k)}:${canonicalJson(o[k])}`).join(',')}}`
+  }
+  return JSON.stringify(v) ?? 'null'
+}
+
 // PRD §6 comparison: money by minor units and currency, dates by ISO, enums by value, arrays as sets, text NFKC + lower case + collapsed white space
 export function key(v: unknown): string {
   if (v === null || v === undefined) return 'null'
@@ -31,11 +41,11 @@ export function key(v: unknown): string {
   if (typeof v === 'boolean') return `b:${v}`
   if (Array.isArray(v)) return `a:${JSON.stringify([...new Set(v.map(key))].sort())}`
   if (typeof v === 'object' && 'minor' in v && 'currency' in v) return `m:${(v as { minor: number }).minor}:${(v as { currency: string }).currency}`
-  return `j:${JSON.stringify(v)}`
+  return `j:${canonicalJson(v)}`
 }
 const keySet = (vs: unknown[]) => JSON.stringify([...new Set(vs.map(key))].sort())
 // rule output «逐项相等» (PRD §6): exact values, lists as sets — no case or white-space folding (EV-F4)
-const exactSet = (vs: unknown[]) => JSON.stringify([...new Set(vs.map((v) => JSON.stringify(v)))].sort())
+export const exactSet = (vs: unknown[]) => JSON.stringify([...new Set(vs.map((v) => canonicalJson(v)))].sort())
 
 const isMultiple = (v: AnnValue): v is { multiple: AnnValue[] } => typeof v === 'object' && v !== null && !Array.isArray(v) && 'multiple' in v
 const isVoid = (v: AnnValue): v is { void: string } => typeof v === 'object' && v !== null && !Array.isArray(v) && 'void' in v

@@ -1,0 +1,45 @@
+Return-Path: <office@nordhaven-fo.example>
+Received: from mail.nordhaven-fo.example (mail.nordhaven-fo.example [192.0.2.82])
+ by mx.ops.example with ESMTPS id 8e4797e9b8 for <investors@ops.example>;
+ Mon, 19 Oct 2026 13:35:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=nordhaven-fo.example;
+ dkim=pass header.d=nordhaven-fo.example;
+ dmarc=pass header.from=nordhaven-fo.example
+Message-ID: <E1045.855df76c2806@nordhaven-fo.example>
+Date: Mon, 19 Oct 2026 13:32:30 +0000
+From: "Nordhaven Family Office Ltd" <office@nordhaven-fo.example>
+To: investors@ops.example
+Subject: SB-007 MT103
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============4443820030341257681=="
+
+--===============4443820030341257681==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Please find attached the MT103 for our Solent Biotherapeutics subscription,=
+ reference SB-007, EUR 150,000.00. The ordering party shown is Nordhaven Fa=
+mily Office Limited, which is us: our full registered name is a little long=
+er than the one on your list.
+
+Regards,
+Nordhaven Family Office
+
+--===============4443820030341257681==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Nordhaven_SB007.txt"
+
+ezI6STEwM1FaQktHQjJMWFhYWE59ezM6ezEyMToyNzFkMTM3ZS04NDNmLTRjOWQtYjI2ZS0zODBi
+MGM0YzQ5ZmJ9fQ0KezQ6DQo6MjA6TkZPLVNCNy0xMDEzDQo6MjNCOkNSRUQNCjozMkE6MjYxMDEz
+RVVSMTUwMDAwLDAwDQo6NTBLOi9HQjg0UVpCSzMyMzU2OTYzNzcwNzQxDQpOT1JESEFWRU4gRkFN
+SUxZIE9GRklDRSBMSU1JVEVEDQpFRElOQlVSR0gNCjo1OTovR0IzOVFaQks3MDQwNDgwMDY3NDQ1
+MA0KU09MRU5UIEJJT1RIRVJBUEVVVElDUyBTUFYNCjo3MDpTQi0wMDcgTk9SREhBVkVODQo6NzFB
+OlNIQQ0KLX0NCg==
+
+--===============4443820030341257681==--

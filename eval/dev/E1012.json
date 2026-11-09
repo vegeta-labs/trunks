@@ -1,0 +1,73 @@
+{
+  "id": "E1012",
+  "family": "F086",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-21T10:05:00Z",
+  "prior_messages": [],
+  "description": "C-CLS-4a exempt: TXT MT103 with :50K:/IBAN and :59:/listed IBAN, ledger received in full -> payment_evidence only, medium, payment_received. Public demo candidate.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "f3125ca9-ff84-4e9e-ac8b-6334aa31ed6f",
+    "amount": {
+      "minor": 1000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-10-20",
+    "payer_name": "AMELIA HART",
+    "reference": "NW-001"
+  },
+  "rule_output": {
+    "uetrs": [
+      "f3125ca9-ff84-4e9e-ac8b-6334aa31ed6f"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-001"
+    ],
+    "account_last4": [
+      "1312",
+      "2012"
+    ],
+    "evidence_value_dates": [
+      "2026-10-20"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C001",
+    "investor_id": "Northwind Robotics::001",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0001"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_received",
+  "notes": "BEST PUBLIC DEMO SAMPLE (normal, no prior_messages, MT103 with both IBANs, beneficiary on the Northwind list, ledger T-NW-0001 received in full). Fictional IBANs with valid mod-97. M1-M5 and E1-E6 hold; both account shapes are the whole value of an account position. Body amount equals :32A: so no mismatch. Close date 2026-11-20 is 22 working days away, no pressure words. account_last4 stays in rule_output because C-EXT-4 extraction does not depend on the exception (QUESTIONS F1-6). Demo-mode caveat: QUESTIONS F1-8."
+}

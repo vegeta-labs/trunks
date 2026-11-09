@@ -1,0 +1,68 @@
+{
+  "id": "E1034",
+  "family": "F108",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-03T09:35:00Z",
+  "prior_messages": [],
+  "description": "D7 negative: 后续 is on C.5 but not C.6; the MT103 has no account, so there is no label -> payment_evidence, medium, payment_wait.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "7e01c5f0-93e8-44c2-9ff2-003c4dcc6a38",
+    "amount": {
+      "minor": 2500000,
+      "currency": "EUR"
+    },
+    "currency": "EUR",
+    "value_date": "2026-11-02",
+    "payer_name": "WANG FANG",
+    "reference": "SB-006"
+  },
+  "rule_output": {
+    "uetrs": [
+      "7e01c5f0-93e8-44c2-9ff2-003c4dcc6a38"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 2500000,
+        "currency": "EUR"
+      }
+    ],
+    "references": [
+      "SB-006"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": [
+      "2026-11-02"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C024",
+    "investor_id": "Solent Biotherapeutics::006",
+    "deal": "Solent Biotherapeutics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_wait",
+  "notes": "后续 only cancels an exemption, and with no account shape there is nothing to exempt (C.0). Ledger shows nothing; value date Mon 2026-11-02, received Tue 2026-11-03: 1 working day."
+}

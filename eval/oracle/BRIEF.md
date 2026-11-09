@@ -112,3 +112,28 @@ Extend `selfcheck.py` with every concrete example in TC-RED-11 (build the `.eml`
 
 ## Done when
 `python3 eval/oracle/selfcheck.py` passes and `check_actual.py` handles the new check; report back a short summary and the list of new readings.
+
+# Oracle brief, part 5 (F1)
+
+Same rules as above: read **only** `docs/01_PRD.md` (v0.7.28), `docs/04_TEST_PLAN.md` (v0.7.26), `eval/SCHEMA.md`, this file, the existing files in `eval/oracle/` and the sample files `eval/dev/<id>.eml` and `.json`. Never `src/`, `parser/`, `scripts/`, `eval/*.ts`, `docs/review/`, the holdout or `.env*`.
+
+## Goal
+Independent Python reference for PRD C-CLS-4, C-CLS-4a and appendix C, C-RSK-2 `evidence_beneficiary_mismatch`, C-RED-1's structural accounts, C-DRF-4's new step, C-OUT-3's new action, C-DIR-1a.
+
+## Functions (add to the CLI)
+32. `payment_message` `{kind, parse_status, top_level: bool, text, xml: str|null, currencies}` → `{structured: bool, payers: [str], beneficiaries: [str], problem: "M2"|"M3"|"M4"|null}` (M1–M4, appendix C.0–C.2, C.4). `xml` is the raw file for a pacs.008; you parse it yourself with the standard library, without reading a DTD.
+33. `redirect_wording` `{text}` → `{hit: bool}` (C.5). 34. `explicit_redirect` `{text}` → `{hit: bool}` (C.6).
+35. `evidence_exemption` `{subject, body, body_html, attachments: [{kind, parse_status, filename, text, xml, maybe_kyc}], currencies, signals, dmarc_pass, sender_contact: {deals, investor_ids, authorised_for}|null, reference_deals: [str], blocked_or_over_limit, model_labels: [str]|null, prior_bank_rule, receiving_accounts: {deal: [str]}}` → `{applied: bool, deal: str|null, reason: "M2"|"M3"|"M4"|"M5"|"E2"|"E3"|"E4"|"E5"|"E6"|null}`. Reason = the failed condition; the order of checks is not part of the rule, so compare `applied` strictly and report `reason` only for reading.
+36. `rule_labels` `{subject, body, body_html, attachment_texts, esign_invite, payment_evidence_parsed, evidence_anywhere, exempt_attachment: int|null, prior_bank_rule}` → `{labels: [str]}` (C-CLS-4 plus C-CLS-4a).
+37. `beneficiary_mismatch` `{structured_beneficiaries: [str], linked_deal: str|null, receiving_accounts, exempted_deal: str|null}` → `{hit: bool}` (C-RSK-2).
+38. `evidence_supports_tracing` `{attachments, currencies, deal_currency, cash_due_minor, received_at_date}` → `{ok: bool}` (C-DRF-4). Extend `template` with this input, and `actions` with `check_payment_evidence`.
+39. Extend `redact` with C-RED-1's structural accounts (a `pacs_accounts` input gives the positions for pacs.008, or derive them from the raw XML).
+
+## Consistency check
+Extend `check_actual.py`: when an `<id>.actual.json` has `f1_input` (format in test plan §3 v0.7.26), recompute `evidence_exemption`, `rule_labels`, the mismatch and the template using `eval/dev/<id>.eml` for raw XML, and report each difference from `rule_labels`, `risk` and `template` with the sample id. `prior_bank_rule` is false in the first generation these exports describe.
+
+## Self-check
+Extend `selfcheck.py` with every concrete example in TC-CLS-10 to TC-CLS-18, TC-RED-13, TC-DIR-10, TC-DRF-21.
+
+## Done when
+`python3 eval/oracle/selfcheck.py` passes and `check_actual.py` handles files with and without `f1_input`; list your new readings in `eval/oracle/READINGS.md`. Report back a short summary, the readings, and every place the PRD was ambiguous or contradicted a test case. Do not resolve those silently.

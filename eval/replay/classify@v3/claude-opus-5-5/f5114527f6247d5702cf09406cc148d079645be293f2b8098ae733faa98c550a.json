@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"bank_details\",\"confidence\":\"high\",\"reason\":\"Investor asks to change the bank account held for them to the payer account on the MT103.\"},{\"class\":\"payment_evidence\",\"confidence\":\"high\",\"reason\":\"An MT103 payment confirmation of GBP 20,000 to Northwind Robotics SPV with reference NW-006 is attached.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2306,
+  "outputTokens": 131
+ }
+}

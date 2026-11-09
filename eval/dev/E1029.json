@@ -1,0 +1,80 @@
+{
+  "id": "E1029",
+  "family": "F103",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-10T15:25:00Z",
+  "prior_messages": [],
+  "description": "\"remitting to\" wording: a remit word outside the C.5 carve-outs -> exemption cancelled, bank_details, high, safe_ack.",
+  "classes": [
+    "payment_evidence",
+    "bank_details"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "bank_change",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "cc08641f-8270-474d-8be3-d3f1c9364d00",
+    "amount": {
+      "minor": 600000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-11-09",
+    "payer_name": "HANNAH KOWALCZYK",
+    "reference": "NW-013",
+    "party_role": "other",
+    "change_requested": true,
+    "account_last4": {
+      "multiple": [
+        "2254",
+        "8838"
+      ]
+    }
+  },
+  "rule_output": {
+    "uetrs": [
+      "cc08641f-8270-474d-8be3-d3f1c9364d00"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 600000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-013"
+    ],
+    "account_last4": [
+      "2254",
+      "8838"
+    ],
+    "evidence_value_dates": [
+      "2026-11-09"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C013",
+    "investor_id": "Northwind Robotics::013",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "remitting starts with remit and is not in an allowed phrase. Same path as E1028."
+}

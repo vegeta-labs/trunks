@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"3b6c2959-84ac-4cf1-a05e-3f8b839fc9cf\",\"confidence\":\"high\",\"quote\":\"3b6c2959-84ac-4cf1-a05e-3f8b839fc9cf\"},\"amount\":{\"value\":\"10000.00\",\"confidence\":\"medium\",\"quote\":\"10000.00\"},\"currency\":{\"value\":null,\"confidence\":\"low\",\"quote\":\"\"},\"value_date\":{\"value\":\"2026-11-05\",\"confidence\":\"high\",\"quote\":\"2026-11-05\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\"[NAME_1] [NAME_2]\"},\"reference\":{\"value\":\"SB-003 [NAME_2] RATE 2\",\"confidence\":\"medium\",\"quote\":\"SB-003 [NAME_2] RATE 2\"}}}",
+ "usage": {
+  "inputTokens": 2008,
+  "outputTokens": 296
+ }
+}

@@ -1,0 +1,58 @@
+Return-Path: <office@nordhaven-fo.example>
+Received: from mail.nordhaven-fo.example (mail.nordhaven-fo.example
+ [192.0.2.113]) by mx.ops.example with ESMTPS id 702660d474 for
+ <investors@ops.example>; Thu, 15 Oct 2026 09:25:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=nordhaven-fo.example;
+ dkim=pass header.d=nordhaven-fo.example;
+ dmarc=pass header.from=nordhaven-fo.example
+Message-ID: <E1015.0d6b83cc19d5@nordhaven-fo.example>
+Date: Thu, 15 Oct 2026 09:22:30 +0000
+From: "Nordhaven Family Office Ltd" <office@nordhaven-fo.example>
+To: investors@ops.example
+Subject: Solent SB-007 pacs.008
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============8081253046959303555=="
+
+--===============8081253046959303555==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Attached is the pacs.008 for our Solent subscription, reference SB-007, EUR=
+ 150,000.00.
+
+Regards,
+Nordhaven Family Office
+
+--===============8081253046959303555==
+Content-Type: application/xml
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="pacs008_nordhaven.xml"
+
+PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPERvY3VtZW50IHhtbG5zPSJ1
+cm46aXNvOnN0ZDppc286MjAwMjI6dGVjaDp4c2Q6cGFjcy4wMDguMDAxLjA4Ij4KICA8RklUb0ZJ
+Q3N0bXJDZHRUcmY+CiAgICA8R3JwSGRyPgogICAgICA8TXNnSWQ+UVpCSy1NU0ctTkZPLTEwMTM8
+L01zZ0lkPgogICAgICA8Q3JlRHRUbT4yMDI2LTEwLTEzVDA4OjEyOjQ0WjwvQ3JlRHRUbT4KICAg
+ICAgPE5iT2ZUeHM+MTwvTmJPZlR4cz4KICAgICAgPFN0dGxtSW5mPgogICAgICAgIDxTdHRsbU10
+ZD5DTFJHPC9TdHRsbU10ZD4KICAgICAgPC9TdHRsbUluZj4KICAgIDwvR3JwSGRyPgogICAgPENk
+dFRyZlR4SW5mPgogICAgICA8UG10SWQ+CiAgICAgICAgPEluc3RySWQ+SU5TVFItMTwvSW5zdHJJ
+ZD4KICAgICAgICA8RW5kVG9FbmRJZD5OT1JESEFWRU4tU0ItMTwvRW5kVG9FbmRJZD4KICAgICAg
+ICA8VUVUUj4zNTJjZTY2ZS1lMzQzLTQ0OGMtYjhjNC0yOTk3ZWUyN2NjNWE8L1VFVFI+CiAgICAg
+IDwvUG10SWQ+CiAgICAgIDxJbnRyQmtTdHRsbUFtdCBDY3k9IkVVUiI+MTUwMDAwLjAwPC9JbnRy
+QmtTdHRsbUFtdD4KICAgICAgPEludHJCa1N0dGxtRHQ+MjAyNi0xMC0xMzwvSW50ckJrU3R0bG1E
+dD4KICAgICAgPENocmdCcj5TSEFSPC9DaHJnQnI+CiAgICAgIDxEYnRyPjxObT5OT1JESEFWRU4g
+RkFNSUxZIE9GRklDRSBMVEQ8L05tPjwvRGJ0cj4KICAgICAgPERidHJBY2N0PjxJZD48SUJBTj5H
+Qjc0UVpCSzgxMzc0NDAwMjc0OTc0PC9JQkFOPjwvSWQ+PC9EYnRyQWNjdD4KICAgICAgPERidHJB
+Z3Q+PEZpbkluc3RuSWQ+PEJJQ0ZJPlFaQktHQjJMWFhYPC9CSUNGST48L0Zpbkluc3RuSWQ+PC9E
+YnRyQWd0PgogICAgICA8Q2R0ckFndD48RmluSW5zdG5JZD48QklDRkk+UVpCS0dCMkxYWFg8L0JJ
+Q0ZJPjwvRmluSW5zdG5JZD48L0NkdHJBZ3Q+CiAgICAgIDxDZHRyPjxObT5TT0xFTlQgQklPVEhF
+UkFQRVVUSUNTIFNQVjwvTm0+PC9DZHRyPgogICAgICA8Q2R0ckFjY3Q+PElkPjxJQkFOPkdCMzlR
+WkJLNzA0MDQ4MDA2NzQ0NTA8L0lCQU4+PC9JZD48L0NkdHJBY2N0PgogICAgICA8Um10SW5mPjxV
+c3RyZD5TQi0wMDcgTk9SREhBVkVOPC9Vc3RyZD48L1JtdEluZj4KICAgIDwvQ2R0VHJmVHhJbmY+
+CiAgPC9GSVRvRklDc3RtckNkdFRyZj4KPC9Eb2N1bWVudD4K
+
+--===============8081253046959303555==--

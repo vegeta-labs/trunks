@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"payment_evidence\",\"confidence\":\"high\",\"reason\":\"An MT103 payment confirmation for EUR 25,000 to Solent Biotherapeutics SPV is attached.\"},{\"class\":\"bank_details\",\"confidence\":\"medium\",\"reason\":\"Sender asks that future payments go to the account in the attachment, indicating payment instructions/account details.\"}],\"language\":\"zh\"}",
+ "usage": {
+  "inputTokens": 2289,
+  "outputTokens": 134
+ }
+}

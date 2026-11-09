@@ -13,6 +13,7 @@ const NAMES: Record<string, string> = {
   value_date: 'Value date', deal_name: 'Deal name', investor_name: 'Investor name',
   safe_ack: 'Acknowledgement', payment_received: 'Payment received', payment_wait: 'Awaiting payment',
   payment_need_evidence: 'Request payment evidence',
+  payment_evidence_received: 'Acknowledge payment confirmation',
 }
 export const displayName = (id: string) => NAMES[id] ?? id
 const STATUS: Record<string, string> = {

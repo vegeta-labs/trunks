@@ -1,0 +1,43 @@
+Return-Path: <lucia.fernandez@correo-fernandez.example>
+Received: from mail.correo-fernandez.example (mail.correo-fernandez.example
+ [192.0.2.200]) by mx.ops.example with ESMTPS id c75f408453 for
+ <investors@ops.example>; Thu, 05 Nov 2026 14:10:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=correo-fernandez.example;
+ dkim=pass header.d=correo-fernandez.example;
+ dmarc=pass header.from=correo-fernandez.example
+Message-ID: <E1023.3b16c1c949b6@correo-fernandez.example>
+Date: Thu, 05 Nov 2026 14:07:21 +0000
+From: =?utf-8?b?THVjw61hIEZlcm7DoW5kZXo=?=
+ <lucia.fernandez@correo-fernandez.example>
+To: investors@ops.example
+Subject: Overpayment NW-008
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="===============14366272273411413697=="
+
+--===============14366272273411413697==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+I paid too much by mistake. Please refund the overpayment to the sender sho=
+wn on the attached MT103.
+
+Luc=C3=ADa Fern=C3=A1ndez
+
+--===============14366272273411413697==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Fernandez.txt"
+
+ezM6ezEyMTpkNTNmZThhOS0xZTM0LTQ2NjUtYmE2Ni1jOTM3MzlmNWQzNWN9fQ0KezQ6DQo6MjA6
+TEZaLTA0MTEtVUsNCjoyM0I6Q1JFRA0KOjMyQToyNjExMDRHQlA5MDAwLDAwDQo6NTBLOi9HQjgx
+UVpCSzcwMzg3ODE0OTU1MDAwDQpMVUNJQSBGRVJOQU5ERVoNCjo1OTovR0I0NlFaQks3ODYwNzIy
+MjU3ODgzOA0KTk9SVEhXSU5EIFJPQk9USUNTIFNQViBMUA0KOjcwOk5XLTAwOCBGRVJOQU5ERVoN
+Cjo3MUE6U0hBDQotfQ0K
+
+--===============14366272273411413697==--

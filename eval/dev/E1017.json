@@ -1,0 +1,73 @@
+{
+  "id": "E1017",
+  "family": "F091",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-03T10:50:00Z",
+  "prior_messages": [],
+  "description": "C.5 carve-out: \"remittance advice\" does not cancel the exemption; pacs.008 with DbtrAcct and listed CdtrAcct, partly received, 6 working days -> payment_evidence_received.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "b28ba334-fc46-4944-9754-86591d9ce2ad",
+    "amount": {
+      "minor": 1000000,
+      "currency": "EUR"
+    },
+    "currency": "EUR",
+    "value_date": "2026-10-26",
+    "payer_name": "MATTHIAS VOGEL",
+    "reference": "SB-003"
+  },
+  "rule_output": {
+    "uetrs": [
+      "b28ba334-fc46-4944-9754-86591d9ce2ad"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1000000,
+        "currency": "EUR"
+      }
+    ],
+    "references": [
+      "SB-003"
+    ],
+    "account_last4": [
+      "4450",
+      "6592"
+    ],
+    "evidence_value_dates": [
+      "2026-10-26"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C021",
+    "investor_id": "Solent Biotherapeutics::003",
+    "deal": "Solent Biotherapeutics",
+    "transaction_ids": [
+      "T-SB-0002"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_evidence_received",
+  "notes": "Ledger T-SB-0002 is 5,000 of 15,000 -> not received in full. Working days after 2026-10-26: 27,28,29,30 Oct, 2,3 Nov = 6. 10,000 <= cash due 15,000 (also equal to what is still owed, so both readings of the amount cap agree)."
+}

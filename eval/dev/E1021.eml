@@ -1,0 +1,38 @@
+Return-Path: <moneill@oneill-home.example>
+Received: from mail.oneill-home.example (mail.oneill-home.example [192.0.2.7])
+ by mx.ops.example with ESMTPS id 0651ac21fe for <investors@ops.example>;
+ Wed, 04 Nov 2026 11:00:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=oneill-home.example;
+ dkim=pass header.d=oneill-home.example;
+ dmarc=pass header.from=oneill-home.example
+Message-ID: <E1021.227196d7a0d5@oneill-home.example>
+Date: Wed, 04 Nov 2026 10:57:03 +0000
+From: "Margaret O'Neill" <moneill@oneill-home.example>
+To: investors@ops.example
+Subject: Northwind payment message
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============455334299338699158=="
+
+--===============455334299338699158==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+From now on pay to the beneficiary on the attached.
+
+Margaret
+
+--===============455334299338699158==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_ONeill.txt"
+
+ezM6ezEyMTo1MmQzMDgxZS1iNTk2LTQ2NTctYjhiMS1mNzFiMDRlYmQxN2R9fQ0KezQ6DQo6MjA6
+T05MLVBNVC0xMTAzDQo6MjNCOkNSRUQNCjozMkE6MjYxMTAzR0JQODAwMCwwMA0KOjUwSzovR0I4
+OFFaQks3Nzc3NzgzMzI3MDU3OA0KTUFSR0FSRVQgTydORUlMTA0KOjU5Oi9HQjQ2UVpCSzc4NjA3
+MjIyNTc4ODM4DQpOT1JUSFdJTkQgUk9CT1RJQ1MgU1BWIExQDQo6NzA6TlctMDExIE9ORUlMTA0K
+OjcxQTpTSEENCi19DQo=
+
+--===============455334299338699158==--

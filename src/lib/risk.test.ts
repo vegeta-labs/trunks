@@ -88,7 +88,7 @@ describe('risk (C-RSK-1, C-RSK-2, C-RSK-2a)', () => {
   })
   it('every rule result is reported (C-AUD-3)', () => {
     const r = computeRisk(input({ sig: { auth_fail: true } }))
-    expect(r.clauses).toHaveLength(14)
+    expect(r.clauses).toHaveLength(15)
     expect(r.clauses.filter((c) => c.hit).map((c) => c.id)).toEqual(['C-RSK-2a:auth_fail'])
     expect(r.reasons).toEqual(['bank_letter_request', 'C-RSK-2a:auth_fail'])
   })

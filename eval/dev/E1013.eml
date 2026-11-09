@@ -1,0 +1,43 @@
+Return-Path: <priya@ramanfamily.example>
+Received: from mail.ramanfamily.example (mail.ramanfamily.example
+ [192.0.2.224]) by mx.ops.example with ESMTPS id dfa9f54f81 for
+ <investors@ops.example>; Thu, 05 Nov 2026 11:10:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=ramanfamily.example;
+ dkim=pass header.d=ramanfamily.example;
+ dmarc=pass header.from=ramanfamily.example
+Message-ID: <E1013.5176811c921c@ramanfamily.example>
+Date: Thu, 05 Nov 2026 11:07:43 +0000
+From: "Priya Raman" <priya@ramanfamily.example>
+To: investors@ops.example
+Subject: Northwind NW-003 MT103
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="===============16116682463342851713=="
+
+--===============16116682463342851713==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+Attached is my bank's MT103 for my Northwind subscription (NW-003), =C2=A35=
+,000.00.
+
+Thanks,
+Priya
+
+--===============16116682463342851713==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Raman.txt"
+
+ezM6ezEyMTozMjlhOTVjNC03NjI2LTRlNWQtYmZlZi1kMzM3YzZlZGM3YjV9fQ0KezQ6DQo6MjA6
+UFJNLVBNVC0xMTAzDQo6MjNCOkNSRUQNCjozMkE6MjYxMTAzR0JQNTAwMCwwMA0KOjUwSzovR0I5
+N1FaQksyNDQ1OTQ2MTc2MzU5Ng0KUFJJWUEgUkFNQU4NCjo1OTovR0I0NiBRWkJLIDc4NjAgNzIy
+MiA1Nzg4IDM4DQpOT1JUSFdJTkQgUk9CT1RJQ1MgU1BWIExQDQo6NzA6TlctMDAzIFJBTUFODQo6
+NzFBOlNIQQ0KLX0NCg==
+
+--===============16116682463342851713==--

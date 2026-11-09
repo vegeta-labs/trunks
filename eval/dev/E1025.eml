@@ -1,0 +1,42 @@
+Return-Path: <daniel.osei@osei-mail.example>
+Received: from mail.osei-mail.example (mail.osei-mail.example [192.0.2.174])
+ by mx.ops.example with ESMTPS id adf645289b for <investors@ops.example>;
+ Fri, 06 Nov 2026 13:20:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=osei-mail.example;
+ dkim=pass header.d=osei-mail.example;
+ dmarc=pass header.from=osei-mail.example
+Message-ID: <E1025.0765d856167d@osei-mail.example>
+Date: Fri, 06 Nov 2026 13:17:46 +0000
+From: "Daniel Osei" <daniel.osei@osei-mail.example>
+To: investors@ops.example
+Subject: MT103 NW-016 balance
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="===============12535282653534315992=="
+
+--===============12535282653534315992==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+Attached is my bank's MT103 for the balance of my Northwind subscription.
+
+Cheers,
+Dan
+
+--===============12535282653534315992==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Osei.txt"
+
+ezM6ezEyMTo4NDkxNTAwZS1lNTFlLTQyODUtYWE2ZC1mZjlhNDMwMDMwOWV9fQ0KezQ6DQo6MjA6
+T1NFLVBNVC0xMTA1DQo6MjNCOkNSRUQNCjozMkE6MjYxMTA1R0JQOTAwMCwwMA0KOjUwSzpEQU5J
+RUwgS1dBTUUgT1NFSQ0KMTQgTElOREVOIEdST1ZFDQpMRUVEUw0KOjU5Oi80ODIwMTkzNw0KTk9S
+VEhXSU5EIFJPQk9USUNTIFNQViBMUA0KOjcwOk5XLTAxNiBCQUxBTkNFDQo6NzFBOlNIQQ0KLX0N
+Cg==
+
+--===============12535282653534315992==--

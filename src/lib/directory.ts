@@ -2,6 +2,7 @@
 // cell handling are copied from Deal Ops Toolkit src/lib/csv.ts and money.ts (same author), so files exported by the
 // Toolkit import here unchanged.
 import Papa from 'papaparse'
+import { ibanShapes, ibanValid, normaliseAccount } from './accounts.ts'
 import { isoFromParts } from './dates.ts'
 import { normAddress } from './signals.ts'
 
@@ -33,6 +34,7 @@ const SCHEMAS = {
     { key: 'currency', required: true, aliases: ['ccy'] },
     { key: 'close_date', required: false, aliases: ['planned close', 'planned close date', 'planned_close_date', 'close date'] },
     { key: 'reference_prefix', required: false, aliases: ['reference prefix', 'reference_prefix'] },
+    { key: 'receiving_accounts', required: false, aliases: ['receiving accounts', 'receiving_accounts'] },
   ],
   commitments: [
     { key: 'investor_id', required: false, aliases: ['id', 'investor id'] },
@@ -71,7 +73,7 @@ type Kind = keyof typeof SCHEMAS
 const CCY_MARKS: Record<string, string[]> = { GBP: ['£', 'gbp'], EUR: ['€', 'eur'], USD: ['$', 'us$', 'usd'] }
 const CURRENCY_COLUMN = ['currency', 'ccy']
 const IDENTIFIER_FIELDS: Record<Kind, string[]> = {
-  deals: ['currency', 'close_date', 'reference_prefix'],
+  deals: ['currency', 'close_date', 'reference_prefix', 'receiving_accounts'],
   commitments: ['investor_id', 'reference', 'email', 'cash_due', 'scheme'],
   bank: ['transaction_id', 'date', 'amount'],
   ledger: ['transaction_id', 'date', 'amount', 'status', 'investor_id', 'withdrawn_on'],
@@ -255,6 +257,7 @@ export interface DealRow {
   name: string
   currency: Currency
   closeDate: string | null
+  receivingAccounts: string[] // C-DIR-1a, in the appendix C.3 form
   referencePrefix: string | null
   row: number
 }
@@ -275,7 +278,13 @@ export function importDeals(text: string, currencies: readonly Currency[]): Impo
       if (d.ok) closeDate = d.value
       else errors.push({ where: `row ${row}, close_date`, message: d.reason })
     }
-    rows.push({ name, currency, closeDate, referencePrefix: r.reference_prefix || null, row })
+    // C-DIR-1a: semicolon separated; an IBAN-shaped value must pass its check digits
+    const receivingAccounts = (r.receiving_accounts ?? '').split(';').map(normaliseAccount).filter(Boolean)
+    for (const v of receivingAccounts) {
+      const shape = ibanShapes(v).find((h) => h.start === 0 && h.end === v.length)
+      if (shape && !ibanValid(v)) errors.push({ where: `row ${row}, receiving_accounts`, message: 'an IBAN with invalid check digits' })
+    }
+    rows.push({ name, currency, closeDate, referencePrefix: r.reference_prefix || null, receivingAccounts, row })
   })
   uniqueIds(rows, (r) => r.name, (r) => r.row, 'name', errors)
   return errors.length ? { ok: false, errors } : { ok: true, rows, ignoredColumns: ignored }

@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"139a0e00-c7c9-479b-b137-e4fe4fdfc7bf\",\"confidence\":\"high\",\"quote\":\"{121:139a0e00-c7c9-479b-b137-e4fe4fdfc7bf}\"},\"amount\":{\"value\":\"GBP15000,00\",\"confidence\":\"high\",\"quote\":\":32A:261030GBP15000,00\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\":32A:261030GBP15000,00\"},\"value_date\":{\"value\":\"261030\",\"confidence\":\"high\",\"quote\":\":32A:261030GBP15000,00\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\":50K:[NAME_1] [NAME_2]\"},\"reference\":{\"value\":\"BCK-TRF-1030\",\"confidence\":\"medium\",\"quote\":\":20:BCK-TRF-1030\"},\"party_role\":{\"value\":\"investor\",\"confidence\":\"medium\",\"quote\":\"Attached is the MT103 for my Northwind payment.\"},\"change_requested\":{\"value\":true,\"confidence\":\"medium\",\"quote\":\":70:NEW BENEFICIARY [ACCOUNT_2] FOR NEXT INSTALMENT\"}}}",
+ "usage": {
+  "inputTokens": 1977,
+  "outputTokens": 425
+ }
+}

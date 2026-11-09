@@ -10,7 +10,8 @@ import { getBlobs, getJson, putBlob, putJson } from '../store/blobs.ts'
 import { appendAudit } from '../store/audit.ts'
 import type { Json } from '../lib/audit-hash.ts'
 import type { FileStore } from '../store/files.ts'
-import { loadSnapshot } from '../store/directory.ts'
+import { loadSnapshot, receivingAccountHmac } from '../store/directory.ts'
+import { evidenceExemption, type Exemption } from '../lib/payment-message.ts'
 import type { Scanner } from '../adapters/scan/clamd.ts'
 import type { ParserClient } from './parser-client.ts'
 import { STAGES, type Queue, type Stage, type StageJob } from './queue.ts'
@@ -19,14 +20,14 @@ import { imageHeader, type ImageFacts } from '../lib/image-header.ts'
 import type { TaskResult } from '../../parser/task.ts'
 import { htmlToText } from '../lib/html.ts'
 import { hasHiddenText, htmlScanTexts, injectionMarkers, domainOf } from '../lib/signals.ts'
-import { fromOriginal, normalise, toOriginal } from '../lib/text.ts'
+import { fromOriginal, normalise, normaliseText, toOriginal } from '../lib/text.ts'
 import { extractUetrs } from '../lib/uetr.ts'
 import { extractAmounts, mt103 } from '../lib/amounts.ts'
 import { findReferences } from '../lib/references.ts'
-import { distinctAccounts, extractAccounts, invalidIbanCount } from '../lib/accounts.ts'
+import { distinctAccounts, extractAccounts, invalidIbanCount, normaliseAccount } from '../lib/accounts.ts'
 import { extractDates } from '../lib/dates.ts'
 import { detectEsign, linkDomains } from '../lib/esign.ts'
-import { Redactor } from '../lib/redact.ts'
+import { accountShapes, hasEnoughDigitsForAccount, Redactor } from '../lib/redact.ts'
 import { pacsAmount, type PacsItem } from '../lib/pacs008.ts'
 import { readFileSync } from 'node:fs'
 import { createDeliveries } from '../maintenance/kyc.ts'
@@ -53,7 +54,7 @@ export interface StageDeps {
 
 const sha256 = (s: string | Buffer) => createHash('sha256').update(s).digest('hex')
 const PARSEABLE = new Set(['pdf', 'txt', 'csv', 'eml', 'docx', 'xml'])
-export const PIPELINE_VERSION = 'e6.1' // bump when stage logic changes (part of the input identity)
+export const PIPELINE_VERSION = 'f1.1' // bump when stage logic changes (part of the input identity)
 
 export interface Applied {
   audit: Record<string, Json>
@@ -368,7 +369,23 @@ async function prepRedact(d: StageDeps, cr: CaseRow): Promise<Prepared> {
     ...m.attachments.flatMap((a) => [{ text: a.filename, source: a.id }, { text: a.text, source: a.id }]),
   ]
   // redaction sees the text as written, keywords in any markup included (Codex round 2 F10)
-  const done = r.redactAll(parts.map((p) => normalise(p.text).text))
+  // C-RED-1 v0.7.28: pacs.008 account positions, known only from the parser (the MT103 ones are found in the text)
+  const extraAccounts = new Map<number, Array<{ start: number; end: number }>>()
+  const pacsAccounts = (facts: TaskResult['facts'] | null, offset: number): Array<[number, number]> => [
+    ...(facts?.pacs008?.parsed && facts.pacs008.strict ? facts.pacs008.strict.accounts.map((x): [number, number] => [offset + x.span[0], offset + x.span[1]]) : []),
+    ...(facts?.nested ?? []).flatMap((p) => pacsAccounts(p.result.facts, offset + p.offset)),
+  ]
+  m.attachments.forEach((a, j) => {
+    const found = pacsAccounts(a.facts, 0)
+    if (!found.length) return
+    const n = normalise(a.text)
+    const spans = found.map(([s, e]) => {
+      const [start, end] = fromOriginal(n, s, e)
+      return { start, end }
+    }).filter((x) => hasEnoughDigitsForAccount(n.text.slice(x.start, x.end)))
+    if (spans.length) extraAccounts.set(5 + 2 * j, spans)
+  })
+  const done = r.redactAll(parts.map((p) => normalise(p.text).text), extraAccounts)
   const sourceOf = new Map<string, string | null>() // placeholder → source attachment (null = mail itself)
   done.forEach((x, i) => {
     for (const p of x.text.match(/\[[A-Z]+_\d+\]/g) ?? []) if (!sourceOf.has(p)) sourceOf.set(p, parts[i]!.source)
@@ -387,7 +404,7 @@ async function prepRedact(d: StageDeps, cr: CaseRow): Promise<Prepared> {
     out.counts[kind] = (out.counts[kind] ?? 0) + 1
   }
   return {
-    inputHash: sha256(JSON.stringify([m.subject, m.fromName, m.text, m.htmlText, m.attachments.map((a) => [a.filename, a.text]), cr.snapshot_id])),
+    inputHash: sha256(JSON.stringify([m.subject, m.fromName, m.text, m.htmlText, m.attachments.map((a) => [a.filename, a.text, a.facts]), cr.snapshot_id])),
     result: out,
     kycJudgements: judgeAttachments(d, m),
     async apply(c) {
@@ -609,12 +626,46 @@ async function callModelLocked<S extends z.ZodType>(d: StageDeps, caseId: string
 export const CLASSIFY_PROMPT = 'classify@v3'
 
 export interface ClassifyResult {
+  evidenceExemption?: Exemption | null // C-CLS-4a; null: no account in an attachment, nothing to decide. Absent before v0.7.28
+  exemptionWithoutModel?: boolean // the same decision with only payment classes from the model (evaluation report of E5; no rule reads it)
   labels: Label[]
   adopted: string[]
   risk: string[] // C-RSK-1 input: adopted + model low labels
   language: string | null
   modelFailed: boolean
   kyc: ModelView['kyc']
+}
+
+/** Gathers C-CLS-4a's inputs; the rule itself is the pure function. */
+async function decideEvidenceExemption(d: StageDeps, cr: CaseRow, m: MessageView, ex: Extraction | null, model: Classification | null, priorBankRule: boolean): Promise<Exemption> {
+  const signals = Object.fromEntries((await d.db.query<{ signal: string; value: boolean | null }>('SELECT signal, value FROM case_signal WHERE case_id = $1', [cr.id])).rows.map((r) => [r.signal, r.value]))
+  const dir = await loadSnapshot(d.db, d.k, cr.snapshot_id)
+  const matches = m.fromAddress ? dir.contacts.filter((x) => x.emails.some((e) => e.toLowerCase() === m.fromAddress!.toLowerCase())) : []
+  const sender = matches.length === 1 ? matches[0]! : null
+  const keyOfName = new Map(dir.deals.map((x) => [x.name, x.dealKey]))
+  // a commitment key is «deal name::investor id» (C-DIR-2); a name with no deal in this snapshot counts as its own deal
+  const dealOfKey = (k: string) => k.slice(0, k.lastIndexOf('::'))
+  const senderDeals = sender ? [...sender.deals, ...sender.investorIds.map(dealOfKey), ...sender.authorisedFor.map(dealOfKey)].map((n) => keyOfName.get(n) ?? `unknown:${n}`) : []
+  const refs = (ex?.references ?? []).map((r) => dir.commitments.find((x) => x.reference === r.value)?.dealKey ?? '')
+  return evidenceExemption({
+    subject: m.subject,
+    body: m.text,
+    bodyHtml: m.htmlText ?? '',
+    attachments: m.attachments,
+    currencies: d.config.deployment.currencies,
+    signals,
+    authenticated: signals.dmarc_pass === true && sender !== null,
+    senderDeals,
+    referenceDeals: refs,
+    blockedOrOverLimit: cr.flags.includes('attachment_blocked') || cr.flags.includes('attachment_over_limit') || cr.flags.includes('mime_parse_failed'),
+    modelLabels: model ? model.labels.map((l) => l.class) : null,
+    priorBankRule,
+    listed: (dealKey, account) => {
+      const list = dir.deals.find((x) => x.dealKey === dealKey)?.receiving ?? null
+      if (list === null) return null
+      return list.some((x) => x.hmac === receivingAccountHmac(d.k, normaliseAccount(account)))
+    },
+  })
 }
 
 async function prepClassify(d: StageDeps, cr: CaseRow): Promise<Prepared> {
@@ -625,20 +676,28 @@ async function prepClassify(d: StageDeps, cr: CaseRow): Promise<Prepared> {
   // rule labels read the original text (an IBAN is a placeholder in the redacted text) and the extraction result
   const m = await loadMessage(d, cr.message_id)
   const ex = await resultOf<Extraction>(d, cr.id, 'extract', cr.processing_generation)
+  const model = call.parsed ? maskUnknownPlaceholders(call.parsed as Classification, view.user) : null
+  const priorBankRule = (await d.db.query(`SELECT 1 FROM case_label WHERE case_id = $1 AND class_id = 'bank_details' AND source = 'rule' LIMIT 1`, [cr.id])).rows.length > 0
+  const exemption = m.attachments.some((a) => accountShapes(normaliseText(a.text)).length > 0)
+    ? await decideEvidenceExemption(d, cr, m, ex ?? null, model, priorBankRule)
+    : null
+  const exemptionWithoutModel = exemption === null ? undefined : exemption.applied || (await decideEvidenceExemption(d, cr, m, ex ?? null, { labels: [{ class: 'payment_evidence', confidence: 'high', reason: '' }], language: 'en' }, priorBankRule)).applied
   const rules = ruleLabels({
     subject: m.subject,
     body: m.text,
     bodyHtml: m.htmlText ?? '',
     attachmentTexts: m.attachments.map((a) => a.text),
     esignInvite: ex?.esign.esignInvite ?? false,
+    evidenceAnywhere: (ex?.evidence ?? []).some((e) => e.minor !== null),
+    exemptAttachment: exemption?.applied ? m.attachments.findIndex((a) => a.ordinal === exemption.ordinal) : null,
+    priorBankRule,
     // C-EXT-3 parsed `:32A:` or `IntrBkSttlmAmt` (an amount); a value date alone is not enough (CF-F9)
     paymentEvidenceParsed: (ex?.evidence ?? []).some((e) => e.part.startsWith('attachment') && e.minor !== null),
   })
-  const model = call.parsed ? maskUnknownPlaceholders(call.parsed as Classification, view.user) : null
   const labels = adoptLabels(model, rules)
-  const out: ClassifyResult = { labels, adopted: adoptedClasses(labels), risk: riskClasses(labels), language: model?.language ?? null, modelFailed: model === null, kyc: view.kyc }
+  const out: ClassifyResult = { evidenceExemption: exemption, ...(exemptionWithoutModel === undefined ? {} : { exemptionWithoutModel }), labels, adopted: adoptedClasses(labels), risk: riskClasses(labels), language: model?.language ?? null, modelFailed: model === null, kyc: view.kyc }
   return {
-    inputHash: sha256(JSON.stringify([view.user, system, rules, d.llm?.id])),
+    inputHash: sha256(JSON.stringify([view.user, system, rules, d.llm?.id, exemption])),
     result: out,
     kycJudgements: view.judgements,
     async apply(c) {
@@ -649,7 +708,7 @@ async function prepClassify(d: StageDeps, cr: CaseRow): Promise<Prepared> {
         )
       }
       return {
-        audit: { adopted: out.adopted, model_failed: out.modelFailed, attempts: call.attempts.length, kyc_attachments: view.kyc.length, model: d.llm?.id ?? null, prompt: CLASSIFY_PROMPT },
+        audit: { adopted: out.adopted, model_failed: out.modelFailed, attempts: call.attempts.length, kyc_attachments: view.kyc.length, model: d.llm?.id ?? null, prompt: CLASSIFY_PROMPT, evidence_exemption: exemption === null ? null : exemption.applied ? 'applied' : exemption.reason },
         // the model's replies are kept in audit_detail, never in the audit row itself (TC-AUD-06b); TC-CLS-01: both attempts
         // the exact request with its schema, and its attempts (tech design §5, round 2 F9)
         detail: { requests: [{ system, user: view.user, prompt: CLASSIFY_PROMPT, schema: toJSONSchema(classificationSchema(ids)) as Json, attempts: call.attempts.map((a) => ({ raw: a.raw, error: a.error, detail: a.detail, reused: a.reused })) }], labels: labels as unknown as Json },
@@ -671,7 +730,9 @@ async function prepFields(d: StageDeps, cr: CaseRow): Promise<Prepared> {
   const cls = await resultOf<ClassifyResult>(d, cr.id, 'classify', gen)
   if (!cls) throw new Error('no classification for this generation')
   const configured = Object.fromEntries(d.config.classes.map((c) => [c.id, c.fields]))
-  const fields = fieldsFor(cls.adopted, configured)
+  // C-RSK-2 v0.7.28: a bank_details rule label the risk step wrote asks for its fields too (the restart below in prepRisk)
+  const bankRule = !cls.adopted.includes('bank_details') && (await d.db.query(`SELECT 1 FROM case_label WHERE case_id = $1 AND class_id = 'bank_details' AND source = 'rule' LIMIT 1`, [cr.id])).rows.length > 0
+  const fields = fieldsFor(bankRule ? [...cls.adopted, 'bank_details'] : cls.adopted, configured)
   const asked = modelFields(fields)
   const view = await modelView(d, cr, gen)
   // the provider refuses structured-output schemas past about nine fields: at most eight fields per call
@@ -706,10 +767,10 @@ async function prepFields(d: StageDeps, cr: CaseRow): Promise<Prepared> {
       valueDates: [...new Set((ex?.evidence ?? []).flatMap((e) => (e.valueDate ? [e.valueDate] : [])))],
     },
   })
-  const out: FieldsResult = { classes: cls.adopted, fields: res, modelFailed: call?.failed ?? false }
+  const out: FieldsResult = { classes: bankRule ? [...cls.adopted, 'bank_details'] : cls.adopted, fields: res, modelFailed: call?.failed ?? false }
   return {
     kycJudgements: view.judgements,
-    inputHash: sha256(JSON.stringify([view.user, system, cls.adopted, ex, cr.snapshot_id, d.llm?.id])),
+    inputHash: sha256(JSON.stringify([view.user, system, out.classes, ex, cr.snapshot_id, d.llm?.id])),
     result: out,
     async apply(c) {
       for (const f of res) {

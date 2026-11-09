@@ -1,0 +1,43 @@
+Return-Path: <oliver.bennett@bennettmail.example>
+Received: from mail.bennettmail.example (mail.bennettmail.example [192.0.2.62])
+ by mx.ops.example with ESMTPS id 60c5f86109 for <investors@ops.example>;
+ Wed, 11 Nov 2026 09:45:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=bennettmail.example;
+ dkim=pass header.d=bennettmail.example;
+ dmarc=pass header.from=bennettmail.example
+Message-ID: <E1038.828ba5f4140e@bennettmail.example>
+Date: Wed, 11 Nov 2026 09:42:30 +0000
+From: "Oliver Bennett" <oliver.bennett@bennettmail.example>
+To: investors@ops.example
+Subject: Second instalment NW-002 - MT103
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============4975371493576563695=="
+
+--===============4975371493576563695==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+I am paying my Northwind Robotics commitment in two instalments. The first =
+went across on 21 October; the second, =C2=A310,000.00 under reference NW-0=
+02, was sent on 3 November. The MT103 for the second instalment is attached.
+
+Kind regards,
+Oliver Bennett
+
+--===============4975371493576563695==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Bennett_instalment2.txt"
+
+ezI6STEwM1FaQktHQjJMWFhYWE59ezM6ezEyMTo2ZDE3MTcxZC0yY2E3LTQ5YTgtODg0My00YjE1
+YWY4OWRkMzB9fQ0KezQ6DQo6MjA6T0JOLUlOU1QtMDAwMg0KOjIzQjpDUkVEDQo6MzJBOjI2MTEw
+M0dCUDEwMDAwLDAwDQo6NTBLOi9HQjI2UVpCSzQ5ODc3NTY5MjU5MjY1DQpPTElWRVIgQkVOTkVU
+VA0KQlJJU1RPTA0KOjU5Oi9HQjQ2UVpCSzc4NjA3MjIyNTc4ODM4DQpOT1JUSFdJTkQgUk9CT1RJ
+Q1MgU1BWIExQDQo6NzA6TlctMDAyIEJFTk5FVFQNCjo3MUE6U0hBDQotfQ0K
+
+--===============4975371493576563695==--

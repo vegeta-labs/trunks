@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"873bd569-9da3-4afd-b4de-883eecf3434d\",\"confidence\":\"high\",\"quote\":\"{121:873bd569-9da3-4afd-b4de-883eecf3434d}\"},\"amount\":{\"value\":\"£5,000.00\",\"confidence\":\"high\",\"quote\":\"I sent the remaining £5,000.00 (reference NW-008) on 2 November\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\":32A:261102GBP5000,00\"},\"value_date\":{\"value\":\"261102\",\"confidence\":\"high\",\"quote\":\":32A:261102GBP5000,00\"},\"payer_name\":{\"value\":\"LUCIA FERNANDEZ\",\"confidence\":\"high\",\"quote\":\"LUCIA FERNANDEZ\"},\"reference\":{\"value\":\"NW-008\",\"confidence\":\"high\",\"quote\":\"I sent the remaining £5,000.00 (reference NW-008) on 2 November\"}}}",
+ "usage": {
+  "inputTokens": 2039,
+  "outputTokens": 323
+ }
+}

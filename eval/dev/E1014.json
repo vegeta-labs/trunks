@@ -1,0 +1,71 @@
+{
+  "id": "E1014",
+  "family": "F088",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-28T14:30:00Z",
+  "prior_messages": [],
+  "description": "C-CLS-4a exempt; ledger not received and 7 working days since the value date, one qualifying message -> payment_evidence_received (C-DRF-4).",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "9e89d948-771c-485f-a810-1ece20139b05",
+    "amount": {
+      "minor": 600000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-10-19",
+    "payer_name": "HANNAH KOWALCZYK",
+    "reference": "NW-013"
+  },
+  "rule_output": {
+    "uetrs": [
+      "9e89d948-771c-485f-a810-1ece20139b05"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 600000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-013"
+    ],
+    "account_last4": [
+      "0743",
+      "1312"
+    ],
+    "evidence_value_dates": [
+      "2026-10-19"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C013",
+    "investor_id": "Northwind Robotics::013",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_evidence_received",
+  "notes": "From Mon 2026-10-19 the working days 20,21,22,23,26,27,28 Oct = 7 >= 5. One M1/M2 message, valid value date not after receipt, GBP = deal currency, valid UETR, 6,000 <= cash due 6,000 -> payment_evidence_received."
+}

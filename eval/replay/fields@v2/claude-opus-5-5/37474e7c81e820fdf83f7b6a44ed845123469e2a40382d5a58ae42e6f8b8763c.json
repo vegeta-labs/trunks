@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"10ca8f38-ffb3-4a9f-a751-ad5140d11169\",\"confidence\":\"high\",\"quote\":\"{121:10ca8f38-ffb3-4a9f-a751-ad5140d11169}\"},\"amount\":{\"value\":\"EUR25000,00\",\"confidence\":\"high\",\"quote\":\":32A:261104EUR25000,00\"},\"currency\":{\"value\":\"EUR\",\"confidence\":\"high\",\"quote\":\":32A:261104EUR25000,00\"},\"value_date\":{\"value\":\"261104\",\"confidence\":\"high\",\"quote\":\":32A:261104EUR25000,00\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\":50K:/[ACCOUNT_1]\\n[NAME_1] [NAME_2]\"},\"reference\":{\"value\":\"SB-006 [NAME_1]\",\"confidence\":\"high\",\"quote\":\":70:SB-006 [NAME_1]\"},\"party_role\":{\"value\":\"investor\",\"confidence\":\"medium\",\"quote\":\"以后请付到附件里的这个账户。\"},\"change_requested\":{\"value\":true,\"confidence\":\"medium\",\"quote\":\"以后请付到附件里的这个账户。\"}}}",
+ "usage": {
+  "inputTokens": 1953,
+  "outputTokens": 411
+ }
+}

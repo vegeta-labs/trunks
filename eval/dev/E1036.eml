@@ -1,0 +1,40 @@
+Return-Path: <kenji@tanaka-home.example>
+Received: from mail.tanaka-home.example (mail.tanaka-home.example
+ [192.0.2.233]) by mx.ops.example with ESMTPS id e879b0466e for
+ <investors@ops.example>; Wed, 04 Nov 2026 17:05:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=tanaka-home.example;
+ dkim=pass header.d=tanaka-home.example;
+ dmarc=pass header.from=tanaka-home.example
+Message-ID: <E1036.09020018911e@tanaka-home.example>
+Date: Wed, 04 Nov 2026 17:02:07 +0000
+From: "Kenji Tanaka" <kenji@tanaka-home.example>
+To: investors@ops.example
+Subject: MT103 LK-002
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="===============16751614105521553920=="
+
+--===============16751614105521553920==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Attached is the MT103 for my Larkspur subscription (LK-002).
+
+Kenji Tanaka
+
+--===============16751614105521553920==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Tanaka.txt"
+
+ezM6ezEyMTo0MmI4YjZjYy1mODNkLTQ2OTgtYTY0ZC03YTFiMzQ2MWRiNDJ9fQ0KezQ6DQo6MjA6
+S1ROLVBNVC0xMTAzDQo6MjNCOkNSRUQNCjozMkE6MjYxMTAzVVNEMTUwMDAsMDANCjo1MEs6S0VO
+SkkgVEFOQUtBDQo6NTk6L0xBUktTUFVSIFNQViBDTElFTlQNCkxBUktTUFVSIEVORVJHWSBTVE9S
+QUdFIFNQVg0KOjcwOkxLLTAwMiBUQU5BS0ENCjo3MUE6U0hBDQotfQ0K
+
+--===============16751614105521553920==--

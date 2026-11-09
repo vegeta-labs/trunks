@@ -1,0 +1,82 @@
+{
+  "id": "E1021",
+  "family": "F095",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-04T11:00:00Z",
+  "prior_messages": [],
+  "description": "Body has no account and says from now on pay the beneficiary on the attached -> D7 phrase and E2, bank_details, high, safe_ack.",
+  "classes": [
+    "payment_evidence",
+    "bank_details"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "bank_change",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "52d3081e-b596-4657-b8b1-f71b04ebd17d",
+    "amount": {
+      "minor": 800000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-11-03",
+    "payer_name": "MARGARET O'NEILL",
+    "reference": "NW-011",
+    "party_role": "other",
+    "change_requested": true,
+    "account_last4": {
+      "multiple": [
+        "0578",
+        "8838"
+      ]
+    }
+  },
+  "rule_output": {
+    "uetrs": [
+      "52d3081e-b596-4657-b8b1-f71b04ebd17d"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 800000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-011"
+    ],
+    "account_last4": [
+      "0578",
+      "8838"
+    ],
+    "evidence_value_dates": [
+      "2026-11-03"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C011",
+    "investor_id": "Northwind Robotics::011",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0008"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "from now on is on C.6 and C.5; pay to, benef are on C.5. :59: is listed, so only the wording stops the exemption. Margaret O'Neill has no phone on file (C-FRD-4 path)."
+}

@@ -1,0 +1,61 @@
+Return-Path: <t.wolski@wolski-family.example>
+Received: from mail.wolski-family.example (mail.wolski-family.example [192.0.2.167])
+ by mx.ops.example with ESMTPS id 1656d1016e for <investors@ops.example>;
+ Mon, 26 Oct 2026 14:05:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=wolski-family.example;
+ dkim=pass header.d=wolski-family.example;
+ dmarc=pass header.from=wolski-family.example
+Message-ID: <E1039.3831ee121829@wolski-family.example>
+Date: Mon, 26 Oct 2026 14:02:30 +0000
+From: "Tomasz Wolski" <t.wolski@wolski-family.example>
+To: investors@ops.example
+Subject: Northwind Robotics NW-004 - pacs.008
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============1604847557537512403=="
+
+--===============1604847557537512403==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+I emailed you last week about the date of the investor call; that is a sepa=
+rate matter and nothing more is needed on it here.
+
+This message is only to send the pacs.008 for my Northwind Robotics subscri=
+ption: =C2=A350,000.00, reference NW-004, settled on 22 October.
+
+Best regards,
+Tomasz Wolski
+
+--===============1604847557537512403==
+MIME-Version: 1.0
+Content-Type: application/xml
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="pacs008_Wolski.xml"
+
+PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPERvY3VtZW50IHhtbG5zPSJ1
+cm46aXNvOnN0ZDppc286MjAwMjI6dGVjaDp4c2Q6cGFjcy4wMDguMDAxLjA4Ij4KICA8RklUb0ZJ
+Q3N0bXJDZHRUcmY+CiAgICA8R3JwSGRyPgogICAgICA8TXNnSWQ+UVpCSy1NU0ctVFdPLTEwMjI8
+L01zZ0lkPgogICAgICA8Q3JlRHRUbT4yMDI2LTEwLTIyVDA5OjQxOjEyWjwvQ3JlRHRUbT4KICAg
+ICAgPE5iT2ZUeHM+MTwvTmJPZlR4cz4KICAgICAgPFN0dGxtSW5mPgogICAgICAgIDxTdHRsbU10
+ZD5DTFJHPC9TdHRsbU10ZD4KICAgICAgPC9TdHRsbUluZj4KICAgIDwvR3JwSGRyPgogICAgPENk
+dFRyZlR4SW5mPgogICAgICA8UG10SWQ+CiAgICAgICAgPEluc3RySWQ+SU5TVFItMTwvSW5zdHJJ
+ZD4KICAgICAgICA8RW5kVG9FbmRJZD5XT0xTS0ktTlctNDwvRW5kVG9FbmRJZD4KICAgICAgICA8
+VUVUUj5mMzE3Yjk3MC1hN2I5LTQ3OGUtYTExYS0yMTY2ZDM2YTYzNDk8L1VFVFI+CiAgICAgIDwv
+UG10SWQ+CiAgICAgIDxJbnRyQmtTdHRsbUFtdCBDY3k9IkdCUCI+NTAwMDAuMDA8L0ludHJCa1N0
+dGxtQW10PgogICAgICA8SW50ckJrU3R0bG1EdD4yMDI2LTEwLTIyPC9JbnRyQmtTdHRsbUR0Pgog
+ICAgICA8Q2hyZ0JyPlNIQVI8L0NocmdCcj4KICAgICAgPERidHI+PE5tPlRPTUFTWiBXT0xTS0k8
+L05tPjwvRGJ0cj4KICAgICAgPERidHJBY2N0PjxJZD48SUJBTj5HQjM5UVpCSzk0Njk2OTE0NTk1
+MTU3PC9JQkFOPjwvSWQ+PC9EYnRyQWNjdD4KICAgICAgPERidHJBZ3Q+PEZpbkluc3RuSWQ+PEJJ
+Q0ZJPlFaQktHQjJMWFhYPC9CSUNGST48L0Zpbkluc3RuSWQ+PC9EYnRyQWd0PgogICAgICA8Q2R0
+ckFndD48RmluSW5zdG5JZD48QklDRkk+UVpCS0dCMkxYWFg8L0JJQ0ZJPjwvRmluSW5zdG5JZD48
+L0NkdHJBZ3Q+CiAgICAgIDxDZHRyPjxObT5OT1JUSFdJTkQgUk9CT1RJQ1MgU1BWIExQPC9ObT48
+L0NkdHI+CiAgICAgIDxDZHRyQWNjdD48SWQ+PElCQU4+R0I0MVFaQks3OTEzNzIxMTk4MTMxMjwv
+SUJBTj48L0lkPjwvQ2R0ckFjY3Q+CiAgICAgIDxSbXRJbmY+PFVzdHJkPk5XLTAwNCBXT0xTS0k8
+L1VzdHJkPjwvUm10SW5mPgogICAgPC9DZHRUcmZUeEluZj4KICA8L0ZJVG9GSUNzdG1yQ2R0VHJm
+Pgo8L0RvY3VtZW50Pgo=
+
+--===============1604847557537512403==--

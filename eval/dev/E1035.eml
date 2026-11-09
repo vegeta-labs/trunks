@@ -1,0 +1,41 @@
+Return-Path: <olivia.grant@grantmail.example>
+Received: from mail.grantmail.example (mail.grantmail.example [192.0.2.198])
+ by mx.ops.example with ESMTPS id c5748a7583 for <investors@ops.example>;
+ Wed, 04 Nov 2026 16:15:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=grantmail.example;
+ dkim=pass header.d=grantmail.example;
+ dmarc=pass header.from=grantmail.example
+Message-ID: <E1035.01ffc280409a@grantmail.example>
+Date: Wed, 04 Nov 2026 16:12:32 +0000
+From: "Olivia Grant" <olivia.grant@grantmail.example>
+To: investors@ops.example
+Subject: MT103 LK-003
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="===============14228149360083992514=="
+
+--===============14228149360083992514==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Attached is the MT103 for my Larkspur subscription (LK-003).
+
+Olivia Grant
+
+--===============14228149360083992514==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Grant.txt"
+
+ezM6ezEyMToxMTQwMmNkYy04MzExLTRjYzYtYWVjYi04YWI0MzdiNWI4Zjh9fQ0KezQ6DQo6MjA6
+T0dSLVBNVC0xMTAzDQo6MjNCOkNSRUQNCjozMkE6MjYxMTAzVVNEMjUwMDAsMDANCjo1MEs6L0dC
+NTVRWkJLMTEzMzA3MzAzMjc5NTMNCk9MSVZJQSBHUkFOVA0KOjU5Oi9HQjE4UVpCSzc0MjIxMzIz
+NTEwNDk2DQpMQVJLU1BVUiBFTkVSR1kgU1RPUkFHRSBTUFYNCjo3MDpMSy0wMDMgR1JBTlQNCjo3
+MUE6U0hBDQotfQ0K
+
+--===============14228149360083992514==--

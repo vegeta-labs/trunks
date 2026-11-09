@@ -1,0 +1,60 @@
+Return-Path: <m.vogel@vogel-familie.example>
+Received: from mail.vogel-familie.example (mail.vogel-familie.example [192.0.2.102])
+ by mx.ops.example with ESMTPS id 133ea1161e for <investors@ops.example>;
+ Fri, 6 Nov 2026 08:55:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=vogel-familie.example;
+ dkim=pass header.d=vogel-familie.example;
+ dmarc=pass header.from=vogel-familie.example
+Message-ID: <E1042.ef4a60b1dcf2@vogel-familie.example>
+Date: Fri, 6 Nov 2026 08:52:30 +0000
+From: "Matthias Vogel" <m.vogel@vogel-familie.example>
+To: investors@ops.example
+Subject: Solent Biotherapeutics SB-003 - zweite Rate
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============7602534199074076814=="
+
+--===============7602534199074076814==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Guten Tag,
+
+anbei die pacs.008-Best=C3=A4tigung meiner Bank f=C3=BCr die zweite Rate me=
+iner Zeichnung bei Solent Biotherapeutics (Referenz SB-003), ausgef=C3=BChr=
+t am 5. November. Die erste Rate ist bereits im Oktober bei Ihnen eingegang=
+en.
+
+Mit freundlichen Gr=C3=BC=C3=9Fen
+Matthias Vogel
+
+--===============7602534199074076814==
+MIME-Version: 1.0
+Content-Type: application/xml
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="pacs008_Vogel_Rate2.xml"
+
+PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPERvY3VtZW50IHhtbG5zPSJ1
+cm46aXNvOnN0ZDppc286MjAwMjI6dGVjaDp4c2Q6cGFjcy4wMDguMDAxLjA4Ij4KICA8RklUb0ZJ
+Q3N0bXJDZHRUcmY+CiAgICA8R3JwSGRyPgogICAgICA8TXNnSWQ+UVpCSy1NU0ctTVZPLTExMDU8
+L01zZ0lkPgogICAgICA8Q3JlRHRUbT4yMDI2LTExLTA1VDEwOjAyOjM3WjwvQ3JlRHRUbT4KICAg
+ICAgPE5iT2ZUeHM+MTwvTmJPZlR4cz4KICAgICAgPFN0dGxtSW5mPgogICAgICAgIDxTdHRsbU10
+ZD5DTFJHPC9TdHRsbU10ZD4KICAgICAgPC9TdHRsbUluZj4KICAgIDwvR3JwSGRyPgogICAgPENk
+dFRyZlR4SW5mPgogICAgICA8UG10SWQ+CiAgICAgICAgPEluc3RySWQ+SU5TVFItMTwvSW5zdHJJ
+ZD4KICAgICAgICA8RW5kVG9FbmRJZD5WT0dFTC1TQjMtUjI8L0VuZFRvRW5kSWQ+CiAgICAgICAg
+PFVFVFI+M2I2YzI5NTktODRhYy00Y2YxLWEwNWUtM2Y4YjgzOWZjOWNmPC9VRVRSPgogICAgICA8
+L1BtdElkPgogICAgICA8SW50ckJrU3R0bG1BbXQgQ2N5PSJFVVIiPjEwMDAwLjAwPC9JbnRyQmtT
+dHRsbUFtdD4KICAgICAgPEludHJCa1N0dGxtRHQ+MjAyNi0xMS0wNTwvSW50ckJrU3R0bG1EdD4K
+ICAgICAgPENocmdCcj5TSEFSPC9DaHJnQnI+CiAgICAgIDxEYnRyPjxObT5NQVRUSElBUyBWT0dF
+TDwvTm0+PC9EYnRyPgogICAgICA8RGJ0ckFjY3Q+PElkPjxJQkFOPkdCODdRWkJLMzI4MTE3MTk1
+NzgyODE8L0lCQU4+PC9JZD48L0RidHJBY2N0PgogICAgICA8RGJ0ckFndD48RmluSW5zdG5JZD48
+QklDRkk+UVpCS0dCMkxYWFg8L0JJQ0ZJPjwvRmluSW5zdG5JZD48L0RidHJBZ3Q+CiAgICAgIDxD
+ZHRyQWd0PjxGaW5JbnN0bklkPjxCSUNGST5RWkJLR0IyTFhYWDwvQklDRkk+PC9GaW5JbnN0bklk
+PjwvQ2R0ckFndD4KICAgICAgPENkdHI+PE5tPlNPTEVOVCBCSU9USEVSQVBFVVRJQ1MgU1BWPC9O
+bT48L0NkdHI+CiAgICAgIDxDZHRyQWNjdD48SWQ+PElCQU4+R0IzOVFaQks3MDQwNDgwMDY3NDQ1
+MDwvSUJBTj48L0lkPjwvQ2R0ckFjY3Q+CiAgICAgIDxSbXRJbmY+PFVzdHJkPlNCLTAwMyBWT0dF
+TCBSQVRFIDI8L1VzdHJkPjwvUm10SW5mPgogICAgPC9DZHRUcmZUeEluZj4KICA8L0ZJVG9GSUNz
+dG1yQ2R0VHJmPgo8L0RvY3VtZW50Pgo=
+
+--===============7602534199074076814==--

@@ -5,12 +5,11 @@
   "mailbox_strips_auth_results": true,
   "received_at": "2026-10-22T11:40:00Z",
   "prior_messages": [],
-  "description": "pacs.008 wrapped in an AppHdr envelope, CdtrAcct carries a valid IBAN -> payment_evidence + bank_details -> safe_ack.",
+  "description": "pacs.008 in a BusinessMessage envelope with the SPV's GB IBAN in CdtrAcct, on the Solent list -> C-CLS-4a exempt, payment_evidence only, medium; ledger T-SB-0003 received in full -> payment_received.",
   "classes": [
-    "payment_evidence",
-    "bank_details"
+    "payment_evidence"
   ],
-  "expected_risk": "high",
+  "expected_risk": "medium",
   "malicious": false,
   "malicious_type": null,
   "twin_of": null,
@@ -34,10 +33,7 @@
     "currency": "EUR",
     "value_date": "2026-10-20",
     "payer_name": "ELENA RUIZ",
-    "reference": "SB-004",
-    "party_role": "other",
-    "account_last4": "4450",
-    "change_requested": false
+    "reference": "SB-004"
   },
   "rule_output": {
     "uetrs": [
@@ -71,6 +67,6 @@
     "candidates": []
   },
   "may_disclose_record": true,
-  "draft_template": "safe_ack",
-  "notes": "Envelope root BusinessMessage with AppHdr (head.001.001.02) + Document (pacs.008.001.08). CdtrAcct/Id/IBAN is the SPV's account (checksum valid, fictional): bank_details rule label from attachment text; party_role 'other' (see QUESTIONS W1)."
+  "draft_template": "payment_received",
+  "notes": "PRD v0.7.28: envelope root BusinessMessage with AppHdr (head.001.001.02) + Document (pacs.008.001.08) passes C.2; the IBAN is the whole CdtrAcct value and is on receiving_accounts (M3, M5), so it no longer gives bank_details; party_role, account_last4 and change_requested leave fields with the class. rule_output.account_last4 keeps 4450 (QUESTIONS F1-6). Ledger 10,000 EUR of 10,000 EUR -> received in full."
 }

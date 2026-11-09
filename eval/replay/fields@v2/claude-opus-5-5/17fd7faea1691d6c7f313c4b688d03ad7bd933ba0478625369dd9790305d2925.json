@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"7f99fae7-e3f6-486e-9b81-1b37bc0ac3f0\",\"confidence\":\"high\",\"quote\":\"{121:7f99fae7-e3f6-486e-9b81-1b37bc0ac3f0}\"},\"amount\":{\"value\":\"GBP50000,00\",\"confidence\":\"high\",\"quote\":\":32A:261110GBP50000,00\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\":32A:261110GBP50000,00\"},\"value_date\":{\"value\":\"261110\",\"confidence\":\"high\",\"quote\":\":32A:261110GBP50000,00\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\":50K:/[ACCOUNT_1]\\n[NAME_1] [NAME_2]\"},\"reference\":{\"value\":\"NW-004 [NAME_2]\",\"confidence\":\"high\",\"quote\":\":70:NW-004 [NAME_2]\"},\"party_role\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"change_requested\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 2022,
+  "outputTokens": 384
+ }
+}

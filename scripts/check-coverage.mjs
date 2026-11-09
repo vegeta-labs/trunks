@@ -4,7 +4,7 @@
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 
-const ORDER = ['E1', 'E2', 'E3', 'E4', 'E5', 'E6']
+const ORDER = ['E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'F1']
 const current = readFileSync('docs/milestone.txt', 'utf8').trim()
 if (!ORDER.includes(current)) {
   console.log(`invalid milestone "${current}" in docs/milestone.txt (expected one of ${ORDER.join(', ')})`)
@@ -16,11 +16,11 @@ export function dueCases(plan, milestone) {
   const untagged = []
   let section = null
   for (const line of plan.split('\n')) {
-    if (/^#{2,3} /.test(line)) section = /〔(E\d)/.exec(line)?.[1] ?? null
+    if (/^#{2,3} /.test(line)) section = /〔([EF]\d)/.exec(line)?.[1] ?? null
     const m = /^- \*\*((?:TC|E2E)-[A-Z0-9]+-\d+[a-z]?|E2E-\d+)\*\*/.exec(line)
     if (!m) continue
     const id = m[1]
-    const ms = /〔(E\d)/.exec(line)?.[1] ?? section
+    const ms = /〔([EF]\d)/.exec(line)?.[1] ?? section
     if (!ms) {
       untagged.push(id)
       continue

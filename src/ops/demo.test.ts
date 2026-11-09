@@ -16,6 +16,6 @@ describe('demo configuration', () => {
     bad((x) => ({ ...x, events: { webhook: { url: 'https://hooks.example/x', secret_env: 'X' } } }), /an event webhook/)
     bad((x) => ({ ...x, kyc: { ...x.kyc, target: { kind: 'webhook', url: 'https://kyc.example/x', secret_env: 'X' } } }) as Config, /a KYC webhook/)
     bad((x) => ({ ...x, auth: { ...x.auth, oidc: { issuer: 'https://idp.example', client_id: 'x', client_secret_env: 'X', redirect_uri: 'https://app.example/cb', role_claim: 'roles', role_map: {} } } }) as Config, /OIDC/)
-    expect(new Set(DEMO_SAMPLES).size).toBe(30)
+    expect(new Set(DEMO_SAMPLES).size).toBe(31)
   })
 })

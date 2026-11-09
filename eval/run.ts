@@ -9,15 +9,17 @@ import { exportChildren, exportStatus, ownText, type NestedFacts } from './kyc-e
 import { createKit, FakeLlm } from '../src/pipeline/testkit.ts'
 import { loadMessage, stageResult, type ClassifyResult, type Extraction, type FieldsResult } from '../src/pipeline/stages.ts'
 import { emailHmac, loadSnapshot } from '../src/store/directory.ts'
+import { importDeals } from '../src/lib/directory.ts'
 import { getBlobs, putJson } from '../src/store/blobs.ts'
 import { msgIdNorm } from '../src/pipeline/ingest.ts'
 import { randomUUID } from 'node:crypto'
 import { ANTHROPIC_SETTINGS, AnthropicAdapter } from '../src/adapters/llm/anthropic.ts'
 import { Recorder, ReplayAdapter } from '../src/adapters/llm/replay.ts'
+import type { LlmAdapter } from '../src/adapters/llm/types.ts'
 import { failures, score, type Annotation, type SystemField, type SystemOutput } from './metrics.ts'
 import { directoryLedger, DISCLOSING, parseDirectoryCsv, e3Failures, scoreE3, type E3Annotation, type E3Output } from './metrics-e3.ts'
 
-import { effectiveFields, effectiveLabels, type LinkResult, type ReplyStageResult, type RiskStageResult } from '../src/pipeline/stages-e3.ts'
+import { effectiveFields, effectiveLabels, hadBankRuleLabel, type LinkResult, type ReplyStageResult, type RiskStageResult } from '../src/pipeline/stages-e3.ts'
 import { restartFrom } from '../src/pipeline/restart.ts'
 import { createUser } from '../src/server/auth.ts'
 import { tx } from '../src/store/db.ts'
@@ -40,7 +42,23 @@ const llm = fake
   : record
   ? new Recorder(new AnthropicAdapter({ model: m.model_id, ...(process.env[m.api_key_env] ? { apiKey: process.env[m.api_key_env]! } : {}) }), m.replay_dir!, m.model_id)
   : new ReplayAdapter(m.replay_dir!, m.model_id, ANTHROPIC_SETTINGS)
-const k = await createKit({ config, llm })
+// PRD §6 rule input (v0.7.28, F1-2 reading A): a second processing where the model's answer is the annotation's
+// classes, so C-CLS-4a E5 reads them too; the real model's answer is used only for the end-to-end run
+let annotated: string[] | null = null
+const switching: LlmAdapter = {
+  get id() { return llm.id },
+  get location() { return llm.location },
+  async complete(req) {
+    if (annotated === null) return llm.complete(req)
+    const raw = req.promptVersion.startsWith('classify')
+      ? JSON.stringify({ labels: (annotated.length ? annotated : ['unclassified']).slice(0, 4).map((c) => ({ class: c, confidence: 'high', reason: 'rule input' })), language: 'en' })
+      : '{"fields":{}}'
+    return { raw, parsed: req.schema.parse(JSON.parse(raw)), usage: { inputTokens: 0, outputTokens: 0 } }
+  },
+}
+const k = await createKit({ config, llm: switching })
+let e5Cancelled = 0
+let e5Decided = 0
 
 // the directory, once (Q2 / Q3: files as the evaluation author wrote them, the deal named by its file)
 const D = 'eval/directory'
@@ -101,10 +119,29 @@ async function rawInputs(caseId: string, snap: Awaited<ReturnType<typeof loadSna
   return {
     mime_failed: (await k.db.query<{ flags: string[] }>('SELECT flags FROM "case" WHERE id = $1', [caseId])).rows[0]!.flags.includes('mime_parse_failed'),
     dmarc_pass: dmarc,
-    sender_contacts: matches.map((x) => ({ contact_id: x.contactId, investor_ids: x.investorIds, authorised_for: x.authorisedFor })),
+    sender_contacts: matches.map((x) => ({ contact_id: x.contactId, investor_ids: x.investorIds, authorised_for: x.authorisedFor, deals: x.deals })),
     commitment: c && deal ? { cash_due_minor: c.cashDue, deal_currency: deal.currency, ledger: snap.ledgerDeals.includes(deal.dealKey) ? snap.ledger.filter((l) => l.dealKey === deal.dealKey).map((l) => ({ status: l.status, investor_id: l.commitmentKeyHmac ? (bare.get(l.commitmentKeyHmac) ?? '') : '', currency: l.currency, amount_minor: l.amount })) : null } : null,
     pressure_texts: [m.subject, m.text, m.htmlText],
     account_texts: [m.subject, m.text, m.htmlText, ...m.attachments.flatMap((a) => [a.filename, a.text])],
+  }
+}
+
+// test plan §3 v0.7.26: the C-CLS-4a inputs for the oracle; the evaluation directory is fictional, so its accounts are plain here
+async function f1Input(caseId: string, cls: ClassifyResult, lk: LinkResult, ex: Extraction, snap: Awaited<ReturnType<typeof loadSnapshot>>) {
+  const msgId = (await k.db.query<{ message_id: string }>('SELECT message_id FROM "case" WHERE id = $1', [caseId])).rows[0]!.message_id
+  const m = await loadMessage(k, msgId)
+  const deals = importDeals(csv('deals.csv'), config.deployment.currencies)
+  return {
+    subject: m.subject, body: m.text, body_html: m.htmlText,
+    attachments: m.attachments.map((a) => ({ ordinal: a.ordinal, kind: a.kind, filename: a.filename, parse_status: a.parseStatus, maybe_kyc: a.maybeKyc, text: a.text })),
+    model_labels: cls.modelFailed ? null : cls.labels.filter((l) => l.source === 'model').map((l) => l.classId),
+    esign_invite: ex.esign.esignInvite,
+    references: ex.references.map((r) => {
+      const hit = snap.commitments.find((c) => c.reference === r.value)
+      return { reference: r.value, deal: hit ? snap.deals.find((d) => d.dealKey === hit.dealKey)?.name ?? null : null }
+    }),
+    receiving_accounts: deals.ok ? Object.fromEntries(deals.rows.map((d) => [d.name, d.receivingAccounts])) : {},
+    link_deal: lk.dealName,
   }
 }
 
@@ -118,7 +155,7 @@ if (!pinned && relative(resolve('eval/dev'), resolve(dir)) === '') setProblems.p
 // the E3 rule-input run changes labels and fields as this user (PRD §6 «规则输入», evaluation only)
 const evalUser = await tx(k.db, (c) => createUser(c, k.k, { username: `eval-${Date.now()}`, role: 'admin', password: null, by: null }))
 const MILESTONE = readFileSync('docs/milestone.txt', 'utf8').trim()
-const e3Enabled = ['E3', 'E4', 'E5', 'E6'].includes(MILESTONE)
+const e3Enabled = ['E3', 'E4', 'E5', 'E6', 'F1'].includes(MILESTONE)
 // test plan §3 export for the oracle; EVAL_ACTUAL_DIR keeps it where TC-DEMO-01 compares the demo with it
 const actualDir = process.env.EVAL_ACTUAL_DIR ? (mkdirSync(process.env.EVAL_ACTUAL_DIR, { recursive: true }), process.env.EVAL_ACTUAL_DIR) : mkdtempSync(join(tmpdir(), 'doi-actual-'))
 mkdirSync(actualDir, { recursive: true })
@@ -138,13 +175,20 @@ for (const id of ids) {
     await loadPrior(mailbox, ann.received_at, ann.prior_messages)
     const r = await k.ingest(readFileSync(join(dir, `${id}.eml`)), ann.received_at, { id: mailbox, trustedAuthResults: ann.mailbox_strips_auth_results, trustedAuthservId: 'mx.ops.example' })
     await k.drain()
-    const caseId = (r as { caseId?: string }).caseId
-    if (!caseId) throw new Error(`not ingested: ${JSON.stringify(r)}`)
+    const firstId = (r as { caseId?: string }).caseId
+    if (!firstId) throw new Error(`not ingested: ${JSON.stringify(r)}`)
+    let caseId: string = firstId
     const cls = await stageResult<ClassifyResult>(k.db, k.k, caseId, 'classify')
     const ex = await stageResult<Extraction>(k.db, k.k, caseId, 'extract')
     const fl = await stageResult<FieldsResult>(k.db, k.k, caseId, 'fields')
     if (!cls || !ex || !fl) throw new Error(`pipeline did not finish: ${(await k.db.query('SELECT status, failed_stage FROM "case" WHERE id = $1', [caseId])).rows[0]?.failed_stage}`)
     if (cls.modelFailed || fl.modelFailed) fallbacks++
+    // the real model cancelling C-CLS-4a for a message that otherwise qualifies (reported, no gate)
+    // eligible = the exception would apply if the model gave only payment classes (every other condition holds)
+    if (cls.exemptionWithoutModel === true) {
+      e5Decided++
+      if (cls.evidenceExemption && !cls.evidenceExemption.applied) e5Cancelled++
+    }
     const sig = new Map((await k.db.query<{ signal: string; value: boolean | null }>('SELECT signal, value FROM case_signal WHERE case_id = $1', [caseId])).rows.map((x) => [x.signal, x.value]))
     // null = unknown (auth results not adopted); an absent signal is false
     for (const [name, want] of Object.entries((ann as unknown as { signals: Record<string, boolean | null> }).signals)) {
@@ -194,7 +238,7 @@ for (const id of ids) {
       }
       const out: E3Output = {
         id, risk: rk.final, template: rp.selection.template, adopted: labels.adopted, low: labels.low,
-        ruleLabels: cls.labels.filter((l) => l.source === 'rule').map((l) => l.classId),
+        ruleLabels: [...new Set([...cls.labels.filter((l) => l.source === 'rule').map((l) => l.classId), ...((await hadBankRuleLabel(k.db, caseId)) ? ['bank_details'] : [])])],
         links: { contact_id: lk.links.contact.id, investor_id: lk.commitment?.key ?? null, deal: lk.dealName },
         typed: fieldsOut,
         injectionHit: sig.get('injection_markers') === true || sig.get('hidden_text') === true,
@@ -215,11 +259,25 @@ for (const id of ids) {
         amounts_body: real.rk.inputs.amountsBody, planned_close_date: real.lk.dealCloseDate, risk: real.out.risk, template: real.out.template,
         ...(await rawInputs(caseId, snap, real.lk)),
         attachments: await exportAttachments(caseId),
+        rule_labels: real.out.ruleLabels,
+        f1_input: await f1Input(caseId, cls, real.lk, ex, snap),
       }, null, 1))
-      // rule input: the annotated labels and fields replace the model's output (rule labels stay), then link → emit again
+      // rule input: the same email again, the annotated classes as the model's answer (rule labels by the code), the
+      // annotated fields as the final fields, then link → emit again
+      await k.t.owner.query(RESET)
+      await loadPrior(mailbox, ann.received_at, ann.prior_messages)
+      annotated = [...ann.classes]
+      let second: unknown
+      // the override stays on until the rule run is read: a later restart (the risk step's fields) asks again
+      second = await k.ingest(readFileSync(join(dir, `${id}.eml`)), ann.received_at, { id: mailbox, trustedAuthResults: ann.mailbox_strips_auth_results, trustedAuthservId: 'mx.ops.example' })
+      await k.drain()
+      const secondId = (second as { caseId?: string }).caseId
+      if (!secondId) throw new Error(`rule input not ingested: ${JSON.stringify(second)}`)
+      caseId = secondId
+      const ruleCls = (await stageResult<ClassifyResult>(k.db, k.k, caseId, 'classify'))!
       const gen = (await k.db.query<{ g: number }>('SELECT processing_generation AS g FROM "case" WHERE id = $1', [caseId])).rows[0]!.g
       const labels = await effectiveLabels(k, caseId, gen)
-      const ruleIds = new Set(cls.labels.filter((l) => l.source === 'rule').map((l) => l.classId))
+      const ruleIds = new Set([...ruleCls.labels.filter((l) => l.source === 'rule').map((l) => l.classId), ...((await hadBankRuleLabel(k.db, caseId)) ? ['bank_details'] : [])])
       await tx(k.db, async (c) => {
         for (const cl of new Set([...labels.adopted, ...labels.low])) if (!ruleIds.has(cl) && !ann.classes.includes(cl)) await c.query('INSERT INTO case_label_change (id, case_id, class_id, action, by_user) VALUES (gen_random_uuid(), $1, $2, $3, $4)', [caseId, cl, 'remove', evalUser])
         for (const cl of ann.classes) if (!labels.adopted.includes(cl)) await c.query('INSERT INTO case_label_change (id, case_id, class_id, action, by_user) VALUES (gen_random_uuid(), $1, $2, $3, $4)', [caseId, cl, 'add', evalUser])
@@ -235,6 +293,7 @@ for (const id of ids) {
       })
       await k.drain()
       rulesRun.set(id, (await readE3()).out)
+      annotated = null
     }
   } catch (e) {
     errors++
@@ -251,6 +310,7 @@ console.log(`  classification macro F1  ${report.classification.value === null ?
 for (const [c, x] of Object.entries(report.classification.perClass)) console.log(`    ${c.padEnd(22)} F1 ${x.f1.toFixed(2)}  tp ${x.tp} fp ${x.fp} fn ${x.fn}`)
 console.log(`  rule fields              ${pct(report.ruleFields)} (100%)`)
 console.log(`  field recall             ${pct(report.fieldRecall)} (≥ 90%)`)
+console.log(`  E5 cancellations (real model, report): ${e5Cancelled} of ${e5Decided} payment messages that otherwise qualify`)
 console.log(`  field precision          ${pct(report.fieldPrecision)} (≥ 90%)`)
 console.log(`  empty fields             ${pct(report.emptyFields)} (≥ 95%)`)
 console.log(`  signals (shown)          ${signalMisses.length ? `${signalMisses.length} differ: ${signalMisses.join(', ')}` : 'all equal the annotation'}`)
@@ -297,7 +357,7 @@ if (e2e.size) {
     if (!oracle.ok) failed.push('rule consistency: the oracle differs')
   }
 }
-if (jsonOut) writeFileSync(jsonOut, JSON.stringify({ ...report, e3 }, null, 1))
+if (jsonOut) writeFileSync(jsonOut, JSON.stringify({ ...report, e3, e5Cancellations: { cancelled: e5Cancelled, eligible: e5Decided, rate: e5Decided ? e5Cancelled / e5Decided : null } }, null, 1))
 if (errors) failed.push(`${errors} samples not processed`)
 failed.push(...setProblems)
 console.log(failed.length ? `FAIL: ${failed.join('; ')}` : 'PASS')

@@ -5,6 +5,19 @@ import { extractAccounts, ibanShapes } from './accounts.ts'
 import { extractDates } from './dates.ts'
 import { findPhrases, normaliseText, words } from './text.ts'
 
+// C-RED-1 v0.7.28: the account line of an MT103 party field, wherever it is written
+const PARTY_ACCOUNT_LINE = /^[ \t>]*:(?:50[AFK]|59[AF]?):[\s>]*\/+([^\r\n]*)/gm
+const SIX_DIGITS = (v: string) => (v.match(/\p{Nd}/gu) ?? []).length >= 6
+/** C-RED-1 v0.7.28: values in a structural account position, whatever their shape. */
+export function structuralAccountSpans(t: string): Array<{ start: number; end: number }> {
+  return [...t.matchAll(PARTY_ACCOUNT_LINE)].flatMap((m) => {
+    const value = m[1]!
+    return SIX_DIGITS(value) ? [{ start: m.index + m[0].length - value.length, end: m.index + m[0].length }] : []
+  })
+}
+
+export const hasEnoughDigitsForAccount = SIX_DIGITS
+
 export type RedactKind = 'ACCOUNT' | 'SORTCODE' | 'ID' | 'DOB' | 'ADDRESS' | 'PHONE' | 'EMAIL' | 'NAME'
 
 export interface RedactSpan {
@@ -117,7 +130,7 @@ export interface RedactionRules {
 const ORDER: readonly RedactKind[] = ['ACCOUNT', 'SORTCODE', 'ID', 'DOB', 'ADDRESS', 'PHONE', 'EMAIL', 'NAME']
 
 /** Every hit of every rule, plus the C-EXT-4 hits. */
-function hits(t: string, rules: RedactionRules): Array<Span & { kind: RedactKind }> {
+function hits(t: string, rules: RedactionRules, extraAccounts: readonly Span[] = []): Array<Span & { kind: RedactKind }> {
   const kw = (...p: string[]) => findPhrases(t, p)
   const sortKw = kw('sort', 'sort code')
   const sortCodeKw = kw('sort code')
@@ -132,7 +145,7 @@ function hits(t: string, rules: RedactionRules): Array<Span & { kind: RedactKind
   // the domain of an e-mail address is kept: a name word inside it is not a name
   const inDomain = (s: Span) => emails.some((e) => s.start >= e.domain.start && s.end <= e.domain.end)
   const by: Record<RedactKind, Span[]> = {
-    ACCOUNT: accountShapes(t, ext, accKw, sortCodeKw),
+    ACCOUNT: [...accountShapes(t, ext, accKw, sortCodeKw), ...structuralAccountSpans(t), ...extraAccounts],
     SORTCODE: [...all(t, SORT_HYPHEN), ...all(t, SIX).filter((s) => near(sortKw, s, 20, -1)), ...ext.flatMap((h) => (h.sort ? [h.sort] : []))],
     ID: [...all(t, NINE).filter((s) => near(kw('passport'), s, 30, 30)), ...all(t, DRIVING), ...all(t, NINO)],
     DOB: [...extractDates(t), ...all(t, NUMERIC_DATE)].filter((d) => near(dobKw, d, 30, -1)),
@@ -212,9 +225,10 @@ export class Redactor {
     return p
   }
 
-  redactAll(texts: readonly string[]): Array<{ text: string; spans: RedactSpan[] }> {
+  // extraAccounts: per text, account positions only the parser knows (pacs.008, C-RED-1 v0.7.28)
+  redactAll(texts: readonly string[], extraAccounts: ReadonlyMap<number, readonly Span[]> = new Map()): Array<{ text: string; spans: RedactSpan[] }> {
     // pass 1: what the rules find, part by part (placeholders numbered in order of appearance)
-    const raw = texts.map((t) => hits(t, this.rules))
+    const raw = texts.map((t, i) => hits(t, this.rules, extraAccounts.get(i)))
     const first = raw.map((h) => merge(h))
     first.forEach((spans, i) => spans.forEach((sp) => {
       const value = texts[i]!.slice(sp.start, sp.end)

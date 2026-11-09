@@ -1,0 +1,71 @@
+{
+  "id": "E1047",
+  "family": "F121",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-04T10:25:00Z",
+  "prior_messages": [],
+  "description": "Traditional Chinese body (匯出款項, 如需其他資料) with a C-CLS-4a exempt pacs.008; an offer of more documents is not a KYC submission -> payment_evidence only, medium, payment_wait.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "f93196fc-129d-4a6d-8427-3d4c216ef288",
+    "amount": {
+      "minor": 2500000,
+      "currency": "EUR"
+    },
+    "currency": "EUR",
+    "value_date": "2026-11-02",
+    "payer_name": "WANG FANG",
+    "reference": "SB-006"
+  },
+  "rule_output": {
+    "uetrs": [
+      "f93196fc-129d-4a6d-8427-3d4c216ef288"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 2500000,
+        "currency": "EUR"
+      }
+    ],
+    "references": [
+      "SB-006"
+    ],
+    "account_last4": [
+      "4450",
+      "9015"
+    ],
+    "evidence_value_dates": [
+      "2026-11-02"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C024",
+    "investor_id": "Solent Biotherapeutics::006",
+    "deal": "Solent Biotherapeutics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_wait",
+  "notes": "匯出 is not on C.5 (only 匯到/匯至/匯入/匯款到). Ledger has no row for 006 -> not received in full. Value date Mon 2026-11-02, received Wed 2026-11-04: 2 working days < 5 -> payment_wait. No Solent bank line of 25,000. Body has no amount token. language zh."
+}

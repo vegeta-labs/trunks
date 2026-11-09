@@ -1,0 +1,82 @@
+{
+  "id": "E1018",
+  "family": "F092",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-02T09:40:00Z",
+  "prior_messages": [],
+  "description": "Well-formed MT103 with a listed :59: hides a new account in :70: -> M3 fails, rule bank_details, high, safe_ack.",
+  "classes": [
+    "payment_evidence",
+    "bank_details"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "bank_change",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "139a0e00-c7c9-479b-b137-e4fe4fdfc7bf",
+    "amount": {
+      "minor": 1500000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-10-30",
+    "payer_name": "JONAS BECKER",
+    "reference": "NW-007",
+    "party_role": "other",
+    "change_requested": true,
+    "account_last4": {
+      "multiple": [
+        "1312",
+        "2424"
+      ]
+    }
+  },
+  "rule_output": {
+    "uetrs": [
+      "139a0e00-c7c9-479b-b137-e4fe4fdfc7bf"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1500000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-007"
+    ],
+    "account_last4": [
+      "1312",
+      "2424"
+    ],
+    "evidence_value_dates": [
+      "2026-10-30"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C007",
+    "investor_id": "Northwind Robotics::007",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0005"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "The IBAN in :70: is outside every account position (M3) and :70: also has the C.5 word benef (M4). Fictional account with valid mod-97."
+}

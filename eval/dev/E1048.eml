@@ -1,0 +1,55 @@
+Return-Path: <lucia.fernandez@correo-fernandez.example>
+Received: from mail.correo-fernandez.example (mail.correo-fernandez.example [192.0.2.216])
+ by mx.ops.example with ESMTPS id c87ca4396e for <investors@ops.example>;
+ Thu, 12 Nov 2026 11:05:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=correo-fernandez.example;
+ dkim=pass header.d=correo-fernandez.example;
+ dmarc=pass header.from=correo-fernandez.example
+Message-ID: <E1048.c74c7591ff8f@correo-fernandez.example>
+In-Reply-To: <reminder.nw008.20261027@ops.example>
+References: <reminder.nw008.20261027@ops.example>
+Date: Thu, 12 Nov 2026 11:02:30 +0000
+From: =?utf-8?b?THVjw61hIEZlcm7DoW5kZXo=?= <lucia.fernandez@correo-fernandez.example>
+To: investors@ops.example
+Subject: Re: Northwind Robotics - NW-008 reminder
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============5174845393659707600=="
+
+--===============5174845393659707600==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Thank you for the reminder. I sent the remaining =C2=A35,000.00 (reference =
+NW-008) on 2 November; the MT103 is attached.
+
+Muchas gracias,
+Luc=C3=ADa Fern=C3=A1ndez
+
+On Tue, 27 Oct 2026 at 09:30, Kestrel Syndicate Operations <investors@ops.e=
+xample> wrote:
+> Dear Luc=C3=ADa,
+>
+> Thank you for the first part of your payment for Northwind Robotics. Our =
+records show =C2=A35,000.00 still to come under reference NW-008.
+>
+> Kind regards,
+> Investor Operations
+> Kestrel Syndicate Operations
+
+--===============5174845393659707600==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Fernandez.txt"
+
+ezM6ezEyMTo4NzNiZDU2OS05ZGEzLTRhZmQtYjRkZS04ODNlZWNmMzQzNGR9fQ0KezQ6DQo6MjA6
+TEZFLU5XOC0xMTAyDQo6MjNCOkNSRUQNCjozMkE6MjYxMTAyR0JQNTAwMCwwMA0KOjUwSzovR0I0
+OFFaQks0NDczMjMzMjQ2NjM4OA0KTFVDSUEgRkVSTkFOREVaDQpNQURSSUQNCjo1OTovR0I0NlFa
+Qks3ODYwNzIyMjU3ODgzOA0KTk9SVEhXSU5EIFJPQk9USUNTIFNQViBMUA0KOjcwOk5XLTAwOCBQ
+QVJUIDINCjo3MUE6U0hBDQotfQ0K
+
+--===============5174845393659707600==--

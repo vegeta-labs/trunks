@@ -1,0 +1,71 @@
+{
+  "id": "E1013",
+  "family": "F087",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-05T11:10:00Z",
+  "prior_messages": [],
+  "description": "C-CLS-4a exempt with the listed IBAN written in groups of four in :59: (C.3 normalisation); ledger shows nothing and value date is 2 working days old -> payment_wait.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "329a95c4-7626-4e5d-bfef-d337c6edc7b5",
+    "amount": {
+      "minor": 500000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-11-03",
+    "payer_name": "PRIYA RAMAN",
+    "reference": "NW-003"
+  },
+  "rule_output": {
+    "uetrs": [
+      "329a95c4-7626-4e5d-bfef-d337c6edc7b5"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 500000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-003"
+    ],
+    "account_last4": [
+      "3596",
+      "8838"
+    ],
+    "evidence_value_dates": [
+      "2026-11-03"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C003",
+    "investor_id": "Northwind Robotics::003",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_wait",
+  "notes": "Value date Tue 2026-11-03, received Thu 2026-11-05: 2 working days (C-DRF-4). Spaced IBAN is one account shape and equals the whole position value (M3); C.3 removes the spaces before the list comparison."
+}

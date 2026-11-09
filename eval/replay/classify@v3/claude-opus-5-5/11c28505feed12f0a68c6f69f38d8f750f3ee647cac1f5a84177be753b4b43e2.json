@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"payment_evidence\",\"confidence\":\"high\",\"reason\":\"MT103 attached for the transfer to Northwind Robotics SPV with reference NW-006.\"}],\"language\":\"fr\"}",
+ "usage": {
+  "inputTokens": 2367,
+  "outputTokens": 72
+ }
+}

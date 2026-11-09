@@ -7,7 +7,8 @@ TC-LNK-07, TC-AUD-01 hash part) and the E3 rules (TC-RSK-01-09 rule parts,
 TC-RTE-01-06 and 08, TC-DRF-02-07, 10, 11a/b, 15, TC-LNK-05, 09, TC-FRD-08,
 TC-OUT-07, 08) and the E4 rule C-RED-0 (TC-RED-04, with C-ING-2's unparsed
 XML under ⑤), the E6 C-RED-0 ③ inline-signature exception (TC-RED-11, PRD
-appendix B) and C-DRF-6 v0.7.24, plus the PRD's inline examples. Each check is
+appendix B), C-DRF-6 v0.7.24 and the F1 rules (TC-CLS-10 to 18, TC-RSK-11,
+TC-RED-13, TC-DIR-10, TC-DRF-21, PRD appendix C), plus the PRD's inline examples. Each check is
 named after its TC id (or PRD rule id). Exits non-zero on any failure.
 All example data is fictional (.example domains).
 """
@@ -2197,6 +2198,669 @@ with tempfile.TemporaryDirectory() as td:
 
 import shutil  # noqa: E402
 shutil.rmtree(E6DIR, ignore_errors=True)
+
+
+# ---------------------------------------------------------------- F1 (PRD v0.7.28)
+P, G, X = "GB82WEST12345698765432", "GB29NWBK60161331926819", "DE89370400440532013000"
+BAD_IBAN = "GB82WEST12345698765433"
+F1U = "105f40cc-99eb-43ea-8be8-115490377ee8"
+F1U2 = "7c2a33c4-6ee3-4852-83c0-2044b61e83bb"
+DEAL, DEAL2 = "Northwind Robotics", "Solent Biotherapeutics"
+CFG = {DEAL: [G]}
+SIG9 = {s: False for s in O.F1_SIGNALS}
+CONTACT = {"deals": [DEAL], "investor_ids": [DEAL + "::001"], "authorised_for": []}
+
+
+def mt(payer="/" + P, bene="/" + G, ref=":20:REF-1\n", extra70="NW-001", tail=":71A:SHA\n", between="", date="261030",
+       amount="GBP9000,00", uetr=F1U):
+    head = "{3:{121:%s}}\n" % uetr if uetr else ""
+    return (head + "{4:\n" + ref + ":23B:CRED\n:32A:" + date + amount + "\n:50K:" + payer + "\nDANIEL OSEI\n" + between +
+            ":59:" + bene + "\nNORTHWIND SPV LP\n:70:" + extra70 + "\n" + tail + "-}\n")
+
+
+def px(tx=None, dbtr=P, cdtr=G, head="", attrs="", wrap=False):
+    if tx is None:
+        tx = ("<CdtTrfTxInf><PmtId><InstrId>I-1</InstrId><EndToEndId>E-1</EndToEndId><UETR>%s</UETR></PmtId>"
+              "<IntrBkSttlmAmt Ccy=\"GBP\">9000.00</IntrBkSttlmAmt><IntrBkSttlmDt>2026-10-30</IntrBkSttlmDt>"
+              "<Dbtr><Nm>DANIEL OSEI</Nm></Dbtr>%s<Cdtr><Nm>NORTHWIND SPV LP</Nm></Cdtr>%s"
+              "<RmtInf><Ustrd>NW-001</Ustrd></RmtInf></CdtTrfTxInf>") % (
+                  F1U, "<DbtrAcct><Id><IBAN>%s</IBAN></Id></DbtrAcct>" % dbtr if dbtr else "",
+                  "<CdtrAcct><Id><IBAN>%s</IBAN></Id></CdtrAcct>" % cdtr if cdtr else "")
+    doc = ("<Document xmlns=\"urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08\"%s><FIToFICstmrCdtTrf><GrpHdr><MsgId>M-1</MsgId>"
+           "<NbOfTxs>1</NbOfTxs></GrpHdr>%s</FIToFICstmrCdtTrf></Document>") % (attrs, tx)
+    if wrap:
+        doc = ("<BusinessMessage><AppHdr xmlns=\"urn:iso:std:iso:20022:tech:xsd:head.001.001.02\"><BizMsgIdr>B-1</BizMsgIdr>"
+               "<MsgDefIdr>pacs.008.001.08</MsgDefIdr></AppHdr>" + doc + "</BusinessMessage>")
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + head + doc
+
+
+def txt(text, name="mt103.txt", maybe_kyc=False, status="ok", ordinal=0):
+    return {"ordinal": ordinal, "kind": "text/plain", "parse_status": status, "filename": name, "text": text, "xml": None,
+            "maybe_kyc": maybe_kyc}
+
+
+def xmla(xml, name="pacs008.xml", maybe_kyc=False, ordinal=0):
+    p = O.pacs008({"xml": xml})
+    return {"ordinal": ordinal, "kind": "application/xml", "parse_status": "ok" if p.get("parsed") else "unsupported",
+            "filename": name, "text": p.get("text"), "xml": xml, "maybe_kyc": maybe_kyc}
+
+
+def ex(att=None, atts=None, **kw):
+    inp = dict(subject="Payment confirmation", body="Attached is the payment file.", body_html=None,
+               attachments=atts if atts is not None else [att], currencies=["GBP", "EUR", "USD"], signals=SIG9, dmarc_pass=True,
+               sender_contact=CONTACT, reference_deals=[DEAL], blocked_or_over_limit=False, model_labels=["payment_evidence"],
+               prior_bank_rule=False, receiving_accounts=CFG)
+    inp.update(kw)
+    return O.evidence_exemption(inp)
+
+
+def labels_of(att, **kw):
+    """Rule labels end to end for one attachment, as check_actual computes them."""
+    e = O._exemption_detail(dict(subject=kw.get("subject", "Payment"), body=kw.get("body", "Attached."), body_html=kw.get("body_html"),
+                                 attachments=[att], currencies=None, signals=SIG9, dmarc_pass=True, sender_contact=CONTACT,
+                                 reference_deals=[DEAL], blocked_or_over_limit=False, model_labels=kw.get("model", ["payment_evidence"]),
+                                 prior_bank_rule=False, receiving_accounts=kw.get("cfg", CFG)))
+    parsed = bool(O.mt103({"text": att.get("text") or ""})["items"]) or (
+        isinstance(att.get("xml"), str) and O.pacs008({"xml": att["xml"]}).get("parsed", False) and
+        any(i["minor"] is not None for i in O.pacs008({"xml": att["xml"]})["items"]))
+    return O.rule_labels({"subject": kw.get("subject", "Payment"), "body": kw.get("body", "Attached."), "body_html": kw.get("body_html"),
+                          "attachment_texts": [{"ordinal": 0, "text": att.get("text")}], "esign_invite": False,
+                          "payment_evidence_parsed": parsed, "evidence_anywhere": parsed, "exempt_attachment": e["attachment"],
+                          "prior_bank_rule": False})["labels"]
+
+
+def pm(att):
+    return O.payment_message(dict(att, top_level=att.get("top_level", True), currencies=["GBP", "EUR", "USD"]))
+
+
+def app(x):
+    return ex(x)["applied"]
+
+
+BD, PE = ["bank_details", "payment_evidence"], ["payment_evidence"]
+
+# TC-CLS-10 exempt
+check("TC-CLS-10a MT103", ex(txt(mt())), {"applied": True, "deal": DEAL, "reason": None})
+check("TC-CLS-10a MT103 positions", pm(txt(mt())), {"structured": True, "payers": [P], "beneficiaries": [G], "problem": None})
+check("TC-CLS-10a labels", labels_of(txt(mt())), PE)
+check("TC-CLS-10b pacs.008", ex(xmla(px())), {"applied": True, "deal": DEAL, "reason": None})
+check("TC-CLS-10b positions", pm(xmla(px())), {"structured": True, "payers": [P], "beneficiaries": [G], "problem": None})
+check("TC-CLS-10b labels", labels_of(xmla(px())), PE)
+TX2 = "".join(("<CdtTrfTxInf><PmtId><InstrId>I-%d</InstrId><UETR>%s</UETR></PmtId><IntrBkSttlmAmt Ccy=\"GBP\">100.00</IntrBkSttlmAmt>"
+               "<IntrBkSttlmDt>2026-10-30</IntrBkSttlmDt><CdtrAcct><Id><IBAN>%s</IBAN></Id></CdtrAcct></CdtTrfTxInf>") % (n, u, G)
+              for n, u in ((1, F1U), (2, F1U2)))
+check("TC-CLS-10c AppHdr two payments", ex(xmla(px(tx=TX2, wrap=True))), {"applied": True, "deal": DEAL, "reason": None})
+check("TC-CLS-10c positions", pm(xmla(px(tx=TX2, wrap=True)))["beneficiaries"], [G, G])
+check("TC-CLS-10d only 50K", ex(txt(mt(bene="NORTHWIND SPV LP")))["applied"], True)
+check("TC-CLS-10d no beneficiary position", pm(txt(mt(bene="NORTHWIND SPV LP")))["beneficiaries"], [])
+check("TC-CLS-10e wait", O.template(dict(classes=CLS, adopted=PE, risk="medium", linked_commitment=True, ledger_state="not_received",
+                                         evidence_value_dates=["2026-11-02"], value_date=None, payment_date=None,
+                                         received_at="2026-11-03T10:00:00Z", calendar=CAL, may_disclose=True,
+                                         evidence_supports_tracing=True))["template"], "payment_wait")
+check("TC-CLS-10 a-d received", O.template(dict(classes=CLS, adopted=PE, risk="medium", linked_commitment=True, ledger_state="received",
+                                                evidence_value_dates=["2026-10-30"], value_date=None, payment_date=None,
+                                                received_at="2026-11-03T10:00:00Z", calendar=CAL, may_disclose=True))["template"], "payment_received")
+_DEV = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dev")
+
+
+def dev_att(sid, kind):
+    raw = O.raw_attachment(os.path.join(_DEV, sid + ".eml"), 0)
+    s = raw.decode("utf-8")
+    return xmla(s) if kind == "xml" else txt(s)
+
+
+E19, E25, E18, E24 = dev_att("E0019", "txt"), dev_att("E0025", "xml"), dev_att("E0018", "txt"), dev_att("E0024", "xml")
+check("TC-CLS-10f E0019 exempt", ex(E19, receiving_accounts={DEAL: ["GB41QZBK79137211981312"]})["applied"], True)
+check("TC-CLS-10f E0025 exempt", ex(E25, receiving_accounts={DEAL: ["GB39QZBK70404800674450"]})["applied"], True)
+check("TC-CLS-10f E0019 wait, value date 2026-10-30, received 2026-11-02",
+      O.working_days_after({"from": "2026-10-30", "to": "2026-11-02", "calendar": CAL})["days"] < 5, True)
+check("TC-CLS-10g E0018 no account position", pm(E18), {"structured": True, "payers": [], "beneficiaries": [], "problem": None})
+check("TC-CLS-10g E0024 no account position", pm(E24), {"structured": True, "payers": [], "beneficiaries": [], "problem": None})
+check("TC-CLS-10g E0018 no exception to speak of", ex(E18), {"applied": False, "deal": None, "reason": None})
+check("TC-CLS-10g E0018 no mismatch", O.beneficiary_mismatch({"structured_beneficiaries": pm(E18)["beneficiaries"], "linked_deal": DEAL,
+                                                              "receiving_accounts": CFG, "exempted_deal": None}), {"hit": False})
+check("TC-CLS-10g E0018 labels", labels_of(E18), PE)
+check("TC-CLS-10h NEW YORK and a bank name in another field",
+      app(txt(mt(payer="/" + P + "\nNEW YORK", between=":57A:QZBKGB2L\n"))), True)
+check("TC-CLS-10h field wording", O._wording_hit("NEW YORK"), False)
+
+# TC-CLS-11 fake messages with accounts: the fixture carries :50K:/P and :59:/G unless the case replaces them.
+for name, a in [
+    ("a :70: IBAN", txt(mt(extra70=X))),
+    ("a :72: IBAN", txt(mt(tail=":71A:SHA\n:72:" + X + "\n"))),
+    ("a :57D: IBAN", txt(mt(between=":57D:/" + X + "\n"))),
+    ("a :77B: IBAN", txt(mt(tail=":71A:SHA\n:77B:" + X + "\n"))),
+    ("b plain text + one :32A: + IBAN", txt("Hello\n:32A:261030GBP9000,00\n" + X)),
+    ("c text after the message", txt(mt() + "and more text")),
+    ("c second message", txt(mt() + mt())),
+    ("c unknown field", txt(mt(between=":58A:QZBKGB2L\n"))),
+    ("c order", txt(mt(ref=":23B:CRED\n:20:REF-1\n").replace(":23B:CRED\n:32A:", ":32A:", 1))),
+    ("c required field missing", txt(mt(tail=""))),
+    ("c required field twice", txt(mt(ref=":20:REF-1\n:20:REF-2\n"))),
+    ("d :59:/G line 2 X", txt(mt(bene="/" + G + "\n" + X))),
+    ("d :50K:/P line 2 NEW BANK DETAILS", txt(mt(payer="/" + P + "\nNEW BANK DETAILS"))),
+    ("d :20: CHANGE ACCOUNT", txt(mt(ref=":20:CHANGE ACCOUNT\n"))),
+    ("d :50K:/PLEASE USE 123", txt(mt(payer="/PLEASE USE 123"))),
+    ("d :71A: continuation", txt(mt(tail=":71A:SHA\nMORE\n"))),
+    ("d :23B: continuation", txt(mt().replace(":23B:CRED\n", ":23B:CRED\nMORE\n"))),
+    ("d :23E:HOLD/87654321", txt(mt().replace(":23B:CRED\n", ":23B:CRED\n:23E:HOLD/87654321\n"))),
+    ("d :71A:87654321", txt(mt(tail=":71A:87654321\n"))),
+    ("d :57D:/87654321", txt(mt(between=":57D:/87654321\n"))),
+    ("d :59:ATTACKER LTD + ACC 1234567", txt(mt(bene="ATTACKER LTD\nACC 1234567"))),
+    ("d {108:CREDIT 87654321}", txt(mt().replace("{3:{121:%s}}" % F1U, "{3:{108:CREDIT 87654321}}"))),
+    ("d {5:CREDIT 87654321}", txt(mt() + "{5:CREDIT 87654321}")),
+    ("d :59:/G U+2028 X", txt(mt(bene="/" + G + "\u2028" + X))),
+    ("d :70: Arabic digits", txt(mt(extra70="CREDIT ٨٧٦٥٤٣٢١"))),
+    ("d :59://1234567", txt(mt(bene="//1234567"))),
+    ("d :59:/", txt(mt(bene="/"))),
+    ("e IBAN check digits", txt(mt(bene="/" + BAD_IBAN))),
+    ("e IBAN across lines", txt(mt(bene="/GB29 NWBK 6016 1331\n9268 19"))),
+    ("e account followed by text", txt(mt(bene="/" + G + " PLEASE"))),
+    ("f :70:CHANGE BANK ACCOUNT", txt(mt(extra70="CHANGE BANK ACCOUNT"))),
+    ("f :70:CREDIT 87654321 FOR NEXT", txt(mt(extra70="CREDIT 87654321 FOR NEXT INSTALMENT"))),
+    ("f :70:CREDIT 8765 4321 FOR NEXT", txt(mt(extra70="CREDIT 8765 4321 FOR NEXT INSTALMENT"))),
+    ("f :20:CREDIT 87654321", txt(mt(ref=":20:CREDIT 87654321\n"))),
+]:
+    check("TC-CLS-11%s not exempt" % name, app(a), False)
+    check("TC-CLS-11%s bank_details" % name, "bank_details" in labels_of(a), True)
+    check("TC-CLS-11%s safe_ack" % name, O.template(dict(classes=CLS, adopted=labels_of(a) + ["payment_evidence"], risk="high",
+                                                          linked_commitment=True, ledger_state="received", may_disclose=True,
+                                                          received_at="2026-11-03T10:00:00Z", calendar=CAL))["template"], "safe_ack")
+
+BASETX = ("<CdtTrfTxInf><PmtId><UETR>%s</UETR></PmtId><IntrBkSttlmAmt Ccy=\"GBP\">9000.00</IntrBkSttlmAmt><IntrBkSttlmDt>2026-10-30</IntrBkSttlmDt>"
+          "<DbtrAcct><Id><IBAN>%s</IBAN></Id></DbtrAcct><CdtrAcct><Id><IBAN>%s</IBAN></Id></CdtrAcct>%%s</CdtTrfTxInf>") % (F1U, P, G)
+NS = "urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08"
+CHG = "GB29NWBK60161331926819"
+for name, x in [
+    ("g Ustrd IBAN", px(tx=BASETX % ("<RmtInf><Ustrd>%s</Ustrd></RmtInf>" % X))),
+    ("g InstrInf IBAN", px(tx=BASETX % ("<InstrForNxtAgt><InstrInf>%s</InstrInf></InstrForNxtAgt>" % X))),
+    ("g UltmtCdtr IBAN", px(tx=BASETX % ("<UltmtCdtr><Nm>%s</Nm></UltmtCdtr>" % X))),
+    ("g sentence in IBAN", px(dbtr="PLEASE USE " + P)),
+    ("g two IBAN", px(cdtr=G + "</IBAN><IBAN>" + G)),
+    ("g two CdtrAcct", px(tx=BASETX % ("<CdtrAcct><Id><IBAN>%s</IBAN></Id></CdtrAcct>" % G))),
+    ("h comment", px(head="<!-- note -->")),
+    ("h processing instruction", px(head="<?note x?>")),
+    ("h CDATA", px(tx=BASETX % "<RmtInf><Ustrd><![CDATA[NW-1]]></Ustrd></RmtInf>")),
+    ("h numeric reference", px(tx=BASETX % "<RmtInf><Ustrd>N&#87;-1</Ustrd></RmtInf>")),
+    ("h extra attribute", px(attrs=" Foo=\"1\"")),
+    ("h Ccy on Dbtr", px(tx=BASETX % ("<Dbtr Ccy=\"CHANGE BANK ACCOUNT TO %s\"><Nm>A</Nm></Dbtr>" % CHG))),
+    ("h Ccy not three capitals", px(tx=BASETX.replace("Ccy=\"GBP\"", "Ccy=\"gbp\""))),
+    ("h xmlns prefix", px(attrs=" xmlns:CHANGE_BANK_ACCOUNT_TO_GB82=\"%s\"" % NS)),
+    ("h element name", px(tx=BASETX % "<CHANGE_BANK_ACCOUNT_TO_GB82/>")),
+    ("h envelope extra child", px(wrap=True).replace("</BusinessMessage>", "<Foo/></BusinessMessage>")),
+    ("h foreign namespace", px(tx=BASETX % "<Purp xmlns=\"urn:foo\"><Cd>A</Cd></Purp>")),
+    ("h mixed content", px(tx=BASETX % "<Dbtr>TEXT<Nm>A</Nm></Dbtr>")),
+    ("h two Id", px(tx=BASETX.replace("<CdtrAcct><Id><IBAN>%s</IBAN></Id>" % G, "<CdtrAcct><Id><IBAN>%s</IBAN></Id><Id><IBAN>%s</IBAN></Id>" % (G, G)) % "")),
+    ("h Othr with SchmeNm", px(tx=BASETX.replace("<CdtrAcct><Id><IBAN>%s</IBAN></Id>" % G, "<CdtrAcct><Id><Othr><Id>%s</Id><SchmeNm><Cd>X</Cd></SchmeNm></Othr></Id>" % G) % "")),
+    ("h CdtrAgtAcct", px(tx=BASETX % ("<CdtrAgtAcct><Id><IBAN>%s</IBAN></Id></CdtrAgtAcct>" % X))),
+    ("h CdtrAcct under UltmtCdtr", px(tx=BASETX % ("<UltmtCdtr><CdtrAcct><Id><IBAN>%s</IBAN></Id></CdtrAcct></UltmtCdtr>" % X))),
+    ("h xmlns value", px(wrap=False).replace(NS, "urn:iso:std:iso:20022:tech:xsd:pacs.008.CHANGE.BANK.ACCOUNT")),
+    ("h BICFI digits", px(tx=BASETX % "<DbtrAgt><FinInstnId><BICFI>87654321</BICFI></FinInstnId></DbtrAgt>")),
+    ("h Cdtr OrgId 8 digits", px(tx=BASETX % "<Cdtr><Id><OrgId><Othr><Id>87654321</Id></Othr></OrgId></Id></Cdtr>")),
+]:
+    a = xmla(x)
+    check("TC-CLS-11%s not exempt" % name, app(a), False)
+    # The case's own account is visible to the shape rule when the text can be read.
+    if a["text"] is not None:
+        check("TC-CLS-11%s bank_details" % name, "bank_details" in labels_of(a), True)
+check("TC-CLS-10 BASETX itself exempt (fixture guard)", app(xmla(px(tx=BASETX % ""))), True)
+INNER = {"ordinal": 0, "kind": "message/rfc822", "parse_status": "ok", "filename": "fwd.eml", "text": mt(), "xml": None, "maybe_kyc": False}
+check("TC-CLS-11i in an attached .eml", (app(INNER), "bank_details" in labels_of(INNER)), (False, True))
+
+# TC-CLS-12 body and subject
+for name, kw in [("a from now on pay X", {"body": "From now on pay " + X}),
+                 ("b subject IBAN", {"subject": "Use " + X}),
+                 ("b HTML IBAN", {"body_html": "<p>" + X + "</p>"}),
+                 ("b quoted IBAN", {"body": "> " + X}),
+                 ("c update bank details", {"body": "please update our bank details"})]:
+    check("TC-CLS-12%s bank_details" % name, "bank_details" in labels_of(txt(mt()), **kw), True)
+for t in ["From now on pay to the beneficiary on the attached", "以后请付到附件里的这个账户", "Our accounts have moved",
+          "Bitte auf das Bankkonto im Anhang"]:
+    check("TC-CLS-12d %s" % t, (ex(txt(mt()), body=t)["applied"], "bank_details" in labels_of(txt(mt()), body=t)), (False, True))
+for t in ["Please refund the overpayment to the sender shown", "请把退款打到附件里的付款人"]:
+    check("TC-CLS-12e %s" % t, ex(txt(mt(payer="/" + X)), body=t), {"applied": False, "deal": None, "reason": "E2"})
+B12F = "Please use the attached for all ongoing payments"
+check("TC-CLS-12f model low bank_details", labels_of(txt(mt()), body=B12F, model=["payment_evidence", "bank_details"]), BD)
+check("TC-CLS-12g known limit, model only payment_evidence", labels_of(txt(mt()), body=B12F), PE)
+check("TC-CLS-12h mixed script", ex(txt(mt()), body="Pay the bеneficiary"), {"applied": False, "deal": None, "reason": "E2"})
+for t in ["Attached is the wire confirmation", "Please find the remittance advice", "My wire transfer receipt"]:
+    check("TC-CLS-12i %s" % t, ex(txt(mt()), body=t)["applied"], True)
+for t in ["Please wire to the attached", "wire it to", "wire funds per", "Please remit via the attached",
+          "Remittance now goes to the bank on the attached", "should be wired to", "Wires go to", "Keep remitting to",
+          "Remittance will now go to", "请把下一笔汇款到附件里的银行", "下一笔请转账到附件里的人", "請匯到附件裡的帳戶"]:
+    check("TC-CLS-12j %s" % t, O.redirect_wording({"text": t}), {"hit": True})
+    check("TC-CLS-12j applied %s" % t, ex(txt(mt()), body=t)["applied"], False)
+NOACC = mt(payer="DANIEL OSEI", bene="NORTHWIND SPV LP")
+check("TC-CLS-12k no account fixture has no shape", ex(txt(NOACC)), {"applied": False, "deal": None, "reason": None})
+check("TC-CLS-12k subject", labels_of(txt(NOACC), subject="Please update our bank details"), BD)
+for t in ["from now on", "going forward", "henceforth", "future payments", "以后", "今后"]:
+    check("TC-CLS-12k body %s" % t, labels_of(txt(NOACC), body=t), BD)
+    check("TC-CLS-12k C.6 %s" % t, O.explicit_redirect({"text": t}), {"hit": True})
+L12 = "后续有问题再联系"
+check("TC-CLS-12l no account -> no trigger", labels_of(txt(NOACC), body=L12), PE)
+check("TC-CLS-12l C.6 no, C.5 yes", (O.explicit_redirect({"text": L12})["hit"], O.redirect_wording({"text": L12})["hit"]), (False, True))
+check("TC-CLS-12l account -> exemption cancelled", labels_of(txt(mt()), body=L12), BD)
+RL = dict(subject="Hello", body_html=None, attachment_texts=[], esign_invite=False, payment_evidence_parsed=False,
+          evidence_anywhere=False, exempt_attachment=None, prior_bank_rule=False)
+check("TC-CLS-12m no evidence, from now on", O.rule_labels(dict(RL, body="from now on we are fine"))["labels"], [])
+check("TC-CLS-12m body amount only", O.mt103({"text": "from now on £9,000.00"})["items"], [])
+check("TC-CLS-12n subject and body judged apart", labels_of(txt(NOACC), subject="New MT103", body="my bank's MT103"), PE)
+
+# TC-CLS-13 mismatch
+check("TC-CLS-13a MT103 :59:/X", (ex(txt(mt(bene="/" + X)))["reason"],
+                                  O.beneficiary_mismatch({"structured_beneficiaries": pm(txt(mt(bene="/" + X)))["beneficiaries"],
+                                                          "linked_deal": DEAL, "receiving_accounts": CFG, "exempted_deal": None})["hit"]), ("M5", True))
+check("TC-CLS-13b pacs.008 CdtrAcct X", (ex(xmla(px(cdtr=X)))["reason"],
+                                         O.beneficiary_mismatch({"structured_beneficiaries": pm(xmla(px(cdtr=X)))["beneficiaries"],
+                                                                 "linked_deal": DEAL, "receiving_accounts": CFG, "exempted_deal": None})["hit"]), ("M5", True))
+check("TC-CLS-13c another deal's account", O.beneficiary_mismatch({"structured_beneficiaries": [G], "linked_deal": DEAL2,
+                                                                  "receiving_accounts": {DEAL: [G], DEAL2: [X]}, "exempted_deal": None}), {"hit": True})
+check("TC-CLS-13d one G one X", O.beneficiary_mismatch({"structured_beneficiaries": [G, X], "linked_deal": DEAL,
+                                                        "receiving_accounts": CFG, "exempted_deal": None}), {"hit": True})
+DOTTED = "GB82.WEST.1234.5698.7654.32"
+E13 = txt(mt(bene="/" + DOTTED))
+check("TC-CLS-13e dotted is a position", pm(E13)["beneficiaries"], [DOTTED])
+check("TC-CLS-13e dotted has no shape", O._account_shapes(O.normalize_text("/" + DOTTED)), [])
+check("TC-CLS-13e :59:/12345678 near :32A: has no shape", O._account_shapes(O.normalize_text(mt(payer="D", bene="/12345678"))), [])
+for v in (DOTTED, "12345678"):
+    check("TC-CLS-13e %s hits" % v, O.beneficiary_mismatch({"structured_beneficiaries": [v], "linked_deal": DEAL,
+                                                            "receiving_accounts": CFG, "exempted_deal": None}), {"hit": True})
+_r13 = dict(classes=CLS, adopted=PE, low=[], signals=SIG9, account_present=False, uetr_candidates_invalid=[], amounts_body=[],
+            amounts_attachment=[], attachment_blocked_or_over_limit=False, pressure_text=None, pressure_words=False,
+            planned_close_date=None, received_at="2026-11-03T10:00:00Z", calendar=CAL, adjustment=None)
+check("TC-CLS-13e risk high and reason", (O.risk(dict(_r13, evidence_beneficiary_mismatch=True))["final"],
+                                          "C-RSK-2:evidence_beneficiary_mismatch" in O.risk(dict(_r13, evidence_beneficiary_mismatch=True))["reasons"],
+                                          "bank_details" in O.risk(dict(_r13, evidence_beneficiary_mismatch=True))["reasons"]), ("high", True, True))
+check("TC-CLS-13e risk without", O.risk(_r13)["final"], "medium")
+check("TC-CLS-13e normalised value matches list", O.beneficiary_mismatch({"structured_beneficiaries": ["/gb29 nwbk-6016.1331926819"], "linked_deal": DEAL,
+                                                                          "receiving_accounts": CFG, "exempted_deal": None}), {"hit": False})
+check("TC-CLS-13e no digits does not count", O.beneficiary_mismatch({"structured_beneficiaries": ["NO DIGITS"], "linked_deal": DEAL,
+                                                                     "receiving_accounts": CFG, "exempted_deal": None}), {"hit": False})
+TWO = {"deals": [DEAL, DEAL2], "investor_ids": [], "authorised_for": []}
+check("TC-CLS-13f two deals", ex(txt(mt()), sender_contact=TWO)["reason"], "E3")
+check("TC-CLS-13f authorised for another deal", ex(txt(mt()), sender_contact=dict(CONTACT, authorised_for=[DEAL2 + "::002"]))["reason"], "E3")
+check("TC-CLS-13f another deal's reference", ex(txt(mt()), reference_deals=[DEAL2])["reason"], "E3")
+check("TC-CLS-13g approver lowers risk, still safe_ack", O.template(dict(classes=CLS, adopted=PE + ["bank_details"], risk="medium", linked_commitment=True,
+                                                                         ledger_state="received", may_disclose=True, received_at="2026-11-03T10:00:00Z",
+                                                                         calendar=CAL))["template"], "safe_ack")
+check("TC-CLS-13h no list, :59:/G", ex(txt(mt()), receiving_accounts={})["reason"], "M5")
+check("TC-CLS-13h no list, only :50K:/P", ex(txt(mt(bene="NORTHWIND SPV LP")), receiving_accounts={})["reason"], "M5")
+check("TC-CLS-13h no list no hit", O.beneficiary_mismatch({"structured_beneficiaries": [G], "linked_deal": DEAL, "receiving_accounts": {},
+                                                           "exempted_deal": None}), {"hit": False})
+for name, linked, cfg in [("another deal", DEAL2, {DEAL: [G], DEAL2: [G]}), ("deal without list", DEAL2, CFG), ("no link", None, CFG)]:
+    check("TC-CLS-13i %s" % name, O.beneficiary_mismatch({"structured_beneficiaries": [G], "linked_deal": linked, "receiving_accounts": cfg,
+                                                          "exempted_deal": DEAL}), {"hit": True})
+check("TC-CLS-13i same deal no hit", O.beneficiary_mismatch({"structured_beneficiaries": [G], "linked_deal": DEAL, "receiving_accounts": CFG,
+                                                             "exempted_deal": DEAL}), {"hit": False})
+
+# TC-CLS-14
+check("TC-CLS-14a MT103 + TXT with IBAN", ex(atts=[txt(mt()), txt("See " + X, name="note.txt", ordinal=1)])["reason"], "E4")
+PX_NOAMT = px(tx=BASETX.replace("9000.00", "9.000,00") % "")
+check("TC-CLS-14b pacs.008 no amount", (pm(xmla(PX_NOAMT))["structured"], labels_of(xmla(PX_NOAMT))), (False, ["bank_details"]))
+for kind, nm in (("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "a.docx"), ("text/csv", "a.csv"), ("application/pdf", "a.pdf")):
+    check("TC-CLS-14c %s" % nm, ex(dict(txt(mt(), name=nm), kind=kind))["reason"], "M2")
+check("TC-CLS-14d inline MT103 (E0017 form) counts", "bank_details" in O.rule_labels(dict(RL, body=mt(), evidence_anywhere=True))["labels"], True)
+for name, x in (("DTD", "<!DOCTYPE a>" + px()), ("broken", px()[:-5]), ("not pacs.008", "<a>" + X + "</a>")):
+    a = xmla(x)
+    check("TC-CLS-14e %s" % name, (a["text"], a["parse_status"], pm(a)["structured"]), (None, "unsupported", False))
+check("C.2 no stored raw XML does not qualify (TC-CLS-17b)", pm(dict(xmla(px()), xml=None))["structured"], False)
+
+# TC-CLS-15
+check("TC-CLS-15a DOCX", ex(atts=[txt(mt()), dict(txt("use the new beneficiary", name="n.docx", ordinal=1),
+                                                  kind="application/vnd.openxmlformats-officedocument.wordprocessingml.document")])["reason"], "E4")
+PNG = {"ordinal": 1, "kind": "image/png", "parse_status": "unsupported", "filename": "image001.png", "text": None, "xml": None, "maybe_kyc": False}
+check("TC-CLS-15a file name new_bank_details.png", ex(atts=[txt(mt()), dict(PNG, filename="new_bank_details.png")])["reason"], "E2")
+check("TC-CLS-15a encrypted PDF", ex(atts=[txt(mt()), {"ordinal": 1, "kind": "application/pdf", "parse_status": "encrypted", "filename": "a.pdf",
+                                                       "text": None, "xml": None, "maybe_kyc": True}])["reason"], "E4")
+check("TC-CLS-15a may be KYC", ex(txt(mt(), maybe_kyc=True))["reason"], "E4")
+check("TC-CLS-15a blocked", ex(txt(mt()), blocked_or_over_limit=True)["reason"], "E4")
+check("TC-CLS-15b inline signature", ex(atts=[txt(mt()), PNG])["applied"], True)
+check("TC-CLS-15c model failed", ex(txt(mt()), model_labels=None)["reason"], "E5")
+for c in ("withdrawal", "exit_distribution", "unreferenced_payment"):
+    check("TC-CLS-15c model also %s" % c, ex(txt(mt()), model_labels=["payment_evidence", c])["reason"], "E5")
+
+# TC-CLS-16
+for s in O.F1_SIGNALS:
+    check("TC-CLS-16a %s true" % s, ex(txt(mt()), signals=dict(SIG9, **{s: True}))["reason"], "E3")
+    check("TC-CLS-16a %s null" % s, ex(txt(mt()), signals=dict(SIG9, **{s: None}))["reason"], "E3")
+check("TC-CLS-16b dmarc not pass (none, neutral, temperror, missing, .eml import)", ex(txt(mt()), dmarc_pass=False)["reason"], "E3")
+check("TC-CLS-16b 0 or 2 contacts", ex(txt(mt()), sender_contact=None)["reason"], "E3")
+check("TC-CLS-16 authenticated_sender for .eml", O.authenticated_sender({"signals_input": {
+    "mailbox_strips_auth_results": True, "adapter": "eml", "trusted_authserv_id": "mx.ops.example",
+    "headers": [["Authentication-Results", "mx.ops.example; dmarc=pass"]], "from": {"name": "A", "address": "a@b.example"}, "reply_to": None,
+    "contacts": [{"contact_id": "C1", "name": "A", "emails": ["a@b.example"]}], "prior_from_addresses": [], "html": None, "texts": []}})["authenticated"], False)
+
+# TC-CLS-17, 18
+check("TC-CLS-17a kept after importing X", ex(txt(mt(bene="/" + X)), receiving_accounts={DEAL: [G, X]}, prior_bank_rule=True)["reason"], "E6")
+check("TC-CLS-17a rule label stays", O.rule_labels(dict(RL, body="fine", prior_bank_rule=True))["labels"], ["bank_details"])
+check("TC-CLS-17b old result", ex(dict(xmla(px()), xml=None))["applied"], False)
+for conf in ("high", "medium", "low"):
+    check("TC-CLS-18 model bank_details %s" % conf, ex(txt(mt()), model_labels=["payment_evidence", "bank_details"])["reason"], "E5")
+
+# TC-RSK-11
+check("TC-RSK-11 exempt mail still rises with pressure", O.risk(dict(_r13, pressure_words=True))["final"], "high")
+check("TC-RSK-11 close date still rises", O.risk(dict(_r13, planned_close_date="2026-11-04"))["final"], "high")
+check("TC-RSK-11 amount mismatch", O.risk(dict(_r13, amounts_body=[{"minor": 1, "currency": "GBP"}], amounts_attachment=[{"minor": 2, "currency": "GBP"}]))["final"], "high")
+check("TC-RSK-11 first_time_sender not exempt", ex(txt(mt()), signals=dict(SIG9, first_time_sender=True))["reason"], "E3")
+
+# TC-RED-13
+for name, t in (("good", mt()), ("bad", mt(extra70=X))):
+    r = O.redact({"text": t, "contact_names": []})["text"]
+    check("TC-RED-13 %s message has no IBAN" % name, any(v in r for v in (P, G, X)), False)
+check("TC-RED-13 :50K:/87654321", O.redact({"text": ":50K:/87654321\nNAME", "contact_names": []})["text"], ":50K:/[ACCOUNT_1]\nNAME")
+check("TC-RED-13 :59:/NORTHWIND SPV kept", O.redact({"text": ":59:/NORTHWIND SPV", "contact_names": []})["text"], ":59:/NORTHWIND SPV")
+check("TC-RED-13 5 digits kept", O.redact({"text": ":59:/12345", "contact_names": []})["text"], ":59:/12345")
+check("TC-RED-13 6 digits", O.redact({"text": ":59:/123456", "contact_names": []})["text"], ":59:/[ACCOUNT_1]")
+check("C-RED-1 ① spaces before /", O.redact({"text": ":59: /12345678\n:50K:\t/87654321", "contact_names": []})["text"], ":59: /[ACCOUNT_1]\n:50K:\t/[ACCOUNT_2]")
+check("TC-RED-13 line not at start", O.redact({"text": "see :59:/123456", "contact_names": []})["text"], "see :59:/123456")
+OTHR = px(tx=BASETX.replace("<IBAN>%s</IBAN>" % P, "<Othr><Id>87654321</Id></Othr>") % "")
+check("TC-RED-13 Othr/Id from raw XML", "87654321" in O.redact({"text": O.pacs008({"xml": OTHR})["text"], "contact_names": [], "xml": OTHR})["text"], False)
+OTHR2 = OTHR.replace("<Id><Othr>", "<Id><Othr><Foo/>", 1)
+check("TC-RED-13 unqualified message too", "87654321" in O.redact({"text": O.pacs008({"xml": OTHR2})["text"], "contact_names": [], "xml": OTHR2})["text"], False)
+check("TC-RED-13 pacs_accounts offsets", O.redact({"text": "A 87654321", "contact_names": [], "pacs_accounts": [{"start": 2, "end": 10}]})["text"], "A [ACCOUNT_1]")
+check("TC-RED-13 same value, same placeholder", O.redact({"text": ":59:/123456\nsame 123456", "contact_names": []})["text"], ":59:/[ACCOUNT_1]\nsame [ACCOUNT_1]")
+check("TC-RED-13 structure does not make a shape", O._account_shapes(":59:/123456"), [])
+
+# C.0 example
+check("C.0 261019GBP is not a sort code", O._account_shapes(":20:12345678\n:23B:CRED\n:32A:261019GBP9000,00"), [])
+check("C.0 :20:12345678 passes M3", pm(txt(mt(ref=":20:12345678\n", date="261019")))["problem"], None)
+check("C.0 a real pair: account only", ["123456 12345678"[a:b] for a, b, _ in O._account_shapes("123456 12345678")], ["12345678"])
+check("C.0 sort code alone is no shape", O._account_shapes("12-34-56"), [])
+check("C.0 VT is not a line end", pm(txt(mt().replace("\n:70:", "\x0b:70:")))["structured"], False)
+check("C.1 field lines only", pm(txt(mt().split("{4:\n")[1].replace("-}\n", "")))["structured"], True)
+check("C.1 CR line ends", pm(txt(mt().replace("\n", "\r")))["structured"], True)
+check("C.1 CRLF line ends", pm(txt(mt().replace("\n", "\r\n")))["structured"], True)
+check("C.1 optional blocks", pm(txt("{1:F01QZBKGB2LAXXX0000000000}{2:I103QZBKFRPPXXXN}" + mt() + "{5:{CHK:ABC123}}{S:{SAC:}}"))["problem"], None)
+check("C.1 :32A: invalid", pm(txt(mt(date="261331")))["structured"], False)
+check("C.1 :32A: unconfigured currency", O.payment_message(dict(txt(mt()), top_level=True, currencies=["EUR"]))["structured"], False)
+check("M1 nested", pm(dict(txt(mt()), top_level=False))["structured"], False)
+check("M1 parse failed", pm(txt(mt(), status="failed"))["structured"], False)
+check("M3 payer not IBAN and not digits", pm(txt(mt(payer="/GB82.WEST.1234")))["problem"], "M3")
+check("M3 payer digits, spaces, hyphens, dots", pm(txt(mt(payer="/12 34-56.78")))["problem"], None)
+check("C.2 UETR format", pm(xmla(px(tx=BASETX.replace(F1U, "not-a-uuid") % "")))["structured"], False)
+check("C.2 Othr/Id with no digits is ordinary text", pm(xmla(px(tx=BASETX.replace("<IBAN>%s</IBAN>" % G, "<Othr><Id>NWR-SPV-CLIENT-GBP</Id></Othr>") % "")))["beneficiaries"], [])
+check("C.2 M4 MsgId over 35", pm(xmla(px().replace("<MsgId>M-1</MsgId>", "<MsgId>%s</MsgId>" % ("M" * 36))))["problem"], "M4")
+check("C.2 M4 MsgId blank", pm(xmla(px().replace("<MsgId>M-1</MsgId>", "<MsgId>M 1</MsgId>")))["problem"], "M4")
+check("C.2 document with a prefix", pm(xmla(px().replace("<Document xmlns=", "<ns1:Document xmlns:ns1=").replace("</Document>", "</ns1:Document>")))["structured"], False)
+check("C.2 prefix on every element", pm(xmla("<ns1:Document xmlns:ns1=\"%s\"><ns1:FIToFICstmrCdtTrf><ns1:CdtTrfTxInf><ns1:IntrBkSttlmAmt Ccy=\"GBP\">1.00</ns1:IntrBkSttlmAmt>"
+                                             "</ns1:CdtTrfTxInf></ns1:FIToFICstmrCdtTrf></ns1:Document>" % NS))["structured"], True)
+check("C.3", O._norm_account("gb29/nwbk-6016.1331 9268 19"), "GB29NWBK60161331926819")
+for t in ("instead", "pay to", "a/c", "sort code", "BENEFICIARY", "cuenta", "wiring", "remit", "收款"):
+    check("C.5 hit %s" % t, O.redirect_wording({"text": t}), {"hit": True})
+for t in ("wire transfer", "wire advice", "wire reference", "wire receipt", "remittance slip", "remittance information", "remittance reference",
+          "paying", "the return", "Later"):
+    want = t in ("the return", "Later")
+    check("C.5 %s" % t, O.redirect_wording({"text": t})["hit"], want)
+check("C.5 returned is not return", O.redirect_wording({"text": "returned"})["hit"], False)
+check("C.6 后续 is only in C.5", O.explicit_redirect({"text": "后续"}), {"hit": False})
+check("C-CLS-4a no account shape -> no exception", ex(txt(NOACC)), {"applied": False, "deal": None, "reason": None})
+
+# TC-DIR-10
+RA = O.receiving_accounts_import
+check("TC-DIR-10 empty", RA({"value": "", "line": 2, "role": "admin"})["values"], [])
+check("TC-DIR-10 no column", RA({"value": None, "line": 2, "role": "admin"})["ok"], True)
+check("TC-DIR-10 several, not IBAN", RA({"value": G + "; NWR-CLIENT.01", "line": 2, "role": "admin"})["values"], [G, "NWRCLIENT01"])
+check("TC-DIR-10 last 4", RA({"value": G, "line": 2, "role": "admin"})["last4"], ["6819"])
+check("TC-DIR-10 IBAN check fails with line", (lambda r: (r["ok"], r["line"]))(RA({"value": BAD_IBAN, "line": 7, "role": "admin"})), (False, 7))
+check("TC-DIR-10 not admin", RA({"value": G, "line": 2, "role": "reviewer"})["error"], "forbidden")
+
+# TC-DRF-21
+OKM = mt(payer="DANIEL OSEI", bene="NORTHWIND SPV LP")
+TR = dict(currencies=["GBP"], deal_currency="GBP", cash_due_minor=900000, received_at_date="2026-11-10")
+tr = lambda a, **k: O.evidence_supports_tracing(dict(TR, attachments=a, **k))["ok"]
+check("TC-DRF-21 all met", tr([txt(OKM)]), True)
+check("TC-DRF-21 pacs.008 all met", tr([xmla(px(dbtr=None, cdtr=None))]), True)
+check("TC-DRF-21 sum at due", tr([txt(OKM)], cash_due_minor=900000), True)
+check("TC-DRF-21 no UETR", tr([txt(mt(payer="A", bene="B", uetr=None))]), False)
+TX_PART = ("<CdtTrfTxInf><PmtId>%s</PmtId><IntrBkSttlmAmt Ccy=\"%s\">%s</IntrBkSttlmAmt><IntrBkSttlmDt>%s</IntrBkSttlmDt></CdtTrfTxInf>")
+UE = "<UETR>%s</UETR>"
+check("TC-DRF-21 one payment no UETR", tr([xmla(px(tx=TX_PART % (UE % F1U, "GBP", "1.00", "2026-10-30") + TX_PART % ("", "GBP", "1.00", "2026-10-30")))]), False)
+check("TC-DRF-21 one payment other currency", tr([xmla(px(tx=TX_PART % (UE % F1U, "GBP", "1.00", "2026-10-30") + TX_PART % (UE % F1U2, "EUR", "1.00", "2026-10-30")))]), False)
+check("TC-DRF-21 over the due amount", tr([txt(OKM)], cash_due_minor=899999), False)
+check("TC-DRF-21 value date after receipt", tr([txt(OKM)], received_at_date="2026-10-29"), False)
+check("TC-DRF-21 two value dates", tr([xmla(px(tx=TX_PART % (UE % F1U, "GBP", "1.00", "2026-10-30") + TX_PART % (UE % F1U2, "GBP", "1.00", "2026-10-29")))]), False)
+check("TC-DRF-21 :32A: void", tr([txt(mt(payer="A", bene="B", date="261331"))]), False)
+check("TC-DRF-21 body-inline only", tr([]), False)
+check("TC-DRF-21 one fake :32A: line", tr([txt("Hello\n:32A:261030GBP9000,00\n" + F1U)]), False)
+check("TC-DRF-21 PDF", tr([dict(txt(OKM), kind="application/pdf")]), False)
+check("TC-DRF-21 two messages", tr([txt(OKM), txt(OKM, ordinal=1)]), False)
+TP = dict(classes=CLS, adopted=PE, risk="medium", linked_commitment=True, ledger_state="not_received", evidence_value_dates=["2026-10-30"],
+          value_date=None, payment_date=None, received_at="2026-11-10T10:00:00Z", calendar=CAL, may_disclose=True, evidence_supports_tracing=True)
+tp = lambda **k: O.template(dict(TP, **k))["template"]
+check("TC-DRF-21 received template", tp(), "payment_evidence_received")
+check("TC-DRF-21 ledger unknown", tp(ledger_state="unknown"), "payment_evidence_received")
+check("TC-DRF-21 ledger unknown even when recent", tp(ledger_state="unknown", received_at="2026-11-02T10:00:00Z"), "payment_evidence_received")
+check("TC-DRF-21 not satisfied", tp(evidence_supports_tracing=False), "payment_need_evidence")
+check("TC-DRF-21 under 5 working days", tp(received_at="2026-11-02T10:00:00Z"), "payment_wait")
+check("TC-DRF-21 received in full", tp(ledger_state="received"), "payment_received")
+check("TC-DRF-21 not linked", tp(linked_commitment=False), "payment_need_reference")
+check("TC-DRF-21 C-LNK-5 refuses", tp(may_disclose=False), "safe_ack")
+check("TC-DRF-21 template not configured", tp(evidence_received_configured=False), "payment_need_evidence")
+AC = dict(adopted=PE, fields={}, confirms_confirmed_by_person=False, linked_commitment=True, authenticated_sender=True,
+          sender_is_lead_of_deal=False, investor_name="Daniel", reference="NW-1", deal=DEAL)
+acts = lambda t: [x["action"] for x in O.actions(dict(AC, template=t))["actions"]]
+check("TC-DRF-21 actions", acts("payment_evidence_received"), ["check_payment_in_ledger", "check_payment_evidence"])
+check("TC-DRF-21 reviewer switches to need_evidence", acts("payment_need_evidence"), ["check_payment_in_ledger", "request_payment_evidence"])
+check("TC-DRF-21 details", O.actions(dict(AC, template="payment_evidence_received"))["actions"][1]["details"],
+      "Check the sender's payment confirmation against the ledger; it is not proof of receipt")
+
+# Readings locked (each reported as open to the owner)
+check("C.1 `-}{5:` on one line", pm(txt(mt().rstrip("\n") + "{5:{CHK:ABC}}"))["structured"], True)
+check("C.1 `{5:` on its own line", pm(txt(mt() + "{5:{CHK:ABC}}"))["structured"], True)
+check("C.1 text after `-}`", pm(txt(mt().rstrip("\n") + "TEXT"))["structured"], False)
+check("C.1 ` -}` not at line start", pm(txt(mt().replace("\n-}", "\n -}")))["structured"], False)
+check("M4 ④ :20: with a space", pm(txt(mt(ref=":20:A B\n")))["problem"], "M4")
+check("M4 ④ :20: over 16", pm(txt(mt(ref=":20:12345678901234567\n")))["problem"], "M4")
+check("M4 ④ :20: at 16", pm(txt(mt(ref=":20:1234567890123456\n")))["problem"], None)
+check("C.1 :20: continuation", pm(txt(mt(ref=":20:A\nB\n")))["structured"], False)
+check("M4 ③ :20: digits not counted", pm(txt(mt(ref=":20:1234567890\n")))["problem"], None)
+check("M4 ③ XML reference digits not counted", pm(xmla(px().replace("<MsgId>M-1</MsgId>", "<MsgId>20261105123456</MsgId>")))["problem"], None)
+for tag, good, bad in (("13C", "/SNDTIME/1200+0100", "/SNDTIME/1200"), ("26T", "A1B", "A1BC"), ("33B", "GBP9000,00", "GBP 9000"),
+                       ("36", "1,5", "1.5"), ("71G", "GBP1,00", "1,00")):
+    where = {"13C": (":23B:CRED\n", ":%s:%s\n:23B:CRED\n"), "26T": (":32A:", ":%s:%s\n:32A:"), "33B": (":50K:", ":%s:%s\n:50K:"),
+             "36": (":50K:", ":%s:%s\n:50K:"), "71G": ("-}", ":%s:%s\n-}")}[tag]
+    check("C.1 %s format ok" % tag, pm(txt(mt().replace(where[0], where[1] % (tag, good), 1)))["structured"], True)
+    check("C.1 %s format bad" % tag, pm(txt(mt().replace(where[0], where[1] % (tag, bad), 1)))["structured"], False)
+check("C.1 :23B:PAY1 format", pm(txt(mt().replace(":23B:CRED", ":23B:PAY1")))["structured"], False)
+check("C.1 :71F: format", pm(txt(mt(tail=":71A:SHA\n:71F:GBP1,00\n")))["structured"], True)
+check("C.2 ⑧ BIC starting with digits", pm(xmla(px(tx=BASETX % "<DbtrAgt><FinInstnId><BICFI>8765GB43</BICFI></FinInstnId></DbtrAgt>")))["structured"], False)
+check("C.2 ① lower-case encoding", pm(xmla(px().replace('encoding="UTF-8"', 'encoding="utf-8"')))["structured"], True)
+check("C.2 ① other encoding", pm(xmla(px().replace('encoding="UTF-8"', 'encoding="ISO-8859-1"')))["structured"], False)
+check("C.2 ① BOM", pm(xmla(chr(0xFEFF) + px()))["structured"], True)
+check("C.1 block digits are not counted", pm(txt(mt().replace("{3:{121:%s}}" % F1U, "{3:{108:87654321}}")))["problem"], None)
+check("C.1 block text is in M4 ②", pm(txt(mt().replace("{3:{121:%s}}" % F1U, "{3:{108:REFUND}}")))["problem"], "M4")
+check("M4 ③ 59a non-position lines, 5 digits", pm(txt(mt(bene="/" + G + "\nUNIT 123\nFLAT 45").replace("NORTHWIND SPV LP\n", "")))["problem"], None)
+check("M4 ③ 59a non-position lines total 6", pm(txt(mt(bene="/" + G + "\nUNIT 123\nFLAT 456")))["problem"], "M4")
+check("C-CLS-4 HTML text wording", O.rule_labels(dict(RL, body="fine", body_html="please update our bank details"))["labels"], ["bank_details"])
+check("C-CLS-4 plain new + HTML bank: judged separately", O.rule_labels(dict(RL, body="new", body_html="bank"))["labels"], [])
+check("C-CLS-4 plain bank + HTML new: judged separately", O.rule_labels(dict(RL, body="bank", body_html="new"))["labels"], [])
+check("C-CLS-4 plain alone still hits", O.rule_labels(dict(RL, body="new bank", body_html="fine"))["labels"], ["bank_details"])
+check("C-CLS-4 HTML C.6 with evidence", O.rule_labels(dict(RL, body="fine", body_html="from now on", evidence_anywhere=True))["labels"], ["bank_details"])
+check("C-CLS-4 link address is not in the exported text", ex(txt(mt()), body_html="click")["applied"], True)
+check("R-F1-19 C-DRF-4 message + PDF", tr([txt(OKM), dict(txt("x", name="a.pdf", ordinal=1), kind="application/pdf")]), True)
+check("TC-DRF-21 two payments with the same UETR", tr([xmla(px(tx=TX_PART % (UE % F1U, "GBP", "1.00", "2026-10-30") * 2))]), False)
+check("TC-DRF-21 two payments with distinct UETRs", tr([xmla(px(tx=TX_PART % (UE % F1U, "GBP", "1.00", "2026-10-30") + TX_PART % (UE % F1U2, "GBP", "1.00", "2026-10-30")))]), True)
+check("TC-DRF-21 exempted message with accounts", tr([txt(mt())]), True)
+check("C.0 trim: :59: /value is a position", pm(txt(mt(bene=" /12345678")))["beneficiaries"], ["12345678"])
+check("R-F1-33 A C SMITH hits a/c", O.redirect_wording({"text": "A C SMITH"}), {"hit": True})
+for dm in ("none", "neutral", "temperror"):
+    check("TC-CLS-16b dmarc=%s" % dm, O.signals({"mailbox_strips_auth_results": True, "adapter": "imap", "trusted_authserv_id": "mx.ops.example",
+                                                 "headers": [["Authentication-Results", "mx.ops.example; dmarc=%s" % dm]], "from": {"name": "A", "address": "a@b.example"},
+                                                 "reply_to": None, "contacts": [], "prior_from_addresses": [], "html": None, "texts": []})["dmarc_pass"], False)
+
+# Round 5: PRD and test plan after the self-test
+check("TC-CLS-15a MIME only partly decoded", ex(txt(mt()), mime_parse_failed=True)["reason"], "E4")
+check("TC-DRF-21 MIME only partly decoded", tr([txt(OKM)], mime_parse_failed=True), False)
+check("TC-DRF-21 two {121:}", tr([txt(mt(payer="A", bene="B").replace("{121:%s}" % F1U, "{121:%s}{121:%s}" % (F1U, F1U2)))]), False)
+check("TC-DRF-21 {121:} not version 4", tr([txt(mt(payer="A", bene="B", uetr="105f40cc-99eb-13ea-8be8-115490377ee8"))]), False)
+check("TC-DRF-21 UETR only in :70:, no {3:}", tr([txt(mt(payer="A", bene="B", uetr=None, extra70=F1U))]), False)
+check("R-F1-20 other UETR text does not spoil {121:}", tr([txt(mt(payer="A", bene="B", extra70=F1U2))]), True)
+check("TC-CLS-11d {1:PLEASEUSE…}", pm(txt("{1:PLEASEUSE87654321}" + mt()))["structured"], False)
+check("TC-CLS-11d {2:87654321}", pm(txt("{2:87654321}" + mt()))["structured"], False)
+check("C.1 {2:} output form", pm(txt("{2:O103QZBKFRPPXXXN}" + mt()))["structured"], True)
+check("C.1 {2:} not 103", pm(txt("{2:I202QZBKFRPPXXXN}" + mt()))["structured"], False)
+check("C.1 {2:} 43 characters", pm(txt("{2:I103" + "A" * 43 + "}" + mt()))["structured"], True)
+check("C.1 {2:} 44 characters", pm(txt("{2:I103" + "A" * 44 + "}" + mt()))["structured"], False)
+check("C.1 {1:} wrong length", pm(txt("{1:F01QZBKGB2LAXXX000000000}" + mt()))["structured"], False)
+for name, x in [("CdtTrfTxInf under Purp", px(tx=BASETX % ("<Purp><CdtTrfTxInf><Nm>A</Nm></CdtTrfTxInf></Purp>"))),
+                ("CdtTrfTxInf under GrpHdr", px(tx=BASETX % "").replace("<MsgId>M-1</MsgId>", "<CdtTrfTxInf><Nm>A</Nm></CdtTrfTxInf>")),
+                ("FIToFICstmrCdtTrf nested", px(tx=BASETX % "<Purp><FIToFICstmrCdtTrf><Nm>A</Nm></FIToFICstmrCdtTrf></Purp>")),
+                ("AppHdr elsewhere", px(tx=BASETX % "<AppHdr><Nm>A</Nm></AppHdr>")),
+                ("Document elsewhere", px(tx=BASETX % "<Document><Nm>A</Nm></Document>")),
+                ("encoding CHANGE BANK", px().replace('encoding="UTF-8"', 'encoding="CHANGE BANK"'))]:
+    check("TC-CLS-11h %s" % name, pm(xmla(x))["structured"], False)
+    check("TC-CLS-11h %s not exempt" % name, app(xmla(x)), False)
+for t in ("Send your next wire transfer to the party on the attached", "wire transfer to", "Wire Confirmation, to", "remittance advice to"):
+    check("C.5 carve-out followed by to: %s" % t, O.redirect_wording({"text": t}), {"hit": True})
+check("C.5 carve-out followed by another word", O.redirect_wording({"text": "wire transfer receipt for you"}), {"hit": False})
+check("C.5 carve-out at the end", O.redirect_wording({"text": "the wire transfer"}), {"hit": False})
+check("TC-CLS-12j applied next wire transfer", ex(txt(mt()), body="Send your next wire transfer to the party on the attached")["reason"], "E2")
+check("TC-CLS-13i list cleared, same deal", O.beneficiary_mismatch({"structured_beneficiaries": [G], "linked_deal": DEAL, "receiving_accounts": {DEAL: []},
+                                                                    "exempted_deal": DEAL}), {"hit": True})
+check("TC-CLS-13i list gone, no beneficiary position", O.beneficiary_mismatch({"structured_beneficiaries": [], "linked_deal": DEAL, "receiving_accounts": {},
+                                                                               "exempted_deal": DEAL}), {"hit": True})
+check("C-RSK-2 ① no list and no exemption: no hit", O.beneficiary_mismatch({"structured_beneficiaries": [G], "linked_deal": DEAL, "receiving_accounts": {},
+                                                                            "exempted_deal": None}), {"hit": False})
+rd = lambda t, **k: O.redact(dict({"text": t, "contact_names": []}, **k))["text"]
+check("TC-RED-13 > :59:/", rd("> :59:/87654321"), "> :59:/[ACCOUNT_1]")
+check("TC-RED-13 >> and spaces", rd("  >> :50K:/87654321"), "  >> :50K:/[ACCOUNT_1]")
+check("TC-RED-13 :59: newline /", rd(":59:\n/87654321"), ":59:\n/[ACCOUNT_1]")
+check("TC-RED-13 :59: CRLF /", rd(":59:\r\n/87654321\r\nNAME"), ":59:\r\n/[ACCOUNT_1]\r\nNAME")
+check("C-RED-1 ① quoted field split across lines", rd("> :59:\n> /87654321\nNAME"), "> :59:\n> /[ACCOUNT_1]\nNAME")
+check("C-RED-1 ① `>` right after the tag", rd(":59:>/87654321"), ":59:>/[ACCOUNT_1]")
+check("C-RED-1 ① other text before the `/` line", rd(":59:\nNAME\n/87654321"), ":59:\nNAME\n/87654321")
+check("TC-RED-13 span stops at the line end", rd(":59:\n/87654321\nNAME ONLY"), ":59:\n/[ACCOUNT_1]\nNAME ONLY")
+check("TC-RED-13 full-width digits counted after I-04", rd(":59:/８７６５４３２１"), ":59:/[ACCOUNT_1]")
+check("TC-RED-13 circled digits counted after I-04", rd(":59:/①②③④⑤⑥"), ":59:/[ACCOUNT_1]")
+check("TC-RED-13 second attachment and attached mail", rd("87654321 and 11223344", xml=[px(tx=BASETX.replace("<IBAN>%s</IBAN>" % P, "<Othr><Id>87654321</Id></Othr>") % ""),
+                                                                                      px(tx=BASETX.replace("<IBAN>%s</IBAN>" % G, "<Othr><Id>11223344</Id></Othr>") % "")]),
+      "[ACCOUNT_1] and [ACCOUNT_2]")
+check("TC-RED-13 full-width digits in Othr/Id", rd("87654321", xml=px(tx=BASETX.replace("<IBAN>%s</IBAN>" % P, "<Othr><Id>８７６５４３２１</Id></Othr>") % "")), "[ACCOUNT_1]")
+
+# PRD C.0 accents
+for t in ("ẃire it to", "REMİT", "bénéficiaire", "accóunt", "pày tó", "Lätér", "sénder", "e\u0301 pay to"):
+    check("C.0 accents C.5 %s" % t, O.redirect_wording({"text": t}), {"hit": True})
+for t in ("ẃire transfer", "rémittance advice"):
+    check("C.0 accents carve-out %s" % t, O.redirect_wording({"text": t}), {"hit": False})
+check("C.0 accents carve-out followed by to", O.redirect_wording({"text": "ẃire transfer tó"}), {"hit": True})
+for t in ("frôm now ón", "góing forward", "hénceforth", "fúture payments"):
+    check("C.0 accents C.6 %s" % t, O.explicit_redirect({"text": t}), {"hit": True})
+check("C.0 accents file name", ex(txt(mt(), name="bánk_détails.txt"))["reason"], "E2")
+check("C.0 accents body", ex(txt(mt()), body="Please ẃire to the attached")["reason"], "E2")
+check("C.0 accents M4 ①", pm(txt(mt(payer="/" + P + "\nNÉW BÁNK")))["problem"], "M4")
+NB = "Néw bánk"
+check("C.0 accents wording, no evidence: unchanged", O.rule_labels(dict(RL, body=NB))["labels"], [])
+check("C.0 accents wording, no evidence, HTML: unchanged", O.rule_labels(dict(RL, body="fine", body_html=NB))["labels"], [])
+check("C.0 accents wording, subject with no evidence", O.rule_labels(dict(RL, subject=NB, body="fine"))["labels"], [])
+check("C.0 accents wording, evidence, body", O.rule_labels(dict(RL, body=NB, evidence_anywhere=True))["labels"], ["bank_details"])
+check("C.0 accents wording, evidence, HTML", O.rule_labels(dict(RL, body="fine", body_html=NB, evidence_anywhere=True))["labels"], ["bank_details"])
+check("C.0 accents wording, evidence, subject", O.rule_labels(dict(RL, subject=NB, body="fine", evidence_anywhere=True))["labels"], ["bank_details"])
+check("C.0 accents wording stays separate per text", O.rule_labels(dict(RL, subject="Néw", body="bánk", evidence_anywhere=True))["labels"], [])
+check("C.0 accents: I-05 unchanged", O.wordlist_match({"text": NB, "phrases": ["new", "bank"]}), {"matched": []})
+check("C.0 accents: Chinese stays", O.redirect_wording({"text": "以后请付到这里"}), {"hit": True})
+check("C.0 accents: mixed script still hits", O.redirect_wording({"text": "bеnéficiary"}), {"hit": True})
+
+# PRD C.0 CJK characters separate English words
+for t in ("请wire到附件", "请把钱remit到", "付款pay to这里", "请instead用这个", "銀行sender確認", "はwiredへ", "은wire로"):
+    check("C.0 CJK C.5 %s" % t, O.redirect_wording({"text": t}), {"hit": True})
+check("C.0 CJK and accents together", O.redirect_wording({"text": "请ẃire到附件"}), {"hit": True})
+check("C.0 CJK carve-out", O.redirect_wording({"text": "这是wire confirmation文件"}), {"hit": False})
+check("C.0 CJK carve-out followed by to", O.redirect_wording({"text": "这是wire transfer to文件"}), {"hit": True})
+check("C.0 CJK stem still a substring", O.redirect_wording({"text": "请account到"}), {"hit": True})
+check("C.0 CJK Chinese list on the unseparated text", O.redirect_wording({"text": "汇款到附件"}), {"hit": True})
+check("C.0 CJK Chinese list not across other text", O.redirect_wording({"text": "汇 款到附件"}), {"hit": False})
+check("C.0 CJK plain Chinese is no hit", O.redirect_wording({"text": "附件是付款确认"}), {"hit": False})
+check("C.0 CJK C.6 English", O.explicit_redirect({"text": "请from now on到这里"}), {"hit": True})
+check("C.0 CJK C.6 Chinese", O.explicit_redirect({"text": "以后"}), {"hit": True})
+check("C.0 CJK C.6 no hit", O.explicit_redirect({"text": "付款确认"}), {"hit": False})
+check("C.0 CJK body cancels", ex(txt(mt()), body="请wire到附件")["reason"], "E2")
+check("C.0 CJK file name", ex(txt(mt(), name="请wire到附件.txt"))["reason"], "E2")
+check("C.0 CJK M4 ①", pm(txt(mt(payer="/" + P + "\n新new旧bank")))["problem"], "M4")
+ZB = "请new的bank"
+check("C.0 CJK wording, no evidence: unchanged", O.rule_labels(dict(RL, body=ZB))["labels"], [])
+check("C.0 CJK wording, evidence, body", O.rule_labels(dict(RL, body=ZB, evidence_anywhere=True))["labels"], ["bank_details"])
+check("C.0 CJK wording, evidence, subject", O.rule_labels(dict(RL, subject=ZB, body="fine", evidence_anywhere=True))["labels"], ["bank_details"])
+check("C.0 CJK: I-05 unchanged", O.wordlist_match({"text": "请wire到", "phrases": ["wire"]}), {"matched": []})
+
+# PRD E2 file names
+for nm in ("bank-details.txt", "bank.details.txt", "bank_details.txt", "pay_to.txt", "later.txt"):
+    check("E2 file name %s" % nm, ex(txt(mt(), name=nm))["reason"], "E2")
+for nm in ("wire_confirmation.txt", "wire-transfer.txt", "remittance.advice.txt", "MT103_Hart.txt"):
+    check("E2 file name %s" % nm, ex(txt(mt(), name=nm))["applied"], True)
+
+# CHECK-ACTUAL F1
+F1DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".f1_selfcheck_tmp")
+shutil.rmtree(F1DIR, ignore_errors=True)
+os.makedirs(F1DIR)
+with open(os.path.join(F1DIR, "classes.json"), "w") as fh:
+    json.dump(CLS, fh)
+with open(os.path.join(F1DIR, "calendar.json"), "w") as fh:
+    json.dump(CAL, fh)
+F1BASE = dict(id="E0019", received_at="2026-11-02T12:18:00Z", mailbox="ops", classes=["payment_evidence"], low_labels=[], fields={},
+              signals=SIG9, rule_output={"uetr_candidates_invalid": [], "evidence_value_dates": ["2026-10-30"], "amounts_attachment": []},
+              amounts_body=[], links={"contact_id": "C1", "investor_id": DEAL + "::016", "deal": DEAL, "transaction_ids": []},
+              planned_close_date=None, dmarc_pass=True,
+              sender_contacts=[{"contact_id": "C1", "deals": [DEAL], "investor_ids": [DEAL + "::016"], "authorised_for": []}],
+              commitment={"cash_due_minor": 900000, "deal_currency": "GBP", "ledger": []}, pressure_texts=[], account_texts=[],
+              risk="medium", template="payment_wait", rule_labels=["payment_evidence"],
+              f1_input={"subject": "Second half - MT103", "body": "Attached is my bank's MT103.", "body_html": None,
+                        "attachments": [dict(E19, xml=None)], "model_labels": ["payment_evidence"], "esign_invite": False, "references": [{"reference": "NW-016", "deal": DEAL}],
+                        "receiving_accounts": {DEAL: ["GB41QZBK79137211981312"]}, "link_deal": DEAL})
+
+
+def run_actual(sample, name="E0019"):
+    with open(os.path.join(F1DIR, name + ".actual.json"), "w") as fh:
+        json.dump(sample, fh)
+    p = subprocess.run([sys.executable, CAP, F1DIR], capture_output=True, text=True)
+    return p.returncode, p.stdout.strip().splitlines()
+
+
+check("CHECK-ACTUAL F1 agrees (TC-CLS-10f)", run_actual(F1BASE), (0, ["1 samples, 0 with mismatches"]))
+_s = json.loads(json.dumps(F1BASE))
+_s["f1_input"]["attachments"][0].update(kind="txt", parse_status="parsed")
+check("CHECK-ACTUAL F1 real export shape: kind txt, parse_status parsed, CRLF", run_actual(_s), (0, ["1 samples, 0 with mismatches"]))
+check("CHECK-ACTUAL F1 fixture text is CRLF", "\r\n" in E19["text"], True)
+_s["f1_input"]["attachments"][0]["parse_status"] = "failed"
+check("CHECK-ACTUAL F1 only `parsed` maps to ok", run_actual(_s)[0], 1)
+_s = json.loads(json.dumps(F1BASE))
+_s["mime_failed"] = True
+_s["rule_labels"], _s["classes"], _s["risk"], _s["template"] = BD, BD, "high", "safe_ack"
+check("CHECK-ACTUAL F1 mime_failed cancels the exception", run_actual(_s), (0, ["1 samples, 0 with mismatches"]))
+_s = json.loads(json.dumps(F1BASE))
+_s["f1_input"]["receiving_accounts"] = {DEAL: [G]}
+_s["classes"] = ["payment_evidence", "bank_details"]
+rc, out = run_actual(_s)
+check("CHECK-ACTUAL F1 reports rule_labels and risk", (rc, sum(x.startswith("E0019 rule_labels") for x in out), sum(x.startswith("E0019 risk") for x in out),
+                                                       sum(x.startswith("E0019 template") for x in out)), (1, 1, 1, 1))
+_s = json.loads(json.dumps(F1BASE))
+_s["rule_labels"] = ["payment_evidence", "bank_details"]
+_s["classes"] = ["payment_evidence", "bank_details"]
+_s["risk"], _s["template"] = "high", "safe_ack"
+rc, out = run_actual(_s)
+check("CHECK-ACTUAL F1 oracle exempts where the system did not", (rc, "rule_labels" in out[0], out[-1]), (1, True, "1 samples, 1 with mismatches"))
+_s = json.loads(json.dumps(F1BASE))
+_s["f1_input"]["references"] = [{"reference": "NW-016", "deal": None}]
+rc, out = run_actual(_s)
+check("CHECK-ACTUAL F1 reference with no deal fails E3", (rc, "rule_labels" in out[0], '"reason": "E3"' in out[0]), (1, True, True))
+_s = json.loads(json.dumps(F1BASE))
+_s["f1_input"]["esign_invite"] = True
+_s["rule_labels"] = ["legal_documents", "payment_evidence"]
+_s["classes"] = ["legal_documents", "payment_evidence"]
+check("CHECK-ACTUAL F1 esign_invite read from the export", any(x.startswith("E0019 rule_labels") for x in run_actual(_s)[1]), False)
+_s["f1_input"]["esign_invite"] = False
+check("CHECK-ACTUAL F1 esign_invite differs", any(x.startswith("E0019 rule_labels") for x in run_actual(_s)[1]), True)
+_s = json.loads(json.dumps(F1BASE))
+del _s["f1_input"], _s["rule_labels"]
+_s["rule_labels"] = None
+check("CHECK-ACTUAL F1 file without f1_input still works", run_actual(_s), (0, ["1 samples, 0 with mismatches"]))
+_s25 = dict(F1BASE, id="E0025", received_at="2026-10-22T11:40:00Z", links={"contact_id": "C1", "investor_id": DEAL2 + "::004", "deal": DEAL2, "transaction_ids": []},
+            sender_contacts=[{"contact_id": "C1", "deals": [DEAL2], "investor_ids": [DEAL2 + "::004"], "authorised_for": []}],
+            commitment={"cash_due_minor": 1000000, "deal_currency": "EUR", "ledger": []}, rule_output={"uetr_candidates_invalid": [], "evidence_value_dates": ["2026-10-20"], "amounts_attachment": []})
+_s25["f1_input"] = dict(F1BASE["f1_input"], subject="Solent payment file", body="For your records.", attachments=[dict(E25, xml=None)],
+                        references=[{"reference": "SB-004", "deal": DEAL2}], receiving_accounts={DEAL2: ["GB39QZBK70404800674450"]}, link_deal=DEAL2)
+os.remove(os.path.join(F1DIR, "E0019.actual.json"))
+check("CHECK-ACTUAL F1 raw XML read from the .eml (TC-CLS-10f E0025)", run_actual(_s25, "E0025"), (0, ["1 samples, 0 with mismatches"]))
+shutil.rmtree(F1DIR, ignore_errors=True)
 
 
 # ---------------------------------------------------------------- CLI

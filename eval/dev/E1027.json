@@ -1,0 +1,80 @@
+{
+  "id": "E1027",
+  "family": "F101",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-09T11:35:00Z",
+  "prior_messages": [],
+  "description": "pacs.008 with a listed CdtrAcct hides an account in Ustrd -> M3 fails, bank_details, high, safe_ack.",
+  "classes": [
+    "payment_evidence",
+    "bank_details"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "bank_change",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "0d8e27f7-7105-4ef6-a35c-3d97ba46eae3",
+    "amount": {
+      "minor": 3000000,
+      "currency": "EUR"
+    },
+    "currency": "EUR",
+    "value_date": "2026-11-06",
+    "payer_name": "PIETER VAN DIJK",
+    "reference": "SB-005",
+    "party_role": "other",
+    "change_requested": true,
+    "account_last4": {
+      "multiple": [
+        "1568",
+        "4450"
+      ]
+    }
+  },
+  "rule_output": {
+    "uetrs": [
+      "0d8e27f7-7105-4ef6-a35c-3d97ba46eae3"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 3000000,
+        "currency": "EUR"
+      }
+    ],
+    "references": [
+      "SB-005"
+    ],
+    "account_last4": [
+      "1568",
+      "4450"
+    ],
+    "evidence_value_dates": [
+      "2026-11-06"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C023",
+    "investor_id": "Solent Biotherapeutics::005",
+    "deal": "Solent Biotherapeutics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "Dutch IBAN (length 18) in Ustrd is outside the account positions. Payer has no DbtrAcct, which is allowed."
+}

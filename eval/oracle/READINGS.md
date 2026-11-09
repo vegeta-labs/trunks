@@ -220,3 +220,49 @@ Written 2026-11-03 from PRD v0.7.25 appendix B / C-RED-0 / C-DRF-6, test plan v0
 ## Remaining contract gap
 
 B.1's system-failure veto needs the `mime_failed` export state described in R-E6-03; current-schema files without it receive independent byte-level checking but cannot establish that veto completely. Ledger provenance needs either the existing `null` projection for explicitly cleared snapshots or the optional explicit `commitment.ledger_cleared` marker above; legacy `[]` must not be silently treated as a clear. These are requested input-contract clarifications, not changes to the approved product rules.
+
+---
+
+# Oracle readings (F1)
+
+Updated 2026-11-07 for the PRD and test-plan text that settled the first round's open readings. No implementation, review file, holdout or eval/directory file was read. All examples are fictional. Numbers of settled readings are not reused.
+
+## Settled by the text (no longer readings)
+01 a UK pair's shape is the 8-digit account part only; 02 boundaries as C-EXT-4; 05 `-}` at line start, blocks may follow; 07 `:20:` limited only by M4 ④; 11 blocks not counted by ③, in ②; 12 59a non-position lines total < 6; 21 UETRs distinct; 26 `references` items; 27 `sender_contacts.deals`; 28 `f1_input.esign_invite`; 30 fixed-field formats; 32 C-RED-1 ① allows spaces and tabs before `/`. Also 18: plain and HTML body are judged separately for the C-CLS-4 wording rule. Also 34: `f1_input.parse_status` is the stored value, only `parsed` meets M1. Also 35: C-RED-1 ① allows spaces, newlines and `>` between the tag and the `/`.
+
+## Account shapes (C.0)
+- C-RED-1's every-occurrence rule and the structural accounts are not shapes (PRD C.0 names the patterns only).
+
+## C.5, C.6, HTML
+- **R-F1-03** Stems are substrings after I-04, C.0's accent step and case folding. That step removes only what NFKD decomposes, so `ł` or `ø` stay as written.
+- **R-F1-04** `body_html` is taken as the HTML body's text content, as test plan §3 exports it. The oracle does not strip tags, so it relies on the system's own HTML-to-text step for this one input.
+- **R-F1-36** C.0's CJK separation uses C-RED-0's `_is_cjk` ranges (Han, kana, Hangul). A separator can also sit inside a phrase, so `pay请to` hits `pay to`: CJK counts as a separator like any other (I-05), and this fails closed.
+- **R-F1-33** I-05 makes `a/c` the word sequence a, c, so a payer named `A C SMITH` hits E2. Literal, fails closed.
+
+## C.1 MT103
+- **R-F1-06** An empty first line of a field is not covered, so it does not qualify.
+- **R-F1-31** A line opens a field when it starts with `:` + 1-5 letters or digits + `:`. `{3:}` needs a sub-block; `{5:}` / `{S:}` sub-blocks have three-character names and may be empty (`{TNG:}`). `-}` must be at column 0.
+
+## C.2 pacs.008
+- **R-F1-08** «BIC» is the form with six letters first.
+- **R-F1-09** A missing `encoding` qualifies; `standalone` does not.
+- **R-F1-10** C.2 ⑦ fixes the parents. Beyond that, Document has exactly the one child FIToFICstmrCdtTrf, and a wrapper name below the root does not qualify. The structure is checked with `xml.parsers.expat` on the raw file, no DTD is read. Shapes are computed on leaf texts joined by a line break, so one across elements fails M3.
+
+## M3, M4, E, exception
+- **R-F1-13** The output has no M1. An M1 failure reports `structured: false`, `problem: "M2"`. E1 has no reason either: a second message reports E4.
+- **R-F1-14** An empty `receiving_accounts` list is no list.
+- **R-F1-15** A commitment key with no deal part counts as another deal, so E3 fails.
+- **R-F1-16** No shape in any attachment: not applied, reason null. An image with `maybe_kyc: false` is the C-RED-0 ③ inline signature. A model `labels` list that is empty fails E5.
+- **R-F1-17** `attachment_texts` items are texts (index = ordinal) or `{ordinal, text}`.
+
+## C-DRF-4, C-DIR-1a, C-RED-1
+- **R-F1-19** Exactly one M1 + M2 message (PRD); other attachments of any type do not matter to this step.
+- **R-F1-20** An MT103 is one payment. Its UETR is the one `{121:}` in `{3:}` (PRD); UETR-shaped text elsewhere, such as `:70:`, neither supplies nor spoils it for this step.
+- **R-F1-22** Empty cell = no accounts; empty items are ignored; a value is IBAN-shaped when one shape covers all of it. The oracle has no HMAC key, so `receiving_accounts_import` returns the C.3 form. «Nothing in the database or logs» is a system test, not checkable here.
+- **R-F1-23** `template`: `evidence_supports_tracing` missing = false; `evidence_received_configured` missing = true.
+- **R-F1-24** The span runs from after `/` to that line's end without trailing whitespace. `redact`'s `xml` is one raw file or a list, because C-RED-1 ② covers every pacs.008 of the mail, attached mail included; the caller supplies them. Non-qualifying pacs.008 positions come from a by-name walk of the parsed file.
+
+## check_actual
+- **R-F1-25** Raw XML comes from `<eml-dir>/<id>.eml` by B.1 ordinal; bytes that are not strict UTF-8 do not qualify.
+- `mime_failed` missing from an export counts as false (as R-E6-03); only `true` cancels E4 and the C-DRF-4 step.
+- **R-F1-29** Adopted labels = the system's labels minus its rule labels, plus the oracle's rule labels; `unclassified` only when nothing else is left.

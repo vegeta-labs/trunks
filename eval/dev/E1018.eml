@@ -1,0 +1,42 @@
+Return-Path: <jonas.becker@becker-post.example>
+Received: from mail.becker-post.example (mail.becker-post.example
+ [192.0.2.183]) by mx.ops.example with ESMTPS id b60ec0d3d8 for
+ <investors@ops.example>; Mon, 02 Nov 2026 09:40:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=becker-post.example;
+ dkim=pass header.d=becker-post.example;
+ dmarc=pass header.from=becker-post.example
+Message-ID: <E1018.8589c7abb3f2@becker-post.example>
+Date: Mon, 02 Nov 2026 09:37:14 +0000
+From: "Jonas Becker" <jonas.becker@becker-post.example>
+To: investors@ops.example
+Subject: MT103 NW-007
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="===============13118634780680096199=="
+
+--===============13118634780680096199==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Attached is the MT103 for my Northwind payment.
+
+Regards,
+Jonas Becker
+
+--===============13118634780680096199==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Becker.txt"
+
+ezM6ezEyMToxMzlhMGUwMC1jN2M5LTQ3OWItYjEzNy1lNGZlNGZkZmM3YmZ9fQ0KezQ6DQo6MjA6
+QkNLLVRSRi0xMDMwDQo6MjNCOkNSRUQNCjozMkE6MjYxMDMwR0JQMTUwMDAsMDANCjo1MEs6Sk9O
+QVMgQkVDS0VSDQpCRVJMSU4NCjo1OTovR0I0MVFaQks3OTEzNzIxMTk4MTMxMg0KTk9SVEhXSU5E
+IFJPQk9USUNTIFNQViBMUA0KOjcwOk5FVyBCRU5FRklDSUFSWSBHQjI1UVpCSzg5MjUwNjIyMzcy
+NDI0IEZPUiBORVhUIElOU1RBTE1FTlQNCjo3MUE6U0hBDQotfQ0K
+
+--===============13118634780680096199==--

@@ -1,0 +1,73 @@
+{
+  "id": "E1045",
+  "family": "F119",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-19T13:35:00Z",
+  "prior_messages": [],
+  "description": "Company investor pays under its full legal name (Nordhaven Family Office Limited vs Ltd on the list): the payer is the investor itself, not a third party -> payment_evidence only, medium, payment_received.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "271d137e-843f-4c9d-b26e-380b0c4c49fb",
+    "amount": {
+      "minor": 15000000,
+      "currency": "EUR"
+    },
+    "currency": "EUR",
+    "value_date": "2026-10-13",
+    "payer_name": "NORDHAVEN FAMILY OFFICE LIMITED",
+    "reference": "SB-007"
+  },
+  "rule_output": {
+    "uetrs": [
+      "271d137e-843f-4c9d-b26e-380b0c4c49fb"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 15000000,
+        "currency": "EUR"
+      }
+    ],
+    "references": [
+      "SB-007"
+    ],
+    "account_last4": [
+      "0741",
+      "4450"
+    ],
+    "evidence_value_dates": [
+      "2026-10-13"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C025",
+    "investor_id": "Solent Biotherapeutics::007",
+    "deal": "Solent Biotherapeutics",
+    "transaction_ids": [
+      "T-SB-0004"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_received",
+  "notes": "Not unreferenced_payment: the reference SB-007 is given and the ordering party is the investor (C025 / Solent::007) under its longer registered name, not someone paying for it. Ledger T-SB-0004 150,000 EUR confirmed = cash due -> payment_received. MT103 :32A: EUR = deal currency. C-LNK-4: T-SB-0004 by reference and amount/date. \"ordering party\" and \"registered name\" are on no list."
+}

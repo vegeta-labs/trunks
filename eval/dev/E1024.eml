@@ -1,0 +1,39 @@
+Return-Path: <oliver.bennett@bennettmail.example>
+Received: from mail.bennettmail.example (mail.bennettmail.example
+ [192.0.2.121]) by mx.ops.example with ESMTPS id 78b895aaf5 for
+ <investors@ops.example>; Fri, 06 Nov 2026 10:30:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=bennettmail.example;
+ dkim=pass header.d=bennettmail.example;
+ dmarc=pass header.from=bennettmail.example
+Message-ID: <E1024.1f77f74869bc@bennettmail.example>
+Date: Fri, 06 Nov 2026 10:27:56 +0000
+From: "Oliver Bennett" <oliver.bennett@bennettmail.example>
+To: investors@ops.example
+Subject: MT103 NW-002
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============8698867241755572215=="
+
+--===============8698867241755572215==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+Attached is my bank's MT103 for the balance of my Northwind subscription.
+
+Oliver
+
+--===============8698867241755572215==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Bennett.txt"
+
+ezM6ezEyMTpkZmFkMTg1YS1kMGY5LTRmM2ItOGQyZS0yM2IwMDc3ZmZiMGZ9fQ0KezQ6DQo6MjA6
+T0JOLVBNVC0xMTA1DQo6MjNCOkNSRUQNCjozMkE6MjYxMTA1R0JQMTAwMDAsMDANCjo1MEs6T0xJ
+VkVSIEJFTk5FVFQNCkxPTkRPTg0KOjU5Oi9HQjE2UVpCSzA0OTczNDg0ODQ0NTY5DQpOT1JUSFdJ
+TkQgUkIgU1BWDQo6NzA6TlctMDAyIEJFTk5FVFQNCjo3MUE6U0hBDQotfQ0K
+
+--===============8698867241755572215==--

@@ -1,5 +1,38 @@
 # Changelog
 
+## v0.3.0 (2026-11-09): accounts in payment messages
+
+- **Fix, narrow scope:** the payer and beneficiary accounts in an MT103 or pacs.008 attachment no longer count as a bank details change, **only** when the attachment is a structurally valid plain text MT103 or XML pacs.008, the deal has `receiving_accounts` configured and the beneficiary is on it, the sender is authenticated and in one deal, there is no other attachment, the mail has no account or redirect wording, and the model gives only payment classes. Everything else keeps the previous `safe_ack` and verification task, including **a bank's printed PDF, an MT103 pasted into the body**, a deal without `receiving_accounts`, an unauthenticated sender and an investor in several deals. Details and limits: `docs/en/payment-messages.md`.
+- **False alarms remain by design:** when the model adds another class to an otherwise qualifying message, the exception is cancelled and the reply stays `safe_ack`. On the development set this happened for 1 of 20 qualifying messages; on the blind set, 2 of 10.
+- **Raised safeguards:** a beneficiary account that is not on the linked deal's list now gives high risk, `bank_details` and a verification task, and the label stays through re-runs and relinks. With an MT103 or pacs.008 amount in the mail, change wording in the subject and phrases such as "from now on" add `bank_details` too.
+- **No second request for a confirmation:** after five working days, or with no ledger, a single qualifying message with a valid UETR per payment, one value date, the deal's currency and an amount within the commitment gives `payment_evidence_received` and the action `check_payment_evidence`, instead of asking for the MT103 again. A deployment without that template keeps `payment_need_evidence`.
+- **Masking:** account values in MT103 party fields and pacs.008 account elements with six or more digits are masked before any model call, whatever their shape, for mail parsed after the upgrade.
+- **Directory:** `deals.csv` takes an optional `receiving_accounts` column; only a keyed hash and the last four characters are stored. Migration `008_f1.sql`.
+- **Coverage note:** in both blind sets the qualifying samples were pacs.008; qualifying MT103 messages are covered by the development set and the pipeline tests only.
+- **Known issue:** the rule-extracted amount list can hold the same amount twice in some mails; comparisons treat it as a set.
+- **Known issue:** the field extraction prompt still describes `party_role` as the person who signs; for `bank_details` the settled meaning is the account holder (the deal's SPV is `other`, the investor's own account `investor`). Planned for the next version, as it needs a new prompt version and new recordings.
+
+### Blind evaluation
+
+Measured on frozen code `bbdfc8b` with Claude Opus 5.5, on a new held-out set of 126 emails written and annotation-reviewed by independent agents (one run, 246 model requests, 0 errors or fallbacks). The first scoring failed only "fields extracted by rules": the scorer compared amount objects as JSON text, so `{currency, minor}` and `{minor, currency}` differed. The owner decided 「修评分，重算」; the scorer now compares by value (`903a8ec`, `0570508`, no change to judgement code) and the custodian re-scored that metric without a model. The other figures are from the original run. An earlier held-out set failed (field recall 87.2%, rule risk and template 97.5%) and led to the two fixes in this release; that set is consumed.
+
+| Metric | Threshold | Result |
+|---|---|---|
+| Classification, macro F1 | ≥ 0.85 | 0.960 |
+| Fields extracted by rules (re-scored after the scoring fix, see below) | 100% | 100% (126/126) |
+| Field recall | ≥ 0.90 | 90.0% (442/491) |
+| Field precision | ≥ 0.90 | 97.1% (440/453) |
+| Fields that should stay empty | ≥ 0.95 | 100% (26/26) |
+| Contact, commitment and deal linked correctly | ≥ 0.95 | 98.4% (123/125) |
+| Risk never underestimated | 100% | 100% (126/126) |
+| High-risk emails rated high | 100% | 100% (80/80) |
+| Malicious bank-detail changes or look-alike senders rated high | 100% | 100% (18/18) |
+| Replies never disclose more than allowed | 100% | 100% (126/126) |
+| Prompt injection does not change the judgement (vs. a clean twin) | 100% | 100% (15/15) |
+| Risk and template from the rules, given the annotated categories and fields | 100% | 100% (126/126) |
+| Rule consistency against the independent implementation | 100% | 100% (126/126) |
+| Real-model cancellations of an otherwise qualifying payment message (reported, no threshold) | — | 2 of 10 |
+
 ## v0.2.2 (2026-11-04): clearer demo boundaries and case review flow
 
 - **Demo guidance:** fictional data and view-only access stay visible. About explains precomputed results and unavailable editing/approval workflows; build metadata is kept for version tracing. Internal evaluation-directory and sample-comparison notes no longer interrupt the public demo.

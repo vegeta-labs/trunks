@@ -1,0 +1,53 @@
+Return-Path: <jonas.becker@becker-post.example>
+Received: from mail.becker-post.example (mail.becker-post.example
+ [192.0.2.180]) by mx.ops.example with ESMTPS id b3be17ccf7 for
+ <investors@ops.example>; Wed, 11 Nov 2026 14:45:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=becker-post.example;
+ dkim=pass header.d=becker-post.example;
+ dmarc=pass header.from=becker-post.example
+Message-ID: <E1031.8868b8a1bcb3@becker-post.example>
+Date: Wed, 11 Nov 2026 14:42:06 +0000
+From: "Jonas Becker" <jonas.becker@becker-post.example>
+To: investors@ops.example
+Subject: MT103 as PDF NW-007
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="===============12951815747457804472=="
+
+--===============12951815747457804472==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Attached is my bank's MT103 as a PDF, reference NW-007.
+
+Regards,
+Jonas Becker
+
+--===============12951815747457804472==
+Content-Type: application/pdf
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Becker.pdf"
+
+JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2Jq
+CjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2Jq
+CjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA2MTIg
+NzkyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA1IDAgUiA+PiA+PiAvQ29udGVudHMgNCAw
+IFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL0xlbmd0aCAzMzggPj4Kc3RyZWFtCkJUIC9GMSAxMSBU
+ZiAxNCBUTCA2MCA3NjAgVGQKKHszOnsxMjE6ZjQ1MDllMDAtZDIwYS00NzhkLTlmZjEtMWI4ZjY4
+OWYwY2NifX0pIFRqIFQqCih7NDopIFRqIFQqCig6MjA6QkNLLVBNVC0xMTEwKSBUaiBUKgooOjIz
+QjpDUkVEKSBUaiBUKgooOjMyQToyNjExMTBHQlAxNTAwMCwwMCkgVGogVCoKKDo1MEs6Sk9OQVMg
+QkVDS0VSKSBUaiBUKgooQkVSTElOKSBUaiBUKgooOjU5Oi9HQjQ2UVpCSzc4NjA3MjIyNTc4ODM4
+KSBUaiBUKgooTk9SVEhXSU5EIFJPQk9USUNTIFNQViBMUCkgVGogVCoKKDo3MDpOVy0wMDcgQkVD
+S0VSKSBUaiBUKgooOjcxQTpTSEEpIFRqIFQqCigtfSkgVGogVCoKRVQKZW5kc3RyZWFtCmVuZG9i
+ago1IDAgb2JqCjw8IC9UeXBlIC9Gb250IC9TdWJ0eXBlIC9UeXBlMSAvQmFzZUZvbnQgL0NvdXJp
+ZXIgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgPj4KZW5kb2JqCnhyZWYKMCA2CjAwMDAwMDAw
+MDAgNjU1MzUgZiAKMDAwMDAwMDAwOSAwMDAwMCBuIAowMDAwMDAwMDU4IDAwMDAwIG4gCjAwMDAw
+MDAxMTUgMDAwMDAgbiAKMDAwMDAwMDI0MSAwMDAwMCBuIAowMDAwMDAwNjI5IDAwMDAwIG4gCnRy
+YWlsZXIKPDwgL1NpemUgNiAvUm9vdCAxIDAgUiA+PgpzdGFydHhyZWYKNzI0CiUlRU9GCg==
+
+--===============12951815747457804472==--

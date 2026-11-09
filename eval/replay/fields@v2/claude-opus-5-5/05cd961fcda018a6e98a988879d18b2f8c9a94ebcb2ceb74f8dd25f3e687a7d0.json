@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"b28ba334-fc46-4944-9754-86591d9ce2ad\",\"confidence\":\"high\",\"quote\":\"b28ba334-fc46-4944-9754-86591d9ce2ad\"},\"amount\":{\"value\":\"10000.00\",\"confidence\":\"medium\",\"quote\":\"10000.00\"},\"currency\":{\"value\":null,\"confidence\":\"low\",\"quote\":\"\"},\"value_date\":{\"value\":\"2026-10-26\",\"confidence\":\"medium\",\"quote\":\"2026-10-26\\nSHAR\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\"[NAME_1] [NAME_2]\\n[ACCOUNT_1]\"},\"reference\":{\"value\":\"SB-003 BALANCE\",\"confidence\":\"medium\",\"quote\":\"SB-003 BALANCE\"}}}",
+ "usage": {
+  "inputTokens": 1897,
+  "outputTokens": 292
+ }
+}

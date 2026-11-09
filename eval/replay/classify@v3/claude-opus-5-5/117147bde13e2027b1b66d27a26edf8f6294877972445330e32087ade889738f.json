@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"payment_evidence\",\"confidence\":\"high\",\"reason\":\"An MT103 payment message for GBP 8,000 to Northwind Robotics SPV LP is attached.\"},{\"class\":\"bank_details\",\"confidence\":\"medium\",\"reason\":\"Sender says 'from now on pay to the beneficiary on the attached', indicating payment instructions or beneficiary details.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2274,
+  "outputTokens": 137
+ }
+}

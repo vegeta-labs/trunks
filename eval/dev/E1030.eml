@@ -1,0 +1,50 @@
+Return-Path: <t.wolski@wolski-family.example>
+Received: from mail.wolski-family.example (mail.wolski-family.example
+ [192.0.2.19]) by mx.ops.example with ESMTPS id 129960f100 for
+ <investors@ops.example>; Wed, 11 Nov 2026 10:10:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=wolski-family.example;
+ dkim=pass header.d=wolski-family.example;
+ dmarc=pass header.from=wolski-family.example
+Message-ID: <E1030.f05c1710b99d@wolski-family.example>
+Date: Wed, 11 Nov 2026 10:07:39 +0000
+From: "Tomasz Wolski" <t.wolski@wolski-family.example>
+To: investors@ops.example
+Subject: MT103 and cover note NW-004
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============1340208952338570263=="
+
+--===============1340208952338570263==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+Attached are the MT103 and a short cover note for my Northwind subscription=
+ (NW-004).
+
+Tomasz
+
+--===============1340208952338570263==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Wolski.txt"
+
+ezM6ezEyMTo3Zjk5ZmFlNy1lM2Y2LTQ4NmUtOWI4MS0xYjM3YmMwYWMzZjB9fQ0KezQ6DQo6MjA6
+VFdMLVBNVC0xMTEwDQo6MjNCOkNSRUQNCjozMkE6MjYxMTEwR0JQNTAwMDAsMDANCjo1MEs6L0dC
+OTJRWkJLNTE4NDIwNTEwNTA0NDENClRPTUFTWiBXT0xTS0kNCjo1OTovR0I0MVFaQks3OTEzNzIx
+MTk4MTMxMg0KTk9SVEhXSU5EIFJPQk9USUNTIFNQViBMUA0KOjcwOk5XLTAwNCBXT0xTS0kNCjo3
+MUE6U0hBDQotfQ0K
+
+--===============1340208952338570263==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="cover_note.txt"
+
+Q292ZXIgbm90ZTogdGhpcyByZWxhdGVzIHRvIG15IE5vcnRod2luZCBSb2JvdGljcyBzdWJzY3Jp
+cHRpb24sIE5XLTAwNC4NCg==
+
+--===============1340208952338570263==--

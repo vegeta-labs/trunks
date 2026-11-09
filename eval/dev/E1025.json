@@ -1,0 +1,74 @@
+{
+  "id": "E1025",
+  "family": "F099",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-06T13:20:00Z",
+  "prior_messages": [],
+  "description": "MT103 :59:/48201937 has no account shape and is off the list -> no C-CLS-4 label at extraction; evidence_beneficiary_mismatch writes rule bank_details in the risk step, high, safe_ack.",
+  "classes": [
+    "payment_evidence",
+    "bank_details"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "bank_change",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "8491500e-e51e-4285-aa6d-ff9a4300309e",
+    "amount": {
+      "minor": 900000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-11-05",
+    "payer_name": "DANIEL KWAME OSEI",
+    "reference": "NW-016",
+    "party_role": "other",
+    "change_requested": false,
+    "account_last4": null
+  },
+  "rule_output": {
+    "uetrs": [
+      "8491500e-e51e-4285-aa6d-ff9a4300309e"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 900000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-016"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": [
+      "2026-11-05"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C016",
+    "investor_id": "Northwind Robotics::016",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0012"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "Account position with digits, not on the list (C-RSK-2). More than 30 characters separate 261105 in :32A: from 48201937, so C-EXT-4 does not pair them and rule_output.account_last4 is empty (QUESTIONS F1-5). account_last4 field null: the value is not a C-EXT-4 hit."
+}

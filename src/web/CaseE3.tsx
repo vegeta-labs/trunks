@@ -25,6 +25,7 @@ export interface E3 {
   low: string[]
   pendingAdopted: string[] | null
   ruleLabels: string[]
+  evidenceAccounts?: { payer: string[]; beneficiary: string[] } | null
   removed: Array<{ classId: string; by: string | null; reason: string | null }>
   risk: { computed: string; final: string; by: string; clauses: string[]; floor: { level: string; classes: string[] } | null; adjustment: { level: string; state: string } | null; held: string | null; applied: string } | null
   pendingRisk: string | null
@@ -260,6 +261,11 @@ export function LabelsPanel({ caseId, e3, meta, reload }: { caseId: string; e3: 
   const change = (body: object) => void a.run(() => api('POST', `/api/cases/${caseId}/labels`, { ...body, reason }))
   return (
     <Panel title="Email type">
+      {e3.evidenceAccounts && (
+        <p className="meta">
+          Accounts written in the sender's document (payer {e3.evidenceAccounts.payer.map((x) => `…${x}`).join(', ') || 'none'}, beneficiary {e3.evidenceAccounts.beneficiary.map((x) => `…${x}`).join(', ') || 'none'}) did not count as a bank details change. This is the sender's document, not a verification result.
+        </p>
+      )}
       <ul className="tags plain">
         {e3.adopted.map((c) => (
           <li key={c} className="tag">

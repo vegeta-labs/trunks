@@ -17,6 +17,7 @@ It never sends email. It never moves money. It never changes your business recor
 | [Users and directory](users-and-directory.md) | Creating users and importing deals, commitments, bank lines, ledger and contacts (API with `curl`; no screen yet) |
 | [Mailboxes](mailboxes.md) | IMAP, `.eml` import, Gmail, Microsoft 365: permissions and set-up |
 | [Models and data protection](models-and-data-protection.md) | Model providers, the start-up checks, what a model sees and what it never does |
+| [Accounts in payment messages](payment-messages.md) | When the accounts in an MT103 or pacs.008 do not count as a bank details change, and the limits |
 | [Configuration reference](configuration.md) | Every key of `deployment.yaml`, `cases.yaml` and `templates.yaml` |
 | [Security model](security-model.md) | Read-only guarantees, containers, database roles, audit chain, encryption, fraud rules, known limits |
 | [DPIA template](dpia-template.md) | A data protection impact assessment template for the deploying organisation (UK GDPR) |

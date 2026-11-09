@@ -1,0 +1,80 @@
+{
+  "id": "E1020",
+  "family": "F094",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-03T15:05:00Z",
+  "prior_messages": [],
+  "description": "Body asks to change the account on file; the MT103 itself is clean and listed -> wording rule and E2 both keep bank_details, high, safe_ack.",
+  "classes": [
+    "payment_evidence",
+    "bank_details"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "bank_change",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "5f9ae9a3-db00-47a7-9d04-07955c0521fe",
+    "amount": {
+      "minor": 2000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-11-02",
+    "payer_name": "SOPHIE LAURENT",
+    "reference": "NW-006",
+    "party_role": "investor",
+    "change_requested": true,
+    "account_last4": {
+      "multiple": [
+        "1312",
+        "2031"
+      ]
+    }
+  },
+  "rule_output": {
+    "uetrs": [
+      "5f9ae9a3-db00-47a7-9d04-07955c0521fe"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 2000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-006"
+    ],
+    "account_last4": [
+      "1312",
+      "2031"
+    ],
+    "evidence_value_dates": [
+      "2026-11-02"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C006",
+    "investor_id": "Northwind Robotics::006",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "C-CLS-4 wording (change + bank/account) in the body. C.5 account also cancels the exemption, so the shapes count as well."
+}

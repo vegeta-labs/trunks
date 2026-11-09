@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"329a95c4-7626-4e5d-bfef-d337c6edc7b5\",\"confidence\":\"high\",\"quote\":\"{121:329a95c4-7626-4e5d-bfef-d337c6edc7b5}\"},\"amount\":{\"value\":\"£5,000.00\",\"confidence\":\"high\",\"quote\":\"Attached is my bank's MT103 for my Northwind subscription (NW-003), £5,000.00.\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\":32A:261103GBP5000,00\"},\"value_date\":{\"value\":\"261103\",\"confidence\":\"high\",\"quote\":\":32A:261103GBP5000,00\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\"[NAME_1] [NAME_2]\"},\"reference\":{\"value\":\"NW-003 [NAME_2]\",\"confidence\":\"high\",\"quote\":\":70:NW-003 [NAME_2]\"}}}",
+ "usage": {
+  "inputTokens": 1863,
+  "outputTokens": 332
+ }
+}

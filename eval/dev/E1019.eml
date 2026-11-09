@@ -1,0 +1,38 @@
+Return-Path: <t.wolski@wolski-family.example>
+Received: from mail.wolski-family.example (mail.wolski-family.example
+ [192.0.2.209]) by mx.ops.example with ESMTPS id d0282133a2 for
+ <investors@ops.example>; Wed, 04 Nov 2026 13:15:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=wolski-family.example;
+ dkim=pass header.d=wolski-family.example;
+ dmarc=pass header.from=wolski-family.example
+Message-ID: <E1019.be484d8e86bb@wolski-family.example>
+Date: Wed, 04 Nov 2026 13:12:52 +0000
+From: "Tomasz Wolski" <t.wolski@wolski-family.example>
+To: investors@ops.example
+Subject: Payment summary NW-004
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="===============14999275064614864973=="
+
+--===============14999275064614864973==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+My bank's summary of the transfer is attached.
+
+Tomasz
+
+--===============14999275064614864973==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="payment_summary.txt"
+
+UGF5bWVudCBzdW1tYXJ5IGZvciBOVy0wMDQNCjozMkE6MjYxMTAzR0JQNTAwMDAsMDANClBsZWFz
+ZSBzZW5kIHRoZSBuZXh0IGluc3RhbG1lbnQgdG8gR0I1MVFaQksxNDU2NDQ3MTMyMzQyMA0K
+
+--===============14999275064614864973==--

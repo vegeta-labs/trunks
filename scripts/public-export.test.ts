@@ -16,7 +16,7 @@ describe('public snapshot', () => {
     const names = process.env.FORBIDDEN_NAMES_FILE ? readFileSync(process.env.FORBIDDEN_NAMES_FILE, 'utf8').split('\n') : []
     expect(checkPublic(out, names)).toEqual([])
     for (const p of ['docs/review', 'docs/HANDOFF.md', 'docs/DESIGN_JOURNAL.md', 'CLAUDE.md', 'docs/10_SITE_DEMO_INTERFACE.md']) expect(existsSync(join(out, p)), p).toBe(false)
-    expect(files.filter((f) => f.startsWith('eval/dev/') && f.endsWith('.eml')).length).toBe(199)
+    expect(files.filter((f) => f.startsWith('eval/dev/') && f.endsWith('.eml')).length).toBe(236)
     // the curation rules on their own: scripts/public-curate.test.ts (its hostile inputs are built at run time)
     // it runs: the same dependencies, a tree with nothing but the published files
     symlinkSync(resolve('node_modules'), join(out, 'node_modules'))

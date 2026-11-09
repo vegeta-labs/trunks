@@ -52,7 +52,7 @@ describe('migrate and the demo marker', () => {
   it('TC-DEMO-03 empty database + DEMO=1: every migration and the marker; only the owner can write the marker', async () => {
     const db = await emptyDb()
     const applied = await migrate(url(db), pw('a'), { demo: true })
-    expect(applied.at(-1)).toBe('007_e6.sql')
+    expect(applied.at(-1)).toBe('008_f1.sql')
     expect((await q(db, 'SELECT count(*)::int AS n FROM demo_marker')).rows[0].n).toBe(1)
     expect((await q(db, 'SELECT count(*)::int AS n FROM schema_migrations')).rows[0].n).toBe(applied.length)
     const app = new pg.Client({ connectionString: url(db, 'doi_app', PASSWORDS.doi_app) })

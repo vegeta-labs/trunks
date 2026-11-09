@@ -86,7 +86,7 @@ describe('R-CFG-01 configuration checks', () => {
   })
   it('TC-DRF-09 / TC-DRF-16 template sources, required templates, automatic discloses_record', () => {
     const c = loadConfig('config/default')
-    expect([...c.templateMeta.values()].filter((m) => m.discloses).map((m) => m.id).sort()).toEqual(['commitment_change_ack', 'exit_info', 'payment_need_evidence', 'payment_received', 'payment_wait', 'withdrawal_ack'])
+    expect([...c.templateMeta.values()].filter((m) => m.discloses).map((m) => m.id).sort()).toEqual(['commitment_change_ack', 'exit_info', 'payment_evidence_received', 'payment_need_evidence', 'payment_received', 'payment_wait', 'withdrawal_ack'])
     let d = copy()
     edit(d, 'templates.yaml', (s) => s.replace('We have received {received_amount}', 'We have received {amount}'))
     expect(err(d)).toMatch(/payment_received asserts receipt and may only use directory or ledger placeholders and \{deployment_name\}, not \{amount\}/)

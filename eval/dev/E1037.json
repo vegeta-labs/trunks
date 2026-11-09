@@ -1,0 +1,71 @@
+{
+  "id": "E1037",
+  "family": "F111",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-10T11:20:00Z",
+  "prior_messages": [],
+  "description": "C-CLS-4a exempt MT103 sent a few days late with a short apology; lateness and apology are not a complaint or a query -> payment_evidence only, medium, payment_wait (1 working day).",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "49d21e30-edfd-4808-bc62-af768cef47d9",
+    "amount": {
+      "minor": 500000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-11-09",
+    "payer_name": "PRIYA RAMAN",
+    "reference": "NW-003"
+  },
+  "rule_output": {
+    "uetrs": [
+      "49d21e30-edfd-4808-bc62-af768cef47d9"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 500000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-003"
+    ],
+    "account_last4": [
+      "0346",
+      "1312"
+    ],
+    "evidence_value_dates": [
+      "2026-11-09"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C003",
+    "investor_id": "Northwind Robotics::003",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_wait",
+  "notes": "Ledger has no row for 003 -> not received in full. Value date Mon 2026-11-09, received Tue 2026-11-10: 1 working day < 5 -> payment_wait. Both IBANs (payer, listed :59: GB41...1312) are the whole value of their account positions, mod-97 valid. \"delay\", \"after\", \"travelling\" are on no list; no C.5 word (\"late\" is not \"later\"). Close date 2026-11-20 is 8 working days away. No bank line of 5,000. rule_output.account_last4 lists both IBANs (QUESTIONS F1-6)."
+}

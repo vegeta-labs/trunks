@@ -1,0 +1,46 @@
+Return-Path: <priya@ramanfamily.example>
+Received: from mail.ramanfamily.example (mail.ramanfamily.example [192.0.2.128])
+ by mx.ops.example with ESMTPS id 11195248b5 for <investors@ops.example>;
+ Tue, 10 Nov 2026 11:20:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=ramanfamily.example;
+ dkim=pass header.d=ramanfamily.example;
+ dmarc=pass header.from=ramanfamily.example
+Message-ID: <E1037.997f4e910412@ramanfamily.example>
+Date: Tue, 10 Nov 2026 11:17:30 +0000
+From: "Priya Raman" <priya@ramanfamily.example>
+To: investors@ops.example
+Subject: NW-003 payment confirmation (MT103)
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============8543519617405630240=="
+
+--===============8543519617405630240==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Apologies for the delay with my Northwind Robotics payment - it went a few =
+days after the date in your call notice, as I was travelling. The =C2=A35,0=
+00.00 (reference NW-003) was sent on 9 November and the MT103 from my bank =
+is attached.
+
+Thank you for your patience.
+
+Best wishes,
+Priya Raman
+
+--===============8543519617405630240==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Raman.txt"
+
+ezM6ezEyMTo0OWQyMWUzMC1lZGZkLTQ4MDgtYmM2Mi1hZjc2OGNlZjQ3ZDl9fQ0KezQ6DQo6MjA6
+UFJNLVBNVC0xMTA5DQo6MjNCOkNSRUQNCjozMkE6MjYxMTA5R0JQNTAwMCwwMA0KOjUwSzovR0I3
+OFFaQks2OTIwMjk5ODcwMDM0Ng0KUFJJWUEgUkFNQU4NCkxPTkRPTg0KOjU5Oi9HQjQxUVpCSzc5
+MTM3MjExOTgxMzEyDQpOT1JUSFdJTkQgUk9CT1RJQ1MgU1BWIExQDQo6NzA6TlctMDAzIFJBTUFO
+DQo6NzFBOlNIQQ0KLX0NCg==
+
+--===============8543519617405630240==--

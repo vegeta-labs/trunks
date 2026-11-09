@@ -13,6 +13,8 @@ import { normAddress } from '../lib/signals.ts'
 export type DirectoryKind = 'deals' | 'contacts' | 'commitments' | 'bank' | 'ledger'
 
 export const dealKey = (k: Keyring, name: string) => k.hmac(`deal\0${name}`)
+/** C-DIR-1a: `account` is already in the appendix C.3 form. */
+export const receivingAccountHmac = (k: Keyring, account: string) => k.hmac(`recv\0${account}`)
 export const commitmentKeyHmac = (k: Keyring, key: string) => k.hmac(`commitment\0${key}`)
 export const emailHmac = (k: Keyring, address: string) => k.hmac(`email\0${normAddress(address)}`)
 
@@ -55,8 +57,10 @@ export async function importDirectory(
         if (!r.ok) return r
         await insertVersion()
         for (const d of r.rows) {
-          await c.query('INSERT INTO deal (id, directory_version, deal_key, name_blob, currency, close_date, reference_prefix_blob, row_no) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [
-            randomUUID(), versionId, dealKey(k, d.name), await putBlob(c, k, d.name), d.currency, d.closeDate, await putOptional(c, k, d.referencePrefix), d.row,
+          // C-DIR-1a: a keyed hash and the last four only; NULL = no list for this deal
+          const receiving = d.receivingAccounts.length ? JSON.stringify(d.receivingAccounts.map((v) => ({ hmac: receivingAccountHmac(k, v), last4: v.slice(-4) }))) : null
+          await c.query('INSERT INTO deal (id, directory_version, deal_key, name_blob, currency, close_date, reference_prefix_blob, row_no, receiving_accounts) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)', [
+            randomUUID(), versionId, dealKey(k, d.name), await putBlob(c, k, d.name), d.currency, d.closeDate, await putOptional(c, k, d.referencePrefix), d.row, receiving,
           ])
         }
         count = r.rows.length
@@ -149,7 +153,7 @@ export async function takeSnapshot(c: Pick<Tx, 'query'>): Promise<string> {
 }
 
 export interface SnapshotView {
-  deals: Array<{ dealKey: string; name: string; currency: string; closeDate: string | null }>
+  deals: Array<{ dealKey: string; name: string; currency: string; closeDate: string | null; receiving?: Array<{ hmac: string; last4: string }> | null }>
   contacts: Array<{ contactId: string; name: string; emails: string[]; phone: string | null; role: string; deals: string[]; investorIds: string[]; authorisedFor: string[] }>
   commitments: Array<{ dealKey: string; investorId: string; keyHmac: string; name: string; reference: string; cashDue: number }>
   bankLines: Array<{ dealKey: string; transactionId: string; date: string; amount: number; payer: string | null; reference: string | null }>
@@ -164,7 +168,7 @@ export async function loadSnapshot(c: Pick<Tx, 'query'>, k: Keyring, snapshotId:
     [snapshotId],
   )).rows[0]
   if (!s) throw new Error(`snapshot ${snapshotId} not found`)
-  const deals = s.deals_version ? (await c.query('SELECT deal_key, name_blob, currency, close_date FROM deal WHERE directory_version = $1 ORDER BY row_no', [s.deals_version])).rows : []
+  const deals = s.deals_version ? (await c.query('SELECT deal_key, name_blob, currency, close_date, receiving_accounts FROM deal WHERE directory_version = $1 ORDER BY row_no', [s.deals_version])).rows : []
   const contacts = s.contacts_version
     ? (await c.query('SELECT contact_id_blob, name_blob, emails_blob, phone_blob, role, deals_blob, investor_ids_blob, authorised_for_blob FROM contact WHERE directory_version = $1 ORDER BY row_no', [s.contacts_version])).rows
     : []
@@ -193,7 +197,7 @@ export async function loadSnapshot(c: Pick<Tx, 'query'>, k: Keyring, snapshotId:
   const j = <T>(id: string | null, d: T): T => (id ? (JSON.parse(b.get(id)!.toString('utf8')) as T) : d)
   const iso = (d: Date | string | null) => (d === null ? null : typeof d === 'string' ? d : d.toISOString().slice(0, 10))
   return {
-    deals: deals.map((d) => ({ dealKey: d.deal_key, name: t(d.name_blob)!, currency: d.currency, closeDate: iso(d.close_date) })),
+    deals: deals.map((d) => ({ dealKey: d.deal_key, name: t(d.name_blob)!, currency: d.currency, closeDate: iso(d.close_date), receiving: d.receiving_accounts ?? null })),
     contacts: contacts.map((p) => ({ contactId: t(p.contact_id_blob)!, name: t(p.name_blob)!, emails: j<string[]>(p.emails_blob, []), phone: t(p.phone_blob), role: p.role,
       deals: j<string[]>(p.deals_blob, []), investorIds: j<string[]>(p.investor_ids_blob, []), authorisedFor: j<string[]>(p.authorised_for_blob, []) })),
     commitments: commitments.map((m) => ({ dealKey: m.deal_key, investorId: t(m.investor_id_blob)!, keyHmac: m.commitment_key_hmac, name: t(m.name_blob)!, reference: t(m.reference_blob)!, cashDue: Number(m.cash_due_minor) })),

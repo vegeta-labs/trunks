@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"f317b970-a7b9-478e-a11a-2166d36a6349\",\"confidence\":\"high\",\"quote\":\"f317b970-a7b9-478e-a11a-2166d36a6349\"},\"amount\":{\"value\":\"£50,000.00\",\"confidence\":\"high\",\"quote\":\"£50,000.00, reference NW-004, settled on 22 October\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\"£50,000.00\"},\"value_date\":{\"value\":\"2026-10-22\",\"confidence\":\"high\",\"quote\":\"2026-10-22\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\"[NAME_1] [NAME_2]\"},\"reference\":{\"value\":\"NW-004\",\"confidence\":\"medium\",\"quote\":\"reference NW-004\"}}}",
+ "usage": {
+  "inputTokens": 1953,
+  "outputTokens": 287
+ }
+}

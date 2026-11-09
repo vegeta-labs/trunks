@@ -1,0 +1,73 @@
+{
+  "id": "E1044",
+  "family": "F118",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-21T09:15:00Z",
+  "prior_messages": [],
+  "description": "Chinese body (汇出, 请查收) with a C-CLS-4a exempt MT103; none of the Chinese C.5 words (账户, 收款, 汇到, 汇入 ...) -> payment_evidence only, medium, payment_received.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "84e0deb6-f9e8-48cc-ad29-06f09fc9ec07",
+    "amount": {
+      "minor": 3000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-10-19",
+    "payer_name": "CHEN WEI",
+    "reference": "NW-009"
+  },
+  "rule_output": {
+    "uetrs": [
+      "84e0deb6-f9e8-48cc-ad29-06f09fc9ec07"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 3000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-009"
+    ],
+    "account_last4": [
+      "1153",
+      "1312"
+    ],
+    "evidence_value_dates": [
+      "2026-10-19"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C009",
+    "investor_id": "Northwind Robotics::009",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0007"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_received",
+  "notes": "Ledger T-NW-0007 30,000 GBP auto for 009 = cash due -> received in full -> payment_received. \"汇出\" and \"请查收\" are not on C.5 (only 汇到/汇至/汇入/汇款到 and 收款). The body reference is written with ASCII parentheses and a space so C-EXT-2 sees NW-009 as its own segments; :70: also has it. Value date 19 Oct = T-NW-0007 date. Body has no amount token. language zh."
+}

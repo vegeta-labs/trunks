@@ -40,6 +40,7 @@ export function suggestedActions(i: ActionInput): Action[] {
   const payment = has('payment_query') || has('payment_evidence')
   if (payment && i.commitment) out.push({ action: 'check_payment_in_ledger', details: `Check ${investor}'s payment in the ledger (${i.commitment.reference})` })
   if (payment && i.template === 'payment_need_evidence') out.push({ action: 'request_payment_evidence', details: 'Ask for the payment confirmation with UETR' })
+  if (payment && i.template === 'payment_evidence_received') out.push({ action: 'check_payment_evidence', details: "Check the sender's payment confirmation against the ledger; it is not proof of receipt" })
   if (has('kyc_documents')) out.push({ action: 'forward_kyc_documents', details: 'Forward the documents to the KYC process' })
   if (has('legal_documents') || has('tax_certificates')) out.push({ action: 'forward_to_legal', details: 'Forward to the legal team' })
   if (i.leadConfirmed && i.deal) out.push({ action: 'record_lead_confirmation', details: `Record the lead's confirmation for ${i.deal}` })

@@ -1,0 +1,74 @@
+{
+  "id": "E1033",
+  "family": "F107",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-12T10:20:00Z",
+  "prior_messages": [],
+  "description": "D7: with an evidence message the C-CLS-4 wording rule also reads the subject on its own -> \"update ... bank details\" gives bank_details though no account appears anywhere.",
+  "classes": [
+    "payment_evidence",
+    "bank_details"
+  ],
+  "expected_risk": "high",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "03c6d2f1-897f-4a8b-81b2-1646ad411ddd",
+    "amount": {
+      "minor": 1000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-11-11",
+    "payer_name": "OLIVER BENNETT",
+    "reference": "NW-002",
+    "party_role": "investor",
+    "change_requested": true,
+    "account_last4": null
+  },
+  "rule_output": {
+    "uetrs": [
+      "03c6d2f1-897f-4a8b-81b2-1646ad411ddd"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-002"
+    ],
+    "account_last4": [],
+    "evidence_value_dates": [
+      "2026-11-11"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C002",
+    "investor_id": "Northwind Robotics::002",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0002"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "Without D7 this would stay payment_evidence. The message has no account shape, so C-CLS-4a does not judge it. malicious false: no account is given (QUESTIONS F1-9). No account_last4."
+}

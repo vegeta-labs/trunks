@@ -3,6 +3,7 @@
 // (a directory of <id>.json annotations; `twin_of` is resolved across all directories given).
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { canonicalJson } from './metrics.ts'
 import Ajv2020Module from 'ajv/dist/2020.js'
 import addFormatsModule from 'ajv-formats'
 
@@ -37,7 +38,7 @@ function key(v: unknown): string {
   if (typeof v === 'string') return `s:${v.normalize('NFKC').toLowerCase().replace(/\s+/g, ' ').trim()}`
   if (Array.isArray(v)) return `a:${JSON.stringify(v.map(key).sort())}`
   if (v && typeof v === 'object' && 'minor' in v && 'currency' in v) return `m:${(v as { minor: number }).minor}:${(v as { currency: string }).currency}`
-  return `j:${JSON.stringify(v)}`
+  return `j:${canonicalJson(v)}`
 }
 
 function strings(v: unknown, path: string, out: Array<[string, string]>): void {

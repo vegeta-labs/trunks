@@ -35,7 +35,7 @@ test('TC-DEMO-04 / TC-DEMO-02 static demo: readable under the site CSP, thin bar
   await expect(page.locator('header')).toHaveCount(0)
   await expect(page.locator('.banner[role="alert"]')).toHaveCount(0)
   // all 30 demo cases (test plan §2.12)
-  await expect(page.locator('ul.cases > li > a.row')).toHaveCount(30)
+  await expect(page.locator('ul.cases > li > a.row')).toHaveCount(31)
   // A3 on the list: only the read-only filters, nothing else to fill in
   await expect(page.locator('main input, main textarea')).toHaveCount(0)
   await expect(page.locator('main select')).toHaveCount(3)
@@ -58,7 +58,7 @@ test('TC-DEMO-04 / TC-DEMO-02 static demo: readable under the site CSP, thin bar
   await page.goto('about:blank')
   await page.goto('/')
   const ids = await page.evaluate(() => Object.keys((globalThis as unknown as { DOI_DEMO: { details: object } }).DOI_DEMO.details))
-  expect(ids.length).toBe(30)
+  expect(ids.length).toBe(31)
   for (const id of ids) {
     await page.goto(`/#case=${id}`)
     await page.reload()

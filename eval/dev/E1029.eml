@@ -1,0 +1,41 @@
+Return-Path: <hannah.k@kowalczyk-home.example>
+Received: from mail.kowalczyk-home.example (mail.kowalczyk-home.example
+ [192.0.2.184]) by mx.ops.example with ESMTPS id b749724b88 for
+ <investors@ops.example>; Tue, 10 Nov 2026 15:25:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=kowalczyk-home.example;
+ dkim=pass header.d=kowalczyk-home.example;
+ dmarc=pass header.from=kowalczyk-home.example
+Message-ID: <E1029.8f3b81a406d6@kowalczyk-home.example>
+Date: Tue, 10 Nov 2026 15:22:59 +0000
+From: "Hannah Kowalczyk" <hannah.k@kowalczyk-home.example>
+To: investors@ops.example
+Subject: Northwind MT103
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="===============13207213050979892097=="
+
+--===============13207213050979892097==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+Keep remitting to the bank shown on the attached MT103.
+
+Hannah
+
+--===============13207213050979892097==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Kowalczyk2.txt"
+
+ezM6ezEyMTpjYzA4NjQxZi04MjcwLTQ3NGQtOGJlMy1kM2YxYzkzNjRkMDB9fQ0KezQ6DQo6MjA6
+SEtaLVBNVC0xMTA5DQo6MjNCOkNSRUQNCjozMkE6MjYxMTA5R0JQNjAwMCwwMA0KOjUwSzovR0Iz
+MVFaQks4MzQ2MjEyODQ3MjI1NA0KSEFOTkFIIEtPV0FMQ1pZSw0KOjU5Oi9HQjQ2UVpCSzc4NjA3
+MjIyNTc4ODM4DQpOT1JUSFdJTkQgUk9CT1RJQ1MgU1BWIExQDQo6NzA6TlctMDEzIEtPV0FMQ1pZ
+Sw0KOjcxQTpTSEENCi19DQo=
+
+--===============13207213050979892097==--

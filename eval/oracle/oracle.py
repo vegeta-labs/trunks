@@ -22,6 +22,7 @@ import sys
 import unicodedata
 from email.utils import parseaddr
 from html.parser import HTMLParser
+from xml.parsers import expat as _expat
 from xml.etree import ElementTree as ET
 
 # ---------------------------------------------------------------------------
@@ -956,7 +957,39 @@ def _phone_at(text: str, i: int):
         return None
 
 
-def redact_spans(text: str, contact_names):
+_STRUCT_LINE_RE = re.compile(r"[ \t>]*:(?:50A|50F|50K|59|59A|59F):[\s>]*/")
+
+
+def _structural_accounts(text: str, pacs_accounts):
+    """C-RED-1 v0.7.28 structural accounts: spans with at least 6 Nd digits."""
+    out = []
+    for ls, _le in _lines(text):
+        # PRD C-RED-1 ①: spaces, tabs or `>` before the tag; white space, line
+        # breaks included, and `>` between the tag and the `/`. READING (R-F1-24): the span runs from
+        # after the `/` to its line end without trailing whitespace.
+        m = _STRUCT_LINE_RE.match(text, ls)
+        if m:
+            le = m.end()
+            while le < len(text) and text[le] not in _LINE_BREAKS:
+                le += 1
+            s, e = _trimmed(text, m.end(), le)
+            if _nd_count(text[s:e]) >= 6:
+                out.append((s, e))
+    for p in pacs_accounts or []:
+        if isinstance(p, dict):
+            if _nd_count(text[p["start"]:p["end"]]) >= 6:
+                out.append((p["start"], p["end"]))
+        else:
+            v = normalize_text(p).strip()
+            if _nd_count(v) >= 6:
+                f = text.find(v)
+                while f >= 0:
+                    out.append((f, f + len(v)))
+                    f = text.find(v, f + 1)
+    return out
+
+
+def redact_spans(text: str, contact_names, structural=False, pacs_accounts=None):
     """Return merged spans [(start, end, kind)] over already-normalised text."""
     toks = _tokens(text)
     cands = []  # (start, end, kind)
@@ -986,6 +1019,12 @@ def redact_spans(text: str, contact_names):
     for s, a in _uk_pairs(text):
         cands.append((s[0], s[1], "SORTCODE"))
         cands.append((a[0], a[1], "ACCOUNT"))
+
+    # v0.7.28: only in `redact` itself. The account-shape rules (C-CLS-4,
+    # C-RSK-2, C.0) keep calling this without them: TC-CLS-13e.
+    if structural:
+        for s, e in _structural_accounts(text, pacs_accounts):
+            cands.append((s, e, "ACCOUNT"))
 
     # 3. IDs
     passport_kw = _kw_spans(toks, ["passport"])
@@ -1108,7 +1147,15 @@ def redact_spans(text: str, contact_names):
 
 def redact(inp):
     text = normalize_text(inp["text"])
-    spans = redact_spans(text, inp.get("contact_names") or [])
+    # PRD v0.7.28: `pacs_accounts` ({start, end} or values) or, from raw `xml`,
+    # the DbtrAcct / CdtrAcct position values, whether the message qualifies or not.
+    pacs = inp.get("pacs_accounts")
+    # PRD C-RED-1 ②: every pacs.008 of the mail, attached mail included. READING
+    # (R-F1-24): `xml` is one raw file or a list of them.
+    if pacs is None and inp.get("xml"):
+        xmls = [inp["xml"]] if isinstance(inp["xml"], str) else inp["xml"]
+        pacs = [v for x in xmls for v in pacs_account_values(x)]
+    spans = redact_spans(text, inp.get("contact_names") or [], structural=True, pacs_accounts=pacs)
     counters, assigned = {}, {}
     parts, pos = [], 0
     out_spans = []
@@ -2450,6 +2497,9 @@ def risk(inp):
     order, floor = _class_table(inp.get("classes"))
     adopted = _adopted(inp.get("adopted"))
     labels = set(adopted) | set(inp.get("low") or [])  # C-RSK-1 / C-CLS-2 label set
+    # PRD v0.7.28 C-RSK-2: a hit also writes the rule bank_details label.
+    if inp.get("evidence_beneficiary_mismatch"):
+        labels.add("bank_details")
     for c in labels:
         if c not in floor:
             raise ValueError("unknown class: %s" % c)
@@ -2470,6 +2520,8 @@ def risk(inp):
         clauses.append("C-RSK-2:amount_mismatch")
     if inp.get("attachment_blocked_or_over_limit"):
         clauses.append("C-RSK-2:attachment_blocked_or_over_limit")
+    if inp.get("evidence_beneficiary_mismatch"):
+        clauses.append("C-RSK-2:evidence_beneficiary_mismatch")
     high = bool(clauses)
     steps = 0
     for s in RSK2A_SIGNALS:
@@ -2504,7 +2556,7 @@ def risk(inp):
     reason_classes = [c for c in order if c in labels and _LEVEL_RANK[floor[c]] > thr]
     clause_order = ["C-RSK-2:" + s for s in RSK2_SIGNALS] + [
         "C-RSK-2:first_time_sender_account", "C-RSK-2:uetr_candidate_invalid", "C-RSK-2:amount_mismatch",
-        "C-RSK-2:attachment_blocked_or_over_limit"] + ["C-RSK-2a:" + s for s in RSK2A_SIGNALS] + [
+        "C-RSK-2:attachment_blocked_or_over_limit", "C-RSK-2:evidence_beneficiary_mismatch"] + ["C-RSK-2a:" + s for s in RSK2A_SIGNALS] + [
         "C-RSK-2a:pressure", "C-RSK-2a:closing"]
     reasons = reason_classes + [c for c in clause_order if c in clauses]
 
@@ -2546,7 +2598,7 @@ def risk_adjust(inp):
 # E3: disclosure, ledger, templates (C-LNK-5, C-DRF-2 to C-DRF-6)
 # ---------------------------------------------------------------------------
 
-DISCLOSES_RECORD = {"payment_received", "payment_wait", "payment_need_evidence", "exit_info",
+DISCLOSES_RECORD = {"payment_received", "payment_wait", "payment_need_evidence", "payment_evidence_received", "exit_info",
                     "withdrawal_ack", "commitment_change_ack"}
 ASSERTS_RECEIPT = {"payment_received"}
 DEFAULT_TEMPLATE = {
@@ -2649,19 +2701,22 @@ def _payment_template(inp, primary):
     st = inp.get("ledger_state")
     if st == "received":
         return "payment_received"
-    if st != "not_received":
-        return "payment_need_evidence"
-    d, known = _payment_date(primary, inp.get("evidence_value_dates"), inp.get("value_date"), inp.get("payment_date"))
-    if not known:
-        return "payment_need_evidence"
-    cal = _Cal(inp.get("calendar"))
-    pd = _date(d)
-    recv = cal.local_date(inp["received_at"])
-    # A payment date later than the receive day (deployment time zone) is
-    # invalid; so is a value that is not a calendar date.
-    if pd is None or pd > recv:
-        return "payment_need_evidence"
-    return "payment_wait" if working_days_between(cal, pd, recv) < 5 else "payment_need_evidence"
+    if st == "not_received":
+        d, known = _payment_date(primary, inp.get("evidence_value_dates"), inp.get("value_date"), inp.get("payment_date"))
+        if known:
+            cal = _Cal(inp.get("calendar"))
+            pd = _date(d)
+            recv = cal.local_date(inp["received_at"])
+            # A payment date later than the receive day (deployment time zone)
+            # is invalid; so is a value that is not a calendar date.
+            if pd is not None and pd <= recv and working_days_between(cal, pd, recv) < 5:
+                return "payment_wait"
+    # PRD v0.7.28 C-DRF-4. READING (R-F1-23): old callers without the new
+    # inputs get the old result; `evidence_received_configured` defaults to
+    # true (the default configuration has the template).
+    if inp.get("evidence_supports_tracing") and inp.get("evidence_received_configured", True):
+        return "payment_evidence_received"
+    return "payment_need_evidence"
 
 
 def template(inp):
@@ -2843,6 +2898,9 @@ def actions(inp):
             investor_name=inp.get("investor_name"), reference=inp.get("reference"))})
     if pay and inp.get("template") == "payment_need_evidence":
         out.append({"action": "request_payment_evidence", "details": "Ask for the payment confirmation with UETR"})
+    if pay and inp.get("template") == "payment_evidence_received":
+        out.append({"action": "check_payment_evidence",
+                    "details": "Check the sender's payment confirmation against the ledger; it is not proof of receipt"})
     if "kyc_documents" in adopted:
         out.append({"action": "forward_kyc_documents", "details": "Forward the documents to the KYC process"})
     if adopted & {"legal_documents", "tax_certificates"}:
@@ -3975,6 +4033,834 @@ def _eml_names(part):
 
 
 # ---------------------------------------------------------------------------
+# F1: C-CLS-4, C-CLS-4a, appendix C, C-RSK-2 mismatch, C-DRF-4 step, C-DIR-1a
+# ---------------------------------------------------------------------------
+
+F1_SIGNALS = ("auth_fail", "untrusted_auth_header", "display_name_mismatch", "lookalike_domain", "reply_to_mismatch",
+              "first_time_sender", "hidden_text", "injection_markers", "message_id_collision")
+_F1_ALLOWED_MODEL = {"payment_query", "payment_evidence"}
+_CHANGE_WORDS = ["change", "changed", "new", "update", "updated"]
+_BANK_WORDS = ["bank", "account", "details", "payment instructions"]
+
+_E2_STEMS = ("account", "acct", "iban", "benef", "payee", "banking", "refund", "konto", "banco", "cuenta", "compte")
+_E2_WORDS = ["a/c", "sort code", "rib", "bank details", "payment instructions", "pay to", "pay into", "send funds",
+             "send back", "return", "sender", "originator", "distribution", "from now on", "going forward", "in future",
+             "future payments", "later", "subsequent", "henceforth", "instead"]
+# READING (R-F1-33): I-05 makes `a/c` the word sequence a, c, so `A C SMITH` hits.
+_E2_WIRE = {"wire", "wires", "wired", "wiring"}
+_E2_WIRE_OK = ["wire confirmation", "wire receipt", "wire transfer", "wire advice", "wire reference", "remittance advice",
+               "remittance information", "remittance slip", "remittance reference"]
+_E2_ZH = ("账户", "账号", "帐户", "帐号", "賬戶", "賬號", "帳戶", "帳號", "户口", "戶口", "收款", "受益", "退款", "退回", "以后",
+          "以後", "今后", "今後", "后续", "後續", "汇到", "匯到", "付到", "转到", "轉到", "打到", "汇款到", "匯款到", "转账到",
+          "轉賬到", "轉帳到", "打款到", "付款到", "汇至", "匯至", "汇入", "匯入")
+_D7_WORDS = ["from now on", "going forward", "henceforth", "future payments"]
+_D7_ZH = ("以后", "以後", "今后", "今後")
+
+_OTHER_LINE_SEPS = "\x0b\x0c\x85  "
+
+
+def _nd_count(s: str) -> int:
+    return sum(1 for c in s if unicodedata.category(c) == "Nd")
+
+
+def _account_shapes(text: str):
+    """C.0 account shapes over already-normalised text: [(start, end, is_iban)], left to right."""
+    # PRD C.0: C-RED-1's ACCOUNT hits (IBAN shapes, 8 digits after
+    # account / acc / a/c or around «sort code») plus C-EXT-4's UK accounts.
+    # Of a UK pair only the 8-digit account is the shape («单独的 NN-NN-NN
+    # 不算», «形状范围只是 8 位账号部分»). Boundaries
+    # are C-EXT-4's (PRD C.0: `261019GBP` is no sort code). The «every
+    # occurrence» rule of C-RED-1 is not used here.
+    out = {}
+    ibans = _iban_shapes(text)
+    for s, e, _ in ibans:
+        out[(s, e)] = True
+    toks = _tokens(text)
+    acc_kw = _kw_spans(toks, ["account", "acc", "a/c"])
+    sortcode_kw = _kw_spans(toks, ["sort code"])
+    paired = {a for _, a in _uk_pairs(text)}
+    for m in _ACC8_RE.finditer(text):
+        sp = (m.start(), m.end())
+        if any(s <= sp[0] and sp[1] <= e for s, e, _ in ibans):
+            continue
+        if sp in paired or _after_within(acc_kw, sp, 30) or _around_within(sortcode_kw, sp, 30):
+            out[sp] = False
+    return [(s, e, out[(s, e)]) for s, e in sorted(out)]
+
+
+def _no_accents(text: str) -> str:
+    """PRD C.0 «重音»: NFKD, remove every M character, NFKC. Only C.5, C.6, M4 ① and the wording rule with evidence."""
+    d = unicodedata.normalize("NFKD", text)
+    return unicodedata.normalize("NFKC", "".join(c for c in d if not unicodedata.category(c).startswith("M")))
+
+
+def _cjk_apart(text: str) -> str:
+    """PRD C.0: in the same rules CJK characters separate English words (as C-RED-0 v0.7.11)."""
+    return "".join(" " if _is_cjk(c) else c for c in text)
+
+
+def _wording_hit(text, c0_words=False) -> bool:
+    """C-CLS-4 wording rule on one text: a change word and a bank word (I-05)."""
+    if not text:
+        return False
+    if c0_words:
+        text = _cjk_apart(_no_accents(normalize_text(text)))
+    return bool(wordlist_match({"text": text, "phrases": _CHANGE_WORDS})["matched"]) and \
+        bool(wordlist_match({"text": text, "phrases": _BANK_WORDS})["matched"])
+
+
+def _script_of(c: str):
+    o = ord(c)
+    if 0x0370 <= o <= 0x03FF or 0x1F00 <= o <= 0x1FFF:
+        return "greek"
+    if 0x0400 <= o <= 0x052F or 0x1C80 <= o <= 0x1C8F or 0x2DE0 <= o <= 0x2DFF or 0xA640 <= o <= 0xA69F:
+        return "cyrillic"
+    if c.isalpha() and (o < 0x0250 or 0x1E00 <= o <= 0x1EFF or 0x2C60 <= o <= 0x2C7F or 0xA720 <= o <= 0xA7FF):
+        return "latin"
+    return None
+
+
+def redirect_wording(inp):
+    """C.5 E2 word list on one text."""
+    text = _no_accents(normalize_text(inp.get("text") or ""))
+    # READING (R-F1-03): stems are substrings after C.0's accent step and case folding.
+    folded = text.casefold()
+    if any(s in folded for s in _E2_STEMS) or any(z in text for z in _E2_ZH):
+        return {"hit": True}
+    # PRD C.0: the Chinese list above uses the unseparated text, the English words the separated one.
+    text = _cjk_apart(text)
+    if wordlist_match({"text": text, "phrases": _E2_WORDS})["matched"]:
+        return {"hit": True}
+    toks = _tokens(text)
+    ok_starts = set()
+    next_word = {e: toks[k + 1][2] for k, (_, e, _w) in enumerate(toks[:-1])}
+    for ph in _E2_WIRE_OK:
+        for s, e in _phrase_spans(toks, ph):
+            # C.5: a carve-out directly followed by `to` hits (`wire transfer to …`).
+            if next_word.get(e) != "to":
+                ok_starts.add(s)
+    for s, e, w in toks:
+        if (w in _E2_WIRE or w.startswith("remit")) and s not in ok_starts:
+            return {"hit": True}
+        kinds = {_script_of(c) for c in text[s:e]}
+        if "latin" in kinds and kinds & {"cyrillic", "greek"}:
+            return {"hit": True}
+    return {"hit": False}
+
+
+def explicit_redirect(inp):
+    """C.6 D7 phrases on one text."""
+    text = _no_accents(normalize_text(inp.get("text") or ""))
+    hit = bool(wordlist_match({"text": _cjk_apart(text), "phrases": _D7_WORDS})["matched"]) or any(z in text for z in _D7_ZH)
+    return {"hit": hit}
+
+
+# ---- C.1 MT103 ------------------------------------------------------------
+
+# READING (R-F1-31): a line opens a field when it starts with `:` + 1-5 letters
+# or digits + `:`; a tag outside C.1's list then fails, instead of the line
+# being a continuation. `{3:}` needs at least one sub-block; `{5:}` and `{S:}`
+# sub-blocks are three letters or digits and may have an empty value.
+_MT_TAG_RE = re.compile(r":([0-9A-Za-z]{1,5}):")
+_MT_SPEC = [({"20"}, "1"), ({"13C"}, "*"), ({"23B"}, "1"), ({"23E"}, "*"), ({"26T"}, "?"), ({"32A"}, "1"), ({"33B"}, "?"),
+            ({"36"}, "?"), ({"50A", "50F", "50K"}, "1"), ({"51A"}, "?"), ({"52A", "52D"}, "?"), ({"53A", "53B", "53D"}, "?"),
+            ({"54A", "54B", "54D"}, "?"), ({"55A", "55B", "55D"}, "?"), ({"56A", "56C", "56D"}, "?"),
+            ({"57A", "57B", "57C", "57D"}, "?"), ({"59", "59A", "59F"}, "1"), ({"70"}, "?"), ({"71A"}, "1"), ({"71F"}, "*"),
+            ({"71G"}, "?"), ({"72"}, "?"), ({"77B"}, "?")]
+_MT_FIXED = {"20", "13C", "23B", "26T", "32A", "33B", "36", "71A", "71F", "71G"}
+# C.1's formats. 20 is limited by M4 ④; 32A by C-EXT-3.
+_MT_FORMATS = {"13C": r"/[A-Z]{1,8}/[0-9]{4}[+-][0-9]{4}", "23B": r"[A-Z]{4}", "26T": r"[A-Z0-9]{3}", "33B": r"[A-Z]{3}[0-9,]+",
+               "71F": r"[A-Z]{3}[0-9,]+", "71G": r"[A-Z]{3}[0-9,]+", "36": r"[0-9,]+", "71A": r"BEN|OUR|SHA"}
+_MT_PAYER = {"50A", "50F", "50K"}
+_MT_BENE = {"59", "59A", "59F"}
+_MT_BLOCK1 = re.compile(r"\{1:[FA][0-9]{2}[A-Z0-9]{12}[0-9]{10}\}")
+_MT_BLOCK2 = re.compile(r"\{2:[IO]103[A-Z0-9]{0,43}\}")
+_MT_BLOCK3 = re.compile(r"\{3:((?:\{(?:108|111|119|121):[A-Za-z0-9-]{1,36}\})+)\}")
+_MT_BLOCK4 = re.compile(r"\{4:(?:\r\n|\n|\r)")
+_MT_BLOCK5 = re.compile(r"\{5:((?:\{[A-Za-z0-9]{3}:[A-Za-z0-9]{0,32}\})+)\}")
+_MT_BLOCKS = re.compile(r"\{S:((?:\{[A-Za-z0-9]{3}:[A-Za-z0-9]{0,32}\})+)\}")
+_MT_LINE_END = re.compile(r"\r\n|\n|\r")
+
+
+def _abs_lines(text: str, start: int, end: int):
+    out, p = [], start
+    for m in _MT_LINE_END.finditer(text, start, end):
+        out.append((p, m.start()))
+        p = m.end()
+    out.append((p, end))
+    return out
+
+
+def _skip_ws(text, p, end):
+    while p < end and text[p] in " \t\r\n":
+        p += 1
+    return p
+
+
+def _trimmed(text, s, e):
+    while s < e and text[s].isspace():
+        s += 1
+    while e > s and text[e - 1].isspace():
+        e -= 1
+    return s, e
+
+
+def _mt_structure(text: str, currencies):
+    """C.1 on normalised text: {fields, blocks, positions...} or None when it does not qualify."""
+    if any(c in text for c in _OTHER_LINE_SEPS):
+        return None
+    start, end = _trimmed(text, 0, len(text))
+    blocks = []
+    if start < end and text[start] == "{":
+        p = start
+        for rx in (_MT_BLOCK1, _MT_BLOCK2, _MT_BLOCK3):
+            m = rx.match(text, p, end)
+            if m:
+                blocks.append(text[m.start():m.end()])
+                p = _skip_ws(text, m.end(), end)
+        m = _MT_BLOCK4.match(text, p, end)
+        if not m:
+            return None
+        lines = _abs_lines(text, m.end(), end)
+        close = None
+        # C.1: `-}` at column 0; the following blocks may sit on the same line.
+        for k, (ls, le) in enumerate(lines):
+            if text[ls:le].startswith("-}"):
+                close = k
+                break
+        if close is None:
+            return None
+        field_lines = lines[:close]
+        p = _skip_ws(text, lines[close][0] + 2, end)
+        for rx in (_MT_BLOCK5, _MT_BLOCKS):
+            m = rx.match(text, p, end)
+            if m:
+                blocks.append(text[m.start():m.end()])
+                p = _skip_ws(text, m.end(), end)
+        if p != end:
+            return None
+    else:
+        field_lines = _abs_lines(text, start, end)
+    fields = []
+    for ls, le in field_lines:
+        m = _MT_TAG_RE.match(text, ls, le)
+        if m:
+            fields.append({"tag": m.group(1), "lines": [(m.end(), le)]})
+        elif fields:
+            fields[-1]["lines"].append((ls, le))
+        else:
+            return None
+    # Order and multiplicity.
+    i = 0
+    for allowed, mult in _MT_SPEC:
+        n = 0
+        while i < len(fields) and fields[i]["tag"] in allowed:
+            i += 1
+            n += 1
+        if (mult == "1" and n != 1) or (mult == "?" and n > 1):
+            return None
+    if i != len(fields):
+        return None
+    positions, payers, benes = [], [], []
+    out_fields = []
+    item = None
+    for f in fields:
+        tag = f["tag"]
+        first = _trimmed(text, *f["lines"][0])
+        # READING (R-F1-06): an empty first line of a field is not covered by
+        # C.1, so it does not qualify.
+        if first[0] == first[1]:
+            return None
+        if tag in _MT_FIXED and len(f["lines"]) != 1:
+            return None
+        rest_lines = [_trimmed(text, *x) for x in f["lines"]]
+        pos = None
+        if tag in _MT_PAYER or tag in _MT_BENE:
+            v = text[first[0]:first[1]]
+            if v.startswith("//") or v == "/":
+                return None
+            if v.startswith("/") and _nd_count(v) > 0:
+                pos = _trimmed(text, first[0] + 1, first[1])
+                if pos[0] == pos[1]:
+                    return None
+                positions.append(pos)
+                (payers if tag in _MT_PAYER else benes).append(pos)
+                rest_lines = rest_lines[1:]
+        out_fields.append({"name": tag, "fixed": tag in _MT_FIXED, "text": "\n".join(text[a:b] for a, b in rest_lines),
+                           "limit": 16 if tag == "20" else None})
+        if tag in _MT_FORMATS and not re.fullmatch(_MT_FORMATS[tag], text[first[0]:first[1]]):
+            return None
+        if tag == "32A":
+            items = mt103({"text": ":32A:" + text[first[0]:first[1]]})["items"]
+            m = _MT103_RE.fullmatch(":32A:" + text[first[0]:first[1]])
+            if not m or len(items) != 1 or items[0]["currency"] not in currencies:
+                return None
+            item = items[0]
+    return {"text": text, "fields": out_fields, "blocks": blocks, "positions": positions, "payers": payers, "benes": benes,
+            "item": item}
+
+
+# ---- C.2 pacs.008 ---------------------------------------------------------
+
+_C4_NAMES = set("""Document BusinessMessage BizMsgEnvlp Envelope AppHdr FIToFICstmrCdtTrf GrpHdr MsgId CreDtTm BtchBookg
+NbOfTxs CtrlSum TtlIntrBkSttlmAmt IntrBkSttlmDt SttlmInf SttlmMtd ClrSys Cd Prtry InstgRmbrsmntAgt InstdRmbrsmntAgt
+ThrdRmbrsmntAgt PmtTpInf InstrPrty ClrChanl SvcLvl LclInstrm CtgyPurp InstgAgt InstdAgt CdtTrfTxInf PmtId InstrId
+EndToEndId TxId UETR ClrSysRef IntrBkSttlmAmt SttlmPrty SttlmTmIndctn DbtDtTm CdtDtTm AccptncDtTm PoolgAdjstmntDt InstdAmt
+XchgRate ChrgBr ChrgsInf Amt Agt PrvsInstgAgt1 PrvsInstgAgt2 PrvsInstgAgt3 IntrmyAgt1 IntrmyAgt2 IntrmyAgt3 UltmtDbtr
+InitgPty Dbtr DbtrAcct DbtrAgt CdtrAgt Cdtr CdtrAcct UltmtCdtr InstrForCdtrAgt InstrForNxtAgt InstrInf Purp RmtInf Ustrd Nm
+PstlAdr Id CtctDtls CtryOfRes AdrTp Dept SubDept StrtNm BldgNb BldgNm Flr PstBx Room PstCd TwnNm TwnLctnNm DstrctNm
+CtrySubDvsn Ctry AdrLine OrgId PrvtId AnyBIC LEI Othr SchmeNm Issr IBAN FinInstnId BICFI ClrSysMmbId ClrSysId MmbId BrnchId
+Tp Ccy Prxy CharSet Fr To FIId BizMsgIdr MsgDefIdr BizSvc MktPrctc CreDt CpyDplct PssblDplct Prty""".split())
+_WRAPPERS = {"BusinessMessage", "BizMsgEnvlp", "Envelope"}
+_CCY_ELEMENTS = {"IntrBkSttlmAmt", "InstdAmt", "TtlIntrBkSttlmAmt", "Amt"}
+_PREFIX_OK = {"", "ns", "pacs", "head", "doc"} | {"ns%d" % i for i in range(1, 10)}
+_NS_PACS_RE = re.compile(r"urn:iso:std:iso:20022:tech:xsd:pacs\.008\.[0-9]{3}\.[0-9]{2}")
+_NS_HEAD_RE = re.compile(r"urn:iso:std:iso:20022:tech:xsd:head\.001\.[0-9]{3}\.[0-9]{2}")
+_ISO_DT_RE = re.compile(r"([0-9]{4})-([0-9]{2})-([0-9]{2})T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\.[0-9]+)?(?:Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])?")
+_ISO_D_RE = re.compile(r"([0-9]{4})-([0-9]{2})-([0-9]{2})")
+_NUM_RE = re.compile(r"[0-9]+(?:\.[0-9]+)?")
+# READING (R-F1-08): C.2 ⑧ names «BIC» only. The classic form (four letters
+# first) is used, so `BICFI` cannot carry a run of digits at its start.
+_BIC_RE = re.compile(r"[A-Z]{6}[A-Z0-9]{2}(?:[A-Z0-9]{3})?")
+_LEI_RE = re.compile(r"[A-Z0-9]{18}[0-9]{2}")
+_UETR_FMT_RE = re.compile(r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
+_MSGDEF_RE = re.compile(r"pacs\.008\.[0-9]{3}\.[0-9]{2}")
+_XML_FIXED = {"UETR", "CreDtTm", "CreDt", "AccptncDtTm", "DbtDtTm", "CdtDtTm", "IntrBkSttlmDt", "PoolgAdjstmntDt",
+              "IntrBkSttlmAmt", "InstdAmt", "Amt", "TtlIntrBkSttlmAmt", "CtrlSum", "XchgRate", "NbOfTxs", "BICFI", "AnyBIC",
+              "LEI", "MsgDefIdr"}
+_XML_ID_LIMITED = {"MsgId", "InstrId", "EndToEndId", "TxId", "BizMsgIdr", "ClrSysRef"}
+
+
+def _xml_fixed_ok(name: str, v: str) -> bool:
+    if name == "UETR":
+        return bool(_UETR_FMT_RE.fullmatch(v))
+    if name in ("CreDtTm", "CreDt", "AccptncDtTm", "DbtDtTm", "CdtDtTm"):
+        m = _ISO_DT_RE.fullmatch(v)
+        return bool(m) and _valid_date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+    if name in ("IntrBkSttlmDt", "PoolgAdjstmntDt"):
+        m = _ISO_D_RE.fullmatch(v)
+        return bool(m) and _valid_date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+    if name in ("IntrBkSttlmAmt", "InstdAmt", "Amt", "TtlIntrBkSttlmAmt", "CtrlSum", "XchgRate"):
+        return bool(_NUM_RE.fullmatch(v))
+    if name == "NbOfTxs":
+        return v.isascii() and v.isdigit()
+    if name in ("BICFI", "AnyBIC"):
+        return bool(_BIC_RE.fullmatch(v))
+    if name == "LEI":
+        return bool(_LEI_RE.fullmatch(v))
+    if name == "MsgDefIdr":
+        return bool(_MSGDEF_RE.fullmatch(v))
+    return True
+
+
+class _XNode:
+    __slots__ = ("raw", "prefix", "local", "ns", "attrs", "children", "text", "parent")
+
+    def __init__(self, raw, parent):
+        self.raw = raw
+        self.prefix, self.local = (raw.split(":", 1) + [None])[:2] if ":" in raw else ("", raw)
+        self.parent = parent
+        self.attrs = {}
+        self.children = []
+        self.text = []
+        self.ns = None
+
+
+def _xml_tree(xml: str):
+    """Parse without any DTD; C.2 ① is enforced here. Returns the root or None."""
+    # C.2 ①: a BOM may come first; the encoding name is UTF-8 in any case.
+    # READING (R-F1-09): `encoding` may be missing, `standalone` may not.
+    if "&#" in xml:
+        return None
+    bad = []
+    root = [None]
+    stack = []
+    scopes = []
+
+    def start(name, attrs):
+        node = _XNode(name, stack[-1] if stack else None)
+        node.attrs = dict(attrs)
+        scope = dict(scopes[-1]) if scopes else {}
+        for k, v in node.attrs.items():
+            if k == "xmlns":
+                scope[""] = v
+            elif k.startswith("xmlns:"):
+                scope[k[6:]] = v
+        scopes.append(scope)
+        if node.prefix not in scope and node.prefix != "":
+            bad.append("undeclared prefix")
+        node.ns = scope.get(node.prefix)
+        if stack:
+            stack[-1].children.append(node)
+        else:
+            root[0] = node
+        stack.append(node)
+
+    def end(_name):
+        stack.pop()
+        scopes.pop()
+
+    def chars(data):
+        if stack:
+            stack[-1].text.append(data)
+
+    def decl(version, encoding, standalone):
+        if standalone != -1 or (encoding is not None and encoding.upper() != "UTF-8") or version is None:
+            bad.append("declaration")
+
+    def reject(*_a):
+        bad.append("forbidden construct")
+
+    p = _expat.ParserCreate()
+    p.buffer_text = True
+    p.StartElementHandler = start
+    p.EndElementHandler = end
+    p.CharacterDataHandler = chars
+    p.XmlDeclHandler = decl
+    p.CommentHandler = reject
+    p.ProcessingInstructionHandler = reject
+    p.StartCdataSectionHandler = reject
+    p.StartDoctypeDeclHandler = reject
+    p.EntityDeclHandler = reject
+    try:
+        p.Parse(xml.encode("utf-8"), True)
+    except (_expat.ExpatError, ValueError, LookupError):
+        return None
+    return None if bad else root[0]
+
+
+def _xml_walk(n):
+    yield n
+    for c in n.children:
+        yield from _xml_walk(c)
+
+
+def _pacs_structure(xml: str, currencies):
+    """C.2: the qualifying message's normalised text, leaf fields and account positions, or None."""
+    parsed = pacs008({"xml": xml})
+    if not parsed.get("parsed"):
+        return None
+    items = parsed["items"]
+    if not any(i["minor"] is not None and i["currency"] in currencies for i in items):
+        return None
+    root = _xml_tree(xml)
+    if root is None:
+        return None
+    doc = hdr = None
+    if root.local == "Document":
+        doc = root
+    elif root.local in _WRAPPERS:
+        names = sorted(c.local for c in root.children)
+        if names != ["AppHdr", "Document"]:
+            return None
+        doc = next(c for c in root.children if c.local == "Document")
+        hdr = next(c for c in root.children if c.local == "AppHdr")
+    else:
+        return None
+    if not doc.ns or not _NS_PACS_RE.fullmatch(doc.ns):
+        return None
+    if hdr is not None and (not hdr.ns or not _NS_HEAD_RE.fullmatch(hdr.ns)):
+        return None
+    top = {id(root), id(doc)} | ({id(hdr)} if hdr is not None else set())
+    for n in _xml_walk(root):
+        if n.local not in _C4_NAMES or n.prefix not in _PREFIX_OK:
+            return None
+        if id(n) not in top and n.local in ({"Document", "AppHdr"} | _WRAPPERS):
+            return None
+        for k, v in n.attrs.items():
+            if k == "xmlns" or k.startswith("xmlns:"):
+                if id(n) not in top or (k != "xmlns" and k[6:] not in _PREFIX_OK):
+                    return None
+                if not (_NS_PACS_RE.fullmatch(v) or _NS_HEAD_RE.fullmatch(v)):
+                    return None
+            elif k == "Ccy":
+                if n.local not in _CCY_ELEMENTS or not re.fullmatch(r"[A-Z]{3}", v):
+                    return None
+            else:
+                return None
+        body = "".join(n.text)
+        if n.children and body.strip():
+            return None
+    for n in _xml_walk(doc):
+        if n.ns != doc.ns:
+            return None
+    if hdr is not None:
+        for n in _xml_walk(hdr):
+            if n.ns != hdr.ns:
+                return None
+    # READING (R-F1-10): C.2's path is literal: Document has exactly the one
+    # child FIToFICstmrCdtTrf, and CdtTrfTxInf sits directly under it.
+    if [c.local for c in doc.children] != ["FIToFICstmrCdtTrf"]:
+        return None
+    msg = doc.children[0]
+    for n in _xml_walk(root):
+        if (n.local == "CdtTrfTxInf" and n.parent is not msg) or (n.local == "FIToFICstmrCdtTrf" and n is not msg):
+            return None
+        if n.local in ("DbtrAcct", "CdtrAcct"):
+            if n.parent is None or n.parent.local != "CdtTrfTxInf":
+                return None
+            if [c.local for c in n.children] != ["Id"]:
+                return None
+            idn = n.children[0]
+            if len(idn.children) != 1 or idn.children[0].local not in ("IBAN", "Othr"):
+                return None
+            leaf = idn.children[0]
+            if leaf.local == "Othr":
+                if [c.local for c in leaf.children] != ["Id"] or leaf.children[0].children:
+                    return None
+                leaf = leaf.children[0]
+            elif leaf.children:
+                return None
+            if not "".join(leaf.text).strip():
+                return None
+    for tx in (c for c in msg.children if c.local == "CdtTrfTxInf"):
+        for name in ("DbtrAcct", "CdtrAcct"):
+            if sum(1 for c in tx.children if c.local == name) > 1:
+                return None
+    pos_nodes = {}
+    for tx in (c for c in msg.children if c.local == "CdtTrfTxInf"):
+        for c in tx.children:
+            if c.local in ("DbtrAcct", "CdtrAcct"):
+                leaf = c.children[0].children[0]
+                leaf = leaf.children[0] if leaf.local == "Othr" else leaf
+                pos_nodes[id(leaf)] = c.local
+    pieces, fields, positions, payers, benes, off = [], [], [], [], [], 0
+    for n in _xml_walk(root):
+        if n.children:
+            continue
+        raw = "".join(n.text).strip()
+        if n.local in _XML_FIXED and not _xml_fixed_ok(n.local, raw):
+            return None
+        v = normalize_text(raw).strip()
+        if not v:
+            continue
+        span = (off, off + len(v))
+        pieces.append(v)
+        off = span[1] + 1
+        if id(n) in pos_nodes and _nd_count(v) > 0:
+            positions.append(span)
+            (payers if pos_nodes[id(n)] == "DbtrAcct" else benes).append(span)
+            continue
+        fields.append({"name": n.local, "fixed": n.local in _XML_FIXED or n.local in _XML_ID_LIMITED, "text": v,
+                       "limit": 35 if n.local in _XML_ID_LIMITED else None})
+    return {"text": "\n".join(pieces), "fields": fields, "blocks": [], "positions": positions, "payers": payers,
+            "benes": benes, "items": items}
+
+
+# ---- M1-M4 ----------------------------------------------------------------
+
+
+def _m3_ok(st) -> bool:
+    text = st["text"]
+    pos = set(st["positions"])
+    for s, e, is_iban in _account_shapes(text):
+        if (s, e) not in pos or any(c in text[s:e] for c in _LINE_BREAKS):
+            return False
+        if is_iban and not _iban_mod97_ok("".join(c for c in text[s:e] if c.isalnum()).upper()):
+            return False
+    shapes = {(s, e): i for s, e, i in _account_shapes(text)}
+    for span in st["payers"]:
+        v = text[span[0]:span[1]]
+        if shapes.get(span) is True:
+            continue  # checked above: a qualifying IBAN
+        if not all(c in " -." or unicodedata.category(c) == "Nd" for c in v):
+            return False
+    return True
+
+
+def _m4_ok(st) -> bool:
+    fields = st["fields"]
+    # C.1: blocks are not fields, so ① and ③ skip them; their text is in ②.
+    if any(_wording_hit(f["text"], c0_words=True) for f in fields):
+        return False
+    joined = "\n".join([f["text"] for f in fields] + st["blocks"])
+    if redirect_wording({"text": joined})["hit"]:
+        return False
+    for f in fields:
+        # ③: fixed-format fields and the ④ references are not counted (`fixed`).
+        if not f["fixed"] and _nd_count(f["text"]) >= (6 if f["name"] in _MT_BENE else 8):
+            return False
+        if f["limit"] is not None and (len(f["text"]) > f["limit"] or any(c.isspace() for c in f["text"])):
+            return False
+    return True
+
+
+def _pm_full(att, currencies):
+    """M1-M4 for one attachment: {structured, payers, beneficiaries, problem, shapes, st, type}."""
+    typ = _att_type(att.get("kind"), att.get("filename"))
+    out = {"structured": False, "payers": [], "beneficiaries": [], "problem": "M2", "st": None, "type": typ}
+    # READING (R-F1-13): the output has no "M1"; an M1 failure reports M2.
+    if not att.get("top_level", True) or att.get("parse_status") != "ok" or typ not in ("txt", "xml"):
+        return out
+    if typ == "txt":
+        st = _mt_structure(normalize_text(att.get("text") or ""), currencies)
+    else:
+        # C.2 last paragraph: no raw XML (old data) does not qualify.
+        st = _pacs_structure(att["xml"], currencies) if isinstance(att.get("xml"), str) else None
+    if st is None:
+        return out
+    t = st["text"]
+    out.update(structured=True, st=st, problem=None, payers=[t[a:b] for a, b in st["payers"]],
+               beneficiaries=[t[a:b] for a, b in st["benes"]])
+    if not _m3_ok(st):
+        out["problem"] = "M3"
+    elif not _m4_ok(st):
+        out["problem"] = "M4"
+    return out
+
+
+def _currencies(inp):
+    return list(inp.get("currencies") or SUPPORTED_CURRENCIES)
+
+
+def payment_message(inp):
+    r = _pm_full(inp, _currencies(inp))
+    return {k: r[k] for k in ("structured", "payers", "beneficiaries", "problem")}
+
+
+def _norm_account(v: str) -> str:
+    """C.3."""
+    return re.sub(r"[/ \-.]", "", normalize_text(v or "")).upper()
+
+
+def _configured(receiving_accounts, deal):
+    # READING (R-F1-14): an empty list is the same as no configured list.
+    vals = (receiving_accounts or {}).get(deal) if deal is not None else None
+    return {_norm_account(x) for x in vals} if vals else None
+
+
+def _key_deal(key):
+    return key.split("::", 1)[0] if isinstance(key, str) and "::" in key else None
+
+
+def _sender_deals(contact):
+    """Deals of a contact (C-CLS-4a E3): `deals`, `investor_ids` and `authorised_for` together."""
+    if not contact:
+        return set()
+    deals = {d for d in contact.get("deals") or [] if d}
+    for k in list(contact.get("investor_ids") or []) + list(contact.get("authorised_for") or []):
+        d = _key_deal(k)
+        # READING (R-F1-15): a key without a deal cannot be placed, and the
+        # exception must not rest on it: such a value counts as another deal.
+        deals.add(d if d is not None else "\0unknown:%s" % k)
+    return deals
+
+
+def _att_shapes(att) -> bool:
+    typ = _att_type(att.get("kind"), att.get("filename"))
+    if typ == "xml" and isinstance(att.get("xml"), str):
+        p = pacs008({"xml": att["xml"]})
+        text = p.get("text", "") if p.get("parsed") else (att.get("text") or "")
+    else:
+        text = att.get("text") or ""
+    return bool(_account_shapes(normalize_text(text)))
+
+
+def _exemption_detail(inp):
+    atts = inp.get("attachments") or []
+    no = {"applied": False, "deal": None, "reason": None, "attachment": None}
+
+    def fail(reason):
+        return dict(no, reason=reason)
+
+    others = [a for a in atts if not (_att_type(a.get("kind"), a.get("filename")) == "image" and a.get("maybe_kyc") is False)]
+    # READING (R-F1-16): C.0: no account shape in any attachment -> C-CLS-4a
+    # does not judge: not applied, reason null. An image with maybe_kyc false
+    # can only be the C-RED-0 ③ inline signature exception.
+    if not any(_att_shapes(a) for a in atts):
+        return no
+    if len(others) != 1:
+        return fail("E4")
+    att = others[0]
+    r = _pm_full(dict(att, top_level=True), _currencies(inp))
+    if not r["structured"]:
+        return fail("M2")
+    if r["problem"]:
+        return fail(r["problem"])
+    contact = inp.get("sender_contact")
+    deals = _sender_deals(contact)
+    if not contact or len(deals) != 1 or inp.get("dmarc_pass") is not True:
+        return fail("E3")
+    sig = inp.get("signals") or {}
+    if any(sig.get(s) is not False for s in F1_SIGNALS):
+        return fail("E3")
+    deal = next(iter(deals))
+    if any(d != deal for d in inp.get("reference_deals") or []):
+        return fail("E3")
+    cfg = _configured(inp.get("receiving_accounts"), deal)
+    if cfg is None or any(_norm_account(v) not in cfg for v in r["beneficiaries"]):
+        return fail("M5")
+    wording = [inp.get("subject"), inp.get("body"), inp.get("body_html")]
+    # PRD E2: in file names `_`, `-`, `.` count as spaces.
+    wording += [re.sub(r"[_\-.]", " ", normalize_text(a.get("filename") or "")) for a in atts]
+    if any(t and redirect_wording({"text": t})["hit"] for t in wording):
+        return fail("E2")
+    # E4: the mail must be fully decoded.
+    if inp.get("mime_parse_failed") or inp.get("blocked_or_over_limit") or any(a.get("maybe_kyc") is not False for a in atts):
+        return fail("E4")
+    labels = inp.get("model_labels")
+    if not labels or any(x not in _F1_ALLOWED_MODEL for x in labels):
+        return fail("E5")
+    if inp.get("prior_bank_rule"):
+        return fail("E6")
+    return {"applied": True, "deal": deal, "reason": None, "attachment": att.get("ordinal")}
+
+
+def evidence_exemption(inp):
+    r = _exemption_detail(inp)
+    return {k: r[k] for k in ("applied", "deal", "reason")}
+
+
+def rule_labels(inp):
+    """C-CLS-4 plus C-CLS-4a."""
+    labels = set()
+    # PRD C-CLS-4: «正文» is the text body and the HTML body's text content.
+    # READING (R-F1-04): `body_html` is that text already (test plan §3); no
+    # tag handling here. PRD C-CLS-4: the two are judged separately for the
+    # wording rule, so `new` in one and `bank` in the other do not hit.
+    html = inp.get("body_html")
+    texts = [inp.get("subject"), inp.get("body"), html]
+    exempt = inp.get("exempt_attachment")
+    for i, a in enumerate(inp.get("attachment_texts") or []):
+        # READING (R-F1-17): an item is a text (its list index is the ordinal)
+        # or {ordinal, text}.
+        ord_, t = (a.get("ordinal", i), a.get("text")) if isinstance(a, dict) else (i, a)
+        if exempt is None or ord_ != exempt:
+            texts.append(t)
+    if any(t and _account_shapes(normalize_text(t)) for t in texts):
+        labels.add("bank_details")
+    # PRD C.0: accents are removed for the wording rule only with evidence.
+    with_evidence = bool(inp.get("evidence_anywhere"))
+    if _wording_hit(inp.get("body"), with_evidence) or _wording_hit(html, with_evidence):
+        labels.add("bank_details")
+    if inp.get("evidence_anywhere"):
+        if _wording_hit(inp.get("subject"), True):
+            labels.add("bank_details")
+        if any(t and explicit_redirect({"text": t})["hit"] for t in (inp.get("subject"), inp.get("body"), html)):
+            labels.add("bank_details")
+    if inp.get("prior_bank_rule"):
+        labels.add("bank_details")
+    if inp.get("esign_invite"):
+        labels.add("legal_documents")
+    if inp.get("payment_evidence_parsed"):
+        labels.add("payment_evidence")
+    return {"labels": sorted(labels)}
+
+
+def beneficiary_mismatch(inp):
+    """C-RSK-2 evidence_beneficiary_mismatch ① and ②."""
+    linked = inp.get("linked_deal")
+    cfg = _configured(inp.get("receiving_accounts"), linked)
+    vals = [v for v in inp.get("structured_beneficiaries") or [] if _nd_count(normalize_text(v)) > 0]
+    if cfg is not None and any(_norm_account(v) not in cfg for v in vals):
+        return {"hit": True}
+    exempted = inp.get("exempted_deal")
+    return {"hit": exempted is not None and (linked != exempted or cfg is None)}
+
+
+def evidence_supports_tracing(inp):
+    """C-DRF-4's step: exactly one M1+M2 message whose every payment is usable."""
+    # C-DRF-4: exactly one message meeting M1, M2.
+    # READING (R-F1-19): other attachments do not matter to this step.
+    if inp.get("mime_parse_failed"):  # C-DRF-4: the mail must be fully decoded
+        return {"ok": False}
+    curr = _currencies(inp)
+    msgs = []
+    for a in inp.get("attachments") or []:
+        r = _pm_full(dict(a, top_level=a.get("top_level", True)), curr)
+        if r["structured"]:
+            msgs.append(r)
+    if len(msgs) != 1:
+        return {"ok": False}
+    st = msgs[0]["st"]
+    if "item" in st:
+        # C-DRF-4: exactly one `{121:}` in `{3:}`, a valid C-EXT-1 UETR.
+        # READING (R-F1-20): an MT103 is one payment; UETR-shaped text elsewhere
+        # in the message (`:70:`) neither supplies nor spoils it here.
+        tags = [v for b in st["blocks"] if b.startswith("{3:") for v in re.findall(r"\{121:([^{}]*)\}", b)]
+        u = uetr({"text": tags[0]})["uetrs"] if len(tags) == 1 else []
+        if len(u) != 1:
+            return {"ok": False}
+        items = [dict(st["item"], uetr=u[0])]
+    else:
+        items = st["items"]
+    ccy = str(inp.get("deal_currency") or "").upper()
+    recv = _date(inp.get("received_at_date"))
+    due = inp.get("cash_due_minor")
+    if due is None or recv is None or not items:
+        return {"ok": False}
+    dates = set()
+    total = 0
+    for it in items:
+        d = _date(it.get("value_date")) if it.get("value_date") else None
+        if d is None or it.get("minor") is None or it.get("currency") != ccy or not it.get("uetr"):
+            return {"ok": False}
+        dates.add(d)
+        total += int(it["minor"])
+    if len({it["uetr"] for it in items}) != len(items):  # C-DRF-4: valid and distinct
+        return {"ok": False}
+    if len(dates) != 1 or next(iter(dates)) > recv or total > int(due):
+        return {"ok": False}
+    return {"ok": True}
+
+
+def pacs_account_values(xml: str):
+    """C-RED-1 ②: DbtrAcct / CdtrAcct position values of any parsed pacs.008, qualifying or not."""
+    if not pacs008({"xml": xml}).get("parsed"):
+        return []
+    out = []
+    root = ET.fromstring(xml)
+    for tx in root.iter():
+        if _split_tag(tx.tag)[1] != "CdtTrfTxInf":
+            continue
+        for acct in tx:
+            if _split_tag(acct.tag)[1] not in ("DbtrAcct", "CdtrAcct"):
+                continue
+            for idn in _children(acct, "Id"):
+                for leaf in list(_children(idn, "IBAN")) + [x for o in _children(idn, "Othr") for x in _children(o, "Id")]:
+                    v = normalize_text(leaf.text or "").strip()
+                    if v:
+                        out.append(v)
+    return out
+
+
+def receiving_accounts_import(inp):
+    """C-DIR-1a for one deals row: {value, line, role} -> {ok, error, line, values, last4}."""
+    if inp.get("role") != "admin":
+        return {"ok": False, "error": "forbidden", "line": None, "values": [], "last4": []}
+    # READING (R-F1-22): a missing or empty cell has no accounts; empty items
+    # between semicolons are ignored; a value is IBAN-shaped when one IBAN
+    # shape covers all of it after trimming. C-DIR-1a: HMAC + last 4 stored;
+    # this oracle has no HMAC key and returns the C.3 form for comparison.
+    values = []
+    for raw in (inp.get("value") or "").split(";"):
+        v = normalize_text(raw).strip()
+        if not v:
+            continue
+        shapes = _iban_shapes(v)
+        if shapes and shapes[0][:2] == (0, len(v)) and not _iban_mod97_ok(shapes[0][2].upper()):
+            return {"ok": False, "error": "iban", "line": inp.get("line"), "values": [], "last4": []}
+        values.append(_norm_account(v))
+    return {"ok": True, "error": None, "line": None, "values": values, "last4": [v[-4:] for v in values]}
+
+
+def raw_attachment(eml_path: str, ordinal: int):
+    """Decoded bytes of outer attachment `ordinal` (B.1 numbering), or None when unreadable."""
+    try:
+        with open(eml_path, "rb") as fh:
+            atts = _outer_parts(fh.read())[0]
+        part = atts[ordinal]
+    except Exception:  # noqa: BLE001 - unreadable means «不合格»
+        return None
+    cte = _alower(_astrip(part.first("content-transfer-encoding") or ""))
+    if cte == "base64":
+        return _strict_b64(part.body)
+    if cte == "quoted-printable":
+        return _qp_decode(part.body)
+    return part.body
+
+
+# ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
@@ -4016,6 +4902,15 @@ FUNCTIONS = {
     "kyc": kyc,
     # E6
     "inline_signature": inline_signature,
+    # F1
+    "payment_message": payment_message,
+    "redirect_wording": redirect_wording,
+    "explicit_redirect": explicit_redirect,
+    "evidence_exemption": evidence_exemption,
+    "rule_labels": rule_labels,
+    "beneficiary_mismatch": beneficiary_mismatch,
+    "evidence_supports_tracing": evidence_supports_tracing,
+    "receiving_accounts_import": receiving_accounts_import,
 }
 
 

@@ -1,0 +1,73 @@
+{
+  "id": "E1039",
+  "family": "F113",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-26T14:05:00Z",
+  "prior_messages": [],
+  "description": "C-CLS-4a exempt pacs.008; the body mentions an earlier unrelated email about an investor call, which asks for nothing -> payment_evidence only, medium, payment_wait.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "f317b970-a7b9-478e-a11a-2166d36a6349",
+    "amount": {
+      "minor": 5000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-10-22",
+    "payer_name": "TOMASZ WOLSKI",
+    "reference": "NW-004"
+  },
+  "rule_output": {
+    "uetrs": [
+      "f317b970-a7b9-478e-a11a-2166d36a6349"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 5000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-004"
+    ],
+    "account_last4": [
+      "1312",
+      "5157"
+    ],
+    "evidence_value_dates": [
+      "2026-10-22"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C004",
+    "investor_id": "Northwind Robotics::004",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0003"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_wait",
+  "notes": "Ledger T-NW-0003 (50,000, 22 Oct) is unmatched -> not counted, not received in full. Value date Thu 2026-10-22, received Mon 2026-10-26: 23 and 26 Oct = 2 working days < 5 -> payment_wait. C-LNK-4 lists T-NW-0003 by amount 50,000 and date within 5 days (display only). DbtrAcct and listed CdtrAcct are IBANs, whole values, mod-97 valid. MsgId has 4 digits, EndToEndId 1, Ustrd 3."
+}

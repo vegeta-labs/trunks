@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"271d137e-843f-4c9d-b26e-380b0c4c49fb\",\"confidence\":\"high\",\"quote\":\"{121:271d137e-843f-4c9d-b26e-380b0c4c49fb}\"},\"amount\":{\"value\":\"EUR 150,000.00\",\"confidence\":\"high\",\"quote\":\"reference SB-007, EUR 150,000.00\"},\"currency\":{\"value\":\"EUR\",\"confidence\":\"high\",\"quote\":\":32A:261013EUR150000,00\"},\"value_date\":{\"value\":\"261013\",\"confidence\":\"medium\",\"quote\":\":32A:261013EUR150000,00\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2] [NAME_3] Limited\",\"confidence\":\"high\",\"quote\":\"The ordering party shown is [NAME_1] [NAME_2] [NAME_3] Limited, which is us\"},\"reference\":{\"value\":\"SB-007\",\"confidence\":\"high\",\"quote\":\"reference SB-007\"},\"party_role\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"},\"change_requested\":{\"value\":null,\"confidence\":\"high\",\"quote\":\"\"}}}",
+ "usage": {
+  "inputTokens": 2104,
+  "outputTokens": 382
+ }
+}

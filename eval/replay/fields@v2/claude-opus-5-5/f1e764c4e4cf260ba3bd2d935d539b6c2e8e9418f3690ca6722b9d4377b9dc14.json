@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"52d3081e-b596-4657-b8b1-f71b04ebd17d\",\"confidence\":\"high\",\"quote\":\"{121:52d3081e-b596-4657-b8b1-f71b04ebd17d}\"},\"amount\":{\"value\":\"GBP8000,00\",\"confidence\":\"high\",\"quote\":\":32A:261103GBP8000,00\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\":32A:261103GBP8000,00\"},\"value_date\":{\"value\":\"261103\",\"confidence\":\"high\",\"quote\":\":32A:261103GBP8000,00\"},\"payer_name\":{\"value\":\"[NAME_1] O'[NAME_2]\",\"confidence\":\"high\",\"quote\":\":50K:/[ACCOUNT_1]\\n[NAME_1] O'[NAME_2]\"},\"reference\":{\"value\":\"NW-011 ONEILL\",\"confidence\":\"high\",\"quote\":\":70:NW-011 ONEILL\"},\"party_role\":{\"value\":\"investor\",\"confidence\":\"medium\",\"quote\":\"From now on pay to the beneficiary on the attached.\"},\"change_requested\":{\"value\":true,\"confidence\":\"medium\",\"quote\":\"From now on pay to the beneficiary on the attached.\"}}}",
+ "usage": {
+  "inputTokens": 1938,
+  "outputTokens": 413
+ }
+}

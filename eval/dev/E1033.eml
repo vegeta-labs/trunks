@@ -1,0 +1,40 @@
+Return-Path: <oliver.bennett@bennettmail.example>
+Received: from mail.bennettmail.example (mail.bennettmail.example
+ [192.0.2.69]) by mx.ops.example with ESMTPS id 447b4857ab for
+ <investors@ops.example>; Thu, 12 Nov 2026 10:20:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=bennettmail.example;
+ dkim=pass header.d=bennettmail.example;
+ dmarc=pass header.from=bennettmail.example
+Message-ID: <E1033.93471ee58ce0@bennettmail.example>
+Date: Thu, 12 Nov 2026 10:17:49 +0000
+From: "Oliver Bennett" <oliver.bennett@bennettmail.example>
+To: investors@ops.example
+Subject: Please update our bank details
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============4934617358092420894=="
+
+--===============4934617358092420894==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+See the attached MT103 for NW-002.
+
+Oliver
+
+--===============4934617358092420894==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Bennett2.txt"
+
+ezM6ezEyMTowM2M2ZDJmMS04OTdmLTRhOGItODFiMi0xNjQ2YWQ0MTFkZGR9fQ0KezQ6DQo6MjA6
+T0JOLVBNVC0xMTExDQo6MjNCOkNSRUQNCjozMkE6MjYxMTExR0JQMTAwMDAsMDANCjo1MEs6T0xJ
+VkVSIEJFTk5FVFQNCkxPTkRPTg0KOjU5Oi9OT1JUSFdJTkQgUk9CT1RJQ1MgU1BWIENMSUVOVCBB
+Qw0KTk9SVEhXSU5EIFJPQk9USUNTIFNQViBMUA0KOjcwOk5XLTAwMiBCRU5ORVRUDQo6NzFBOlNI
+QQ0KLX0NCg==
+
+--===============4934617358092420894==--

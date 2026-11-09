@@ -50,6 +50,15 @@ templates:
 
       {deployment_name}
 
+  - id: payment_evidence_received
+    subject: "Re: {case_number}"
+    body: |
+      Dear {contact_name},
+
+      Thank you for sending the payment confirmation for {deal_name} (your payment reference {reference}). A confirmation shows what the bank was instructed to send; it does not confirm that we have received the funds. We will check it against our records and contact you if we need anything else.
+
+      {deployment_name}
+
   - id: payment_need_evidence
     subject: "Re: {case_number}"
     body: |

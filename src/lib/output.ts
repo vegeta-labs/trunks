@@ -33,4 +33,4 @@ export function toCsv<C extends string>(columns: readonly C[], rows: ReadonlyArr
   return [line([...columns]), ...body].join('\r\n') + '\r\n'
 }
 
-export const PAYMENT_ACTIONS = ['check_payment_in_ledger', 'request_payment_evidence']
+export const PAYMENT_ACTIONS = ['check_payment_in_ledger', 'request_payment_evidence', 'check_payment_evidence']

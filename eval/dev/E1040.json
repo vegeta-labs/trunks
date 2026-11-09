@@ -1,0 +1,73 @@
+{
+  "id": "E1040",
+  "family": "F114",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-06T15:30:00Z",
+  "prior_messages": [],
+  "description": "C-CLS-4a exempt MT103 with a polite explicit question whether it has arrived -> payment_evidence and payment_query (§3.1 v0.7.10), still medium, payment_wait.",
+  "classes": [
+    "payment_evidence",
+    "payment_query"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "c493ee64-9a00-450e-8fc2-b411cbfe4097",
+    "amount": {
+      "minor": 1200000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-11-02",
+    "payer_name": "JAMES SMITH",
+    "reference": "NW-010",
+    "payment_date": "2026-11-02"
+  },
+  "rule_output": {
+    "uetrs": [
+      "c493ee64-9a00-450e-8fc2-b411cbfe4097"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1200000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-010"
+    ],
+    "account_last4": [
+      "1312",
+      "7375"
+    ],
+    "evidence_value_dates": [
+      "2026-11-02"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C010",
+    "investor_id": "Northwind Robotics::010",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_wait",
+  "notes": "§3.1: with evidence the class is payment_evidence; an explicit \"has it arrived\" also gives payment_query (same reading as E0287). Both are inside E5's set, so the exemption still applies. Two directory contacts are called James Smith (C010, C030); the From address is C010's, so display_name_mismatch is false and C-LNK-1 links C010 (one deal). Ledger has no row for 010 -> not received in full. Value date Mon 2026-11-02, received Fri 2026-11-06: 4 working days < 5 -> payment_wait. \"No rush\" is not a pressure word. payment_date = value date 2026-11-02 (body says 2 November)."
+}

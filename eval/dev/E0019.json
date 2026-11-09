@@ -5,12 +5,11 @@
   "mailbox_strips_auth_results": true,
   "received_at": "2026-11-02T12:18:00Z",
   "prior_messages": [],
-  "description": "MT103 .txt attachment with the SPV's GB IBAN in :59: -> payment_evidence + bank_details -> high, safe_ack.",
+  "description": "MT103 .txt attachment with the SPV's GB IBAN in :59:, on the Northwind list -> C-CLS-4a exempt, payment_evidence only, medium; 9,000 of 18,000 received, value date 1 working day old -> payment_wait.",
   "classes": [
-    "payment_evidence",
-    "bank_details"
+    "payment_evidence"
   ],
-  "expected_risk": "high",
+  "expected_risk": "medium",
   "malicious": false,
   "malicious_type": null,
   "twin_of": null,
@@ -34,10 +33,7 @@
     "currency": "GBP",
     "value_date": "2026-10-30",
     "payer_name": "DANIEL OSEI",
-    "reference": "NW-016",
-    "party_role": "other",
-    "account_last4": "1312",
-    "change_requested": false
+    "reference": "NW-016"
   },
   "rule_output": {
     "uetrs": [
@@ -71,6 +67,6 @@
     "candidates": []
   },
   "may_disclose_record": true,
-  "draft_template": "safe_ack",
-  "notes": "IBAN (valid, fictional) is in the attachment text -> rule label bank_details (C-CLS-4 looks at attachment text, v0.7.8). party_role 'other' (deal SPV account; see QUESTIONS W1)."
+  "draft_template": "payment_wait",
+  "notes": "PRD v0.7.28: the IBAN is the whole value of the :59: account position and is on receiving_accounts (M3, M5), so it no longer gives bank_details; party_role, account_last4 and change_requested leave fields with the class. rule_output.account_last4 keeps 1312: C-EXT-4 extraction does not depend on the exception (QUESTIONS F1-6). Value date Fri 2026-10-30, received Mon 2026-11-02: 1 working day."
 }

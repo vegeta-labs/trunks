@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { failures, fieldCorrect, score, type Annotation, type SystemOutput } from './metrics.ts'
+import { canonicalJson, exactSet, failures, fieldCorrect, score, type Annotation, type SystemOutput } from './metrics.ts'
+import { normTyped } from './metrics-e3.ts'
 
 const rule = { uetrs: [], uetr_candidates_invalid: [], amounts: [{ minor: 100, currency: 'GBP' }], references: ['NW-001'], account_last4: [], evidence_value_dates: [] }
 const ann = (id: string, classes: string[], fields: Annotation['fields'] = {}): Annotation => ({ id, classes, fields, rule_output: rule })
@@ -73,5 +74,23 @@ describe('PRD §6 E2 metrics', () => {
     const r = score([], [], floors)
     expect(r.fieldRecall.value).toBeNull()
     expect(failures(r)).toEqual([])
+  })
+})
+
+describe('PRD §6 compares values, not key order', () => {
+  it('rule output and typed values: the same object written with its keys in another order is equal', () => {
+    expect(canonicalJson({ minor: 900000, currency: 'GBP' })).toBe(canonicalJson({ currency: 'GBP', minor: 900000 }))
+    expect(exactSet([{ minor: 900000, currency: 'GBP' }, { minor: 900000, currency: 'GBP' }])).toBe(exactSet([{ currency: 'GBP', minor: 900000 }]))
+    expect(canonicalJson({ a: [{ y: 1, x: 2 }], b: null })).toBe(canonicalJson({ b: null, a: [{ x: 2, y: 1 }] }))
+  })
+  it('a non-money object field and a typed value compare by value too', () => {
+    expect(normTyped({ multiple: [{ minor: 1, currency: 'GBP' }, { b: 1, a: 2 }] })).toEqual(normTyped({ multiple: [{ a: 2, b: 1 }, { currency: 'GBP', minor: 1 }] }))
+    expect(canonicalJson(normTyped([{ y: 1, x: 2 }]))).toBe(canonicalJson(normTyped([{ x: 2, y: 1 }])))
+  })
+  it('different values stay different', () => {
+    expect(exactSet([{ minor: 900000, currency: 'GBP' }])).not.toBe(exactSet([{ currency: 'EUR', minor: 900000 }]))
+    expect(exactSet([{ minor: 900000, currency: 'GBP' }])).not.toBe(exactSet([{ currency: 'GBP', minor: 900001 }]))
+    expect(exactSet([{ minor: 1, currency: 'GBP' }])).not.toBe(exactSet([{ minor: 1, currency: 'GBP' }, { minor: 2, currency: 'GBP' }]))
+    expect(canonicalJson(['b', 'a'])).not.toBe(canonicalJson(['a', 'b'])) // arrays keep their order; sets are compared as sets by the callers
   })
 })

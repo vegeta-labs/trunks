@@ -60,8 +60,15 @@ describe('C-DIR directory imports', () => {
     expect(c!.authorisedFor).toEqual(['Northwind Robotics::c02', 'Other Deal::007'])
     expect(c!.deals).toEqual(['Northwind Robotics'])
   })
+  it('TC-DIR-10 receiving accounts: optional, several, not only IBANs; a bad check digit is an error', () => {
+    const header = 'name,currency,receiving_accounts\n'
+    expect(ok(importDeals(`${header}A,GBP,\n`, ['GBP']))[0]!.receivingAccounts).toEqual([])
+    expect(ok(importDeals(`${header}A,GBP,GB82 WEST 1234 5698 7654 32; 12-34-56 12345678;\n`, ['GBP']))[0]!.receivingAccounts).toEqual(['GB82WEST12345698765432', '123456' + '12345678'])
+    expect(errs(importDeals(`${header}A,GBP,GB82WEST12345698765431\n`, ['GBP']))).toEqual(['row 2, receiving_accounts: an IBAN with invalid check digits'])
+    expect(ok(importDeals('name,currency\nA,GBP\n', ['GBP']))[0]!.receivingAccounts).toEqual([])
+  })
   it('TC-DIR-05 deals: currency must be configured', () => {
-    expect(ok(importDeals('name,currency,close_date\nNorthwind Robotics,GBP,2026-11-02\n', ['GBP', 'EUR', 'USD']))).toEqual([{ name: 'Northwind Robotics', currency: 'GBP', closeDate: '2026-11-02', referencePrefix: null, row: 2 }])
+    expect(ok(importDeals('name,currency,close_date\nNorthwind Robotics,GBP,2026-11-02\n', ['GBP', 'EUR', 'USD']))).toEqual([{ name: 'Northwind Robotics', currency: 'GBP', receivingAccounts: [], closeDate: '2026-11-02', referencePrefix: null, row: 2 }])
     expect(errs(importDeals('name,currency\nX,CHF\n', ['GBP', 'EUR', 'USD']))).toEqual(['row 2, currency: "CHF" is not one of GBP, EUR, USD'])
     // the evaluation directory's header (eval/directory/deals.csv): before E3 the close date was silently dropped
     expect(ok(importDeals('deal_id,name,currency,planned_close_date,reference_prefix\nD1,Northwind Robotics,GBP,2026-11-20,NW\n', ['GBP']))[0]).toMatchObject({ closeDate: '2026-11-20', referencePrefix: 'NW' })

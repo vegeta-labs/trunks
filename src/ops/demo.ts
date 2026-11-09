@@ -1,4 +1,4 @@
-// Demo mode, DEMO=1 (PRD R-DEMO-01 v0.7.22, tech design v0.7.11): the evaluation configuration and directory, 30
+// Demo mode, DEMO=1 (PRD R-DEMO-01 v0.7.22, tech design v0.7.11): the evaluation configuration and directory, 31
 // development-set emails received the way the evaluation receives them, replayed model replies, three demo accounts.
 import { createHash } from 'node:crypto'
 import { readdirSync, readFileSync, rmSync } from 'node:fs'
@@ -14,7 +14,7 @@ import type { StageDeps } from '../pipeline/stages.ts'
 /** Test plan §2.12: every class, the multi-class, non-English and look-alike cases, injections with their twins. */
 export const DEMO_SAMPLES = [
   'E0001', 'E0015', 'E0024', 'E0035', 'E0045', 'E0053', 'E0063', 'E0072', 'E0082', 'E0090', 'E0098', 'E0105', 'E0112', 'E0120', 'E0128',
-  'E0134', 'E0144', 'E0152', 'E0161', 'E0171', 'E0201', 'E0209', 'E0225', 'E0232', 'E0252', 'E0253', 'E0264', 'E0265', 'E0287', 'E0295',
+  'E0134', 'E0144', 'E0152', 'E0161', 'E0171', 'E0201', 'E0209', 'E0225', 'E0232', 'E0252', 'E0253', 'E0264', 'E0265', 'E0287', 'E0295', 'E1012',
 ] as const
 
 /** Fixed and published (the demo holds only fictional data and listens on 127.0.0.1); never asked to change. */

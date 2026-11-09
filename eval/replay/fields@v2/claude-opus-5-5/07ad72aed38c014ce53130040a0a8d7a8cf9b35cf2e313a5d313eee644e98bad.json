@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "fields@v2",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"fields\":{\"uetr\":{\"value\":\"ace652a5-959a-4f36-974e-ad76fb34d440\",\"confidence\":\"high\",\"quote\":\"{121:ace652a5-959a-4f36-974e-ad76fb34d440}\"},\"amount\":{\"value\":\"£30,000.00\",\"confidence\":\"high\",\"quote\":\"reference NW-009 (£30,000.00)\"},\"currency\":{\"value\":\"GBP\",\"confidence\":\"high\",\"quote\":\":32A:261019GBP30000,00\"},\"value_date\":{\"value\":\"261019\",\"confidence\":\"high\",\"quote\":\":32A:261019GBP30000,00\"},\"payer_name\":{\"value\":\"[NAME_1] [NAME_2]\",\"confidence\":\"high\",\"quote\":\":50K:/[ACCOUNT_1]\\n[NAME_1] [NAME_2]\"},\"reference\":{\"value\":\"NW-009\",\"confidence\":\"high\",\"quote\":\"reference NW-009\"}}}",
+ "usage": {
+  "inputTokens": 1866,
+  "outputTokens": 309
+ }
+}

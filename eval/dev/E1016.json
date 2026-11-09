@@ -1,0 +1,73 @@
+{
+  "id": "E1016",
+  "family": "F090",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-20T16:40:00Z",
+  "prior_messages": [],
+  "description": "C.5 carve-out: subject, body and file name say \"wire confirmation\", which does not cancel the exemption -> payment_evidence only, payment_received.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "ace652a5-959a-4f36-974e-ad76fb34d440",
+    "amount": {
+      "minor": 3000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-10-19",
+    "payer_name": "CHEN WEI",
+    "reference": "NW-009"
+  },
+  "rule_output": {
+    "uetrs": [
+      "ace652a5-959a-4f36-974e-ad76fb34d440"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 3000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-009"
+    ],
+    "account_last4": [
+      "2625",
+      "8838"
+    ],
+    "evidence_value_dates": [
+      "2026-10-19"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C009",
+    "investor_id": "Northwind Robotics::009",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0007"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_received",
+  "notes": "wire is on the C.5 list except in the phrase wire confirmation; every use here is inside that phrase; in the file name wire_confirmation.txt the underscore separates the words (I-05). Ledger T-NW-0007 received in full."
+}

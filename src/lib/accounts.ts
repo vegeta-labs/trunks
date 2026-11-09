@@ -16,6 +16,9 @@ export interface AccountHit {
 const compact = (s: string) => s.replace(/[\s-]+/g, '').toUpperCase()
 
 /** ISO 13616 mod-97 = 1 on the compact form. */
+/** PRD appendix C.3: the form accounts are compared in. */
+export const normaliseAccount = (v: string) => v.replace(/[/\s.-]/g, '').toUpperCase()
+
 export function ibanValid(s: string): boolean {
   const c = compact(s)
   if (!/^[A-Z]{2}\d{2}[A-Z0-9]+$/.test(c) || IBAN_LENGTHS[c.slice(0, 2)] !== c.length) return false

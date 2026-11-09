@@ -62,6 +62,7 @@
         "payment_received",
         "payment_wait",
         "payment_need_evidence",
+        "payment_evidence_received",
         "payment_need_reference",
         "unreferenced_ack",
         "kyc_received",

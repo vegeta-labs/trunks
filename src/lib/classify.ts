@@ -1,7 +1,8 @@
 // PRD C-CLS-1 to C-CLS-4: the model's output format, rule labels and the adopted labels. Pure functions.
 import { z } from 'zod'
 import { accountShapes } from './redact.ts'
-import { findPhrases, normaliseText } from './text.ts'
+import { hasChangeWording, hasChangeWordingFolded, hasExplicitRedirect } from './payment-message.ts'
+import { normaliseText } from './text.ts'
 
 export type Confidence = 'high' | 'medium' | 'low'
 
@@ -24,18 +25,25 @@ export interface RuleInput {
   attachmentTexts: string[]
   esignInvite: boolean // C-EXT-6
   paymentEvidenceParsed: boolean // an attachment where C-EXT-3 parsed `:32A:` or `IntrBkSttlmAmt`
+  evidenceAnywhere?: boolean // D7 (C-CLS-4a): an amount the rules parsed from a payment message, body or attachment
+  exemptAttachment?: number | null // C-CLS-4a: index in attachmentTexts whose account shapes do not count
+  priorBankRule?: boolean // C-CLS-4a E6: a bank_details rule label in any generation stays
 }
-
-const CHANGE = ['change', 'changed', 'new', 'update', 'updated']
-const BANK = ['bank', 'account', 'details', 'payment instructions']
 
 /** C-CLS-4 (v0.7.8): labels added whatever the model says. */
 export function ruleLabels(i: RuleInput): string[] {
   const out = new Set<string>()
   // account shapes: every text that rule extraction reads (subject, body, attachment texts)
-  if ([i.subject, i.body, i.bodyHtml, ...i.attachmentTexts].some((t) => accountShapes(normaliseText(t)).length > 0)) out.add('bank_details')
+  const counted = i.attachmentTexts.filter((_, n) => n !== i.exemptAttachment)
+  if ([i.subject, i.body, i.bodyHtml, ...counted].some((t) => accountShapes(normaliseText(t)).length > 0)) out.add('bank_details')
   // the word rule: the body only (quoted mail included; plain or HTML), not the subject or attachments
-  for (const b of [i.body, i.bodyHtml].map(normaliseText)) if (findPhrases(b, CHANGE).length > 0 && findPhrases(b, BANK).length > 0) out.add('bank_details')
+  for (const b of [i.body, i.bodyHtml].map(normaliseText)) if (hasChangeWording(b)) out.add('bank_details')
+  // D7 (C-CLS-4a): with payment evidence, the subject counts too, and an explicit «from now on» redirect is enough
+  if (i.evidenceAnywhere) {
+    const surface = [i.subject, i.body, i.bodyHtml].map(normaliseText)
+    if (surface.some(hasChangeWordingFolded) || surface.some(hasExplicitRedirect)) out.add('bank_details')
+  }
+  if (i.priorBankRule) out.add('bank_details')
   if (i.esignInvite) out.add('legal_documents')
   if (i.paymentEvidenceParsed) out.add('payment_evidence')
   return [...out]

@@ -1,0 +1,18 @@
+{
+ "model": "claude-opus-5-5",
+ "prompt_version": "classify@v3",
+ "settings": {
+  "max_tokens": 4096,
+  "effort": "low",
+  "betas": [
+   "server-side-fallback-2026-07-01"
+  ],
+  "fallbacks": "default"
+ },
+ "answered_by": "claude-opus-5-5",
+ "raw": "{\"labels\":[{\"class\":\"payment_evidence\",\"confidence\":\"high\",\"reason\":\"Investor attaches MT103 for £5,000 Northwind NW-003 subscription; reference field 70 includes deal code and name, payer matches investor.\"}],\"language\":\"en\"}",
+ "usage": {
+  "inputTokens": 2308,
+  "outputTokens": 90
+ }
+}

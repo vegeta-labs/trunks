@@ -9,7 +9,7 @@ import { appendAudit } from '../store/audit.ts'
 import { loadSnapshot, takeSnapshot } from '../store/directory.ts'
 import type { Json } from '../lib/audit-hash.ts'
 import { resultOf, type ClassifyResult, type Extraction } from '../pipeline/stages.ts'
-import { checkReply, contentSha, effectiveFields, effectiveLabels, emitEvents, render, replyContext, routeOf, syncVerificationTasks, taskContactOf, type LinkResult, type RiskStageResult } from '../pipeline/stages-e3.ts'
+import { checkReply, contentSha, effectiveFields, effectiveLabels, emitEvents, hadBankRuleLabel, render, replyContext, routeOf, syncVerificationTasks, taskContactOf, type LinkResult, type RiskStageResult } from '../pipeline/stages-e3.ts'
 import { restartFrom } from '../pipeline/restart.ts'
 import { lockThreadTo } from '../maintenance/retention.ts'
 import { discardBlocked, retryDelivery } from '../maintenance/kyc.ts'
@@ -90,7 +90,7 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
     const computed = computeRisk({
       classes: d.config.classes, labels, signals: sig, accountPresent: rk.inputs.accountPresent, uetrCandidatesInvalid: ex.uetrCandidatesInvalid.length, amountsBody: rk.inputs.amountsBody,
       amountsAttachment: rk.inputs.amountsAttachment, attachmentBlockedOrOverLimit: rk.inputs.blockedOrOverLimit, pressure: rk.inputs.pressure, plannedCloseDate: lk.dealCloseDate,
-      receivedDate: rk.inputs.receivedDate, holidays: new Set(d.config.routing.holidays),
+      receivedDate: rk.inputs.receivedDate, holidays: new Set(d.config.routing.holidays), evidenceBeneficiaryMismatch: rk.inputs.evidenceBeneficiaryMismatch,
     })
     const adj = (await c.query<{ level: Level; computed_at_set: Level; reasons: string[] }>(`SELECT level, computed_at_set, reasons FROM risk_adjustment WHERE case_id = $1 AND state = 'active'`, [cr.id])).rows[0]
     return applyAdjustment(computed, adj ? { level: adj.level, computedAtSet: adj.computed_at_set, reasons: adj.reasons } : null, d.config.classes).level
@@ -108,6 +108,7 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
         if (cr.pipeline_complete_generation !== cr.processing_generation) throw new Refused(409, 'the Case is being reprocessed') // R2-3
         const cls = await resultOf<ClassifyResult>(on(c), cr.id, 'classify', cr.processing_generation)
         const ruleLabels = new Set((cls?.labels ?? []).filter((l) => l.source === 'rule').map((l) => l.classId))
+        if (await hadBankRuleLabel(c, cr.id)) ruleLabels.add('bank_details') // C-CLS-4a E6
         if (remove.some((x) => ruleLabels.has(x))) throw new Refused(409, 'a rule label cannot be removed (C-CLS-5)')
         const before = await effectiveLabels(on(c), cr.id, cr.processing_generation)
         const after = new Set(before.risk)

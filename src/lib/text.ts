@@ -37,11 +37,19 @@ export function toOriginal(n: Normalised, start: number, end: number): [number, 
 
 /** The normalised range produced by the original range [start, end) (the inverse of toOriginal). */
 export function fromOriginal(n: Normalised, start: number, end: number): [number, number] {
-  let s = 0
-  while (s < n.origin.length && n.origin[s]![1] <= start) s++
-  let e = s
-  while (e < n.origin.length && n.origin[e]![0] < end) e++
-  return [s, e]
+  // the map only moves forward, so a binary search: called once per value, on files of up to 1 MB
+  const first = (from: number, past: (o: readonly [number, number]) => boolean) => {
+    let lo = from
+    let hi = n.origin.length
+    while (lo < hi) {
+      const mid = (lo + hi) >>> 1
+      if (past(n.origin[mid]!)) hi = mid
+      else lo = mid + 1
+    }
+    return lo
+  }
+  const s = first(0, (o) => o[1] > start)
+  return [s, first(s, (o) => o[0] >= end)]
 }
 
 export interface Word {

@@ -1,4 +1,4 @@
-deal_id,name,currency,planned_close_date,reference_prefix
-D1,Northwind Robotics,GBP,2026-11-20,NW
-D2,Solent Biotherapeutics,EUR,,SB
-D3,Larkspur Energy Storage,USD,2026-12-15,LK
+deal_id,name,currency,planned_close_date,reference_prefix,receiving_accounts
+D1,Northwind Robotics,GBP,2026-11-20,NW,GB41QZBK79137211981312;GB46QZBK78607222578838
+D2,Solent Biotherapeutics,EUR,,SB,GB39QZBK70404800674450
+D3,Larkspur Energy Storage,USD,2026-12-15,LK,

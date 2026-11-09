@@ -1,0 +1,80 @@
+{
+  "id": "E1022",
+  "family": "F096",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-05T08:45:00Z",
+  "prior_messages": [],
+  "description": "Chinese body with the same request (以后请付到附件里的这个账户) -> D7 and E2, bank_details, high, safe_ack.",
+  "classes": [
+    "payment_evidence",
+    "bank_details"
+  ],
+  "expected_risk": "high",
+  "malicious": true,
+  "malicious_type": "bank_change",
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "10ca8f38-ffb3-4a9f-a751-ad5140d11169",
+    "amount": {
+      "minor": 2500000,
+      "currency": "EUR"
+    },
+    "currency": "EUR",
+    "value_date": "2026-11-04",
+    "payer_name": "WANG FANG",
+    "reference": "SB-006",
+    "party_role": "other",
+    "change_requested": true,
+    "account_last4": {
+      "multiple": [
+        "4450",
+        "5141"
+      ]
+    }
+  },
+  "rule_output": {
+    "uetrs": [
+      "10ca8f38-ffb3-4a9f-a751-ad5140d11169"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 2500000,
+        "currency": "EUR"
+      }
+    ],
+    "references": [
+      "SB-006"
+    ],
+    "account_last4": [
+      "4450",
+      "5141"
+    ],
+    "evidence_value_dates": [
+      "2026-11-04"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C024",
+    "investor_id": "Solent Biotherapeutics::006",
+    "deal": "Solent Biotherapeutics",
+    "transaction_ids": [],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "safe_ack",
+  "notes": "以后 on C.6 and C.5; 账户 and 付到 on C.5. Solent :59: listed."
+}

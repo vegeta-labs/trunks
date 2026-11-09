@@ -1,0 +1,43 @@
+Return-Path: <sophie.laurent@laurent-mail.example>
+Received: from mail.laurent-mail.example (mail.laurent-mail.example [192.0.2.99])
+ by mx.ops.example with ESMTPS id d91fff60f6 for <investors@ops.example>;
+ Mon, 9 Nov 2026 10:40:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=laurent-mail.example;
+ dkim=pass header.d=laurent-mail.example;
+ dmarc=pass header.from=laurent-mail.example
+Message-ID: <E1041.381b83e3d323@laurent-mail.example>
+Date: Mon, 9 Nov 2026 10:37:30 +0000
+From: "Sophie Laurent" <sophie.laurent@laurent-mail.example>
+To: investors@ops.example
+Subject: Virement Northwind Robotics NW-006 - MT103
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============3406434463345486692=="
+
+--===============3406434463345486692==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Bonjour,
+
+Veuillez trouver ci-joint le MT103 de mon virement pour Northwind Robotics =
+(r=C3=A9f=C3=A9rence NW-006), ex=C3=A9cut=C3=A9 le 30 octobre. Je vous prie=
+ d'excuser ce petit retard.
+
+Bien cordialement,
+Sophie Laurent
+
+--===============3406434463345486692==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Laurent.txt"
+
+ezM6ezEyMTphNzJiZmQ0YS1kNDQxLTQwMjUtOTM1NS1iNGRiMDZjOWQzNjh9fQ0KezQ6DQo6MjA6
+U0xBLVZJUi0xMDMwDQo6MjNCOkNSRUQNCjozMkE6MjYxMDMwR0JQMjAwMDAsMDANCjo1MEs6L0dC
+MTZRWkJLNDI3NTA1NDI3Mjg0MDUNClNPUEhJRSBMQVVSRU5UDQpMWU9ODQo6NTk6L0dCNDZRWkJL
+Nzg2MDcyMjI1Nzg4MzgNCk5PUlRIV0lORCBST0JPVElDUyBTUFYgTFANCjo3MDpOVy0wMDYgTEFV
+UkVOVA0KOjcxQTpTSEENCi19DQo=
+
+--===============3406434463345486692==--

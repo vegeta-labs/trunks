@@ -12,7 +12,7 @@ import type { FileStore } from '../store/files.ts'
 import { loadMessage, stageResult, type ClassifyResult, type Extraction, type FieldsResult } from '../pipeline/stages.ts'
 import { loadSnapshot } from '../store/directory.ts'
 import type { Value } from '../lib/fields.ts'
-import { currentActions, effectiveFields, effectiveLabels, outputGeneration, replyContext, taskContactOf, type LinkResult, type ReplyStageResult, type RiskStageResult } from '../pipeline/stages-e3.ts'
+import { currentActions, effectiveFields, effectiveLabels, hadBankRuleLabel, outputGeneration, replyContext, taskContactOf, type LinkResult, type ReplyStageResult, type RiskStageResult } from '../pipeline/stages-e3.ts'
 import { allowedManualTemplates, bodyEditable } from '../lib/draft.ts'
 import { CHECKLIST_TEXT, NO_PHONE_TEXT_EN } from '../lib/verification.ts'
 import { dueState } from '../lib/workdays.ts'
@@ -106,6 +106,7 @@ export interface CaseE3 {
   low: string[]
   pendingAdopted: string[] | null // a person's class changes waiting for the re-run
   ruleLabels: string[]
+  evidenceAccounts: { payer: string[]; beneficiary: string[] } | null // C-CLS-4a: last four only
   removed: Array<{ classId: string; by: string | null; reason: string | null }> // classes a person removed (D8)
   risk: { computed: string; final: string; by: string; clauses: string[]; floor: { level: string; classes: string[] } | null; adjustment: { level: string; state: string } | null; held: string | null; applied: string } | null
   pendingRisk: string | null // the Case's newer risk, until the re-run that computed it is complete (self-review T2)
@@ -324,7 +325,9 @@ async function e3View(deps: { db: Db; k: Keyring; files: FileStore; config: Conf
   }).filter((f) => viewer || f.subject === 'completer')
   return {
     generation: gen, complete: done === gen, manualRevision: c.manual_revision, adopted: rp.labels.adopted, low: rp.labels.low, pendingAdopted: sameSet(labels.adopted, rp.labels.adopted) ? null : labels.adopted,
-    ruleLabels: (cls?.labels ?? []).filter((l) => l.source === 'rule').map((l) => l.classId),
+    ruleLabels: [...new Set([...(cls?.labels ?? []).filter((l) => l.source === 'rule').map((l) => l.classId), ...((await hadBankRuleLabel(db, id)) ? ['bank_details'] : [])])],
+    // not once the Case has the rule label, which C-RSK-2 v0.7.28 also writes: the line would then be false
+    evidenceAccounts: cls?.evidenceExemption?.applied && !(await hadBankRuleLabel(db, id)) ? { payer: cls.evidenceExemption.payerLast4, beneficiary: cls.evidenceExemption.beneficiaryLast4 } : null,
     removed: changes.map((x) => ({ classId: x.class_id, by: nameOf(x.by_user), reason: x.reason_blob ? cb.get(x.reason_blob)!.toString('utf8') : null })),
     // the risk of the generation shown, beside its classes (self-review T2)
     risk: { computed: rk.computed.level, final: rk.final, by: rk.by, clauses: rk.computed.clauses.filter((x) => x.hit).map((x) => x.id), floor: floorClasses.length ? { level: base, classes: floorClasses } : null, adjustment: adj ? { level: adj.level, state: adj.state } : null, held: c.risk_hold, applied: rk.applied ?? rk.final },

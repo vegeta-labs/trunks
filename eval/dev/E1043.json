@@ -1,0 +1,73 @@
+{
+  "id": "E1043",
+  "family": "F117",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-10-22T12:10:00Z",
+  "prior_messages": [],
+  "description": "Spanish body (transferencia, fecha valor) with a C-CLS-4a exempt pacs.008; no cuenta, banco or remit- word -> payment_evidence only, medium, payment_received.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "0feb3cb2-f6e3-4419-9681-dbfd3cbd2b04",
+    "amount": {
+      "minor": 1000000,
+      "currency": "EUR"
+    },
+    "currency": "EUR",
+    "value_date": "2026-10-20",
+    "payer_name": "ELENA RUIZ",
+    "reference": "SB-004"
+  },
+  "rule_output": {
+    "uetrs": [
+      "0feb3cb2-f6e3-4419-9681-dbfd3cbd2b04"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1000000,
+        "currency": "EUR"
+      }
+    ],
+    "references": [
+      "SB-004"
+    ],
+    "account_last4": [
+      "4450",
+      "8336"
+    ],
+    "evidence_value_dates": [
+      "2026-10-20"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C022",
+    "investor_id": "Solent Biotherapeutics::004",
+    "deal": "Solent Biotherapeutics",
+    "transaction_ids": [
+      "T-SB-0003"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_received",
+  "notes": "Ledger T-SB-0003 10,000 EUR auto for 004 = cash due 10,000 -> received in full -> payment_received (may_disclose_record true). C-LNK-4 lists T-SB-0003 by reference and by amount/date. Body has no amount token. language es."
+}

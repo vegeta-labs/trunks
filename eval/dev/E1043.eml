@@ -1,0 +1,58 @@
+Return-Path: <elena.ruiz@ruiz-correo.example>
+Received: from mail.ruiz-correo.example (mail.ruiz-correo.example [192.0.2.129])
+ by mx.ops.example with ESMTPS id e74c8bed6f for <investors@ops.example>;
+ Thu, 22 Oct 2026 12:10:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=ruiz-correo.example;
+ dkim=pass header.d=ruiz-correo.example;
+ dmarc=pass header.from=ruiz-correo.example
+Message-ID: <E1043.88d32e27d128@ruiz-correo.example>
+Date: Thu, 22 Oct 2026 12:07:30 +0000
+From: "Elena Ruiz" <elena.ruiz@ruiz-correo.example>
+To: investors@ops.example
+Subject: Solent Biotherapeutics SB-004 - pacs.008
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============6276706929223421608=="
+
+--===============6276706929223421608==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hola:
+
+Adjunto el pacs.008 de mi transferencia para Solent Biotherapeutics (refere=
+ncia SB-004), con fecha valor 20 de octubre.
+
+Un saludo,
+Elena Ruiz
+
+--===============6276706929223421608==
+MIME-Version: 1.0
+Content-Type: application/xml
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="pacs008_Ruiz.xml"
+
+PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPERvY3VtZW50IHhtbG5zPSJ1
+cm46aXNvOnN0ZDppc286MjAwMjI6dGVjaDp4c2Q6cGFjcy4wMDguMDAxLjA4Ij4KICA8RklUb0ZJ
+Q3N0bXJDZHRUcmY+CiAgICA8R3JwSGRyPgogICAgICA8TXNnSWQ+UVpCSy1NU0ctRVJVLTEwMjA8
+L01zZ0lkPgogICAgICA8Q3JlRHRUbT4yMDI2LTEwLTIwVDExOjE1OjAzWjwvQ3JlRHRUbT4KICAg
+ICAgPE5iT2ZUeHM+MTwvTmJPZlR4cz4KICAgICAgPFN0dGxtSW5mPgogICAgICAgIDxTdHRsbU10
+ZD5DTFJHPC9TdHRsbU10ZD4KICAgICAgPC9TdHRsbUluZj4KICAgIDwvR3JwSGRyPgogICAgPENk
+dFRyZlR4SW5mPgogICAgICA8UG10SWQ+CiAgICAgICAgPEluc3RySWQ+SU5TVFItMTwvSW5zdHJJ
+ZD4KICAgICAgICA8RW5kVG9FbmRJZD5SVUlaLVNCLTQ8L0VuZFRvRW5kSWQ+CiAgICAgICAgPFVF
+VFI+MGZlYjNjYjItZjZlMy00NDE5LTk2ODEtZGJmZDNjYmQyYjA0PC9VRVRSPgogICAgICA8L1Bt
+dElkPgogICAgICA8SW50ckJrU3R0bG1BbXQgQ2N5PSJFVVIiPjEwMDAwLjAwPC9JbnRyQmtTdHRs
+bUFtdD4KICAgICAgPEludHJCa1N0dGxtRHQ+MjAyNi0xMC0yMDwvSW50ckJrU3R0bG1EdD4KICAg
+ICAgPENocmdCcj5TSEFSPC9DaHJnQnI+CiAgICAgIDxEYnRyPjxObT5FTEVOQSBSVUlaPC9ObT48
+L0RidHI+CiAgICAgIDxEYnRyQWNjdD48SWQ+PElCQU4+R0I2OFFaQks2ODQyMTA1MTc5ODMzNjwv
+SUJBTj48L0lkPjwvRGJ0ckFjY3Q+CiAgICAgIDxEYnRyQWd0PjxGaW5JbnN0bklkPjxCSUNGST5R
+WkJLR0IyTFhYWDwvQklDRkk+PC9GaW5JbnN0bklkPjwvRGJ0ckFndD4KICAgICAgPENkdHJBZ3Q+
+PEZpbkluc3RuSWQ+PEJJQ0ZJPlFaQktHQjJMWFhYPC9CSUNGST48L0Zpbkluc3RuSWQ+PC9DZHRy
+QWd0PgogICAgICA8Q2R0cj48Tm0+U09MRU5UIEJJT1RIRVJBUEVVVElDUyBTUFY8L05tPjwvQ2R0
+cj4KICAgICAgPENkdHJBY2N0PjxJZD48SUJBTj5HQjM5UVpCSzcwNDA0ODAwNjc0NDUwPC9JQkFO
+PjwvSWQ+PC9DZHRyQWNjdD4KICAgICAgPFJtdEluZj48VXN0cmQ+U0ItMDA0IFJVSVo8L1VzdHJk
+PjwvUm10SW5mPgogICAgPC9DZHRUcmZUeEluZj4KICA8L0ZJVG9GSUNzdG1yQ2R0VHJmPgo8L0Rv
+Y3VtZW50Pgo=
+
+--===============6276706929223421608==--

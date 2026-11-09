@@ -1,0 +1,60 @@
+Return-Path: <wang.fang@wangfang-home.example>
+Received: from mail.wangfang-home.example (mail.wangfang-home.example [192.0.2.69])
+ by mx.ops.example with ESMTPS id b165bb7f95 for <investors@ops.example>;
+ Wed, 4 Nov 2026 10:25:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=wangfang-home.example;
+ dkim=pass header.d=wangfang-home.example;
+ dmarc=pass header.from=wangfang-home.example
+Message-ID: <E1047.669a0cb300c8@wangfang-home.example>
+Date: Wed, 4 Nov 2026 10:22:30 +0000
+From: "Wang Fang" <wang.fang@wangfang-home.example>
+To: investors@ops.example
+Subject: =?utf-8?b?U0ItMDA2IOS7mOasvueiuuiqjSBwYWNzLjAwOA==?=
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============8466052218976768630=="
+
+--===============8466052218976768630==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+=E6=82=A8=E5=A5=BD=EF=BC=8C
+
+=E9=99=84=E4=B8=8A=E6=88=91=E7=82=BA Solent Biotherapeutics =E8=AA=8D=E8=B3=
+=BC=E6=89=80=E5=8C=AF=E5=87=BA=E6=AC=BE=E9=A0=85=E7=9A=84 pacs.008 (=E5=8F=
+=83=E8=80=83=E8=99=9F SB-006)=EF=BC=8C=E8=B5=B7=E6=81=AF=E6=97=A5=E7=82=BA1=
+1=E6=9C=882=E6=97=A5=E3=80=82=E5=A6=82=E9=9C=80=E5=85=B6=E4=BB=96=E8=B3=87=
+=E6=96=99=EF=BC=8C=E8=AB=8B=E5=91=8A=E7=9F=A5=E3=80=82
+
+=E7=8E=8B=E8=8A=B3 Wang Fang
+
+--===============8466052218976768630==
+MIME-Version: 1.0
+Content-Type: application/xml
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="pacs008_WangFang.xml"
+
+PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPERvY3VtZW50IHhtbG5zPSJ1
+cm46aXNvOnN0ZDppc286MjAwMjI6dGVjaDp4c2Q6cGFjcy4wMDguMDAxLjA4Ij4KICA8RklUb0ZJ
+Q3N0bXJDZHRUcmY+CiAgICA8R3JwSGRyPgogICAgICA8TXNnSWQ+UVpCSy1NU0ctV0ZBLTExMDI8
+L01zZ0lkPgogICAgICA8Q3JlRHRUbT4yMDI2LTExLTAyVDA4OjUwOjE5WjwvQ3JlRHRUbT4KICAg
+ICAgPE5iT2ZUeHM+MTwvTmJPZlR4cz4KICAgICAgPFN0dGxtSW5mPgogICAgICAgIDxTdHRsbU10
+ZD5DTFJHPC9TdHRsbU10ZD4KICAgICAgPC9TdHRsbUluZj4KICAgIDwvR3JwSGRyPgogICAgPENk
+dFRyZlR4SW5mPgogICAgICA8UG10SWQ+CiAgICAgICAgPEluc3RySWQ+SU5TVFItMTwvSW5zdHJJ
+ZD4KICAgICAgICA8RW5kVG9FbmRJZD5XQU5HRkFORy1TQi02PC9FbmRUb0VuZElkPgogICAgICAg
+IDxVRVRSPmY5MzE5NmZjLTEyOWQtNGE2ZC04NDI3LTNkNGMyMTZlZjI4ODwvVUVUUj4KICAgICAg
+PC9QbXRJZD4KICAgICAgPEludHJCa1N0dGxtQW10IENjeT0iRVVSIj4yNTAwMC4wMDwvSW50ckJr
+U3R0bG1BbXQ+CiAgICAgIDxJbnRyQmtTdHRsbUR0PjIwMjYtMTEtMDI8L0ludHJCa1N0dGxtRHQ+
+CiAgICAgIDxDaHJnQnI+U0hBUjwvQ2hyZ0JyPgogICAgICA8RGJ0cj48Tm0+V0FORyBGQU5HPC9O
+bT48L0RidHI+CiAgICAgIDxEYnRyQWNjdD48SWQ+PElCQU4+R0I0NFFaQks5MjU1NDMzNTA4OTAx
+NTwvSUJBTj48L0lkPjwvRGJ0ckFjY3Q+CiAgICAgIDxEYnRyQWd0PjxGaW5JbnN0bklkPjxCSUNG
+ST5RWkJLR0IyTFhYWDwvQklDRkk+PC9GaW5JbnN0bklkPjwvRGJ0ckFndD4KICAgICAgPENkdHJB
+Z3Q+PEZpbkluc3RuSWQ+PEJJQ0ZJPlFaQktHQjJMWFhYPC9CSUNGST48L0Zpbkluc3RuSWQ+PC9D
+ZHRyQWd0PgogICAgICA8Q2R0cj48Tm0+U09MRU5UIEJJT1RIRVJBUEVVVElDUyBTUFY8L05tPjwv
+Q2R0cj4KICAgICAgPENkdHJBY2N0PjxJZD48SUJBTj5HQjM5UVpCSzcwNDA0ODAwNjc0NDUwPC9J
+QkFOPjwvSWQ+PC9DZHRyQWNjdD4KICAgICAgPFJtdEluZj48VXN0cmQ+U0ItMDA2IFdBTkcgRkFO
+RzwvVXN0cmQ+PC9SbXRJbmY+CiAgICA8L0NkdFRyZlR4SW5mPgogIDwvRklUb0ZJQ3N0bXJDZHRU
+cmY+CjwvRG9jdW1lbnQ+Cg==
+
+--===============8466052218976768630==--

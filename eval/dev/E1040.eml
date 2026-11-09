@@ -1,0 +1,43 @@
+Return-Path: <jsmith@smithfamily.example>
+Received: from mail.smithfamily.example (mail.smithfamily.example [192.0.2.37])
+ by mx.ops.example with ESMTPS id a8b296ac37 for <investors@ops.example>;
+ Fri, 6 Nov 2026 15:30:00 +0000
+Authentication-Results: mx.ops.example;
+ spf=pass smtp.mailfrom=smithfamily.example;
+ dkim=pass header.d=smithfamily.example;
+ dmarc=pass header.from=smithfamily.example
+Message-ID: <E1040.f5f53b068e4a@smithfamily.example>
+Date: Fri, 6 Nov 2026 15:27:30 +0000
+From: "James Smith" <jsmith@smithfamily.example>
+To: investors@ops.example
+Subject: MT103 - NW-010
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============3039419992283622885=="
+
+--===============3039419992283622885==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+I sent =C2=A312,000.00 for Northwind Robotics (reference NW-010) on 2 Novem=
+ber and attach the MT103. Could you let me know whether it has arrived? No =
+rush at all.
+
+Thanks very much,
+James Smith
+
+--===============3039419992283622885==
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="MT103_Smith.txt"
+
+ezM6ezEyMTpjNDkzZWU2NC05YTAwLTQ1MGUtOGZjMi1iNDExY2JmZTQwOTd9fQ0KezQ6DQo6MjA6
+SlNNLU5XLTExMDINCjoyM0I6Q1JFRA0KOjMyQToyNjExMDJHQlAxMjAwMCwwMA0KOjUwSzovR0Iw
+NFFaQksyNTcxNjU5MTYwNzM3NQ0KSkFNRVMgU01JVEgNCkdVSUxERk9SRA0KOjU5Oi9HQjQxUVpC
+Szc5MTM3MjExOTgxMzEyDQpOT1JUSFdJTkQgUk9CT1RJQ1MgU1BWIExQDQo6NzA6TlctMDEwIFNN
+SVRIDQo6NzFBOlNIQQ0KLX0NCg==
+
+--===============3039419992283622885==--

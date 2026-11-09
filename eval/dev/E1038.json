@@ -1,0 +1,73 @@
+{
+  "id": "E1038",
+  "family": "F112",
+  "mailbox": "ops",
+  "mailbox_strips_auth_results": true,
+  "received_at": "2026-11-11T09:45:00Z",
+  "prior_messages": [],
+  "description": "C-CLS-4a exempt MT103 for the second of two instalments on one commitment; paying in instalments is not a commitment change -> payment_evidence only, medium, payment_evidence_received.",
+  "classes": [
+    "payment_evidence"
+  ],
+  "expected_risk": "medium",
+  "malicious": false,
+  "malicious_type": null,
+  "twin_of": null,
+  "signals": {
+    "auth_fail": false,
+    "untrusted_auth_header": false,
+    "display_name_mismatch": false,
+    "lookalike_domain": false,
+    "reply_to_mismatch": false,
+    "first_time_sender": false,
+    "hidden_text": false,
+    "injection_markers": false,
+    "message_id_collision": false
+  },
+  "fields": {
+    "uetr": "6d17171d-2ca7-49a8-8843-4b15af89dd30",
+    "amount": {
+      "minor": 1000000,
+      "currency": "GBP"
+    },
+    "currency": "GBP",
+    "value_date": "2026-11-03",
+    "payer_name": "OLIVER BENNETT",
+    "reference": "NW-002"
+  },
+  "rule_output": {
+    "uetrs": [
+      "6d17171d-2ca7-49a8-8843-4b15af89dd30"
+    ],
+    "uetr_candidates_invalid": [],
+    "amounts": [
+      {
+        "minor": 1000000,
+        "currency": "GBP"
+      }
+    ],
+    "references": [
+      "NW-002"
+    ],
+    "account_last4": [
+      "8838",
+      "9265"
+    ],
+    "evidence_value_dates": [
+      "2026-11-03"
+    ]
+  },
+  "links": {
+    "ambiguous": false,
+    "contact_id": "C002",
+    "investor_id": "Northwind Robotics::002",
+    "deal": "Northwind Robotics",
+    "transaction_ids": [
+      "T-NW-0002"
+    ],
+    "candidates": []
+  },
+  "may_disclose_record": true,
+  "draft_template": "payment_evidence_received",
+  "notes": "Ledger T-NW-0002 is 15,000 of 25,000 -> not received in full. Value date Tue 2026-11-03, received Wed 2026-11-11: 4,5,6,9,10,11 Nov = 6 working days >= 5; one M1/M2 MT103, {3:} has exactly one {121:}, GBP = deal currency, value date not after receipt, 10,000 <= cash due 25,000 (and <= the 10,000 still owed) -> payment_evidence_received. Body names no amount for the first instalment so amount has one value. :59: is the second listed account GB46...8838. C-LNK-4: T-NW-0002 by reference NW002; the 10,000 lines T-NW-0001 (20 Oct) and T-NW-0011 (28 Oct) are more than 5 days from 3 Nov. Close date 2026-11-20 is 7 working days after receipt."
+}

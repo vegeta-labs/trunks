@@ -1,6 +1,10 @@
 // E3 pipeline stages (tech design §6): link → risk → reply → route → emit. Each computes from the Case's snapshot, the
 // earlier stages of the same generation and a person's changes, then publishes under the Case row lock (runStage).
 // The rules themselves are the pure functions in src/lib; nothing here calls a model (decisions 4, 4a).
+import { restartFrom } from './restart.ts'
+import { evidenceSupportsTracing, structuredBeneficiaries } from '../lib/payment-message.ts'
+import { normaliseAccount } from '../lib/accounts.ts'
+import { receivingAccountHmac } from '../store/directory.ts'
 import { createHash, randomUUID } from 'node:crypto'
 import type { Tx } from '../store/db.ts'
 import { getBlobs, getJson, putBlob } from '../store/blobs.ts'
@@ -30,6 +34,10 @@ export interface EffectiveLabels {
   low: string[]
 }
 
+/** C-CLS-4a E6. */
+export const hadBankRuleLabel = async (c: Pick<Tx, 'query'>, caseId: string) =>
+  (await c.query(`SELECT 1 FROM case_label WHERE case_id = $1 AND class_id = 'bank_details' AND source = 'rule' LIMIT 1`, [caseId])).rows.length > 0
+
 export async function effectiveLabels(d: Pick<StageDeps, 'db' | 'k'>, caseId: string, generation: number): Promise<EffectiveLabels> {
   const cls = await resultOf<ClassifyResult>(d, caseId, 'classify', generation)
   if (!cls) throw new Error('no classification for this generation')
@@ -44,6 +52,11 @@ export async function effectiveLabels(d: Pick<StageDeps, 'db' | 'k'>, caseId: st
       adopted.delete(ch.class_id)
       risk.delete(ch.class_id)
     }
+  }
+  // C-CLS-4a E6: a bank_details rule label of any generation stays, also one the risk step wrote (C-RSK-2 v0.7.28)
+  if (await hadBankRuleLabel(d.db, caseId)) {
+    adopted.add('bank_details')
+    risk.add('bank_details')
   }
   // rule labels cannot be removed by a person (C-CLS-5): the current ones always count, whatever was removed earlier (Codex E3 F4)
   for (const l of cls.labels) if (l.source === 'rule' && l.classId !== 'unclassified') {
@@ -221,7 +234,7 @@ export async function prepLink(d: StageDeps, cr: CaseRow): Promise<Prepared> {
 // ---------- risk (C-RSK) ----------
 
 export interface RiskStageResult {
-  inputs: { pressure: boolean; accountPresent: boolean; amountsBody: Array<{ minor: number; currency: string }>; amountsAttachment: Array<{ minor: number; currency: string }>; blockedOrOverLimit: boolean; receivedDate: string }
+  inputs: { pressure: boolean; accountPresent: boolean; amountsBody: Array<{ minor: number; currency: string }>; amountsAttachment: Array<{ minor: number; currency: string }>; blockedOrOverLimit: boolean; receivedDate: string; evidenceBeneficiaryMismatch?: boolean }
   computed: RiskResult
   final: Level
   by: 'system' | 'person'
@@ -241,6 +254,16 @@ export async function prepRisk(d: StageDeps, cr: CaseRow): Promise<Prepared> {
   const texts = [m.subject, m.text, m.htmlText, ...m.attachments.flatMap((a) => [a.filename, a.text])]
   // C-RSK-2 «IBAN 形状的串或英国账号»: the C-RED-1 account shapes, check digits or not, sort code or not (Codex round 2 F14)
   const accountPresent = texts.some((t) => accountShapes(normalise(t).text).length > 0)
+  // C-RSK-2 v0.7.28: judged on this generation's link, which the classify step could not see
+  const cls = await resultOf<ClassifyResult>(d, cr.id, 'classify', gen)
+  const snap = await loadSnapshot(d.db, d.k, cr.snapshot_id)
+  const linkedDeal = lk.dealName ? snap.deals.find((x) => x.name === lk.dealName) ?? null : null
+  const exempted = cls?.evidenceExemption?.applied ? cls.evidenceExemption : null
+  const fieldsAsked = (await resultOf<FieldsResult>(d, cr.id, 'fields', gen))?.classes ?? []
+  const listed = linkedDeal?.receiving ?? null
+  const evidenceBeneficiaryMismatch =
+    (exempted !== null && (linkedDeal?.dealKey !== exempted.dealKey || listed === null)) ||
+    (listed !== null && structuredBeneficiaries(m.attachments, d.config.deployment.currencies).some((v) => !listed.some((x) => x.hmac === receivingAccountHmac(d.k, normaliseAccount(v)))))
   const inputs: RiskStageResult['inputs'] = {
     pressure: hasPressure([m.subject, m.text, m.htmlText], d.config.signals.pressure_words_extra),
     accountPresent,
@@ -248,10 +271,12 @@ export async function prepRisk(d: StageDeps, cr: CaseRow): Promise<Prepared> {
     amountsAttachment: ex.evidence.filter((e) => e.part.startsWith('attachment') && e.minor !== null && e.currency).map((e) => ({ minor: e.minor!, currency: e.currency! })),
     blockedOrOverLimit: cr.flags.includes('attachment_blocked') || cr.flags.includes('attachment_over_limit'),
     receivedDate: localDate(d.config.deployment.timezone, info.received_at.toISOString()),
+    evidenceBeneficiaryMismatch,
   }
   const computed = computeRisk({
     classes: d.config.classes,
-    labels: labels.risk,
+    labels: evidenceBeneficiaryMismatch ? [...new Set([...labels.risk, 'bank_details'])] : labels.risk,
+    evidenceBeneficiaryMismatch,
     signals: sig,
     accountPresent: inputs.accountPresent,
     uetrCandidatesInvalid: ex.uetrCandidatesInvalid.length,
@@ -276,6 +301,13 @@ export async function prepRisk(d: StageDeps, cr: CaseRow): Promise<Prepared> {
     inputHash: sha256(JSON.stringify([gen, computed, adj ?? null, info.generation_by, hold])),
     result: out,
     async apply(c) {
+      // C-RSK-2 v0.7.28: the mismatch is handled as bank_details from here on, and stays (C-CLS-4a E6)
+      if (evidenceBeneficiaryMismatch) {
+        await c.query(`INSERT INTO case_label (case_id, generation, class_id, source, confidence, adopted, reason_blob) VALUES ($1, $2, 'bank_details', 'rule', 'rule', true, NULL) ON CONFLICT DO NOTHING`, [cr.id, gen])
+        // the fields step ran before this label existed: run it again once in a new generation, so the bank_details
+        // fields (party_role, account_last4, change_requested) are asked for too
+        if (!fieldsAsked.includes('bank_details')) await restartFrom(c, d.queue, cr.id, 'fields', 'system')
+      }
       await c.query('UPDATE "case" SET risk = $2, risk_by = $3, risk_hold = $4 WHERE id = $1', [cr.id, out.final, by, held])
       if (held) await appendAudit(c, d.k, [{ actor: 'system', type: 'risk.lowering_held', caseId: cr.id, payload: { held, computed: applied.level } }])
       if (applied.void && adj) {
@@ -381,6 +413,11 @@ export async function replyContext(d: Pick<StageDeps, 'db' | 'k' | 'files' | 'co
   const select: SelectInput = {
     classes: d.config.classes, adopted: labels.adopted, risk, linkedCommitment: lk.commitment !== null, ledger: lk.ledger, payment: lk.payment,
     receivedDate: localDate(d.config.deployment.timezone, info.received_at.toISOString()), holidays: new Set(d.config.routing.holidays), mayDisclose: lk.mayDisclose, templates: d.config.templateMeta,
+    // only when C-DRF-4 can reach this step: this runs on every Case view too
+    evidenceSupportsTracing: lk.commitment !== null && lk.ledger !== 'received' && evidenceSupportsTracing(m.attachments, {
+      partlyDecoded: (await d.db.query<{ flags: string[] }>('SELECT flags FROM "case" WHERE id = $1', [caseId])).rows[0]!.flags.includes('mime_parse_failed'),
+      currencies: d.config.deployment.currencies, dealCurrency: lk.commitment?.currency ?? null, cashDue: lk.commitment?.cashDue ?? null, receivedDate: localDate(d.config.deployment.timezone, info.received_at.toISOString()),
+    }),
   }
   // C-DRF-2 ④a: Reply-To only as parsed at ingest (the list behind the signal), and only when the signal is exactly
   // false; unparseable or several headers (null) or a mismatch → From only (C-SIG-1.5 v0.7.15)

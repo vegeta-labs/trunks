@@ -35,6 +35,7 @@ export interface RiskInput {
   labels: readonly string[] // C-RSK-1: adopted labels plus the model's low labels
   signals: Readonly<Record<string, boolean | null>> // C-SIG-1, null = unknown
   accountPresent: boolean // an IBAN-shaped string or a UK account (C-RSK-2, with first_time_sender)
+  evidenceBeneficiaryMismatch?: boolean // C-RSK-2 v0.7.28
   uetrCandidatesInvalid: number
   amountsBody: readonly Amount[]
   amountsAttachment: readonly Amount[] // MT103 / pacs.008
@@ -68,6 +69,7 @@ export function computeRisk(i: RiskInput): RiskResult {
   const direct: Array<[string, boolean]> = [
     ...DIRECT.map((s): [string, boolean] => [`C-RSK-2:${s}`, i.signals[s] === true]),
     ['C-RSK-2:first_time_sender_account', i.signals.first_time_sender === true && i.accountPresent],
+    ['C-RSK-2:evidence_beneficiary_mismatch', i.evidenceBeneficiaryMismatch === true],
     ['C-RSK-2:uetr_candidate_invalid', i.uetrCandidatesInvalid > 0],
     ['C-RSK-2:amount_mismatch', i.amountsBody.length > 0 && i.amountsAttachment.length > 0 && !i.amountsAttachment.some((a) => body.has(key(a)))],
     ['C-RSK-2:attachment_blocked_or_over_limit', i.attachmentBlockedOrOverLimit],
