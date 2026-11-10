@@ -1,7 +1,7 @@
 // E3 through the pipeline and the review actions, on the test Postgres: links, risk, replies, verification tasks,
 // routing, events and their delivery, CSV. The rules themselves are unit-tested in src/lib.
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { createHmac } from 'node:crypto'
+import { createHmac, randomUUID } from 'node:crypto'
 import type { FastifyInstance } from 'fastify'
 import { createKit, FakeLlm, testConfig, type Kit } from './testkit.ts'
 import { eml } from '../ingest/testmail.ts'
@@ -10,7 +10,7 @@ import type { LinkResult, ReplyStageResult, RiskStageResult } from './stages-e3.
 import { buildServer } from '../server/app.ts'
 import { createSession, createUser } from '../server/auth.ts'
 import { tx } from '../store/db.ts'
-import { getText } from '../store/blobs.ts'
+import { getText, putJson } from '../store/blobs.ts'
 import { deliverDue, signature, type Poster } from './outbox.ts'
 import { eventProblems } from '../lib/events.ts'
 import { makePdf } from '../../parser/testfiles.ts'
@@ -122,7 +122,7 @@ describe('a payment query through E3', () => {
     expect((await post('rita', `/api/cases/${id}/replies/${edited}/approve`)).json().error).toMatch(/earlier generation/)
     expect((await post('rita', `/api/cases/${id}/replies/${edited}/revise`, { text: 'x' })).statusCode).toBe(409)
     const current = await revise()
-    expect((await post('rita', `/api/cases/${id}/replies/${current}/approve`)).statusCode).toBe(200)
+    expect((await post('paul', `/api/cases/${id}/replies/${current}/approve`)).statusCode).toBe(200)
     expect((await one<{ status: string }>('SELECT status FROM "case" WHERE id = $1', [id])).status).toBe('approved')
     // a person changes a field: new manual revision, the approval no longer holds
     await put('rita', `/api/cases/${id}/fields/payment_date`, { value: '2026-10-28' })
@@ -138,7 +138,7 @@ describe('a payment query through E3', () => {
     const lapsed = await post('rita', `/api/cases/${id}/replies/${current}/copy`)
     expect(lapsed.statusCode).toBe(409)
     const again = await revise()
-    expect((await post('rita', `/api/cases/${id}/replies/${again}/approve`)).statusCode).toBe(200)
+    expect((await post('paul', `/api/cases/${id}/replies/${again}/approve`)).statusCode).toBe(200)
     const copy = await post('rita', `/api/cases/${id}/replies/${again}/copy`)
     expect(copy.statusCode).toBe(200)
     expect(copy.json()).toEqual({ recipient: 'amelia@hartfamily.example', subject: expect.stringMatching(/^Re: /), text: TEXT })
@@ -157,7 +157,7 @@ describe('a payment query through E3', () => {
     const bad = (await post('rita', `/api/cases/${id}/replies/${auto.id}/revise`, { text: 'Your payment was flagged.' })).json().replyId
     expect((await post('rita', `/api/cases/${id}/replies/${bad}/approve`)).json().error).toMatch(/internal_terms:flagged/)
     const ok = (await post('rita', `/api/cases/${id}/replies/${bad}/revise`, { text: 'Sarah will call you.' })).json().replyId
-    expect((await post('rita', `/api/cases/${id}/replies/${ok}/approve`)).statusCode).toBe(200)
+    expect((await post('paul', `/api/cases/${id}/replies/${ok}/approve`)).statusCode).toBe(200)
   })
   it('TC-OUT-10 / TC-OUT-01 events: state changes only, each fits appendix A', async () => {
     const ev = await events(id)
@@ -1092,7 +1092,7 @@ describe('self-review of the round-3 fixes', () => {
     classes.set('Closed unrouted', ['complaint'])
     const r = await k.ingest(eml({ from: 'Amelia Hart <amelia@hartfamily.example>', subject: 'Closed unrouted', text: 'Hello', headers: AUTH }), '2026-10-29T10:15:00.000Z', TRUSTED)
     const id = (r as { caseId: string }).caseId
-    expect((await post('rita', `/api/cases/${id}/close`, { outcome: 'spam' })).statusCode).toBe(200)
+    expect((await post('paul', `/api/cases/${id}/close`, { outcome: 'spam', reason: 'Spam' })).statusCode).toBe(200) // C-FRD-7: still processing
     expect((await events(id)).map((e) => e.type)).toEqual(['case.created', 'case.closed'])
     await k.drain()
   })
@@ -1215,7 +1215,7 @@ describe('D8 (PRD v0.7.21)', () => {
     const view = (await get('rita', `/api/cases/${id}`)).json().e3
     expect(view.verification[0]).toMatchObject({ phone: '+44 7700 900101', notifyRecipient: 'amelia@hartfamily.example', impersonatedContact: 'Amelia Hart' })
     expect(view.links.contact).toBe(null)
-    expect(view.allowedRecipients).toEqual(['amelia@hartfamiiy.example']) // the reply still goes only to the sender (I-03 lower-case)
+    expect(view.allowedRecipients).toEqual([]) // C-DRF-10: a look-alike sender has no allowed recipient until an approver allows From
     // the task can be worked through while the Case stays unlinked (Codex D8 F1)
     const all = ['call_phone_on_file', 'no_contact_details_from_mail', 'check_request_content', 'notify_old_contact']
     expect((await post('rita', `/api/verification/${t.id}/complete`, { items: all })).statusCode).toBe(200)
@@ -1363,4 +1363,181 @@ it('TC-REV-12 hidden evidence inherits sensitive values learned from other messa
   const detail = (await app.inject({ method: 'GET', url: `/api/cases/${r.caseId}`, cookies: { doi_session: users.rita!.session } })).json()
   expect(detail.hiddenTexts.map((f: { text: string }) => f.text).join('')).not.toContain('123456789')
   expect(detail.hiddenTexts.map((f: { text: string }) => f.text).join('')).toContain('(ID number)')
+})
+
+describe('usability fixes (PRD v0.7.29)', () => {
+  const ALL = ['call_phone_on_file', 'no_contact_details_from_mail', 'check_request_content', 'notify_old_contact']
+  const task = async (id: string) => one<{ id: string; state: string; completed_by: string; cooling_until: Date; bound_manual_revision: number }>(`SELECT id, state, completed_by, cooling_until, bound_manual_revision FROM verification_task WHERE case_id = $1 AND state <> 'invalidated'`, [id])
+  const revision = async (id: string) => (await one<{ manual_revision: number }>('SELECT manual_revision FROM "case" WHERE id = $1', [id])).manual_revision
+  const taskCount = async (id: string) => (await k.db.query('SELECT 1 FROM verification_task WHERE case_id = $1', [id])).rowCount
+  const field = async (id: string, name: string) => ((await get('rita', `/api/cases/${id}`)).json().fields as Array<{ field: string; value: string | null }>).find((f) => f.field === name)?.value
+  const confirm = (id: string, body: object = { confirm: true }) => put('rita', `/api/cases/${id}/fields/payment_date`, body)
+  let n = 0
+  /** A bank details Case with a person-set value and its verification task worked through to `upTo`. */
+  const worked = async (upTo: 'checklist_done' | 'approved') => {
+    const id = await ingest(`Bank change usability ${++n}`, ['bank_details'], { text: 'New account GB33 BUKB 2020 1555 5555 55.' })
+    expect((await put('rita', `/api/cases/${id}/fields/payment_date`, { value: '2026-10-27' })).statusCode).toBe(200)
+    await k.drain()
+    const t = await task(id)
+    expect((await post('rita', `/api/verification/${t.id}/complete`, { items: ALL })).statusCode).toBe(200)
+    if (upTo === 'approved') {
+      await k.t.owner.query(`UPDATE verification_task SET completed_at = completed_at - interval '2 hours', cooling_until = now() - interval '1 hour' WHERE id = $1`, [t.id])
+      expect((await post('paul', `/api/verification/${t.id}/approve`)).statusCode).toBe(200)
+    }
+    return { id, t: await task(id) }
+  }
+  const replaced = async (id: string, was: string) => {
+    await k.drain()
+    const now = await task(id)
+    expect(now.id).not.toBe(was)
+    expect(now.state).toBe('open')
+    expect((await one<{ state: string }>('SELECT state FROM verification_task WHERE id = $1', [was])).state).toBe('invalidated')
+  }
+
+  it('TC-FRD-13 confirming the value keeps a checklist_done task, its completer and its cooling-off', async () => {
+    const { id, t } = await worked('checklist_done')
+    const before = await revision(id)
+    const tasksBefore = await taskCount(id)
+    const invalidations = async () => (await auditTypes(id)).filter((x) => x === 'verification.invalidated').length
+    const invalidatedBefore = await invalidations()
+    expect((await confirm(id)).statusCode).toBe(200)
+    await k.drain()
+    const now = await task(id)
+    expect(now).toMatchObject({ id: t.id, state: 'checklist_done', completed_by: t.completed_by, cooling_until: t.cooling_until })
+    expect(await revision(id)).toBe(before + 1)
+    expect(now.bound_manual_revision).toBe(before + 1)
+    expect(await taskCount(id)).toBe(tasksBefore)
+    expect(await auditTypes(id)).toContain('verification.binding_carried')
+    expect(await invalidations()).toBe(invalidatedBefore)
+  })
+  it('TC-FRD-13 an approved task stays approved and is not announced again; an approved reply still lapses (C-DRF-8)', async () => {
+    const { id, t } = await worked('approved')
+    const completed = async () => (await events(id)).filter((e) => e.type === 'verification.completed').length
+    expect(await completed()).toBe(1)
+    const reply = await latestReply(id)
+    expect((await post('rita', `/api/cases/${id}/replies/${reply.id}/approve`)).statusCode).toBe(200)
+    expect((await confirm(id)).statusCode).toBe(200)
+    await k.drain()
+    expect(await task(id)).toMatchObject({ id: t.id, state: 'approved' })
+    expect(await completed()).toBe(1)
+    expect((await post('rita', `/api/cases/${id}/replies/${reply.id}/copy`)).statusCode).toBe(409)
+  })
+  it('TC-FRD-13 a value sent along with confirm is ignored: the value stays and the task stays', async () => {
+    const { id, t } = await worked('checklist_done')
+    expect((await confirm(id, { confirm: true, value: '2026-11-11' })).statusCode).toBe(200)
+    await k.drain()
+    expect(await field(id, 'payment_date')).toBe('2026-10-27')
+    expect((await task(id)).id).toBe(t.id)
+  })
+  it('TC-FRD-13 only the boolean confirm counts: confirm "true" is an ordinary change and the task is invalidated', async () => {
+    const { id, t } = await worked('checklist_done')
+    expect((await confirm(id, { confirm: 'true', value: '2026-10-27' })).statusCode).toBe(200)
+    await replaced(id, t.id)
+  })
+  it('TC-FRD-13 Edit with the same value is not a confirmation: the task is invalidated', async () => {
+    const { id, t } = await worked('checklist_done')
+    expect((await put('rita', `/api/cases/${id}/fields/payment_date`, { value: '2026-10-27' })).statusCode).toBe(200)
+    await replaced(id, t.id)
+  })
+  it('TC-FRD-13 a real change invalidates the task, also when a confirmation follows before the re-run', async () => {
+    const { id, t } = await worked('approved')
+    expect((await put('rita', `/api/cases/${id}/fields/payment_date`, { value: '2026-10-28' })).statusCode).toBe(200)
+    expect((await confirm(id)).statusCode).toBe(200) // the invalidation has not been published yet
+    await replaced(id, t.id)
+    expect(await field(id, 'payment_date')).toBe('2026-10-28')
+  })
+  it('TC-FRD-13 / TC-FRD-27 fields worked out again after the task was created, same values: the task is bound to its fields, so confirming carries it (code review round 2 D4)', async () => {
+    const { id, t } = await worked('checklist_done')
+    await tx(k.db, async (c) => {
+      const { restartFrom } = await import('./restart.ts')
+      await restartFrom(c, k.boss, id, 'fields', 'system')
+    })
+    await k.drain()
+    expect((await task(id)).id).toBe(t.id)
+    expect((await confirm(id)).statusCode).toBe(200)
+    await k.drain()
+    expect((await task(id)).id).toBe(t.id)
+  })
+  it('TC-FRD-13 a re-run that only carries the fields over does not count: the task follows the confirmation', async () => {
+    const { id, t } = await worked('checklist_done')
+    await tx(k.db, async (c) => {
+      const { restartFrom } = await import('./restart.ts')
+      await restartFrom(c, k.boss, id, 'link', 'system') // fields reused
+    })
+    await k.drain()
+    expect((await confirm(id)).statusCode).toBe(200)
+    await k.drain()
+    expect((await task(id)).id).toBe(t.id)
+  })
+  it('TC-FRD-13 a confirmation while a system re-run is unfinished does not carry the task', async () => {
+    const { id, t } = await worked('approved')
+    await tx(k.db, async (c) => {
+      const { restartFrom } = await import('./restart.ts')
+      await restartFrom(c, k.boss, id, 'fields', 'system') // fields not worked out yet: the guard on stage_run cannot see it
+    })
+    expect((await confirm(id)).statusCode).toBe(200)
+    await replaced(id, t.id)
+  })
+  it('TC-FRD-13 an empty field cannot be confirmed and leaves the task alone', async () => {
+    const { id, t } = await worked('checklist_done')
+    const before = await revision(id)
+    expect((await put('rita', `/api/cases/${id}/fields/amount`, { confirm: true })).statusCode).toBe(409)
+    // several values: a person chooses; there is no single value to confirm
+    await tx(k.db, async (c) => {
+      await c.query('INSERT INTO case_field_change (id, case_id, field, value_blob, by_user) VALUES ($1, $2, $3, $4, $5)', [randomUUID(), id, 'value_date', await putJson(c, k.k, { multiple: ['2026-10-27', '2026-10-28'] }), users.rita!.id])
+    })
+    expect((await put('rita', `/api/cases/${id}/fields/value_date`, { confirm: true })).statusCode).toBe(409)
+    expect(await task(id)).toMatchObject({ id: t.id, state: 'checklist_done', bound_manual_revision: before })
+    expect(await revision(id)).toBe(before)
+  })
+
+  it('TC-REV-14 pages cover every case once in a fixed order, with the total of the filters', async () => {
+    for (const s of ['Paging one', 'Paging two', 'Paging three']) await ingest(s, ['complaint'])
+    const everything = (await get('rita', '/api/cases?limit=200')).json() as { cases: Array<{ id: string; risk: string }>; total: number }
+    expect(everything.total).toBeGreaterThanOrEqual(3)
+    const seen: string[] = []
+    for (let offset = 0; offset < everything.total; offset += 2) {
+      const page = (await get('rita', `/api/cases?limit=2&offset=${offset}`)).json() as { cases: Array<{ id: string }>; total: number }
+      expect(page.total).toBe(everything.total)
+      seen.push(...page.cases.map((c) => c.id))
+    }
+    expect(seen).toEqual(everything.cases.map((c) => c.id))
+    const filtered = (await get('rita', '/api/cases?risk=medium&limit=1')).json() as { cases: unknown[]; total: number }
+    expect(filtered.cases.length).toBe(1)
+    expect(filtered.total).toBe(everything.cases.filter((c) => c.risk === 'medium').length)
+    expect((await get('rita', '/api/cases?limit=1&offset=999999')).json()).toMatchObject({ cases: [], total: everything.total })
+  })
+  it('TC-REV-14 a limit or offset that makes no sense answers the default page, never a failure', async () => {
+    for (const q of ['limit=abc', 'limit=-1', 'limit=0', 'limit=1.5', 'offset=-5', 'offset=abc', 'offset=1e30', 'limit=1e30&offset=1.5']) {
+      const r = await get('rita', `/api/cases?${q}`)
+      expect(r.statusCode, q).toBe(200)
+      expect((r.json() as { cases: unknown[] }).cases.length, q).toBeGreaterThan(0)
+    }
+    expect(((await get('rita', '/api/cases?limit=9999')).json() as { cases: unknown[] }).cases.length).toBeLessThanOrEqual(200)
+  })
+
+  it('TC-REV-17 a re-run in progress shows no lower risk awaiting confirmation; a real hold stays visible', async () => {
+    const id = await ingest('Held banner flash', ['payment_query'])
+    expect((await put('rita', `/api/cases/${id}/fields/payment_date`, { value: '2026-10-27' })).statusCode).toBe(200) // not drained
+    expect((await one<{ risk_hold: string | null }>('SELECT risk_hold FROM "case" WHERE id = $1', [id])).risk_hold).not.toBeNull()
+    const during = (await get('rita', `/api/cases/${id}`)).json()
+    expect(during.e3.complete).toBe(false)
+    expect(during.e3.risk.held).toBeNull()
+    await k.drain()
+    expect((await get('rita', `/api/cases/${id}`)).json().e3.risk.held).toBeNull()
+
+    const held = await ingest('Paid ahead of the closing, a real hold', ['payment_query'], { from: 'Sam Lee <sam@newinvestor.example>', received: '2026-12-16T10:00:00.000Z' })
+    expect((await put('rita', `/api/cases/${held}/fields/deal`, { value: 'Northwind Robotics' })).statusCode).toBe(200)
+    await k.drain()
+    expect((await put('rita', `/api/cases/${held}/fields/deal`, { value: 'Larkspur Energy Storage' })).statusCode).toBe(200)
+    await k.drain()
+    expect((await get('rita', `/api/cases/${held}`)).json().e3.risk.held).toBe('high')
+    expect((await put('rita', `/api/cases/${held}/fields/payment_date`, { value: '2026-10-27' })).statusCode).toBe(200) // not drained
+    expect((await get('rita', `/api/cases/${held}`)).json().e3.risk.held).toBe('high')
+    await k.drain()
+    const level = (await get('rita', `/api/cases/${held}`)).json().e3.risk.applied
+    expect((await post('paul', `/api/cases/${held}/risk/confirm-lower`, { reason: 'checked', level })).statusCode).toBe(200) // not drained
+    expect((await get('rita', `/api/cases/${held}`)).json().e3.risk.held).toBeNull()
+    await k.drain()
+  })
 })

@@ -47,7 +47,7 @@ G0 需求评审 → G1 方案评审 → [冻结解除] → G2 每个 PR → G3 �
 2. 全新上下文审查代理（看不到写作过程，限时 30 分钟），用与 Codex 相同的提示词先审一轮；问题先处理。
 3. Codex 交叉审核（提示词存 `docs/review/`）。
 4. Claude 逐条判断：接受 / 不接受及理由，写进评审记录。
-5. 有 blocker 或 major 被接受 → 改版后复审；直到 READY 或 READY AFTER FIXES 且修复完成。
+5. 有 blocker 或 major 被接受 → 改版后复审；轮数和停止条件见 `DEV_PROCESS_RULES.md`（负责人 2026-11-09 批准）。
 6. 负责人批准：在 PRD 变更记录写「批准」。
 
 ### G2 每个 PR

@@ -20,6 +20,7 @@ const CLASSES: Array<[string, string[]]> = [
   ['Bank letter please', ['bank_letter_request', 'complaint']],
   ['Second payment', ['payment_query']],
   ['E6 review details', ['legal_documents:low']],
+  ['Update my contact details', ['identity_change']],
 ]
 const llm = new FakeLlm()
 llm.reply = (v, user) => {

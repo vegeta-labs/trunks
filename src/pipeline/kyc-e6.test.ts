@@ -196,6 +196,24 @@ it('TC-RED-12 a classify result in flight becomes stale when an earlier transfer
 })
 
 
+it('TC-FRD-17 a KYC transfer and replacement on a closed Case finish: the Case stays closed, with no new draft, task or routing change', async () => {
+  const r = await untilRedact(mail())
+  await k.drain()
+  await k.t.owner.query(`UPDATE "case" SET status = 'closed', closed_at = now(), outcome = 'no_action' WHERE id = $1`, [r.caseId])
+  const state = async () => (await k.db.query('SELECT status, queue, due_at, processing_generation AS g, pipeline_complete_generation AS done FROM "case" WHERE id = $1', [r.caseId])).rows[0]
+  const before = await state()
+  await runKycDeliveries(k, sink)
+  expect(await replaceMessage({ ...k, db: k.t.maintenance }, r.messageId)).toBe('done')
+  await k.drain()
+  const after = await state()
+  expect(after.g).toBe(before.g + 1)
+  expect(after.done).toBe(after.g)
+  expect({ status: after.status, queue: after.queue, due: after.due_at?.getTime() }).toEqual({ status: 'closed', queue: before.queue, due: before.due_at?.getTime() })
+  expect((await k.db.query('SELECT 1 FROM reply WHERE case_id = $1', [r.caseId])).rowCount).toBe(0) // the replacement removed the draft; none came back
+  expect((await k.db.query('SELECT 1 FROM verification_task WHERE case_id = $1', [r.caseId])).rowCount).toBe(0)
+  expect((await k.db.query('SELECT 1 FROM attachment WHERE message_id = $1 AND source_deleted', [r.messageId])).rowCount).toBeGreaterThan(0)
+})
+
 it('TC-RED-12 / TC-PRV-12 deferred decisions survive workers finishing during step four, then retry automatically and resume round two after a crash', async () => {
   const { retryDeferredKyc } = await import('./kyc-recheck.ts')
   const r = await untilRedact(mail())

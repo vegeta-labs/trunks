@@ -9,7 +9,7 @@ import { appendAudit } from '../store/audit.ts'
 import { loadSnapshot, takeSnapshot } from '../store/directory.ts'
 import type { Json } from '../lib/audit-hash.ts'
 import { resultOf, type ClassifyResult, type Extraction } from '../pipeline/stages.ts'
-import { checkReply, contentSha, effectiveFields, effectiveLabels, emitEvents, hadBankRuleLabel, render, replyContext, routeOf, syncVerificationTasks, taskContactOf, type LinkResult, type RiskStageResult } from '../pipeline/stages-e3.ts'
+import { carryVerificationBinding, caseClosureBlockers, checkReply, contentSha, effectiveFields, effectiveLabels, emitEvents, protectedRuleLabels, render, replyContext, routeOf, syncVerificationTasks, taskContactOf, taskFieldsSha, type LinkResult, type RiskStageResult } from '../pipeline/stages-e3.ts'
 import { restartFrom } from '../pipeline/restart.ts'
 import { lockThreadTo } from '../maintenance/retention.ts'
 import { discardBlocked, retryDelivery } from '../maintenance/kyc.ts'
@@ -17,7 +17,8 @@ import type { Queue } from '../pipeline/queue.ts'
 import { allowedManualTemplates, bodyEditable, selectTemplate } from '../lib/draft.ts'
 import { applyAdjustment, computeRisk, rank, requestAdjustment, type Level } from '../lib/risk.ts'
 import { checkValue } from '../lib/fields.ts'
-import { canApprove, CHECKLIST, type UserEvent } from '../lib/verification.ts'
+import { canApprove, CHECKLIST, fieldsChanged, type UserEvent } from '../lib/verification.ts'
+import { closeBlockerText, editedReplyProblem, isProtectedClass, senderSuspect, SUSPECT_SENDER_REASON, type CloseBlocker } from '../lib/gates.ts'
 import type { Role } from './auth.ts'
 import { CLASS_FIELDS_KNOWN } from '../config/constants.ts'
 import type { ServerDeps } from './app.ts'
@@ -48,11 +49,26 @@ interface CaseLock {
   status: string
   queue: string | null
   assignee: string | null
+  closed_at: Date | null
 }
 
-const lockCase = async (c: Tx, id: string): Promise<CaseLock> => {
-  const r = (await c.query<CaseLock>('SELECT id, message_id, processing_generation, pipeline_complete_generation, manual_revision, risk, status, queue, assignee FROM "case" WHERE id = $1 FOR UPDATE', [id])).rows[0]
+const MAX_REASON = 2000
+
+/**
+ * PRD C-FRD-6, C-FRD-7, C-DRF-10: an approver-only decision re-reads the acting user under a row lock, after the Case
+ * lock (the order of /verification/:id/approve): a demotion, disabling or credential reset committed while the request
+ * waited for the Case lock refuses it instead of being ignored.
+ */
+const lockActor = async (c: Tx, user: { id: string; role: string; credentialVersion: number }) => {
+  const me = (await c.query<{ role: string; credential_version: number; disabled: boolean }>('SELECT role, credential_version, disabled FROM app_user WHERE id = $1 FOR UPDATE', [user.id])).rows[0]
+  if (!me || me.disabled || me.credential_version !== user.credentialVersion || me.role !== user.role) throw new Refused(409, 'your account changed; sign in again')
+}
+
+/** PRD C-FRD-8: every person's action takes the Case lock here, and a closed Case refuses it; only /hold opts out. */
+const lockCase = async (c: Tx, id: string, o: { closedOk?: boolean } = {}): Promise<CaseLock> => {
+  const r = (await c.query<CaseLock>('SELECT id, message_id, processing_generation, pipeline_complete_generation, manual_revision, risk, status, queue, assignee, closed_at FROM "case" WHERE id = $1 FOR UPDATE', [id])).rows[0]
   if (!r) throw new Refused(404, 'not found')
+  if (r.closed_at !== null && !o.closedOk) throw new Refused(409, 'This case is closed, so it can no longer be changed')
   return r
 }
 
@@ -108,8 +124,14 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
         if (cr.pipeline_complete_generation !== cr.processing_generation) throw new Refused(409, 'the Case is being reprocessed') // R2-3
         const cls = await resultOf<ClassifyResult>(on(c), cr.id, 'classify', cr.processing_generation)
         const ruleLabels = new Set((cls?.labels ?? []).filter((l) => l.source === 'rule').map((l) => l.classId))
-        if (await hadBankRuleLabel(c, cr.id)) ruleLabels.add('bank_details') // C-CLS-4a E6
+        for (const x of await protectedRuleLabels(c, cr.id)) ruleLabels.add(x) // C-CLS-4a E6, C-FRD-6
         if (remove.some((x) => ruleLabels.has(x))) throw new Refused(409, 'a rule label cannot be removed (C-CLS-5)')
+        const reasonText = req.body?.reason?.trim() ?? ''
+        if (reasonText.length > MAX_REASON) throw new Refused(400, 'the reason is too long')
+        const isApprover = req.user!.role !== 'reviewer'
+        // C-FRD-6: the verification obligation is removed only by an approver or admin with a reason, whatever the risk
+        if (remove.some(isProtectedClass) && (!isApprover || !reasonText)) throw new Refused(403, 'Removing the bank details or identity change type needs an approver or admin and a reason')
+        if (remove.some(isProtectedClass)) await lockActor(c, req.user!)
         const before = await effectiveLabels(on(c), cr.id, cr.processing_generation)
         const after = new Set(before.risk)
         for (const x of remove) after.delete(x)
@@ -119,11 +141,12 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
         const lowers = rank(await riskWithLabels(c, cr, [...after])) < rank(await riskWithLabels(c, cr, before.risk))
         const approved = lowers && req.user!.role !== 'reviewer' && !!req.body?.reason?.trim()
         if (lowers && !approved) throw new Refused(403, 'lowering the risk this way needs the approver role and a reason (C-RSK-3)')
-        const reasonBlob = req.body?.reason?.trim() ? await putBlob(c, d.k, req.body.reason.trim()) : null
+        const reasonBlob = reasonText ? await putBlob(c, d.k, reasonText) : null
         for (const [list, action] of [[remove, 'remove'], [add, 'add']] as const) {
-          for (const x of list) await c.query('INSERT INTO case_label_change (id, case_id, class_id, action, by_user, reason_blob) VALUES ($1, $2, $3, $4, $5, $6)', [randomUUID(), cr.id, x, action, req.user!.id, reasonBlob])
+          // C-FRD-6: a removal records its approver when an approver or admin gave a reason (used for the protected classes)
+          for (const x of list) await c.query('INSERT INTO case_label_change (id, case_id, class_id, action, by_user, reason_blob, approved_by) VALUES ($1, $2, $3, $4, $5, $6, $7)', [randomUUID(), cr.id, x, action, req.user!.id, reasonBlob, action === 'remove' && isApprover && reasonText ? req.user!.id : null])
         }
-        await audit(c, req.user!.id, 'case.labels_changed', cr.id, { add, remove, lowers_risk: lowers }, before.adopted, [...new Set([...before.adopted.filter((x) => !remove.includes(x)), ...add])])
+        await audit(c, req.user!.id, 'case.labels_changed', cr.id, { add, remove, lowers_risk: lowers, protected_removed: remove.filter(isProtectedClass) }, before.adopted, [...new Set([...before.adopted.filter((x) => !remove.includes(x)), ...add])])
         // an approver's reasoned lowering needs no new hold; an earlier hold stays until /risk/confirm-lower (R2-2)
         return restartFrom(c, d.queue, cr.id, 'link', 'person', { hold: !approved })
       }),
@@ -161,6 +184,8 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
           randomUUID(), cr.id, req.params.field, value === null ? null : await putJson(c, d.k, value as unknown as Json), req.user!.id,
         ])
         await audit(c, req.user!.id, 'case.field_changed', cr.id, { field: req.params.field }, (previousField ?? null) as unknown as Json, value as unknown as Json)
+        // C-FRD-5 v0.7.29: not during a re-run, whose fields are not known yet (plan review F1)
+        if (req.body?.confirm === true && cr.pipeline_complete_generation === cr.processing_generation) await carryVerificationBinding(c, d.k, req.user!.id, cr.id, cr.manual_revision, req.params.field)
         return restartFrom(c, d.queue, cr.id, 'link', 'person')
       }),
     ),
@@ -270,7 +295,7 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
         if (!reason) throw new Refused(400, 'a reason is required')
         if (reason.length > 2000) throw new Refused(400, 'the reason is too long')
         if (!(await lockThreadTo(c, req.params.id)).length) throw new Refused(404, 'not found')
-        const cr = await lockCase(c, req.params.id)
+        const cr = await lockCase(c, req.params.id, { closedOk: true }) // C-FRD-8: the one action allowed on a closed Case
         const cur = (await c.query<{ hold: boolean }>('SELECT hold FROM "case" WHERE id = $1', [cr.id])).rows[0]!.hold
         if (cur === hold) throw new Refused(409, hold ? 'the Case is already on hold' : 'the Case is not on hold')
         await c.query('UPDATE "case" SET hold = $2, hold_reason_blob = $3 WHERE id = $1', [cr.id, hold, hold ? await putBlob(c, d.k, reason) : null])
@@ -307,8 +332,8 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
   // ---------- replies (C-DRF-2, C-DRF-7, C-DRF-8, R-REV-04) ----------
   const loadReply = async (c: Tx, caseId: string, replyId: string) => {
     if (!UUID.test(replyId)) throw new Refused(404, 'not found')
-    const r = (await c.query<{ id: string; template_id: string; template_source: string; edited: boolean; recipient_blob: string | null; subject_blob: string; text_blob: string; content_sha256: string; status: string; generation: number; approved_generation: number | null; approved_manual_revision: number | null }>(
-      'SELECT id, template_id, template_source, edited, recipient_blob, subject_blob, text_blob, content_sha256, status, generation, approved_generation, approved_manual_revision FROM reply WHERE id = $1 AND case_id = $2 FOR UPDATE',
+    const r = (await c.query<{ id: string; template_id: string; template_source: string; edited: boolean; recipient_blob: string | null; subject_blob: string; text_blob: string; content_sha256: string; status: string; generation: number; approved_generation: number | null; approved_manual_revision: number | null; approved_by: string | null; text_editors: string[] }>(
+      'SELECT id, template_id, template_source, edited, recipient_blob, subject_blob, text_blob, content_sha256, status, generation, approved_generation, approved_manual_revision, approved_by, text_editors FROM reply WHERE id = $1 AND case_id = $2 FOR UPDATE',
       [replyId, caseId],
     )).rows[0]
     if (!r) throw new Refused(404, 'not found')
@@ -331,6 +356,7 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
         let text = base.text
         let removed = 0
         let source = base.template_source
+        let textChanged = false // C-DRF-11: a template switch alone is not an edit
         if (req.body?.templateId && req.body.templateId !== base.template_id) {
           if (!allowedManualTemplates(ctx.select).includes(req.body.templateId)) throw new Refused(409, 'this template is not allowed for this Case (C-DRF-7)')
           templateId = req.body.templateId
@@ -344,6 +370,7 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
         if (typeof req.body?.text === 'string' && req.body.text !== text) {
           if (!bodyEditable(templateId)) throw new Refused(409, `the text of ${templateId} cannot be changed (C-DRF-7)`)
           text = req.body.text
+          textChanged = true
         }
         const recipient = typeof req.body?.recipient === 'string' ? req.body.recipient.trim().toLowerCase() : base.recipient
         const check = checkReply({ subject, text, recipient, allowed: ctx.allowed, removed, extraInternal: d.config.replies.internal_terms_extra })
@@ -352,11 +379,13 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
         // step as a system run (no manual revision: a verification task stays valid); the person's reply belongs to that
         // new generation, so it can be approved once the run completes (R2-1)
         const generation = templateId !== base.template_id ? (await restartFrom(c, d.queue, cr.id, 'reply', 'system')).generation : cr.processing_generation
+        // C-DRF-11: everyone who changed the text stays on the record, also across a template switch
+        const editors = textChanged ? [...new Set([...base.text_editors, req.user!.id])] : base.text_editors
         await c.query(
-          `INSERT INTO reply (id, case_id, generation, template_id, template_source, edited, recipient_blob, subject_blob, text_blob, content_sha256, removed_sentences, check_ok, check_problems, status, created_by)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'draft', $14)`,
+          `INSERT INTO reply (id, case_id, generation, template_id, template_source, edited, recipient_blob, subject_blob, text_blob, content_sha256, removed_sentences, check_ok, check_problems, status, created_by, text_editors)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'draft', $14, $15)`,
           [id, cr.id, generation, templateId, source, base.edited || text !== base.text, recipient ? await putBlob(c, d.k, recipient) : null, await putBlob(c, d.k, subject), await putBlob(c, d.k, text),
-            contentSha(recipient, subject, text), removed, check.ok, JSON.stringify(check.problems), req.user!.id],
+            contentSha(recipient, subject, text), removed, check.ok, JSON.stringify(check.problems), req.user!.id, editors],
         )
         await c.query(`UPDATE reply SET status = 'superseded' WHERE id = $1`, [base.id])
         await audit(c, req.user!.id, 'reply.revised', cr.id, { reply_id: id, from_reply: base.id, template: templateId, template_changed: templateId !== base.template_id, check_ok: check.ok, problems: check.problems.map((p) => p.split(':')[0]!) },
@@ -367,7 +396,7 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
   )
 
   /** C-DRF-8: whether an approval still holds; checked at approval and again before copying, in the same transaction. */
-  const approvalProblems = async (c: Tx, cr: CaseLock, r: Awaited<ReturnType<typeof loadReply>>, forCopy: boolean): Promise<string[]> => {
+  const approvalProblems = async (c: Tx, cr: CaseLock, r: Awaited<ReturnType<typeof loadReply>>, forCopy: boolean, approverId: string | null): Promise<string[]> => {
     const p: string[] = []
     // a re-run is under way: nothing can be checked against a generation that has not finished (C-DRF-8)
     if (cr.pipeline_complete_generation !== cr.processing_generation) return ['the Case is being reprocessed']
@@ -375,12 +404,34 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
     if (forCopy && (r.approved_generation !== cr.processing_generation || r.approved_manual_revision !== cr.manual_revision)) p.push('the Case changed after the approval')
     const ctx = await replyContext({ ...sd, db: c as never }, cr.id, cr.message_id, cr.processing_generation, cr.risk ?? undefined)
     const check = checkReply({ subject: r.subject, text: r.text, recipient: r.recipient, allowed: ctx.allowed, removed: 0, extraInternal: d.config.replies.internal_terms_extra })
-    p.push(...check.problems)
+    // C-DRF-10: the recipient problem of a suspect sender, in plain English instead of the bare code
+    const blocked = ctx.senderSuspect && (check.problems.includes('no_recipient') || check.problems.includes('recipient_not_allowed'))
+    p.push(...check.problems.filter((x) => !blocked || (x !== 'no_recipient' && x !== 'recipient_not_allowed')), ...(blocked ? [SUSPECT_SENDER_REASON] : []))
+    // C-DRF-11: a body that differs from the template's rendered text needs a recorded approver who did not change it
+    const template = d.config.templates.find((t) => t.id === r.template_id)
+    if (!template || render(d.config, r.template_id, ctx.values).text !== r.text) {
+      const who = approverId === null ? null : (await c.query<{ id: string; role: string; disabled: boolean }>('SELECT id, role, disabled FROM app_user WHERE id = $1', [approverId])).rows[0]
+      // C-DRF-11 with the relationship rules of C-FRD-5: every account event between the approver and an editor
+      const people = who ? [who.id, ...r.text_editors] : []
+      const events = people.length < 2 ? [] : (await c.query<{ user_id: string; type: UserEvent['type']; role: string | null; by_user: string | null; at: Date }>(
+        'SELECT user_id, type, role, by_user, at FROM user_event WHERE user_id = ANY($1::uuid[]) OR by_user = ANY($1::uuid[]) ORDER BY at',
+        [people],
+      )).rows.map((e) => ({ userId: e.user_id, type: e.type, role: e.role, byUser: e.by_user, at: e.at.toISOString() }))
+      const problem = editedReplyProblem(who ? { id: who.id, role: who.disabled ? null : who.role } : null, r.text_editors, events)
+      if (problem) p.push(problem)
+    }
     if (contentSha(r.recipient, r.subject, r.text) !== r.content_sha256) p.push('the content changed')
     if (r.template_source === 'auto') {
       if (selectTemplate(ctx.select).template !== r.template_id) p.push('the rules now choose another template')
     } else if (!allowedManualTemplates(ctx.select).includes(r.template_id)) p.push('the chosen template is no longer allowed')
     return p
+  }
+
+  /** C-DRF-9: the approval no longer holds: back to a draft, needs approving again. */
+  const lapseApproval = async (c: Tx, cr: CaseLock, replyId: string, actor: string, problems: string[]) => {
+    await c.query(`UPDATE reply SET status = 'draft', approved_by = NULL, approved_at = NULL, approved_generation = NULL, approved_manual_revision = NULL WHERE id = $1`, [replyId])
+    await c.query(`UPDATE "case" SET status = 'open' WHERE id = $1 AND status = 'approved'`, [cr.id])
+    await audit(c, actor, 'reply.approval_lapsed', cr.id, { reply_id: replyId, problems: problems.map((p) => p.split(':')[0]!) })
   }
 
   app.post<{ Params: { id: string; replyId: string } }>('/api/cases/:id/replies/:replyId/approve', OPTS, async (req, reply) =>
@@ -389,7 +440,7 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
         const cr = await lockCase(c, req.params.id)
         const r = await loadReply(c, cr.id, req.params.replyId)
         if (r.status !== 'draft') throw new Refused(409, `the reply is ${r.status}`)
-        const problems = await approvalProblems(c, cr, r, false)
+        const problems = await approvalProblems(c, cr, r, false, req.user!.id)
         if (problems.length) throw new Refused(409, `cannot approve: ${problems.join('; ')}`)
         await c.query(`UPDATE reply SET status = 'superseded' WHERE case_id = $1 AND status = 'approved'`, [cr.id])
         await c.query(`UPDATE reply SET status = 'approved', approved_by = $2, approved_at = now(), approved_generation = $3, approved_manual_revision = $4 WHERE id = $1`, [r.id, req.user!.id, cr.processing_generation, cr.manual_revision])
@@ -407,13 +458,10 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
         const cr = await lockCase(c, req.params.id)
         const r = await loadReply(c, cr.id, req.params.replyId)
         if (r.status !== 'approved' && r.status !== 'sent') return { refused: 'the reply is not approved' }
-        const problems = await approvalProblems(c, cr, r, true)
+        const problems = await approvalProblems(c, cr, r, true, r.approved_by)
         if (problems.length && r.status === 'sent') return { refused: `this reply was marked as sent and no longer matches the Case: ${problems.join('; ')}` } // the record stays (R-REV-04)
         if (problems.length) {
-          // the approval no longer holds: back to a draft, needs approving again
-          await c.query(`UPDATE reply SET status = 'draft', approved_by = NULL, approved_at = NULL, approved_generation = NULL, approved_manual_revision = NULL WHERE id = $1`, [r.id])
-          await c.query(`UPDATE "case" SET status = 'open' WHERE id = $1 AND status = 'approved'`, [cr.id])
-          await audit(c, req.user!.id, 'reply.approval_lapsed', cr.id, { reply_id: r.id, problems: problems.map((p) => p.split(':')[0]!) })
+          await lapseApproval(c, cr, r.id, req.user!.id, problems)
           return { refused: `the approval no longer holds: ${problems.join('; ')}` }
         }
         await audit(c, req.user!.id, 'reply.copied', cr.id, { reply_id: r.id, content_sha256: r.content_sha256 })
@@ -429,11 +477,17 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
         const cr = await lockCase(c, req.params.id)
         const r = await loadReply(c, cr.id, req.params.replyId)
         if (r.status !== 'approved') throw new Refused(409, 'only an approved reply can be marked as sent')
+        // C-DRF-9: the same check as approving and copying; the Case's closure was refused by lockCase already
+        const problems = await approvalProblems(c, cr, r, true, r.approved_by)
+        if (problems.length) {
+          await lapseApproval(c, cr, r.id, req.user!.id, problems)
+          return { refused: `the approval no longer holds: ${problems.join('; ')}` }
+        }
         await c.query(`UPDATE reply SET status = 'sent', sent_by = $2, sent_at = now() WHERE id = $1`, [r.id, req.user!.id])
         await c.query(`UPDATE "case" SET status = 'sent' WHERE id = $1`, [cr.id])
         await audit(c, req.user!.id, 'reply.marked_sent', cr.id, { reply_id: r.id })
         return { ok: true }
-      }),
+      }).then((x) => ('refused' in x ? reply.code(409).send({ error: x.refused }) : x)),
     ),
   )
 
@@ -481,15 +535,52 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
     ),
   )
 
-  app.post<{ Params: { id: string }; Body: { outcome?: string } }>('/api/cases/:id/close', OPTS, async (req, reply) =>
+  // C-FRD-7: a normal close needs nothing in the way; otherwise an approver or admin decides, with a reason (the audit keeps it)
+  const closeRefusal = (blockers: readonly CloseBlocker[]) => `This case cannot be closed yet because ${blockers.map(closeBlockerText).join('; ')}`
+  app.post<{ Params: { id: string }; Body: { outcome?: string; reason?: string } }>('/api/cases/:id/close', OPTS, async (req, reply) =>
     run(reply, () =>
       tx(d.db, async (c) => {
         const cr = await lockCase(c, req.params.id)
         const outcome = req.body?.outcome
         if (!outcome || !(OUTCOMES as readonly string[]).includes(outcome)) throw new Refused(400, `outcome required: ${OUTCOMES.join(', ')}`)
+        const reason = req.body?.reason?.trim() ?? ''
+        if (reason.length > MAX_REASON) throw new Refused(400, 'the reason is too long')
+        const blockers = await caseClosureBlockers(on(c), cr)
+        if (blockers.length && req.user!.role === 'reviewer') throw new Refused(403, `${closeRefusal(blockers)}. An approver or admin can close it with a reason`)
+        if (blockers.length && !reason) throw new Refused(400, `${closeRefusal(blockers)}. Closing it anyway needs a reason`)
+        if (blockers.length) await lockActor(c, req.user!) // the exception is an approver's decision
         await c.query(`UPDATE "case" SET status = 'closed', closed_at = now(), outcome = $2 WHERE id = $1`, [cr.id, outcome])
-        await audit(c, req.user!.id, 'case.closed', cr.id, { outcome })
+        // C-FRD-8: what the closing voids: approved replies and unfinished verification tasks (an approved one stays on record)
+        const voidedReplies = (await c.query<{ id: string }>(`UPDATE reply SET status = 'superseded' WHERE case_id = $1 AND status = 'approved' RETURNING id`, [cr.id])).rows
+        const voidedTasks = (await c.query<{ id: string; was: string }>(
+          `WITH x AS (SELECT id, state AS was FROM verification_task WHERE case_id = $1 AND state IN ('open', 'checklist_done') FOR UPDATE)
+           UPDATE verification_task t SET state = 'invalidated', invalidated_at = now() FROM x WHERE t.id = x.id RETURNING t.id, x.was`,
+          [cr.id],
+        )).rows
+        await audit(c, req.user!.id, 'case.closed', cr.id, { outcome, exception: blockers.length > 0, blockers }, null, reason ? { reason } : null)
+        if (voidedReplies.length) await appendAudit(c, d.k, voidedReplies.map((r) => ({ actor: req.user!.id, type: 'reply.voided_on_close', caseId: cr.id, payload: { reply_id: r.id } })))
+        if (voidedTasks.length) await appendAudit(c, d.k, voidedTasks.map((t) => ({ actor: req.user!.id, type: 'verification.invalidated', caseId: cr.id, payload: { task_id: t.id, was: t.was, reason: 'case_closed' } })))
         await emitEvents(c, sd, cr.id)
+        return { ok: true }
+      }),
+    ),
+  )
+
+  // C-DRF-10: a Case-level exception for a suspect sender: an approver or admin, with a reason; only From becomes allowed
+  app.post<{ Params: { id: string }; Body: { reason?: string } }>('/api/cases/:id/recipient-override', { ...OPTS, preHandler: need('approver') }, async (req, reply) =>
+    run(reply, () =>
+      tx(d.db, async (c) => {
+        const cr = await lockCase(c, req.params.id)
+        await lockActor(c, req.user!)
+        const reason = req.body?.reason?.trim() ?? ''
+        if (!reason) throw new Refused(400, 'a reason is required')
+        if (reason.length > MAX_REASON) throw new Refused(400, 'the reason is too long')
+        const sig = Object.fromEntries((await c.query<{ signal: string; value: boolean | null }>('SELECT signal, value FROM case_signal WHERE case_id = $1', [cr.id])).rows.map((x) => [x.signal, x.value]))
+        if (!senderSuspect(sig)) throw new Refused(409, 'this sender does not need an exception')
+        const already = (await c.query<{ at: Date | null }>('SELECT recipient_override_at AS at FROM "case" WHERE id = $1', [cr.id])).rows[0]!.at
+        if (already) throw new Refused(409, 'an exception is already recorded for this case')
+        await c.query('UPDATE "case" SET recipient_override_by = $2, recipient_override_at = now(), recipient_override_reason_blob = $3 WHERE id = $1', [cr.id, req.user!.id, await putBlob(c, d.k, reason)])
+        await audit(c, req.user!.id, 'case.recipient_override_set', cr.id, {}, null, { reason })
         return { ok: true }
       }),
     ),
@@ -508,11 +599,15 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
     )).rows[0]
     if (!t) throw new Refused(404, 'not found')
     // C-FRD-5: nothing on a task whose binding has changed but whose invalidation has not been published yet (WP3)
-    const binding = (await c.query<{ bound_manual_revision: number; bound_contact_blob: string | null }>('SELECT bound_manual_revision, bound_contact_blob FROM verification_task WHERE id = $1', [taskId])).rows[0]!
+    const binding = (await c.query<{ kind: string; bound_manual_revision: number; bound_contact_blob: string | null; bound_fields_sha256: string | null }>('SELECT kind, bound_manual_revision, bound_contact_blob, bound_fields_sha256 FROM verification_task WHERE id = $1', [taskId])).rows[0]!
     if (cr.pipeline_complete_generation !== cr.processing_generation) throw new Refused(409, 'the Case is being reprocessed')
     const lk = await resultOf<LinkResult>(on(c), cr.id, 'link', cr.processing_generation)
     const bound = binding.bound_contact_blob ? (await getBlobs(c, d.k, [binding.bound_contact_blob])).get(binding.bound_contact_blob)!.toString('utf8') : null
-    if (binding.bound_manual_revision !== cr.manual_revision || bound !== (taskContactOf(lk)?.contact.contactId ?? null)) throw new Refused(409, 'this task no longer applies; a new task replaces it')
+    // C-FRD-5 (owner 2026-11-10): also when the field content it was made on has changed
+    const fieldsNow = taskFieldsSha(d.config, binding.kind, await effectiveFields(on(c), cr.id, cr.processing_generation))
+    if (binding.bound_manual_revision !== cr.manual_revision || bound !== (taskContactOf(lk)?.contact.contactId ?? null) || fieldsChanged({ fieldsSha: binding.bound_fields_sha256 }, { fieldsSha: fieldsNow })) {
+      throw new Refused(409, 'this task no longer applies; a new task replaces it')
+    }
     return { ...t, cr, lk }
   }
 
@@ -540,7 +635,7 @@ export function registerCaseActions(app: FastifyInstance, d: ServerDeps & { queu
       const kind = (await c.query<{ kind: string }>('SELECT kind FROM verification_task WHERE id = $1', [t.id])).rows[0]!.kind
       const labels = await effectiveLabels(on(c), t.cr.id, t.cr.processing_generation)
       if (!t.lk || !labels.adopted.includes(kind)) throw new Refused(409, 'this task no longer applies (C-FRD-5)')
-      await syncVerificationTasks(c, on(c), t.cr, labels.adopted, t.lk, kind)
+      await syncVerificationTasks(c, on(c), t.cr, labels.adopted, t.lk, await effectiveFields(on(c), t.cr.id, t.cr.processing_generation), kind)
       const replacement = (await c.query<{ replaced_by: string }>('SELECT replaced_by FROM verification_task WHERE id = $1', [t.id])).rows[0]!.replaced_by
       await appendAudit(c, d.k, [{ actor: req.user!.id, type: 'verification.restarted', caseId: t.case_id, payload: { task_id: t.id, replaced_by: replacement }, detail: { reason } }])
       return { ok: true, taskId: replacement }

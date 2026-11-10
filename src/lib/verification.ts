@@ -40,13 +40,25 @@ export interface TaskBinding {
   manualRevision: number
   contactId: string | null
   checklist: readonly string[]
+  // C-FRD-5 (plan R1, owner 2026-11-10): the hash of the field values the task depends on; null on a task made before
+  // this binding existed, which counts as changed (code review round 2 D1): the start-up step replaces such tasks
+  fieldsSha: string | null
 }
 
 /** C-FRD-5: whether a task bound at creation must be invalidated (approved ones included) and replaced by a new open one. */
 export function invalidated(task: TaskBinding & { state: TaskState }, now: TaskBinding): boolean {
   if (task.state === 'invalidated') return false
-  return task.manualRevision !== now.manualRevision || task.contactId !== now.contactId || task.checklist.join('\n') !== now.checklist.join('\n')
+  return task.manualRevision !== now.manualRevision || task.contactId !== now.contactId || task.checklist.join('\n') !== now.checklist.join('\n') || fieldsChanged(task, now)
 }
+
+/**
+ * C-FRD-5: the field content a task was made on has changed (a system re-run, a KYC replacement or a person's edit). A
+ * task without a binding (made before it existed) is never adopted to the values found later: it counts as changed (D1).
+ */
+export const fieldsChanged = (task: Pick<TaskBinding, 'fieldsSha'>, now: Pick<TaskBinding, 'fieldsSha'>): boolean => task.fieldsSha === null || task.fieldsSha !== now.fieldsSha
+
+/** C-FRD-5: the canonical content of the fields a task depends on (values only: confirming an unchanged value is no change). */
+export const taskFieldContent = (names: readonly string[], valueOf: (name: string) => unknown): string => JSON.stringify([...new Set(names)].sort().map((n) => [n, valueOf(n) ?? null]))
 
 export interface UserEvent {
   userId: string
@@ -74,6 +86,11 @@ export interface ApprovalFailure {
   reason: string
 }
 
+/** C-FRD-5: one of two different users created, granted a role to or reset the credentials of the other in this event. */
+export const relatesPair = (e: UserEvent, a: string, b: string): e is UserEvent & { type: 'created' | 'role_granted' | 'credential_reset'; byUser: string } =>
+  (e.type === 'created' || e.type === 'role_granted' || e.type === 'credential_reset') && e.byUser !== null && a !== b &&
+  ((e.userId === a && e.byUser === b) || (e.userId === b && e.byUser === a))
+
 /** E6: all failures in the existing decision order. Completer checks do not depend on who is viewing. */
 export function approvalFailures(i: ApproveInput): ApprovalFailure[] {
   const t = (iso: string) => Date.parse(iso)
@@ -86,7 +103,7 @@ export function approvalFailures(i: ApproveInput): ApprovalFailure[] {
   if (t(i.now) < t(i.checklistDoneAt) + i.coolingMs) add('timing', 'cooling', 'the cooling-off period has not ended')
   const pair = [i.completedBy, i.approver.id]
   for (const e of i.events) {
-    if ((e.type === 'created' || e.type === 'role_granted' || e.type === 'credential_reset') && e.byUser !== null && pair.includes(e.userId) && pair.includes(e.byUser) && e.userId !== e.byUser) {
+    if (relatesPair(e, i.completedBy, i.approver.id)) {
       add('pair', `related_${e.type}`, `one of the two users ${e.type === 'created' ? 'created' : e.type === 'role_granted' ? 'granted a role to' : 'reset the credentials of'} the other`)
     }
   }

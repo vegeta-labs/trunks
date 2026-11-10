@@ -2,6 +2,7 @@
 // earlier stages of the same generation and a person's changes, then publishes under the Case row lock (runStage).
 // The rules themselves are the pure functions in src/lib; nothing here calls a model (decisions 4, 4a).
 import { restartFrom } from './restart.ts'
+import { caseReplyRecipients, closureBlockers, labelsWithChanges, PROTECTED_CLASSES, senderSuspect, type CloseBlocker } from '../lib/gates.ts'
 import { evidenceSupportsTracing, structuredBeneficiaries } from '../lib/payment-message.ts'
 import { normaliseAccount } from '../lib/accounts.ts'
 import { receivingAccountHmac } from '../store/directory.ts'
@@ -11,20 +12,24 @@ import { getBlobs, getJson, putBlob } from '../store/blobs.ts'
 import { appendAudit } from '../store/audit.ts'
 import { loadSnapshot, type SnapshotView } from '../store/directory.ts'
 import type { Json } from '../lib/audit-hash.ts'
-import { loadMessage, resultOf, type CaseRow, type ClassifyResult, type Extraction, type FieldsResult, type Prepared, type StageDeps } from './stages.ts'
+import { loadMessage, resultOf, type Applied, type CaseRow, type ClassifyResult, type Extraction, type FieldsResult, type Prepared, type StageDeps } from './stages.ts'
 import { commitmentKey, ledgerState, link, mayDisclose, type Dir, type LedgerState, type Links } from '../lib/link.ts'
 import { applyAdjustment, computeRisk, hasPressure, rank, type Level, type RiskResult } from '../lib/risk.ts'
-import { allowedCaseRecipients, fill, formatMoney, internalTermsIn, NOTIFY_OLD_CONTACT, paymentDate, primaryClass, selectTemplate, type FieldValue, type SelectInput, type Selection } from '../lib/draft.ts'
+import { fill, formatMoney, internalTermsIn, NOTIFY_OLD_CONTACT, paymentDate, primaryClass, selectTemplate, type FieldValue, type SelectInput, type Selection } from '../lib/draft.ts'
 import { addWorkingHours, localDate, type WorkCalendar } from '../lib/workdays.ts'
 import { PAYMENT_ACTIONS, queueFor } from '../lib/output.ts'
-import { CHECKLIST, invalidated, phoneOnFile, taskContact } from '../lib/verification.ts'
+import { CHECKLIST, fieldsChanged, invalidated, phoneOnFile, taskContact, taskFieldContent } from '../lib/verification.ts'
+import { fieldsFor } from '../lib/fields.ts'
 import { suggestedActions, closingLeadConfirmed, type Action, type ActionInput } from '../lib/actions.ts'
 import { dueEvents, eventProblems, sensitiveIn, SCHEMA_VERSION, type CaseFacts } from '../lib/events.ts'
 import { accountShapes, fullNumbers } from '../lib/redact.ts'
 import { normalise } from '../lib/text.ts'
 import type { Config } from '../config/load.ts'
+import type { Keyring } from '../store/crypto.ts'
 
 const sha256 = (s: string) => createHash('sha256').update(s).digest('hex')
+/** PRD C-FRD-8: what a closing stage writes on a closed Case: nothing but its own stage record. */
+const SKIPPED_CLOSED: Applied = { audit: { skipped: 'closed' } }
 
 // ---------- the Case's effective inputs: pipeline results plus a person's changes ----------
 
@@ -38,25 +43,21 @@ export interface EffectiveLabels {
 export const hadBankRuleLabel = async (c: Pick<Tx, 'query'>, caseId: string) =>
   (await c.query(`SELECT 1 FROM case_label WHERE case_id = $1 AND class_id = 'bank_details' AND source = 'rule' LIMIT 1`, [caseId])).rows.length > 0
 
+/** C-FRD-6: the protected classes that carry a rule label in any generation (rule labels cannot be removed, C-CLS-5). */
+export const protectedRuleLabels = async (c: Pick<Tx, 'query'>, caseId: string): Promise<string[]> =>
+  (await c.query<{ class_id: string }>(`SELECT DISTINCT class_id FROM case_label WHERE case_id = $1 AND source = 'rule' AND class_id = ANY($2::text[])`, [caseId, PROTECTED_CLASSES])).rows.map((r) => r.class_id)
+
 export async function effectiveLabels(d: Pick<StageDeps, 'db' | 'k'>, caseId: string, generation: number): Promise<EffectiveLabels> {
   const cls = await resultOf<ClassifyResult>(d, caseId, 'classify', generation)
   if (!cls) throw new Error('no classification for this generation')
-  const adopted = new Set(cls.adopted)
-  const risk = new Set(cls.risk)
-  const changes = (await d.db.query<{ class_id: string; action: string }>('SELECT class_id, action FROM case_label_change WHERE case_id = $1 ORDER BY created_at, id', [caseId])).rows
-  for (const ch of changes) {
-    if (ch.action === 'add') {
-      adopted.add(ch.class_id)
-      risk.add(ch.class_id)
-    } else {
-      adopted.delete(ch.class_id)
-      risk.delete(ch.class_id)
-    }
-  }
-  // C-CLS-4a E6: a bank_details rule label of any generation stays, also one the risk step wrote (C-RSK-2 v0.7.28)
-  if (await hadBankRuleLabel(d.db, caseId)) {
-    adopted.add('bank_details')
-    risk.add('bank_details')
+  // C-FRD-6: a protected class adopted in any generation stays, whatever a later classification says
+  const persisted = (await d.db.query<{ class_id: string }>('SELECT DISTINCT class_id FROM case_label WHERE case_id = $1 AND adopted AND class_id = ANY($2::text[])', [caseId, PROTECTED_CLASSES])).rows.map((r) => r.class_id)
+  const changes = (await d.db.query<{ class_id: string; action: string; approved_by: string | null }>('SELECT class_id, action, approved_by FROM case_label_change WHERE case_id = $1 ORDER BY created_at, id', [caseId])).rows
+  const { adopted, risk } = labelsWithChanges(cls, persisted, changes.map((ch) => ({ classId: ch.class_id, action: ch.action, approvedBy: ch.approved_by })))
+  // C-CLS-4a E6, C-FRD-6: a protected rule label of any generation stays, also one the risk step wrote (C-RSK-2 v0.7.28)
+  for (const c of await protectedRuleLabels(d.db, caseId)) {
+    adopted.add(c)
+    risk.add(c)
   }
   // rule labels cannot be removed by a person (C-CLS-5): the current ones always count, whatever was removed earlier (Codex E3 F4)
   for (const l of cls.labels) if (l.source === 'rule' && l.classId !== 'unclassified') {
@@ -300,7 +301,8 @@ export async function prepRisk(d: StageDeps, cr: CaseRow): Promise<Prepared> {
     // per generation: this step writes the Case's risk, so every generation publishes it, never reused (Codex round 3 F20)
     inputHash: sha256(JSON.stringify([gen, computed, adj ?? null, info.generation_by, hold])),
     result: out,
-    async apply(c) {
+    async apply(c, locked) {
+      if (locked.closed_at) return SKIPPED_CLOSED // C-FRD-8
       // C-RSK-2 v0.7.28: the mismatch is handled as bank_details from here on, and stays (C-CLS-4a E6)
       if (evidenceBeneficiaryMismatch) {
         await c.query(`INSERT INTO case_label (case_id, generation, class_id, source, confidence, adopted, reason_blob) VALUES ($1, $2, 'bank_details', 'rule', 'rule', true, NULL) ON CONFLICT DO NOTHING`, [cr.id, gen])
@@ -398,6 +400,7 @@ export interface ReplyContext {
   select: SelectInput
   allowed: string[] // C-DRF-2 ④ a: From, and Reply-To unless reply_to_mismatch
   recipient: string | null // the default: Reply-To when allowed, otherwise From
+  senderSuspect: boolean // C-DRF-10
   values: Record<string, string | null>
 }
 
@@ -423,9 +426,12 @@ export async function replyContext(d: Pick<StageDeps, 'db' | 'k' | 'files' | 'co
   // false; unparseable or several headers (null) or a mismatch → From only (C-SIG-1.5 v0.7.15)
   const hdr = await getJson<{ reply_to?: string[] | null }>(d.db, d.k, (await d.db.query<{ header_blob: string }>('SELECT header_blob FROM message WHERE id = $1', [messageId])).rows[0]!.header_blob)
   const replyTo = sig.reply_to_mismatch === false ? (hdr?.reply_to ?? []) : []
-  const allowed = allowedCaseRecipients(m.fromAddress, replyTo, sig.reply_to_mismatch !== false)
+  const suspect = senderSuspect(sig)
+  const overrideGranted = suspect && (await d.db.query<{ recipient_override_at: Date | null }>('SELECT recipient_override_at FROM "case" WHERE id = $1', [caseId])).rows[0]!.recipient_override_at !== null
+  // C-DRF-10 over C-DRF-2 ④a
+  const allowed = caseReplyRecipients(m.fromAddress, replyTo, sig.reply_to_mismatch !== false, suspect, overrideGranted)
   const recipient = allowed.find((a) => a !== m.fromAddress?.toLowerCase()) ?? allowed[0] ?? null
-  return { lk, labels, fields, select, allowed, recipient, values: placeholderValues({ lk, fields, config: d.config, caseId }) }
+  return { lk, labels, fields, select, allowed, recipient, senderSuspect: suspect, values: placeholderValues({ lk, fields, config: d.config, caseId }) }
 }
 
 export async function prepReply(d: StageDeps, cr: CaseRow): Promise<Prepared> {
@@ -455,7 +461,8 @@ export async function prepReply(d: StageDeps, cr: CaseRow): Promise<Prepared> {
     // per generation: every generation needs its own draft row to approve (Codex round 2 F17)
     inputHash: sha256(JSON.stringify([gen, selection, actions, draft, recipient, lk, labels.adopted])),
     result: out,
-    async apply(c) {
+    async apply(c, locked) {
+      if (locked.closed_at) return SKIPPED_CLOSED // C-FRD-8: no draft and no task on a closed Case
       // earlier automatic drafts give way; approved or sent replies and a person's replies stay (shown side by side)
       await c.query(`UPDATE reply SET status = 'superseded' WHERE case_id = $1 AND status = 'draft' AND template_source = 'auto' AND NOT edited`, [cr.id])
       // an approval from an earlier generation can no longer hold (C-DRF-8): it lapses now, not only at the next copy,
@@ -477,7 +484,7 @@ export async function prepReply(d: StageDeps, cr: CaseRow): Promise<Prepared> {
             contentSha(recipient, draft.subject, draft.text), draft.removed, check!.ok, JSON.stringify(check!.problems)],
         )
       }
-      const tasks = await syncVerificationTasks(c, d, cr, labels.adopted, lk)
+      const tasks = await syncVerificationTasks(c, d, cr, labels.adopted, lk, fields)
       return {
         audit: { template: selection.template, step: selection.step, primary: selection.primary, reply_check_ok: check?.ok ?? null, reply_problems: (check?.problems ?? []).map((p) => p.split(':')[0]!), removed_sentences: draft?.removed ?? 0, actions: actions.map((a) => a.action), verification_tasks: tasks },
         ...(draft ? { detail: { reply_id: replyId, subject: draft.subject, text: draft.text, recipient } } : {}),
@@ -507,14 +514,35 @@ const noticeProblems = (config: Config, subject: string, text: string, onFile: s
 export const taskContactOf = (lk: LinkResult | null) =>
   !lk ? null : lk.taskContact === undefined ? (lk.contact ? { contact: lk.contact, impersonated: false } : null) : lk.taskContact
 
-export async function syncVerificationTasks(c: Tx, d: Pick<StageDeps, 'k' | 'config'>, cr: Pick<CaseRow, 'id' | 'manual_revision'>, adopted: readonly string[], lk: LinkResult, forceKind?: string): Promise<Record<string, string>> {
+/** C-FRD-5 (plan R1, owner 2026-11-10): the hash of the effective values of the fields a task of `kind` depends on. */
+export const taskFieldsSha = (config: Config, kind: string, fields: Readonly<Record<string, EffectiveField>>): string =>
+  sha256(taskFieldContent(fieldsFor([kind], Object.fromEntries(config.classes.map((x) => [x.id, x.fields]))), (n) => asFieldValue(fields[n])))
+
+/**
+ * C-FRD-5 v0.7.29: a person confirmed a field's current value, so nothing the task rests on changed. Live tasks bound to
+ * the revision now in force follow it to the next one, which the caller's restart makes. A task already behind stays
+ * behind and is invalidated as usual. A task bound to its field content (C10) follows even when the fields were worked
+ * out again after it was created: the hash decides whether they changed (code review round 2 D4); a task without that
+ * binding does not follow then.
+ */
+export async function carryVerificationBinding(c: Tx, k: Keyring, actor: string, caseId: string, revision: number, field: string): Promise<void> {
+  const carried = (await c.query<{ id: string }>(
+    `UPDATE verification_task t SET bound_manual_revision = $2 + 1 WHERE t.case_id = $1 AND t.state <> 'invalidated' AND t.bound_manual_revision = $2
+       AND (t.bound_fields_sha256 IS NOT NULL OR NOT EXISTS (SELECT 1 FROM stage_run s WHERE s.case_id = t.case_id AND s.stage = 'fields' AND NOT s.reused AND s.created_at >= t.created_at))
+     RETURNING t.id`,
+    [caseId, revision],
+  )).rows
+  for (const t of carried) await appendAudit(c, k, [{ actor, type: 'verification.binding_carried', caseId, payload: { task_id: t.id, field, from_revision: revision, to_revision: revision + 1 } }])
+}
+
+export async function syncVerificationTasks(c: Tx, d: Pick<StageDeps, 'k' | 'config'>, cr: Pick<CaseRow, 'id' | 'manual_revision'>, adopted: readonly string[], lk: LinkResult, fields: Readonly<Record<string, EffectiveField>>, forceKind?: string): Promise<Record<string, string>> {
   const done: Record<string, string> = {}
   // C-FRD-4 v0.7.21: the task contact; results saved before it have none and fall back to the linked contact
   const who = taskContactOf(lk)
   const tcon = who?.contact ?? null
   const contactId = tcon?.contactId ?? null
-  const now = { manualRevision: cr.manual_revision, contactId, checklist: [...CHECKLIST] }
   for (const kind of ['bank_details', 'identity_change'] as const) {
+    const now = { manualRevision: cr.manual_revision, contactId, checklist: [...CHECKLIST], fieldsSha: taskFieldsSha(d.config, kind, fields) }
     // a task whose class is no longer adopted no longer applies, approved or not (C-FRD-5, Codex E3 F5)
     if (!adopted.includes(kind)) {
       const gone = (await c.query<{ id: string; state: string }>(`UPDATE verification_task SET state = 'invalidated', invalidated_at = now() WHERE case_id = $1 AND kind = $2 AND state <> 'invalidated' RETURNING id, state`, [cr.id, kind])).rows
@@ -522,13 +550,13 @@ export async function syncVerificationTasks(c: Tx, d: Pick<StageDeps, 'k' | 'con
       if (gone.length) done[kind] = 'invalidated'
       continue
     }
-    const live = (await c.query<{ id: string; state: 'open' | 'checklist_done' | 'approved'; bound_manual_revision: number; bound_contact_blob: string | null; checklist: string[]; notify_recipient_blob: string | null; notify_subject_blob: string; notify_text_blob: string; notify_problems: string[] }>(
-      `SELECT id, state, bound_manual_revision, bound_contact_blob, checklist, notify_recipient_blob, notify_subject_blob, notify_text_blob, notify_problems FROM verification_task WHERE case_id = $1 AND kind = $2 AND state <> 'invalidated' ORDER BY created_at DESC LIMIT 1`,
+    const live = (await c.query<{ id: string; state: 'open' | 'checklist_done' | 'approved'; bound_manual_revision: number; bound_contact_blob: string | null; bound_fields_sha256: string | null; checklist: string[]; notify_recipient_blob: string | null; notify_subject_blob: string; notify_text_blob: string; notify_problems: string[] }>(
+      `SELECT id, state, bound_manual_revision, bound_contact_blob, bound_fields_sha256, checklist, notify_recipient_blob, notify_subject_blob, notify_text_blob, notify_problems FROM verification_task WHERE case_id = $1 AND kind = $2 AND state <> 'invalidated' ORDER BY created_at DESC LIMIT 1`,
       [cr.id, kind],
     )).rows[0]
+    const bound = live?.bound_contact_blob ? (await getBlobs(c, d.k, [live.bound_contact_blob])).get(live.bound_contact_blob)!.toString('utf8') : null
     if (live) {
-      const bound = live.bound_contact_blob ? (await getBlobs(c, d.k, [live.bound_contact_blob])).get(live.bound_contact_blob)!.toString('utf8') : null
-      if (kind !== forceKind && !invalidated({ state: live.state, manualRevision: live.bound_manual_revision, contactId: bound, checklist: live.checklist }, now)) {
+      if (kind !== forceKind && !invalidated({ state: live.state, manualRevision: live.bound_manual_revision, contactId: bound, checklist: live.checklist, fieldsSha: live.bound_fields_sha256 }, now)) {
         // a kept task's notice is checked again: the internal terms may have changed with the configuration
         const b = await getBlobs(c, d.k, [live.notify_subject_blob, live.notify_text_blob, ...(live.notify_recipient_blob ? [live.notify_recipient_blob] : [])])
         const text = (x: string | null) => (x ? b.get(x)!.toString('utf8') : null)
@@ -542,19 +570,42 @@ export async function syncVerificationTasks(c: Tx, d: Pick<StageDeps, 'k' | 'con
     const values = placeholderValues({ lk: { ...lk, contact: tcon }, fields: {}, config: d.config, caseId: cr.id })
     const notice = render(d.config, NOTIFY_OLD_CONTACT, values)
     await c.query(
-      `INSERT INTO verification_task (id, case_id, kind, state, bound_manual_revision, bound_contact_blob, checklist, phone_blob, notify_recipient_blob, notify_subject_blob, notify_text_blob, notify_problems)
-       VALUES ($1, $2, $3, 'open', $4, $5, $6, $7, $8, $9, $10, $11)`,
+      `INSERT INTO verification_task (id, case_id, kind, state, bound_manual_revision, bound_contact_blob, checklist, phone_blob, notify_recipient_blob, notify_subject_blob, notify_text_blob, notify_problems, bound_fields_sha256)
+       VALUES ($1, $2, $3, 'open', $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
       [id, cr.id, kind, cr.manual_revision, contactId ? await putBlob(c, d.k, contactId) : null, JSON.stringify(CHECKLIST), phoneOnFile(tcon?.phone) ? await putBlob(c, d.k, phoneOnFile(tcon?.phone)!) : null,
-        tcon?.emails[0] ? await putBlob(c, d.k, tcon.emails[0]) : null, await putBlob(c, d.k, notice.subject), await putBlob(c, d.k, notice.text), JSON.stringify(noticeProblems(d.config, notice.subject, notice.text, tcon?.emails[0] ?? null))],
+        tcon?.emails[0] ? await putBlob(c, d.k, tcon.emails[0]) : null, await putBlob(c, d.k, notice.subject), await putBlob(c, d.k, notice.text), JSON.stringify(noticeProblems(d.config, notice.subject, notice.text, tcon?.emails[0] ?? null)), now.fieldsSha],
     )
     if (live) {
       await c.query(`UPDATE verification_task SET state = 'invalidated', invalidated_at = now(), replaced_by = $2 WHERE id = $1`, [live.id, id])
-      await appendAudit(c, d.k, [{ actor: 'system', type: 'verification.invalidated', caseId: cr.id, payload: { task_id: live.id, was: live.state, replaced_by: id } }])
+      await appendAudit(c, d.k, [{ actor: 'system', type: 'verification.invalidated', caseId: cr.id, payload: { task_id: live.id, was: live.state, replaced_by: id, fields_changed: fieldsChanged({ fieldsSha: live.bound_fields_sha256 }, now) } }])
     }
     await appendAudit(c, d.k, [{ actor: 'system', type: 'verification.created', caseId: cr.id, payload: { task_id: id, kind, phone_on_file: phoneOnFile(tcon?.phone) !== null, impersonated_contact: who?.impersonated ?? false } }])
     done[kind] = live ? 'replaced' : 'created'
   }
   return done
+}
+
+// ---------- closing (C-FRD-7) ----------
+
+/** What stands in the way of a normal close, read in the caller's transaction or for the review page. */
+export async function caseClosureBlockers(d: Pick<StageDeps, 'db' | 'k' | 'config'>, cr: { id: string; processing_generation: number; pipeline_complete_generation: number | null; manual_revision: number }): Promise<CloseBlocker[]> {
+  const complete = cr.pipeline_complete_generation === cr.processing_generation
+  const approvedUnsentReply = (await d.db.query(`SELECT 1 FROM reply WHERE case_id = $1 AND status = 'approved' LIMIT 1`, [cr.id])).rows.length > 0
+  if (!complete) return closureBlockers({ complete, requiredKinds: [], tasks: [], approvedUnsentReply })
+  const labels = await effectiveLabels(d, cr.id, cr.processing_generation)
+  const lk = await resultOf<LinkResult>(d, cr.id, 'link', cr.processing_generation)
+  const fields = await effectiveFields(d, cr.id, cr.processing_generation)
+  const rows = (await d.db.query<{ kind: string; state: 'open' | 'checklist_done' | 'approved'; bound_manual_revision: number; bound_contact_blob: string | null; bound_fields_sha256: string | null; checklist: string[] }>(
+    `SELECT kind, state, bound_manual_revision, bound_contact_blob, bound_fields_sha256, checklist FROM verification_task WHERE case_id = $1 AND state <> 'invalidated'`, [cr.id],
+  )).rows
+  const b = await getBlobs(d.db, d.k, rows.flatMap((r) => (r.bound_contact_blob ? [r.bound_contact_blob] : [])))
+  const now = { manualRevision: cr.manual_revision, contactId: taskContactOf(lk)?.contact.contactId ?? null, checklist: [...CHECKLIST] }
+  const tasks = rows.map((t) => ({
+    kind: t.kind,
+    state: t.state,
+    valid: !invalidated({ state: t.state, manualRevision: t.bound_manual_revision, contactId: t.bound_contact_blob ? b.get(t.bound_contact_blob)!.toString('utf8') : null, checklist: t.checklist, fieldsSha: t.bound_fields_sha256 }, { ...now, fieldsSha: taskFieldsSha(d.config, t.kind, fields) }),
+  }))
+  return closureBlockers({ complete, requiredKinds: labels.adopted.filter((c) => (PROTECTED_CLASSES as readonly string[]).includes(c)), tasks, approvedUnsentReply })
 }
 
 // ---------- route (R-RTE) ----------
@@ -578,7 +629,8 @@ export async function prepRoute(d: StageDeps, cr: CaseRow): Promise<Prepared> {
     // per generation: this step writes the Case's queue and due time (Codex round 3 F20)
     inputHash: sha256(JSON.stringify([cr.processing_generation, r, labels.adopted])),
     result: r,
-    async apply(c) {
+    async apply(c, locked) {
+      if (locked.closed_at) return SKIPPED_CLOSED // C-FRD-8
       // read again under the publication lock: a person may have moved the Case since this step was prepared (Codex E3 F6)
       const now = (await c.query<{ queue_by: string | null; queue: string | null }>('SELECT queue_by, queue FROM "case" WHERE id = $1', [cr.id])).rows[0]!
       if (now.queue_by === 'person' && now.queue) {
@@ -598,7 +650,8 @@ export async function prepRoute(d: StageDeps, cr: CaseRow): Promise<Prepared> {
 export async function prepEmit(d: StageDeps, cr: CaseRow): Promise<Prepared> {
   return {
     inputHash: sha256(JSON.stringify([cr.processing_generation, cr.manual_revision])),
-    async apply(c) {
+    async apply(c, locked) {
+      if (locked.closed_at) return SKIPPED_CLOSED // C-FRD-8: the closing itself emitted case.closed
       const n = await emitEvents(c, d, cr.id)
       return { audit: { events: n } }
     },

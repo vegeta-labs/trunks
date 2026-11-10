@@ -25,7 +25,7 @@ export async function restartFrom(c: Tx, queue: Queue, caseId: string, stage: St
   }
   const next = gen + 1
   await c.query(
-    `UPDATE "case" SET processing_generation = $2, manual_revision = manual_revision + $3, generation_by = $4, status = CASE WHEN status = 'failed' THEN 'processing' ELSE status END, failed_stage = NULL, failed_reason = NULL,
+    `UPDATE "case" SET processing_generation = $2, manual_revision = manual_revision + $3, generation_by = $4, status = CASE WHEN status = 'failed' AND closed_at IS NULL THEN 'processing' ELSE status END, failed_stage = NULL, failed_reason = NULL,
        risk_hold = CASE WHEN $5 THEN COALESCE(risk_hold, risk) ELSE risk_hold END WHERE id = $1`,
     [caseId, next, by === 'person' ? 1 : 0, by, by === 'person' && o.hold !== false],
   )
@@ -44,8 +44,8 @@ export async function restartFrom(c: Tx, queue: Queue, caseId: string, stage: St
  * `rerun-failed` command. The steps before it are carried over; a Case that is not failed is left as it is (null).
  */
 export async function rerunFailed(c: Tx, k: Keyring, queue: Queue, caseId: string): Promise<{ generation: number; from: Stage } | null> {
-  const row = (await c.query<{ status: string; failed_stage: Stage | null }>('SELECT status, failed_stage FROM "case" WHERE id = $1 FOR UPDATE', [caseId])).rows[0]
-  if (!row || row.status !== 'failed' || !row.failed_stage || !STAGES.includes(row.failed_stage)) return null
+  const row = (await c.query<{ status: string; failed_stage: Stage | null; closed_at: Date | null }>('SELECT status, failed_stage, closed_at FROM "case" WHERE id = $1 FOR UPDATE', [caseId])).rows[0]
+  if (!row || row.status !== 'failed' || row.closed_at !== null || !row.failed_stage || !STAGES.includes(row.failed_stage)) return null
   // a reply belongs to its generation (C-DRF-8): after a failure past `reply`, the draft is made again for the new
   // generation instead of carrying the old one over, which could not be approved (Codex E5 round 5 F1)
   const start: Stage = STAGES.indexOf(row.failed_stage) > STAGES.indexOf('reply') ? 'reply' : row.failed_stage

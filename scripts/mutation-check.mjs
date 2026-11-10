@@ -27,6 +27,8 @@ import { execSync } from 'node:child_process'
 // adds the bank fields has another identity anyway; kept to say what the step depends on.
 // F1 equivalent: dropping only the element prefix check in strictProblem: a prefix in use must be declared (else the
 // namespace check fails), and the declaration has its own prefix check.
+// v0.7.29 equivalent: the bound-revision condition in carryVerificationBinding: the carry needs a complete generation, whose
+// reply step has already moved every live task to the current revision; kept as defence in depth.
 // a mutant may name its own test command (the database tests for the pipeline and the review actions)
 const DB = 'npx vitest run src/pipeline/e3.test.ts --reporter=dot'
 const R4 = 'npx vitest run src/maintenance/retention.test.ts --reporter=dot'
@@ -44,6 +46,7 @@ const E5C = 'npx vitest run src/pipeline/classify.test.ts -t TC-OPS-09 --reporte
 // running, processed local demo at 127.0.0.1:8080 (deploy/compose.demo.yml) to rebuild the snapshot
 const W = 'npx vitest run src/web --reporter=dot'
 const WE = 'npx playwright test -g TC-REV-10 --reporter=dot'
+const GT = 'npx vitest run src/pipeline/gates.test.ts src/pipeline/kyc-e6.test.ts --reporter=dot'
 const DEMO = 'npm run demo:snapshot --silent -- http://127.0.0.1:8080 && npx playwright test -c playwright.demo.config.ts --reporter=dot'
 const F1U = 'npx vitest run src/lib/payment-message.test.ts --reporter=dot'
 const F1P = 'npx vitest run src/pipeline/f1.test.ts --reporter=dot'
@@ -127,8 +130,8 @@ const MUTANTS = [
   ['src/lib/redact.ts', 'return SIX_DIGITS(value) ? [{', 'return false ? [{', 'F1 C-RED-1 structural accounts off', F1U],
   ['src/pipeline/stages-e3.ts', '(exempted !== null && (linkedDeal?.dealKey !== exempted.dealKey || listed === null)) ||', 'false ||', 'F1 C-RSK-2 link recheck off', F1P],
   ['src/pipeline/stages-e3.ts', '(listed !== null && structuredBeneficiaries(', '(false && structuredBeneficiaries(', 'F1 C-RSK-2 list check off', F1P],
-  ['src/pipeline/stages-e3.ts', '  if (await hadBankRuleLabel(d.db, caseId)) {', '  if (false) {', 'F1 E6 label history off', F1P],
-  ['src/server/actions.ts', '        if (await hadBankRuleLabel(c, cr.id)) ruleLabels.add(\'bank_details\') // C-CLS-4a E6\n', '', 'F1 written rule label can be removed', F1P],
+  ['src/pipeline/stages-e3.ts', '  for (const c of await protectedRuleLabels(d.db, caseId)) {', '  for (const c of [] as string[]) {', 'F1 E6 label history off', GT],
+  ['src/server/actions.ts', '        for (const x of await protectedRuleLabels(c, cr.id)) ruleLabels.add(x) // C-CLS-4a E6, C-FRD-6\n', '', 'F1 written rule label can be removed', F1P],
   ['src/lib/uetr.ts', "hex[12] === '4'", "hex[12] !== '0'", 'UETR version digit not checked'],
   ['src/lib/uetr.ts', "'89ab'.includes(hex[16]!)", "'89abc'.includes(hex[16]!)", 'UETR variant c accepted'],
   ['src/lib/references.ts', 'for (let n = 1; n <= 3 && i + n <= t.length; n++)', 'for (let n = 1; n <= 2 && i + n <= t.length; n++)', 'only 1–2 token runs'],
@@ -287,7 +290,7 @@ const MUTANTS = [
   ['src/lib/link.ts', "(l.status === 'auto' || l.status === 'confirmed') && l.commitmentKeyHmac", "(l.status !== 'rejected') && l.commitmentKeyHmac", 'unmatched rows counted as received'],
   ['src/lib/link.ts', 'conflict: i.deal !== null && i.deal !== dealOf(commitment.dealKey)', 'conflict: false', 'deal conflict not shown'],
   ['src/lib/link.ts', 'if (byRef.length === 1) {', 'if (byRef.length >= 1) {', 'two reference matches linked to the first'],
-  ['src/lib/verification.ts', "if ((e.type === 'created' || e.type === 'role_granted' || e.type === 'credential_reset')", "if ((e.type === 'created' || e.type === 'role_granted')", 'a credential reset by the other person allowed'],
+  ['src/lib/verification.ts', "(e.type === 'created' || e.type === 'role_granted' || e.type === 'credential_reset') && e.byUser !== null && a !== b", "(e.type === 'created' || e.type === 'role_granted') && e.byUser !== null && a !== b", 'a credential reset by the other person allowed'],
   ['src/lib/verification.ts', 'if (t(i.now) < t(i.checklistDoneAt) + i.coolingMs)', 'if (t(i.now) < t(i.checklistDoneAt))', 'no cooling-off period'],
   ['src/lib/verification.ts', "if (i.approver.role !== 'approver' && i.approver.role !== 'admin')", 'if (false)', 'a reviewer may approve'],
   ['src/lib/verification.ts', 'task.manualRevision !== now.manualRevision || task.contactId !== now.contactId ||', 'task.manualRevision !== now.manualRevision ||', 'a contact change keeps the task'],
@@ -316,7 +319,7 @@ const MUTANTS = [
   ['src/pipeline/stages-e3.ts', 'const authenticated = sig.dmarc_pass === true && sender !== null', 'const authenticated = sender !== null', 'C-SIG-3 without dmarc', DB],
   ['src/pipeline/stages-e3.ts', 'const blocked = sensitiveIn(serialised, fullNumbers)', 'const blocked = false', 'events with a full IBAN sent', DB],
   // Codex E3 round 2
-  ['src/pipeline/stages-e3.ts', 'JSON.stringify(noticeProblems(d.config, notice.subject, notice.text, tcon?.emails[0] ?? null))]', "'[]']", 'the rendered notice not checked (F13)', DB],
+  ['src/pipeline/stages-e3.ts', 'JSON.stringify(noticeProblems(d.config, notice.subject, notice.text, tcon?.emails[0] ?? null)), now.fieldsSha]', "'[]', now.fieldsSha]", 'the rendered notice not checked (F13)', DB],
   ['src/server/cases.ts', 'notifyText: (x.notify_problems as string[]).length ? null : t(x.notify_text_blob)', 'notifyText: t(x.notify_text_blob)', 'a notice with problems offered for copying (F13)', DB],
   ['src/pipeline/stages-e3.ts', 'const accountPresent = texts.some(', 'const accountPresent = texts.slice(0, 3).some(', 'attachment names not looked at for accounts (F14)', DB],
   ['src/server/actions.ts', 'WHERE id = ANY($1::uuid[]) ORDER BY id FOR UPDATE', 'WHERE id = ANY($1::uuid[]) ORDER BY id', 'the two users not locked during approval (F15)', DB],
@@ -493,13 +496,93 @@ const MUTANTS = [
 
   ['src/web/App.tsx', '{on.length === 0 && <p className="meta">', '{true && <p className="meta">', '«No warning signals» beside fired signals (R-REV-02 v0.7.25)', W],
   ['src/web/App.tsx', '{unknown.length > 0 && <ul', '{false && <ul', 'unchecked signals hidden (R-REV-02 v0.7.25)', W],
-  ['src/web/App.tsx', '`No warning signals; ${unknown.length} could not be checked`', "'No warning signals'", 'unchecked signals not counted (R-REV-02 v0.7.25)', W],
+  ['src/web/App.tsx', '`No warning signals detected. ${unknown.length} checks could not be completed.`', "'No warning signals detected.'", 'unchecked signals not counted (R-REV-02 v0.7.25)', W],
   ['src/web/styles.css', "grid-template-areas: 'main side'", "grid-template-areas: 'side main'", 'the mail on the right (界面规则 v0.3.4)', WE],
   ['src/web/styles.css', 'appearance: none; -webkit-appearance: none; padding-right: 36px;', 'appearance: none; -webkit-appearance: none; padding-right: 12px;', 'the select arrow against the edge (界面规则 v0.3.4)', WE],
-  ['src/web/CaseE3.tsx', '(STATIC_DEMO ? null : <>{children}</>)', '(<>{children}</>)', 'change controls in the static demo (R-DEMO-02 v0.7.25)', DEMO],
+  ['src/web/CaseE3.tsx', 'useContext(ClosedCase) || STATIC_DEMO', 'useContext(ClosedCase)', 'change controls in the static demo (R-DEMO-02 v0.7.25)', DEMO],
   ['src/web/CaseE3.tsx', "{STATIC_DEMO ? <><span aria-label={c.checked ? 'done' : 'not done'}>", "{false ? <><span aria-label={c.checked ? 'done' : 'not done'}>", 'checklist boxes in the static demo (R-DEMO-02 v0.7.25)', DEMO],
   ['src/web/App.tsx', '...Object.keys(SIGNAL_TEXT).filter((k) => !known.has(k))', '...([] as string[]).filter((k) => !known.has(k))', 'a signal without a row counted as clean (self-test F1)', W],
   ['src/web/App.tsx', '      {STATIC_DEMO ? (\n', '      {false ? (\n', 'user, role and Sign out in the static demo (R-DEMO-02 v0.7.25)', DEMO],
+  ['src/server/actions.ts', 'if (req.body?.confirm === true && cr.pipeline_complete_generation === cr.processing_generation) await carry', 'if (cr.pipeline_complete_generation === cr.processing_generation) await carry', 'an edit carries the task (C-FRD-5 v0.7.29)', DB],
+  ['src/server/actions.ts', 'if (req.body?.confirm === true && cr.pipeline_complete_generation === cr.processing_generation) await carry', 'if (req.body?.confirm === true) await carry', 'a confirmation during a re-run carries the task (C-FRD-5 v0.7.29)', DB],
+  ['src/pipeline/stages-e3.ts', "AND s.created_at >= t.created_at)", "AND s.created_at < t.created_at)", 'fields worked out again after the task do not stop the carry (C-FRD-5 v0.7.29)', DB],
+  ['src/pipeline/stages-e3.ts', "s.stage = 'fields' AND NOT s.reused AND", "s.stage = 'fields' AND", 'a re-run that reuses the fields stops the carry (C-FRD-5 v0.7.29)', DB],
+  ['src/pipeline/stages-e3.ts', "for (const t of carried) await appendAudit", "for (const t of [] as typeof carried) await appendAudit", 'the carry is not audited (C-FRD-5 v0.7.29)', DB],
+  ['src/server/cases.ts', 'held: c.risk_hold === null ? null : (rk.held ?? null), applied:', 'held: c.risk_hold, applied:', 'the held banner flashes during a re-run (TC-REV-17 v0.7.29)', DB],
+  ['src/server/cases.ts', 'held: c.risk_hold === null ? null : (rk.held ?? null), applied:', 'held: rk.held ?? null, applied:', 'the held banner stays after the approver accepted (TC-REV-17 v0.7.29)', DB],
+  ['src/server/cases.ts', 'FROM "case" c ${whereSql}`, args)', 'FROM "case" c`, [])', 'the total ignores the filters (TC-REV-14 v0.7.29)', DB],
+  ['src/lib/paging.ts', 'Math.min(limit!, MAX_PAGE)', 'limit!', 'no upper limit on a page (TC-REV-14 v0.7.29)'],
+  ['src/lib/paging.ts', 'limit! >= 1', 'limit! >= 0', 'a page of zero (TC-REV-14 v0.7.29)'],
+  ['src/lib/paging.ts', 'Number.isSafeInteger(offset)', 'Number.isFinite(offset)', 'an offset beyond what the query can take (TC-REV-14 v0.7.29)'],
+  ['src/web/presentation.ts', "'C-RSK-2:evidence_beneficiary_mismatch': 'The beneficiary", "'C-RSK-2:evidence_beneficiary_mismatch_x': 'The beneficiary", 'the beneficiary mismatch has no sentence (TC-REV-15 v0.7.29)', 'npx vitest run src/web --reporter=dot'],
+  ['src/web/presentation.ts', "(terms === undefined ? PROBLEM_TEXT[code]! : internalTerms(terms))", "code", 'a refusal shows internal_terms codes (TC-REV-15 v0.7.29)', 'npx vitest run src/web --reporter=dot'],
+  ['src/web/api.ts', "plainProblems(withoutRuleIds(data.error ?? res.statusText))", "withoutRuleIds(data.error ?? res.statusText)", 'server refusals not translated (TC-REV-15 v0.7.29)', 'npx vitest run src/web --reporter=dot'],
+  ['src/web/App.tsx', "    refresh()\n", "", 'warnings wait for the next minute after sign-in (TC-REV-16 v0.7.29)', "npx playwright test -g 'TC-REV-16'"],
+  ['src/web/App.tsx', "    void api<Meta>('GET', '/api/meta').then((m) => { if (active) setMeta(m) }, () => undefined)\n", "", 'menus empty after sign-in (TC-REV-16 v0.7.29)', "npx playwright test -g 'TC-REV-16'"],
+  ['src/web/App.tsx', "[key]: value, page: 0, scroll: 0", "[key]: value, scroll: 0", 'a filter keeps the page number (TC-REV-14 v0.7.29)', "npx playwright test -g 'TC-REV-14'"],
+  ['src/web/App.tsx', "if (r.cases.length === 0 && r.total > 0 && page > 0)", "if (false)", 'an empty page instead of the last one (TC-REV-14 v0.7.29)', "npx playwright test -g 'TC-REV-14'"],
+  ['src/web/App.tsx', "      setShownPage(page)\n", "", 'the range does not follow the page (TC-REV-14 v0.7.29)', "npx playwright test -g 'TC-REV-14'"],
+  // TC-REV-18 (test plan v0.7.29): yes/no and list fields can be edited
+  ['src/web/presentation.ts', "text === 'true' ? true : text === 'false' ? false : null", "text === '' ? null : text", 'a yes/no edit sends text (TC-REV-18)', 'npx vitest run src/web --reporter=dot'],
+  ['src/web/presentation.ts', "input.options.filter((o) => picked.includes(o))", "[...picked]", 'a list edit in the order clicked (TC-REV-18)', 'npx vitest run src/web --reporter=dot'],
+  ['src/web/presentation.ts', "KIND[field] === 'enums' ? { kind: 'list', options: ENUMS[field]! } : ", "", 'a list field edited as text (TC-REV-18)', 'npx vitest run src/web --reporter=dot'],
+  ['src/web/CaseE3.tsx', "{ value: editValue(input, value, picked) }", "{ value: value.trim() === '' ? null : value.trim() }", 'the page ignores the field kind (TC-REV-18)', "npx playwright test -g 'TC-REV-18'"],
+  ['src/web/CaseE3.tsx', "    setValue('')\n    setPicked([])\n    setEditing(open)", "    setEditing(open)", 'a reopened edit keeps an earlier choice (TC-REV-18 review m1)', "npx playwright test -g 'TC-REV-18'"],
+  // Fraud gates (PRD v0.7.30)
+  ['src/pipeline/restart.ts', "row.status !== 'failed' || row.closed_at !== null ||", "row.status !== 'failed' ||", 'rerun-failed reopens a closed Case marked failed (C-FRD-8)', E5C],
+  ['src/lib/gates.ts', '|| ch.approvedBy !== null', '|| true', 'a protected removal without an approver counts (C-FRD-6)'],
+  ['src/lib/gates.ts', "if (!f.complete) out.add('processing')", '', 'closing while still processing (C-FRD-7)'],
+  ['src/lib/gates.ts', "if (f.approvedUnsentReply) out.add('reply_not_sent')", '', 'closing with an unsent approved reply (C-FRD-7)'],
+  ['src/lib/gates.ts', "if (!f.tasks.some((t) => t.kind === k)) out.add('check_not_created')", '', 'a required class with no task (C-FRD-7)'],
+  ['src/lib/gates.ts', "if (t.state !== 'approved') out.add('check_not_approved')", "if (false) out.add('check_not_approved')", 'an unapproved task does not block closing (C-FRD-7)'],
+  ['src/lib/gates.ts', 'signals.lookalike_domain === true', 'false', 'a look-alike domain not suspect (C-DRF-10)'],
+  ['src/lib/gates.ts', 'if (suspect) return', 'if (false) return', 'a suspect sender keeps a recipient (C-DRF-10)'],
+  ['src/lib/gates.ts', 'if (editors.includes(approver.id)) return EDITED_NEEDS_OTHER', '', 'an editor approves their own text (C-DRF-11)'],
+  // code review round 1 (C1–C10)
+  ['src/server/actions.ts', '|| me.role !== user.role) throw', ') throw', 'a demoted approver decides (C1)', GT],
+  ['src/server/actions.ts', "        if (remove.some(isProtectedClass)) await lockActor(c, req.user!)\n", '', 'a protected removal by a demoted approver (C1)', GT],
+  ['src/server/actions.ts', "        if (blockers.length) await lockActor(c, req.user!) // the exception is an approver's decision\n", '', 'an exception close by a demoted approver (C1)', GT],
+  ['src/server/actions.ts', "        const cr = await lockCase(c, req.params.id)\n        await lockActor(c, req.user!)\n", "        const cr = await lockCase(c, req.params.id)\n", 'a recipient exception by a demoted approver (C1)', GT],
+  ['src/lib/gates.ts', 'return events.some((e) => editors.some((ed) => relatesPair(e, approver.id, ed))) ? EDITED_RELATED : null', 'return null', 'an approver related to an editor approves (C2)'],
+  ['src/lib/verification.ts', '((e.userId === a && e.byUser === b) || (e.userId === b && e.byUser === a))', '(e.userId === a && e.byUser === b)', 'a relationship counted in one direction only (C2)'],
+  ['src/server/actions.ts', 'const events = people.length < 2 ? [] :', 'const events = true ? [] :', 'no account events read for the edited-reply check (C2)', GT],
+  ['src/store/migrations/009_fraud_gates.sql', 'WHERE x.case_id = r.case_id AND x.created_by IS NOT NULL', 'WHERE x.case_id = r.case_id AND x.generation = r.generation AND x.created_by IS NOT NULL', 'the backfill drops editors of earlier generations (C3)', GT],
+  ['src/pipeline/rollout.ts', 'if (!missing.length) return { unbound: gone.length, restarted: 0 }', 'if (true) return { unbound: gone.length, restarted: 0 }', 'no task made for a restored class (C4)', GT],
+  ['src/store/migrations/009_fraud_gates.sql', "INSERT INTO rollout_lapsed_reply (reply_id, case_id) SELECT id, case_id FROM reply WHERE status = 'approved';", '', 'no audit for approvals returned to draft (C5)', GT],
+  ['src/store/migrations/009_fraud_gates.sql', 'UPDATE "case" SET status = \'open\' WHERE status = \'approved\' AND closed_at IS NULL;', '', 'a Case still shown approved after the upgrade (C5)', GT],
+  ['src/pipeline/rollout.ts', 'if (rows.length) await appendAudit', 'if (false) await appendAudit', 'no audit for approvals returned to draft (C5)', GT],
+  ['src/server/actions.ts', "state IN ('open', 'checklist_done') FOR UPDATE", "state <> 'invalidated' FOR UPDATE", 'closing voids an approved check (C6)', GT],
+  ['src/store/migrations/009_fraud_gates.sql', 'UPDATE "case" SET status = \'closed\' WHERE closed_at IS NOT NULL AND status <> \'closed\';', '', 'a closed Case keeps another status (C7)', GT],
+  ['src/pipeline/stages.ts', 'const classes = [...cls.adopted, ...persisted]', 'const classes = [...cls.adopted]', 'a kept protected class no longer asks for its fields (C8)', GT],
+  ['src/lib/verification.ts', '|| fieldsChanged(task, now)', '', 'a field change keeps the task (C10)'],
+  ['src/lib/verification.ts', 'task.fieldsSha === null || task.fieldsSha !== now.fieldsSha', 'task.fieldsSha !== null && task.fieldsSha !== now.fieldsSha', 'a task from before the binding adopted to later values (round 2 D1)'],
+  ['src/lib/verification.ts', 'task.fieldsSha === null || task.fieldsSha !== now.fieldsSha', 'task.fieldsSha !== null && task.fieldsSha !== now.fieldsSha', 'a task from before the binding adopted by a re-run (round 2 D1)', GT],
+  ['src/pipeline/stages-e3.ts', 'fieldsSha: taskFieldsSha(d.config, kind, fields) }', 'fieldsSha: null }', 'tasks not bound to their fields (C10)', GT],
+  ['src/server/actions.ts', 'if (r.closed_at !== null && !o.closedOk) throw', 'if (false) throw', 'a closed Case takes changes (C-FRD-8)', GT],
+  ['src/server/actions.ts', 'if (remove.some(isProtectedClass) && (!isApprover || !reasonText)) throw', 'if (false) throw', 'a protected class removed without an approver and a reason (C-FRD-6)', GT],
+  ['src/server/actions.ts', "if (blockers.length && req.user!.role === 'reviewer') throw", 'if (false) throw', 'a reviewer closes past a blocker (C-FRD-7)', GT],
+  ['src/server/actions.ts', "if (blockers.length && !reason) throw", 'if (false) throw', 'an exception close without a reason (C-FRD-7)', GT],
+  ['src/server/actions.ts', "WHERE case_id = $1 AND status = 'approved' RETURNING id", "WHERE case_id = $1 AND false RETURNING id", 'closing keeps approved replies (C-FRD-8)', GT],
+  ['src/server/actions.ts', "lockCase(c, req.params.id, { closedOk: true })", 'lockCase(c, req.params.id)', 'the retention hold refused on a closed Case (C-FRD-8)', GT],
+  ['src/server/actions.ts', "// C-DRF-9: the same check as approving and copying; the Case's closure was refused by lockCase already\n        const problems = await approvalProblems(c, cr, r, true, r.approved_by)", 'const problems: string[] = []', 'sent runs no check (C-DRF-9)', GT],
+  ['src/server/actions.ts', "const problems = await approvalProblems(c, cr, r, true, r.approved_by)\n        if (problems.length && r.status === 'sent')", "const problems = await approvalProblems(c, cr, r, true, req.user!.id)\n        if (problems.length && r.status === 'sent')", 'copy checks the caller, not the recorded approver (C-DRF-9)', GT],
+  ['src/server/actions.ts', 'const editors = textChanged ? [...new Set([...base.text_editors, req.user!.id])] : base.text_editors', 'const editors = base.text_editors', 'an edit not recorded (C-DRF-11)', GT],
+  ['src/server/actions.ts', 'if (!template || render(d.config, r.template_id, ctx.values).text !== r.text) {', 'if (false) {', 'an edited body approved by anyone (C-DRF-11)', GT],
+  ['src/pipeline/stages.ts', '|| cr.closed_at !== null) return', ') return', 'a failure overwrites a closed Case (C-FRD-8)', GT],
+  ['src/pipeline/stages-e3.ts', "if (locked.closed_at) return SKIPPED_CLOSED // C-FRD-8: no draft and no task on a closed Case\n", '', 'a draft or task on a closed Case (C-FRD-8)', GT],
+  ['src/pipeline/stages-e3.ts', "if (locked.closed_at) return SKIPPED_CLOSED // C-FRD-8\n      // read again under the publication lock", '// read again under the publication lock', 'routing rewritten on a closed Case (C-FRD-8)', GT],
+  ['src/pipeline/stages-e3.ts', "if (locked.closed_at) return SKIPPED_CLOSED // C-FRD-8\n      // C-RSK-2 v0.7.28: the mismatch", '// C-RSK-2 v0.7.28: the mismatch', 'risk written on a closed Case (C-FRD-8)', GT],
+  ['src/pipeline/stages-e3.ts', "WHERE case_id = $1 AND adopted AND class_id = ANY($2::text[])'", "WHERE case_id = $1 AND false AND class_id = ANY($2::text[])'", 'a protected class forgotten after reprocessing (C-FRD-6)', GT],
+  ['src/pipeline/stages-e3.ts', 'const overrideGranted = suspect && (await d.db.query', 'const overrideGranted = false && (await d.db.query', 'the exception has no effect (C-DRF-10)', GT],
+  // code review round 2 (D1–D6)
+  ['src/pipeline/rollout.ts', "AND bound_fields_sha256 IS NULL FOR UPDATE)", "AND false FOR UPDATE)", 'an unbound task kept at start-up (D1)', GT],
+  ['src/pipeline/rollout.ts', "WHERE EXISTS (SELECT 1 FROM verification_task t WHERE t.case_id = c.id AND t.state <> 'invalidated' AND t.bound_fields_sha256 IS NULL)\n         OR (", 'WHERE (', 'a Case with only unbound tasks not visited at start-up (D1)', GT],
+  ['src/pipeline/rollout.ts', "export const RERUN_FROM: Stage = 'fields'", "export const RERUN_FROM: Stage = 'reply'", 'the restored class keeps the old fields and risk (D2)', GT],
+  ['src/pipeline/rollout.ts', "export const RERUN_FROM: Stage = 'fields'", "export const RERUN_FROM: Stage = 'risk'", 'the restored class keeps the old fields (D2)', GT],
+  ['src/pipeline/rollout.ts', "'WITH gone AS (DELETE FROM rollout_lapsed_reply RETURNING reply_id, case_id) SELECT reply_id, case_id FROM gone ORDER BY reply_id'", "'WITH gone AS (DELETE FROM rollout_lapsed_reply RETURNING reply_id) SELECT g.reply_id, r.case_id FROM gone g LEFT JOIN reply r ON r.id = g.reply_id ORDER BY g.reply_id'", 'the lapse audit read through the reply, lost when it is deleted (D3)', GT],
+  ['src/pipeline/stages-e3.ts', 'AND (t.bound_fields_sha256 IS NOT NULL OR NOT EXISTS', 'AND (false OR NOT EXISTS', 'confirming an unchanged value voids a bound task after a fields run (D4)', GT],
+  ['src/pipeline/rollout.ts', "      failed++\n", "      throw e\n", 'one bad Case stops the start-up (D5)', GT],
+  ['src/store/migrations/009_fraud_gates.sql', "approved_manual_revision = NULL WHERE status = 'approved';", "approved_manual_revision = NULL WHERE status = 'approved' AND case_id IN (SELECT id FROM \"case\" WHERE closed_at IS NULL);", 'an approval on a closed Case kept after the upgrade (D6)', GT],
 ]
 
 // the parity test with the Python oracle is a separate CI step; its result must not count as a catch here

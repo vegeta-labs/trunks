@@ -39,6 +39,7 @@ import { LlmOutputError, SetupError, type LlmAdapter, type LlmRequest } from '..
 import { inputSha } from '../adapters/llm/replay.ts'
 import { CLASS_TEXT, FIELD_TEXT } from './prompts/catalogue.ts'
 import { fieldSchema, fieldsFor, modelFields, resolveFields, type FieldOutput, type FieldResult } from '../lib/fields.ts'
+import { PROTECTED_CLASSES } from '../lib/gates.ts'
 import { prepEmit, prepLink, prepReply, prepRisk, prepRoute } from './stages-e3.ts'
 
 export interface StageDeps {
@@ -76,12 +77,13 @@ export interface CaseRow {
   manual_revision: number
   snapshot_id: string
   flags: string[]
+  closed_at: Date | null // PRD C-FRD-8: read under the Case row lock
 }
 
 // ---------- shared loaders ----------
 
 async function caseRow(c: Pick<Tx, 'query'>, caseId: string, lock = false): Promise<CaseRow> {
-  const r = await c.query<CaseRow>(`SELECT id, message_id, processing_generation, manual_revision, snapshot_id, flags FROM "case" WHERE id = $1${lock ? ' FOR UPDATE' : ''}`, [caseId])
+  const r = await c.query<CaseRow>(`SELECT id, message_id, processing_generation, manual_revision, snapshot_id, flags, closed_at FROM "case" WHERE id = $1${lock ? ' FOR UPDATE' : ''}`, [caseId])
   if (!r.rows[0]) throw new Error(`case ${caseId} not found`)
   return r.rows[0]
 }
@@ -730,9 +732,13 @@ async function prepFields(d: StageDeps, cr: CaseRow): Promise<Prepared> {
   const cls = await resultOf<ClassifyResult>(d, cr.id, 'classify', gen)
   if (!cls) throw new Error('no classification for this generation')
   const configured = Object.fromEntries(d.config.classes.map((c) => [c.id, c.fields]))
-  // C-RSK-2 v0.7.28: a bank_details rule label the risk step wrote asks for its fields too (the restart below in prepRisk)
-  const bankRule = !cls.adopted.includes('bank_details') && (await d.db.query(`SELECT 1 FROM case_label WHERE case_id = $1 AND class_id = 'bank_details' AND source = 'rule' LIMIT 1`, [cr.id])).rows.length > 0
-  const fields = fieldsFor(bankRule ? [...cls.adopted, 'bank_details'] : cls.adopted, configured)
+  // C-RSK-2 v0.7.28: a bank_details rule label the risk step wrote asks for its fields too (the restart below in prepRisk);
+  // C-FRD-6: so does a protected class adopted in an earlier generation, which the Case keeps
+  const persisted = (await d.db.query<{ class_id: string }>(
+    `SELECT DISTINCT class_id FROM case_label WHERE case_id = $1 AND class_id = ANY($2::text[]) AND (adopted OR source = 'rule') ORDER BY class_id`, [cr.id, PROTECTED_CLASSES],
+  )).rows.map((r) => r.class_id).filter((c) => !cls.adopted.includes(c))
+  const classes = [...cls.adopted, ...persisted]
+  const fields = fieldsFor(classes, configured)
   const asked = modelFields(fields)
   const view = await modelView(d, cr, gen)
   // the provider refuses structured-output schemas past about nine fields: at most eight fields per call
@@ -767,7 +773,7 @@ async function prepFields(d: StageDeps, cr: CaseRow): Promise<Prepared> {
       valueDates: [...new Set((ex?.evidence ?? []).flatMap((e) => (e.valueDate ? [e.valueDate] : [])))],
     },
   })
-  const out: FieldsResult = { classes: bankRule ? [...cls.adopted, 'bank_details'] : cls.adopted, fields: res, modelFailed: call?.failed ?? false }
+  const out: FieldsResult = { classes, fields: res, modelFailed: call?.failed ?? false }
   return {
     kycJudgements: view.judgements,
     inputHash: sha256(JSON.stringify([view.user, system, out.classes, ex, cr.snapshot_id, d.llm?.id])),
@@ -884,7 +890,8 @@ export async function markFailed(d: Pick<StageDeps, 'db' | 'k'>, stage: Stage, j
   const reason = failureCode(error)
   await tx(d.db, async (c) => {
     const cr = await caseRow(c, job.caseId, true)
-    if (cr.processing_generation !== job.generation) return
+    // C-FRD-8: a closed Case stays closed
+    if (cr.processing_generation !== job.generation || cr.closed_at !== null) return
     await c.query(`UPDATE "case" SET status = 'failed', failed_stage = $2, failed_reason = $3 WHERE id = $1`, [cr.id, stage, reason])
     // the reason code in plain text; the error's own text only in the encrypted detail (tech design v0.7.15)
     await appendAudit(c, d.k, [{ actor: 'system', type: 'stage.failed', caseId: cr.id, payload: { stage, generation: job.generation, reason }, detail: { error: originalText(error).slice(0, 500) } }])

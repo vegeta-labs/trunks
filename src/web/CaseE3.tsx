@@ -1,14 +1,16 @@
 // E3 review panels (PRD R-REV-02 to R-REV-05, R-RTE-03): links, risk, labels, fields, suggested actions, replies with
 // approval and copy, verification tasks, routing. Every text is plain text; nothing is sent from here — a person
 // copies the approved reply into their own mail client (decision 5).
-import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
+import { createContext, Fragment, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { api, ApiError, type SessionUser } from './api.ts'
 import type { ApprovalFailure } from '../lib/verification.ts'
 import { STATIC_DEMO } from './static-demo.ts'
-import { displayName, RISK_NOTE } from './presentation.ts'
+import { displayName, editInput, editValue, optionText, problemText, riskReasonText, RISK_NOTE, SECOND_APPROVER_NOTE } from './presentation.ts'
 
-/** The static demo is read-only: change controls are not rendered at all (PRD R-DEMO-02 v0.7.25). */
-const Change = ({ children }: { children: ReactNode }) => (STATIC_DEMO ? null : <>{children}</>)
+/** A closed Case takes no change (PRD C-FRD-8); the static demo is read-only too (R-DEMO-02 v0.7.25). */
+const ClosedCase = createContext(false)
+const useReadOnly = () => useContext(ClosedCase) || STATIC_DEMO
+const Change = ({ children }: { children: ReactNode }) => (useReadOnly() ? null : <>{children}</>)
 
 export interface Meta {
   classes: Array<{ id: string; riskFloor: string }>
@@ -46,33 +48,18 @@ export interface E3 {
   actions: Array<{ action: string; details: string | null }>
   autoTemplate: string | null
   allowedTemplates: string[]
-  replies: Array<{ id: string; templateId: string; source: string; edited: boolean; recipient: string | null; subject: string; text: string; status: string; checkOk: boolean; problems: string[]; removed: number; bodyEditable: boolean; createdAt: string; outOfDate: boolean }>
+  replies: Array<{ id: string; templateId: string; source: string; edited: boolean; recipient: string | null; subject: string; text: string; status: string; checkOk: boolean; problems: string[]; removed: number; bodyEditable: boolean; createdAt: string; outOfDate: boolean; needsSecondApprover?: boolean }>
   allowedRecipients: string[]
+  closed?: boolean // PRD C-FRD-8
+  closeBlockers?: string[] // C-FRD-7
+  senderSuspect?: boolean // C-DRF-10
+  recipientOverride?: { reason: string | null } | null
   verification: Array<{ id: string; kind: string; state: string; checklist: Array<{ id: string; text: string; checked: boolean }>; phone: string | null; notifyRecipient: string | null; notifySubject: string | null; notifyText: string | null; notifyProblems: string[]; completedBy: string | null; coolingUntil: string | null; approvedBy: string | null; impersonatedContact: string | null; approvalFailures: ApprovalFailure[] }>
   due: { at: string | null; state: string | null; followUpAt: string | null }
   assignee: string | null
   outcome: string | null
 }
 
-const CLAUSE_TEXT: Record<string, string> = {
-  'C-RSK-2:display_name_mismatch': 'Display name matches a contact, address does not',
-  'C-RSK-2:lookalike_domain': 'Look-alike domain',
-  'C-RSK-2:hidden_text': 'Hidden text',
-  'C-RSK-2:injection_markers': 'Instruction-like phrases',
-  'C-RSK-2:message_id_collision': 'Message-ID seen before with other content',
-  'C-RSK-2:first_time_sender_account': 'First mail from this address, with an account number',
-  'C-RSK-2:uetr_candidate_invalid': 'A UETR-like value that is not valid',
-  'C-RSK-2:amount_mismatch': 'Attachment amounts differ from the mail',
-  'C-RSK-2:attachment_blocked_or_over_limit': 'An attachment was blocked or over the limit',
-  'C-RSK-2a:auth_fail': 'Authentication failed (+1)',
-  'C-RSK-2a:untrusted_auth_header': 'Authentication header from an unknown server (+1)',
-  'C-RSK-2a:reply_to_mismatch': 'Reply-To differs from From (+1)',
-  'C-RSK-2a:pressure': 'Pressure words in a payment or account mail (+1)',
-  'C-RSK-2a:closing': 'Planned close within 3 working days (+1)',
-}
-export const riskReasonText = (clause: string) => CLAUSE_TEXT[clause] ?? clause
-const PROBLEM_TEXT = (p: string) =>
-  p.startsWith('internal_terms:') ? `Internal wording not allowed in a reply: ${p.slice(15).split('|').join(', ')}` : ({ placeholder_left: 'A value is missing', no_recipient: 'No recipient', recipient_not_allowed: 'This recipient is not allowed' } as Record<string, string>)[p] ?? p
 const STATUS_TEXT: Record<string, string> = { draft: 'Draft', approved: 'Approved, waiting to be sent by a person', sent: 'Marked as sent', rejected: 'Rejected' }
 const DUE_TEXT: Record<string, string> = { ok: 'on time', due_soon: 'due soon', overdue: 'overdue' }
 // R-REV-04 v0.7.20: a clipboard write that has not finished by then counts as failed
@@ -129,8 +116,9 @@ export function actionText(a: E3['actions'][number]): string {
 
 export function E3Panels({ caseId, e3, user, meta, reload, signals }: { caseId: string; e3: E3; user: SessionUser; meta: Meta | null; reload: (notice?: string) => void; signals?: ReactNode }) {
   return (
-    <>
-      {!e3.complete && <p className="banner" role="status">Reprocessing after a change… approving and copying wait until it finishes.</p>}
+    <ClosedCase.Provider value={e3.closed === true}>
+      {e3.closed && <p className="banner" role="status">This case is closed. It can no longer be changed.</p>}
+      {!e3.complete && !e3.closed && <p className="banner" role="status">Reprocessing after a change… approving and copying wait until it finishes.</p>}
       <RiskPanel caseId={caseId} e3={e3} user={user} reload={reload} />
       {signals}
       <LinksPanel caseId={caseId} e3={e3} reload={reload} />
@@ -142,9 +130,9 @@ export function E3Panels({ caseId, e3, user, meta, reload, signals }: { caseId: 
         {STATIC_DEMO && <p className="meta">Suggested only — no action is performed here.</p>}
       </Panel>
       {e3.verification.map((t) => <VerificationPanel key={t.id} caseId={caseId} task={t} user={user} reload={reload} />)}
-      <RepliesPanel caseId={caseId} e3={e3} reload={reload} />
-      <RoutingPanel caseId={caseId} e3={e3} meta={meta} reload={reload} />
-    </>
+      <RepliesPanel caseId={caseId} e3={e3} user={user} reload={reload} />
+      <RoutingPanel caseId={caseId} e3={e3} user={user} meta={meta} reload={reload} />
+    </ClosedCase.Provider>
   )
 }
 
@@ -171,6 +159,7 @@ function RiskPanel({ caseId, e3, user, reload }: { caseId: string; e3: E3; user:
   const [level, setLevel] = useState('')
   const [reason, setReason] = useState('')
   const a = useAction(reload)
+  const readOnly = useReadOnly()
   if (!e3.risk) return null
   return (
     <Panel title="Risk">
@@ -182,7 +171,7 @@ function RiskPanel({ caseId, e3, user, reload }: { caseId: string; e3: E3; user:
       {e3.risk.held && (
         <div className="banner" role="status">
           <p>A change by a person would lower the risk to {e3.risk.applied}. It stays {e3.risk.held} until an approver confirms the lower risk.</p>
-          {user.role !== 'reviewer' && !STATIC_DEMO && (
+          {user.role !== 'reviewer' && !readOnly && (
             <div className="inline-form">
               <input aria-label="Reason for accepting the lower risk" placeholder="Reason" value={reason} onChange={(e) => setReason(e.target.value)} />
               <button className="secondary" disabled={!reason.trim() || a.busy} onClick={() => void a.run(() => api('POST', `/api/cases/${caseId}/risk/confirm-lower`, { reason, level: e3.risk!.applied }))}>Accept the lower risk</button>
@@ -193,7 +182,7 @@ function RiskPanel({ caseId, e3, user, reload }: { caseId: string; e3: E3; user:
       {e3.risk.floor && <p className="meta">Class floor: {e3.risk.floor.classes.map((c) => e3.low.includes(c) ? `possible ${displayName(c)} (low confidence)` : displayName(c)).join(', ')} → {e3.risk.floor.level}</p>}
       {e3.risk.clauses.length > 0 && (
         <ul className="signals">
-          {e3.risk.clauses.map((c) => <li key={c} className="on">{CLAUSE_TEXT[c] ?? c}</li>)}
+          {e3.risk.clauses.map((c) => <li key={c} className="on">{riskReasonText(c)}</li>)}
         </ul>
       )}
       <Change>
@@ -219,8 +208,9 @@ function LinksPanel({ caseId, e3, reload }: { caseId: string; e3: E3; reload: (n
   const l = e3.links
   if (!l) return null
   const set = (kind: string, target: string | null) => void a.run(() => api('PUT', `/api/cases/${caseId}/links/${kind}`, { target }))
+  const readOnly = useReadOnly()
   const Pick = ({ kind, current, candidates }: { kind: string; current: string | null; candidates: string[] }) =>
-    candidates.length > 0 && STATIC_DEMO ? (
+    candidates.length > 0 && readOnly ? (
       // the demo shows what the system found, as text (self-test F5)
       <span className="meta">candidates: {candidates.join(', ')}</span>
     ) : candidates.length > 0 ? (
@@ -259,6 +249,7 @@ export function LabelsPanel({ caseId, e3, meta, reload }: { caseId: string; e3: 
   const [reason, setReason] = useState('')
   const a = useAction(reload)
   const change = (body: object) => void a.run(() => api('POST', `/api/cases/${caseId}/labels`, { ...body, reason }))
+  const closed = e3.closed === true || STATIC_DEMO // LabelsPanel is outside E3Panels' provider
   return (
     <Panel title="Email type">
       {e3.evidenceAccounts && (
@@ -270,49 +261,74 @@ export function LabelsPanel({ caseId, e3, meta, reload }: { caseId: string; e3: 
         {e3.adopted.map((c) => (
           <li key={c} className="tag">
             {displayName(c)}
-            {e3.ruleLabels.includes(c) ? <span className="meta"> (rule)</span> : STATIC_DEMO ? null : <button className="link" aria-label={`Remove ${c}`} onClick={() => change({ remove: [c] })}> ×</button>}
+            {e3.ruleLabels.includes(c) ? <span className="meta"> (rule)</span> : closed ? null : <button className="link" aria-label={`Remove ${c}`} onClick={() => change({ remove: [c] })}> ×</button>}
           </li>
         ))}
         {e3.low.map((c) => <li key={c} className="tag confirm">{displayName(c)} (low confidence — needs confirmation; counts for risk)</li>)}
       </ul>
       {e3.removed.length > 0 && (
         <ul className="removed">
-          {e3.removed.map((x) => <li key={x.classId} className="meta"><s>{x.classId}</s> removed by {x.by ?? 'a person'}{x.reason ? `: ${x.reason}` : ''}</li>)}
+          {e3.removed.map((x) => <li key={x.classId} className="meta"><s>{displayName(x.classId)}</s> removed by {x.by ?? 'a person'}{x.reason ? `: ${x.reason}` : ''}</li>)}
         </ul>
       )}
-      {e3.pendingAdopted && <p className="meta" role="status">After the re-run: {e3.pendingAdopted.join(', ') || 'no class'}</p>}
-      <Change>
+      {e3.pendingAdopted && <p className="meta" role="status">After the re-run: {e3.pendingAdopted.map(displayName).join(', ') || 'no class'}</p>}
+      {!closed && <Change>
       <div className="inline-form">
         <select aria-label="Add a class" value={add} onChange={(e) => setAdd(e.target.value)}>
           <option value="">Add a class…</option>
           {(meta?.classes ?? []).filter((c) => !e3.adopted.includes(c.id)).map((c) => <option key={c.id} value={c.id}>{displayName(c.id)}</option>)}
         </select>
         <button className="secondary" disabled={!add || a.busy} onClick={() => change({ add: [add] })}>Add</button>
-        <input aria-label="Reason for the class change" placeholder="Reason (needed when it lowers the risk)" value={reason} onChange={(e) => setReason(e.target.value)} />
+        <input aria-label="Reason for the class change" placeholder="Reason (needed to remove bank details or identity change, or when it lowers the risk)" value={reason} onChange={(e) => setReason(e.target.value)} />
       </div>
-      </Change>
+      </Change>}
       <Err text={a.error} />
     </Panel>
   )
 }
 
-export function FieldActions({ caseId, field, confirmed, reload }: { caseId: string; field: string; confirmed: boolean; reload: (notice?: string) => void }) {
+export function FieldActions({ caseId, field, confirmed, closed = false, reload }: { caseId: string; field: string; confirmed: boolean; closed?: boolean; reload: (notice?: string) => void }) {
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState('')
+  const [picked, setPicked] = useState<string[]>([])
+  // every edit starts empty, so a later Save never re-sends an earlier choice (TC-REV-18 review m1)
+  const toggle = (open: boolean) => {
+    setValue('')
+    setPicked([])
+    setEditing(open)
+  }
   const a = useAction((notice) => {
-    setEditing(false)
+    toggle(false)
     reload(notice)
   })
   if (confirmed) return <span className="tag ok">confirmed</span>
-  if (STATIC_DEMO) return null
+  if (STATIC_DEMO || closed) return null
+  const input = editInput(field)
+  const label = `New value for ${displayName(field)}`
   return (
     <span className="field-actions">
       <button className="link" onClick={() => void a.run(() => api('PUT', `/api/cases/${caseId}/fields/${field}`, { confirm: true }))}>Confirm</button>{' '}
-      <button className="link" onClick={() => setEditing(!editing)}>Edit</button>
+      <button className="link" onClick={() => toggle(!editing)}>Edit</button>
       {editing && (
         <span className="inline-form">
-          <input aria-label={`New value for ${field}`} value={value} onChange={(e) => setValue(e.target.value)} />
-          <button className="secondary" onClick={() => void a.run(() => api('PUT', `/api/cases/${caseId}/fields/${field}`, { value: value.trim() === '' ? null : value.trim() }))}>Save</button>
+          {input.kind === 'boolean' ? (
+            <select aria-label={label} value={value} onChange={(e) => setValue(e.target.value)}>
+              <option value="">No value</option>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          ) : input.kind === 'list' ? (
+            <span role="group" aria-label={label}>
+              {input.options.map((o) => (
+                <label key={o} className="check">
+                  <input type="checkbox" checked={picked.includes(o)} onChange={(e) => setPicked(e.target.checked ? [...picked, o] : picked.filter((x) => x !== o))} /> {optionText(o)}
+                </label>
+              ))}
+            </span>
+          ) : (
+            <input aria-label={label} value={value} onChange={(e) => setValue(e.target.value)} />
+          )}
+          <button className="secondary" onClick={() => void a.run(() => api('PUT', `/api/cases/${caseId}/fields/${field}`, { value: editValue(input, value, picked) }))}>Save</button>
         </span>
       )}
       <Err text={a.error} />
@@ -323,11 +339,33 @@ export function FieldActions({ caseId, field, confirmed, reload }: { caseId: str
 // PRD R-DEMO-02 v0.7.25: the demo shows no approval controls, so it says how a reply leaves a real deployment
 export const DEMO_REPLY_NOTE = 'In a real deployment, approve and copy the reply, then send it from your own mail client. Trunks cannot send email.'
 
-function RepliesPanel({ caseId, e3, reload }: { caseId: string; e3: E3; reload: (notice?: string) => void }) {
+function SenderOverride({ caseId, e3, user, reload }: { caseId: string; e3: E3; user: SessionUser; reload: (notice?: string) => void }) {
+  const [reason, setReason] = useState('')
+  const a = useAction(reload)
+  if (!e3.senderSuspect) return null
+  if (e3.recipientOverride) return <p className="meta">An approver allowed replying to the original address: {e3.recipientOverride.reason ?? 'no reason shown'}</p>
+  return (
+    <div className="banner" role="status">
+      <p>This sender's name or domain imitates a known contact, so this reply has no allowed recipient.</p>
+      <Change>
+        {user.role === 'reviewer' ? <p className="meta">An approver or admin can allow replying to the original address, with a reason.</p> : (
+          <div className="inline-form">
+            <input aria-label="Reason for allowing the reply to the original address" placeholder="Reason" value={reason} onChange={(e) => setReason(e.target.value)} />
+            <button className="secondary" disabled={!reason.trim() || a.busy} onClick={() => void a.run(() => api('POST', `/api/cases/${caseId}/recipient-override`, { reason }))}>Allow reply to the original address</button>
+          </div>
+        )}
+      </Change>
+      <Err text={a.error} />
+    </div>
+  )
+}
+
+function RepliesPanel({ caseId, e3, user, reload }: { caseId: string; e3: E3; user: SessionUser; reload: (notice?: string) => void }) {
   if (e3.replies.length === 0) return <Panel title="Reply">{STATIC_DEMO && <p className="meta">{DEMO_REPLY_NOTE}</p>}<p className="meta">No reply is drafted for this Case.</p></Panel>
   return (
     <Panel title="Reply">
       <p className="meta">{STATIC_DEMO ? DEMO_REPLY_NOTE : 'Nothing is sent from here: copy the approved reply into your mail client, then mark it as sent.'}</p>
+      <SenderOverride caseId={caseId} e3={e3} user={user} reload={reload} />
       <details><summary>How replies are prepared</summary><p>Templates are chosen by the rules{e3.autoTemplate ? ` (now: ${e3.autoTemplate})` : ''}. Reply subjects use a fixed template.</p></details>
       {e3.replies.map((r) => <ReplyCard key={r.id} caseId={caseId} r={r} e3={e3} reload={reload} />)}
     </Panel>
@@ -337,6 +375,7 @@ function RepliesPanel({ caseId, e3, reload }: { caseId: string; e3: E3; reload: 
 function ReplyCard({ caseId, r, e3, reload }: { caseId: string; r: E3['replies'][number]; e3: E3; reload: (notice?: string) => void }) {
   const [text, setText] = useState(r.text)
   const a = useAction(reload)
+  const readOnly = useReadOnly()
   const url = `/api/cases/${caseId}/replies/${r.id}`
   // every copy asks the server first (C-DRF-8 re-check) and copies what it returns now: nothing cached in the page
   // can outlive a rejection, a change or a re-run (Codex E3 F2)
@@ -408,8 +447,9 @@ function ReplyCard({ caseId, r, e3, reload }: { caseId: string; r: E3['replies']
       <dl className="facts">
         <dt>To</dt>
         <dd>
-          {r.status === 'draft' && e3.allowedRecipients.length > 1 && !STATIC_DEMO ? (
-            <select aria-label="Recipient" value={r.recipient ?? ''} onChange={(e) => void a.run(() => api('POST', `${url}/revise`, { recipient: e.target.value }))}>
+          {r.status === 'draft' && !r.outOfDate && !readOnly && (e3.allowedRecipients.length > 1 || (e3.allowedRecipients.length === 1 && e3.allowedRecipients[0] !== r.recipient)) ? (
+            <select aria-label="Recipient" value={r.recipient ?? ''} onChange={(e) => e.target.value && void a.run(() => api('POST', `${url}/revise`, { recipient: e.target.value }))}>
+              {!r.recipient && <option value="">Choose the recipient…</option>}
               {e3.allowedRecipients.map((x) => <option key={x} value={x}>{x}</option>)}
             </select>
           ) : (r.recipient ?? '—')}
@@ -417,7 +457,7 @@ function ReplyCard({ caseId, r, e3, reload }: { caseId: string; r: E3['replies']
         <dt>Subject</dt>
         <dd>{r.subject}</dd>
       </dl>
-      {r.status === 'draft' && r.bodyEditable && !r.outOfDate && !STATIC_DEMO ? (
+      {r.status === 'draft' && r.bodyEditable && !r.outOfDate && !readOnly ? (
         <textarea aria-label="Reply text" value={text} rows={Math.min(14, text.split('\n').length + 2)} onChange={(e) => setText(e.target.value)} />
       ) : (
         <pre className="body">{r.text}</pre>
@@ -425,14 +465,15 @@ function ReplyCard({ caseId, r, e3, reload }: { caseId: string; r: E3['replies']
       <details><summary>Template reference</summary><code>{r.templateId}</code></details>
       {!r.bodyEditable && r.status === 'draft' && <p className="meta">This reply's text is fixed and cannot be edited.</p>}
       {r.removed > 0 && <p className="meta">{r.removed} sentence{r.removed > 1 ? 's were' : ' was'} left out because a value is missing.</p>}
-      {r.problems.length > 0 && <ul className="flags">{r.problems.map((p) => <li key={p}>{PROBLEM_TEXT(p)}</li>)}</ul>}
+      {r.needsSecondApprover && <p className="meta">{SECOND_APPROVER_NOTE}</p>}
+      {r.problems.length > 0 && <ul className="flags">{r.problems.map((p) => <li key={p}>{problemText(p)}</li>)}</ul>}
       <Change>
       <div className="inline-form">
         {r.status === 'draft' && r.bodyEditable && text !== r.text && <button className="secondary" disabled={a.busy} onClick={() => void a.run(() => api('POST', `${url}/revise`, { text }))}>Save text</button>}
         {r.status === 'draft' && !r.outOfDate && e3.allowedTemplates.length > 0 && (
           <select aria-label="Use another template" value="" onChange={(e) => e.target.value && void a.run(() => api('POST', `${url}/revise`, { templateId: e.target.value }))}>
             <option value="">Use another template…</option>
-            {e3.allowedTemplates.filter((t) => t !== r.templateId).map((t) => <option key={t} value={t}>{t}</option>)}
+            {e3.allowedTemplates.filter((t) => t !== r.templateId).map((t) => <option key={t} value={t}>{displayName(t)}</option>)}
           </select>
         )}
         {r.status === 'draft' && !r.outOfDate && <button disabled={a.busy || !e3.complete || text !== r.text} onClick={() => void a.run(() => api('POST', `${url}/approve`))}>Approve</button>}
@@ -442,7 +483,7 @@ function ReplyCard({ caseId, r, e3, reload }: { caseId: string; r: E3['replies']
         {r.status === 'approved' && !r.outOfDate && <button className="secondary" disabled={a.busy} onClick={() => void a.run(() => api('POST', `${url}/sent`))}>Mark as sent</button>}
       </div>
       </Change>
-      {(r.status === 'approved' || r.status === 'sent') && !r.outOfDate && !STATIC_DEMO && (
+      {(r.status === 'approved' || r.status === 'sent') && !r.outOfDate && !readOnly && (
         <div className="copy">
           <button className="secondary" disabled={!e3.complete} onClick={() => void copy('recipient')}>Copy recipient</button>
           <button className="secondary" disabled={!e3.complete} onClick={() => void copy('subject')}>Copy subject</button>
@@ -481,8 +522,8 @@ function VerificationPanel({ task, user, reload }: { caseId: string; task: E3['v
         <dd>{task.phone}</dd>
       </dl>
       {task.state === 'checklist_done' && (completerFailures.length > 0 || otherFailures.length > 0) && <div className="banner" role="status">
-        <p>{completerFailures.length ? 'With the current account history, this task cannot be approved (C-FRD-5).' : 'You cannot approve this task (C-FRD-5).'}</p>
-        <ul>{(completerFailures.length ? completerFailures : otherFailures).map((f) => <li key={`${f.subject}-${f.code}`}>{f.reason} (C-FRD-5)</li>)}</ul>
+        <p>{completerFailures.length ? 'With the current account history, this task cannot be approved.' : 'You cannot approve this task.'}</p>
+        <ul>{(completerFailures.length ? completerFailures : otherFailures).map((f) => <li key={`${f.subject}-${f.code}`}>{f.reason}</li>)}</ul>
       </div>}
       {STATIC_DEMO && <p className="meta">This demo shows the verification checklist. In a real deployment, a reviewer completes it before the cooling-off period and second-person approval.</p>}
       {!STATIC_DEMO && task.state === 'open' && ticked.length < task.checklist.length && <p className="meta">Tick every checklist item before marking the checklist done.</p>}
@@ -496,7 +537,7 @@ function VerificationPanel({ task, user, reload }: { caseId: string; task: E3['v
           </li>
         ))}
       </ul>
-      {task.notifyProblems.length > 0 && <ul className="flags">{task.notifyProblems.map((p) => <li key={p}>The message to the old contact cannot be sent: {PROBLEM_TEXT(p)}</li>)}</ul>}
+      {task.notifyProblems.length > 0 && <ul className="flags">{task.notifyProblems.map((p) => <li key={p}>The message to the old contact cannot be sent: {problemText(p)}</li>)}</ul>}
       {task.notifyText && (
         <details>
           <summary>Message to the old contact details ({task.notifyRecipient ?? 'no address on file'})</summary>
@@ -519,8 +560,12 @@ function VerificationPanel({ task, user, reload }: { caseId: string; task: E3['v
   )
 }
 
-function RoutingPanel({ caseId, e3, meta, reload }: { caseId: string; e3: E3; meta: Meta | null; reload: (notice?: string) => void }) {
+function RoutingPanel({ caseId, e3, user, meta, reload }: { caseId: string; e3: E3; user: SessionUser; meta: Meta | null; reload: (notice?: string) => void }) {
   const [outcome, setOutcome] = useState('')
+  const [closeReason, setCloseReason] = useState('')
+  const blockers = e3.closeBlockers ?? []
+  const readOnly = useReadOnly()
+  const canClose = blockers.length === 0 || user.role !== 'reviewer'
   const a = useAction(reload)
   const users = meta?.users ?? []
   return (
@@ -555,14 +600,25 @@ function RoutingPanel({ caseId, e3, meta, reload }: { caseId: string; e3: E3; me
       </Change>
       {e3.outcome ? (
         <p>Closed: {e3.outcome}</p>
-      ) : STATIC_DEMO ? null : (
-        <div className="inline-form">
-          <select aria-label="Outcome" value={outcome} onChange={(e) => setOutcome(e.target.value)}>
-            <option value="">Close with outcome…</option>
-            {(meta?.outcomes ?? []).map((o) => <option key={o} value={o}>{o}</option>)}
-          </select>
-          <button className="secondary" disabled={!outcome || a.busy} onClick={() => void a.run(() => api('POST', `/api/cases/${caseId}/close`, { outcome }))}>Close</button>
-        </div>
+      ) : readOnly ? null : (
+        <>
+          {blockers.length > 0 && (
+            <div className="banner" role="status">
+              <p>{user.role === 'reviewer' ? 'Only an approver or admin can close this case now, with a reason:' : 'This case is not ready to close. Closing it anyway needs a reason:'}</p>
+              <ul>{blockers.map((b) => <li key={b}>{b}</li>)}</ul>
+            </div>
+          )}
+          {canClose && (
+            <div className="inline-form">
+              <select aria-label="Outcome" value={outcome} onChange={(e) => setOutcome(e.target.value)}>
+                <option value="">Close with outcome…</option>
+                {(meta?.outcomes ?? []).map((o) => <option key={o} value={o}>{o}</option>)}
+              </select>
+              {blockers.length > 0 && <input aria-label="Reason for closing" placeholder="Reason" value={closeReason} onChange={(e) => setCloseReason(e.target.value)} />}
+              <button className="secondary" disabled={!outcome || a.busy || (blockers.length > 0 && !closeReason.trim())} onClick={() => void a.run(() => api('POST', `/api/cases/${caseId}/close`, { outcome, reason: closeReason }))}>Close</button>
+            </div>
+          )}
+        </>
       )}
       <Err text={a.error} />
     </Panel>

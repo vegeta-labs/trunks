@@ -1,4 +1,5 @@
 import { approvalFailures, type ApprovalFailure, type UserEvent } from '../lib/verification.ts'
+import { pageOf } from '../lib/paging.ts'
 import { hiddenTextView, type HiddenFinding } from '../lib/html.ts'
 import { Redactor } from '../lib/redact.ts'
 import { normalise, fromOriginal } from '../lib/text.ts'
@@ -12,8 +13,9 @@ import type { FileStore } from '../store/files.ts'
 import { loadMessage, stageResult, type ClassifyResult, type Extraction, type FieldsResult } from '../pipeline/stages.ts'
 import { loadSnapshot } from '../store/directory.ts'
 import type { Value } from '../lib/fields.ts'
-import { currentActions, effectiveFields, effectiveLabels, hadBankRuleLabel, outputGeneration, replyContext, taskContactOf, type LinkResult, type ReplyStageResult, type RiskStageResult } from '../pipeline/stages-e3.ts'
+import { caseClosureBlockers, currentActions, effectiveFields, effectiveLabels, hadBankRuleLabel, outputGeneration, protectedRuleLabels, render, replyContext, taskContactOf, type LinkResult, type ReplyStageResult, type RiskStageResult } from '../pipeline/stages-e3.ts'
 import { allowedManualTemplates, bodyEditable } from '../lib/draft.ts'
+import { closeBlockerText } from '../lib/gates.ts'
 import { CHECKLIST_TEXT, NO_PHONE_TEXT_EN } from '../lib/verification.ts'
 import { dueState } from '../lib/workdays.ts'
 import { calendar } from '../pipeline/stages-e3.ts'
@@ -45,7 +47,8 @@ export interface CaseFilter {
 
 const RISK_ORDER = `CASE c.risk WHEN 'high' THEN 0 WHEN 'medium' THEN 1 WHEN 'low' THEN 2 ELSE 3 END`
 
-export async function listCases(db: Db, k: Keyring, config: Config, f: CaseFilter): Promise<CaseListItem[]> {
+/** R-REV-01 v0.7.29: one page, and how many Cases the filters match in all. */
+export async function listCases(db: Db, k: Keyring, config: Config, f: CaseFilter): Promise<{ cases: CaseListItem[]; total: number }> {
   const where: string[] = []
   const args: unknown[] = []
   for (const key of ['status', 'queue', 'risk'] as const) {
@@ -54,26 +57,30 @@ export async function listCases(db: Db, k: Keyring, config: Config, f: CaseFilte
       where.push(`c.${key} = $${args.length}`)
     }
   }
-  args.push(Math.min(f.limit ?? 50, 200), f.offset ?? 0)
+  const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : ''
+  const total = (await db.query<{ n: number }>(`SELECT count(*)::int AS n FROM "case" c ${whereSql}`, args)).rows[0]!.n
+  const page = pageOf(f.limit, f.offset)
+  args.push(page.limit, page.offset)
   const r = await db.query(
     `SELECT c.id, m.received_at, m.mailbox_id, m.header_blob, c.status, c.risk, c.queue, c.due_at, c.flags, c.hold,
             coalesce(array_agg(s.signal) FILTER (WHERE s.value AND s.signal <> 'dmarc_pass'), '{}') AS signals
        FROM "case" c JOIN message m ON m.id = c.message_id LEFT JOIN case_signal s ON s.case_id = c.id
-      ${where.length ? `WHERE ${where.join(' AND ')}` : ''}
+      ${whereSql}
       GROUP BY c.id, m.id
-      ORDER BY ${RISK_ORDER}, c.due_at NULLS LAST, m.received_at DESC
+      ORDER BY ${RISK_ORDER}, c.due_at NULLS LAST, m.received_at DESC, c.id
       LIMIT $${args.length - 1} OFFSET $${args.length}`,
     args,
   )
   const blobs = await getBlobs(db, k, r.rows.map((x) => x.header_blob))
   const names = new Map(config.mailboxes.map((m) => [m.id, m.name]))
-  return r.rows.map((x) => {
+  const cases = r.rows.map((x) => {
     const h = JSON.parse(blobs.get(x.header_blob)!.toString('utf8')) as { from: string | null; from_name: string | null; subject: string | null }
     return {
       id: x.id, receivedAt: (x.received_at as Date).toISOString(), mailbox: names.get(x.mailbox_id) ?? x.mailbox_id, from: h.from, fromName: h.from_name, subject: h.subject,
       status: x.status, risk: x.risk, queue: x.queue, dueAt: x.due_at ? (x.due_at as Date).toISOString() : null, flags: x.flags, signals: x.signals, hold: x.hold,
     }
   })
+  return { cases, total }
 }
 
 export interface CaseDetail extends CaseListItem {
@@ -127,8 +134,12 @@ export interface CaseE3 {
   actions: Array<{ action: string; details: string | null }>
   autoTemplate: string | null
   allowedTemplates: string[]
-  replies: Array<{ id: string; templateId: string; source: string; edited: boolean; recipient: string | null; subject: string; text: string; status: string; checkOk: boolean; problems: string[]; removed: number; bodyEditable: boolean; createdAt: string; outOfDate: boolean }>
+  replies: Array<{ id: string; templateId: string; source: string; edited: boolean; recipient: string | null; subject: string; text: string; status: string; checkOk: boolean; problems: string[]; removed: number; bodyEditable: boolean; createdAt: string; outOfDate: boolean; needsSecondApprover: boolean }>
   allowedRecipients: string[]
+  closed: boolean // PRD C-FRD-8
+  closeBlockers: string[] // C-FRD-7: why a normal close is not possible now, in plain English
+  senderSuspect: boolean // C-DRF-10
+  recipientOverride: { reason: string | null } | null // C-DRF-10: the exception, if an approver gave one
   verification: Array<{ id: string; kind: string; state: string; checklist: Array<{ id: string; text: string; checked: boolean }>; phone: string | null; notifyRecipient: string | null; notifySubject: string | null; notifyText: string | null; notifyProblems: string[]; completedBy: string | null; coolingUntil: string | null; approvedBy: string | null; impersonatedContact: string | null; approvalFailures: ApprovalFailure[] }>
   due: { at: string | null; state: string | null; followUpAt: string | null }
   assignee: string | null
@@ -279,7 +290,7 @@ const sameSet = (a: readonly string[], b: readonly string[]) => a.length === b.l
 
 async function e3View(deps: { db: Db; k: Keyring; files: FileStore; config: Config }, id: string, messageId: string, viewer?: { id: string; role: string }): Promise<CaseE3 | null> {
   const { db, k, config } = deps
-  const c = (await db.query(`SELECT processing_generation, pipeline_complete_generation, manual_revision, risk, risk_by, risk_hold, due_at, follow_up_at, assignee, outcome, snapshot_id, status, m.received_at
+  const c = (await db.query(`SELECT "case".id, processing_generation, pipeline_complete_generation, manual_revision, risk, risk_by, risk_hold, due_at, follow_up_at, assignee, outcome, snapshot_id, status, closed_at, recipient_override_at, recipient_override_reason_blob, m.received_at
      FROM "case" JOIN message m ON m.id = "case".message_id WHERE "case".id = $1`, [id])).rows[0]
   const gen = c.processing_generation as number
   const done = c.pipeline_complete_generation as number | null
@@ -325,12 +336,12 @@ async function e3View(deps: { db: Db; k: Keyring; files: FileStore; config: Conf
   }).filter((f) => viewer || f.subject === 'completer')
   return {
     generation: gen, complete: done === gen, manualRevision: c.manual_revision, adopted: rp.labels.adopted, low: rp.labels.low, pendingAdopted: sameSet(labels.adopted, rp.labels.adopted) ? null : labels.adopted,
-    ruleLabels: [...new Set([...(cls?.labels ?? []).filter((l) => l.source === 'rule').map((l) => l.classId), ...((await hadBankRuleLabel(db, id)) ? ['bank_details'] : [])])],
+    ruleLabels: [...new Set([...(cls?.labels ?? []).filter((l) => l.source === 'rule').map((l) => l.classId), ...(await protectedRuleLabels(db, id))])],
     // not once the Case has the rule label, which C-RSK-2 v0.7.28 also writes: the line would then be false
     evidenceAccounts: cls?.evidenceExemption?.applied && !(await hadBankRuleLabel(db, id)) ? { payer: cls.evidenceExemption.payerLast4, beneficiary: cls.evidenceExemption.beneficiaryLast4 } : null,
     removed: changes.map((x) => ({ classId: x.class_id, by: nameOf(x.by_user), reason: x.reason_blob ? cb.get(x.reason_blob)!.toString('utf8') : null })),
     // the risk of the generation shown, beside its classes (self-review T2)
-    risk: { computed: rk.computed.level, final: rk.final, by: rk.by, clauses: rk.computed.clauses.filter((x) => x.hit).map((x) => x.id), floor: floorClasses.length ? { level: base, classes: floorClasses } : null, adjustment: adj ? { level: adj.level, state: adj.state } : null, held: c.risk_hold, applied: rk.applied ?? rk.final },
+    risk: { computed: rk.computed.level, final: rk.final, by: rk.by, clauses: rk.computed.clauses.filter((x) => x.hit).map((x) => x.id), floor: floorClasses.length ? { level: base, classes: floorClasses } : null, adjustment: adj ? { level: adj.level, state: adj.state } : null, held: c.risk_hold === null ? null : (rk.held ?? null), applied: rk.applied ?? rk.final },
     pendingRisk: c.risk && c.risk !== rk.final ? c.risk : null,
     links: {
       contact: contact ? { id: contact.contactId, name: contact.name } : null, contactCandidates: lk.links.contact.candidates,
@@ -342,8 +353,12 @@ async function e3View(deps: { db: Db; k: Keyring; files: FileStore; config: Conf
     actions: await currentActions(db, id, shown, rp), // the reply in use now (Codex round 2 F18)
     autoTemplate: rp.selection.template,
     allowedTemplates: allowedManualTemplates(ctx.select),
-    replies: replies.map((r) => ({ id: r.id, templateId: r.template_id, source: r.template_source, edited: r.edited, recipient: t(r.recipient_blob), subject: t(r.subject_blob)!, text: t(r.text_blob)!, status: r.status, checkOk: r.check_ok, problems: r.check_problems, removed: r.removed_sentences, bodyEditable: bodyEditable(r.template_id), createdAt: (r.created_at as Date).toISOString(), outOfDate: r.generation !== gen && (r.status === 'draft' || r.status === 'approved') })),
+    replies: replies.map((r) => ({ id: r.id, templateId: r.template_id, source: r.template_source, edited: r.edited, recipient: t(r.recipient_blob), subject: t(r.subject_blob)!, text: t(r.text_blob)!, status: r.status, checkOk: r.check_ok, problems: r.check_problems, removed: r.removed_sentences, bodyEditable: bodyEditable(r.template_id), createdAt: (r.created_at as Date).toISOString(), outOfDate: r.generation !== gen && (r.status === 'draft' || r.status === 'approved'), needsSecondApprover: r.status === 'draft' && r.generation === gen && (!config.templates.some((x) => x.id === r.template_id) || render(config, r.template_id, ctx.values).text !== t(r.text_blob)!) })),
     allowedRecipients: ctx.allowed,
+    closed: c.closed_at !== null,
+    closeBlockers: c.closed_at !== null ? [] : (await caseClosureBlockers(deps, c)).map(closeBlockerText),
+    senderSuspect: ctx.senderSuspect,
+    recipientOverride: c.recipient_override_at ? { reason: await getText(db, k, c.recipient_override_reason_blob) } : null,
     verification: tasks.map((x) => ({
       id: x.id, kind: x.kind, state: x.state, checklist: (x.checklist as string[]).map((i) => ({ id: i, text: CHECKLIST_TEXT[i as keyof typeof CHECKLIST_TEXT] ?? i, checked: (x.checked as string[]).includes(i) })),
       phone: t(x.phone_blob) ?? NO_PHONE_TEXT_EN, notifyRecipient: t(x.notify_recipient_blob), notifySubject: t(x.notify_subject_blob), notifyText: (x.notify_problems as string[]).length ? null : t(x.notify_text_blob), notifyProblems: x.notify_problems as string[],

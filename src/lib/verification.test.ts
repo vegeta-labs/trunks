@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { approvalFailures, canApprove, CHECKLIST, invalidated, phoneOnFile, taskContact, type ApproveInput, type UserEvent } from './verification.ts'
+import { approvalFailures, canApprove, CHECKLIST, invalidated, phoneOnFile, taskContact, taskFieldContent, type ApproveInput, type UserEvent } from './verification.ts'
 
 const H = 3_600_000
 const day = 24 * H
@@ -43,7 +43,7 @@ describe('two-person condition and cooling-off (C-FRD-5)', () => {
 })
 
 describe('task binding and content (C-FRD-4, C-FRD-5)', () => {
-  const bound = { manualRevision: 3, contactId: 'C001', checklist: [...CHECKLIST] }
+  const bound = { manualRevision: 3, contactId: 'C001', checklist: [...CHECKLIST], fieldsSha: 'f1' }
   it('TC-FRD-09 a change of revision, contact or checklist invalidates, approved tasks included', () => {
     for (const state of ['open', 'checklist_done', 'approved'] as const) {
       expect(invalidated({ ...bound, state }, bound)).toBe(false)
@@ -52,6 +52,19 @@ describe('task binding and content (C-FRD-4, C-FRD-5)', () => {
       expect(invalidated({ ...bound, state }, { ...bound, checklist: CHECKLIST.slice(1) })).toBe(true)
     }
     expect(invalidated({ ...bound, state: 'invalidated' }, { ...bound, manualRevision: 4 })).toBe(false)
+  })
+  it('TC-FRD-25 a change of the field content invalidates, approved tasks included; a task made before the binding (null) counts as changed', () => {
+    for (const state of ['open', 'checklist_done', 'approved'] as const) {
+      expect(invalidated({ ...bound, state }, { ...bound, fieldsSha: 'f2' })).toBe(true)
+      expect(invalidated({ ...bound, state, fieldsSha: null }, { ...bound, fieldsSha: 'f2' })).toBe(true)
+    }
+    expect(invalidated({ ...bound, state: 'invalidated' }, { ...bound, fieldsSha: 'f2' })).toBe(false)
+  })
+  it('TC-FRD-25 the field content: only the named fields, in a fixed order, values only, missing as null', () => {
+    const v: Record<string, unknown> = { b: 'x', a: ['name'], other: 'ignored' }
+    expect(taskFieldContent(['b', 'a', 'c'], (n) => v[n])).toBe('[["a",["name"]],["b","x"],["c",null]]')
+    expect(taskFieldContent(['a', 'b', 'a'], (n) => v[n])).toBe(taskFieldContent(['b', 'a'], (n) => v[n]))
+    expect(taskFieldContent(['a'], () => undefined)).toBe('[["a",null]]')
   })
   it('TC-FRD-04 / 05 phone from the contacts CSV only', () => {
     expect(phoneOnFile('+44 7700 900101')).toBe('+44 7700 900101')

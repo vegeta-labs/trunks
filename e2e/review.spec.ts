@@ -17,7 +17,10 @@ async function signIn(page: Page) {
     await page.getByRole('button', { name: 'Save' }).click()
   }
   await expect(page.getByRole('heading', { name: 'Cases' })).toBeVisible()
+  await expectMenus(page) // TC-REV-16: also straight after choosing a first password, with no reload
 }
+
+const expectMenus = (page: Page) => expect.poll(() => page.getByLabel('Queue', { exact: true }).locator('option').count()).toBeGreaterThan(1)
 
 test.describe.configure({ mode: 'serial' })
 
@@ -334,7 +337,7 @@ test('E2E-04 removing a class that lowers the risk needs an approver; risk and r
   await expect(page.locator('.tag.risk-low').first()).toBeVisible({ timeout: 10_000 })
   await expect(page.getByTestId('reply').filter({ hasText: 'bank_letter_info' })).toBeVisible()
   // approved earlier; the change since then lapses the approval as soon as the new reply is ready, not at the next copy
-  const old = page.getByTestId('reply').filter({ has: page.locator('span.tag', { hasText: /^complaint_ack$/ }) })
+  const old = page.getByTestId('reply').filter({ has: page.locator('span.tag', { hasText: /^Acknowledge complaint$/ }) })
   await expect(old).toContainText('Out of date')
   await expect(old.getByRole('button', { name: /^Copy|Mark as sent|Approve/ })).toHaveCount(0)
   await expect(page.getByText('Approved, waiting')).toHaveCount(0)
@@ -360,9 +363,9 @@ test('TC-REV-09 wording and display (D8): class floor, subject note, monospace a
   // after E2E-04: complaint was removed by paul with a reason
   await page.goto('/')
   await openCase(page, 'Bank letter please')
-  await expect(page.locator('ul.removed')).toContainText('complaint removed by paul: the mail only asks for a bank letter')
+  await expect(page.locator('ul.removed')).toContainText('Complaint removed by paul: the mail only asks for a bank letter')
   await expect(page.locator('ul.removed s', { hasText: 'complaint' })).toBeVisible()
-  const old = page.getByTestId('reply').filter({ has: page.locator('span.tag', { hasText: /^complaint_ack$/ }) })
+  const old = page.getByTestId('reply').filter({ has: page.locator('span.tag', { hasText: /^Acknowledge complaint$/ }) })
   await expect(old).toContainText('Out of date')
   await expect(old.getByRole('button', { name: 'Reject' })).toHaveCount(0)
   const actions = page.locator('ul.actions')
@@ -500,6 +503,38 @@ test('TC-REV-11 a field refusal keeps its reason after refreshing the Case', asy
   await expect.poll(() => loads).toBeGreaterThan(0)
 })
 
+test('TC-REV-18 a person edits a yes/no field and a list field, and the server keeps the values', async ({ page }) => {
+  await control('/ingest', { from: 'Amelia Hart <amelia@hartfamily.example>', subject: 'New bank details edit test', text: 'Please use my new bank account GB33 BUKB 2020 1555 5555 55.' })
+  await control('/ingest', { from: 'Amelia Hart <amelia@hartfamily.example>', subject: 'Update my contact details edit test', text: 'Please change my email and phone number.' })
+  await signInAs(page, 'rita')
+  const row = (name: string) => page.locator('dl.fields dt', { hasText: name }).locator('xpath=following-sibling::dd[1]')
+  await openCase(page, 'New bank details edit test')
+  const changed = row('Change requested')
+  await expect(changed).not.toContainText('yes')
+  await changed.getByRole('button', { name: 'Edit', exact: true }).click()
+  // a closed and reopened form starts empty (review m1)
+  await changed.getByLabel('New value for Change requested').selectOption('No')
+  await changed.getByRole('button', { name: 'Edit', exact: true }).click()
+  await changed.getByRole('button', { name: 'Edit', exact: true }).click()
+  await expect(changed.getByLabel('New value for Change requested')).toHaveValue('')
+  await changed.getByLabel('New value for Change requested').selectOption('Yes')
+  await changed.getByRole('button', { name: 'Save', exact: true }).click()
+  await expect(changed).toContainText('yes')
+  await expect(changed.getByText('confirmed', { exact: true })).toBeVisible()
+  await expect(page.getByRole('alert')).toHaveCount(0)
+  await page.getByRole('button', { name: '← All cases' }).click()
+  await openCase(page, 'Update my contact details edit test')
+  const details = row('Details to change')
+  await expect(details).not.toContainText('email, phone')
+  await details.getByRole('button', { name: 'Edit', exact: true }).click()
+  const group = details.getByRole('group', { name: 'New value for Details to change' })
+  await group.getByLabel('Phone').check()
+  await group.getByLabel('Email').check()
+  await details.getByRole('button', { name: 'Save', exact: true }).click()
+  await expect(details).toContainText('email, phone')
+  await expect(page.getByRole('alert')).toHaveCount(0)
+})
+
 test('TC-FRD-12 simulated acceptance: a reviewer completes the checklist and an approver restarts it with an audited reason', async ({ page }) => {
   const subject = 'New bank details restart acceptance'
   await control('/ingest', { from: 'Amelia Hart <amelia@hartfamily.example>', subject, text: 'Please use my new bank account GB33 BUKB 2020 1555 5555 55.' })
@@ -525,16 +560,78 @@ test('TC-FRD-12 simulated acceptance: a reviewer completes the checklist and an 
   expect(audit.find((a) => a.type === 'verification.restarted')?.detail).toBe(true)
 })
 
-test('TC-REV-13 live list count describes the capped response, not a total', async ({ page }) => {
+test('TC-FRD-18 closing states its reason in plain English; only an approver can close past it; a closed case takes no changes', async ({ page }) => {
+  const subject = 'New bank details closing gate'
+  await control('/ingest', { from: 'Amelia Hart <amelia@hartfamily.example>', subject, text: 'Please use my new bank account GB33 BUKB 2020 1555 5555 55.' })
+  await signInAs(page, 'rita')
+  await openCase(page, subject)
+  const routing = page.locator('section.panel').filter({ has: page.getByRole('heading', { name: 'Queue and owner' }) })
+  await expect(routing).toContainText('Only an approver or admin can close this case now')
+  await expect(routing).toContainText('a bank details or identity check has not been approved')
+  await expect(routing).not.toContainText(/C-[A-Z]+-\d/)
+  await expect(routing.getByRole('button', { name: 'Close', exact: true })).toHaveCount(0)
+  await signInAs(page, 'paul')
+  await openCase(page, subject)
+  await routing.getByLabel('Outcome').selectOption('spam')
+  await expect(routing.getByRole('button', { name: 'Close', exact: true })).toBeDisabled()
+  await routing.getByLabel('Reason for closing').fill('Confirmed spam, checked by phone')
+  await routing.getByRole('button', { name: 'Close', exact: true }).click()
+  await expect(page.getByText('This case is closed. It can no longer be changed.')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Add' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Relink with the latest directory' })).toHaveCount(0)
+})
+
+test('TC-REV-16 after signing in the menus and warnings are there without a reload; signing out clears them', async ({ page }) => {
+  await page.route('**/api/session', async (route) => {
+    const response = await route.fetch()
+    await route.fulfill({ response, json: { ...(await response.json()), warnings: ['Test warning TC-REV-16'] } })
+  })
   await signIn(page)
-  await page.route('**/api/cases', async (route) => {
+  await expect(page.getByRole('alert')).toContainText('Test warning TC-REV-16')
+  await page.getByRole('button', { name: 'Sign out' }).click()
+  await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible()
+  await expect(page.getByText('Test warning TC-REV-16')).toHaveCount(0)
+  await page.getByLabel('Username').fill('admin')
+  await page.getByLabel('Password').fill(password)
+  await page.getByRole('button', { name: 'Sign in' }).click()
+  await expect(page.getByRole('heading', { name: 'Cases' })).toBeVisible()
+  await expectMenus(page)
+  await expect(page.getByRole('alert')).toContainText('Test warning TC-REV-16')
+})
+
+test('TC-REV-14 the list shows its range and total and pages through every case', async ({ page }) => {
+  await signIn(page)
+  let sample: unknown
+  let total = 57
+  await page.route(/\/api\/cases\?/, async (route) => {
     const response = await route.fetch()
     const body = await response.json()
-    const sample = body.cases[0]
-    body.cases = Array.from({ length: 50 }, (_, i) => ({ ...sample, id: `synthetic-${i}`, subject: `Synthetic capped case ${i}` }))
+    sample ??= body.cases[0]
+    const offset = Number(new URL(route.request().url()).searchParams.get('offset'))
+    body.cases = Array.from({ length: Math.max(0, Math.min(50, total - offset)) }, (_, i) => ({ ...(sample as object), id: `synthetic-${offset + i}`, subject: `Synthetic case ${offset + i}` }))
+    body.total = total
     await route.fulfill({ response, json: body })
   })
   await page.reload()
-  await expect(page.getByRole('status')).toHaveText('50 cases shown')
+  await expect(page.getByRole('status')).toHaveText('Showing 1–50 of 57 cases')
   await expect(page.locator('a.row')).toHaveCount(50)
+  await expect(page.getByRole('button', { name: 'Previous' })).toBeDisabled()
+  await page.getByRole('button', { name: 'Next' }).click()
+  await expect(page.getByRole('status')).toHaveText('Showing 51–57 of 57 cases')
+  await expect(page.locator('a.row')).toHaveCount(7)
+  await expect(page.getByRole('button', { name: 'Next' })).toBeDisabled()
+  await page.getByText('Synthetic case 50').click()
+  await expect(page.getByRole('button', { name: '← All cases' })).toBeVisible()
+  await page.goBack()
+  await expect(page.getByRole('status')).toHaveText('Showing 51–57 of 57 cases')
+  await page.getByLabel('Status', { exact: true }).selectOption('open')
+  await expect(page.getByRole('status')).toHaveText('Showing 1–50 of 57 cases')
+  // fewer cases than when the page was opened: back to the last page there is
+  await page.getByRole('button', { name: 'Next' }).click()
+  await expect(page.getByRole('status')).toHaveText('Showing 51–57 of 57 cases')
+  await page.getByText('Synthetic case 50').click()
+  await expect(page.getByRole('button', { name: '← All cases' })).toBeVisible()
+  total = 30
+  await page.goBack()
+  await expect(page.getByRole('status')).toHaveText('Showing 1–30 of 30 cases')
 })

@@ -23,6 +23,7 @@ import { stageHandler, type StageDeps } from './pipeline/stages.ts'
 import { failureLabel } from './pipeline/failure.ts'
 import { retryDeferredKyc } from './pipeline/kyc-recheck.ts'
 import { rerunFailed } from './pipeline/restart.ts'
+import { fraudGatesRollout } from './pipeline/rollout.ts'
 import { catchUp } from './pipeline/catchup.ts'
 import { buildServer } from './server/app.ts'
 import { bootstrapAdmin } from './server/auth.ts'
@@ -81,6 +82,10 @@ async function serve(): Promise<void> {
   const parser = process.env.PARSER_SOCKET ? new SocketParser(process.env.PARSER_SOCKET) : new InProcessParser()
   if (!process.env.PARSER_SOCKET) console.warn('DEV_IN_PROCESS_PARSER=1: attachments are parsed in-process, without the sandbox. Never in production.')
   const deps: StageDeps = { db, k, files, config, queue, scanner: new Clamd(process.env.CLAMD_HOST ?? 'clamav', Number(process.env.CLAMD_PORT ?? 3310)), parser, llm }
+  // what migration 009 leaves to the app, before the workers start (PRD C-FRD-6, C-DRF-9); a later start finds nothing
+  const rollout = await fraudGatesRollout(deps)
+  if (rollout.lapsed || rollout.unbound || rollout.restarted) console.log(`fraud gates: ${rollout.lapsed} earlier approvals returned to draft, ${rollout.unbound} earlier checks to redo, ${rollout.restarted} cases run again for a missing check`)
+  if (rollout.failed) console.warn(`fraud gates: ${rollout.failed} cases could not be prepared (audit case.rollout_failed); they cannot be closed normally until processed again`)
 
   for (const stage of STAGES) {
     // only a fixed code reaches the log and the job queue; the error's text goes to the encrypted audit (E6 D2)

@@ -1,5 +1,69 @@
 # Changelog
 
+## v0.4.0 (2026-11-10): closing rules and two-person checks
+
+### Before you upgrade
+
+New images and migration `009_fraud_gates.sql` (`migrate` applies it before `app` starts; it only goes forward). No configuration change is needed. At the first start of v0.4.0:
+
+- Every approved reply that was not marked as sent goes back to draft, and its case goes back to open unless it is closed. Approve these replies again.
+- For a reply from before the upgrade, everyone who created any reply on that case counts as an editor, so it needs an approver or admin who is none of them.
+- Every verification task from before the upgrade is cancelled, approved ones included. An open case that had finished processing is processed again and gets a new task: do the checklist, cooling-off and second-person approval again. On a closed case the task is not replaced.
+- A `bank_details` or `identity_change` class removed before the upgrade counts again, and the case gets a new task, unless it was removed with a reason by someone who is still an approver or admin and whose role has not changed since.
+- If one case fails in this startup step, it is recorded in the audit log and startup continues; that case cannot be closed normally until it is reprocessed.
+
+Operators: see `docs/en/use/limits-and-help.md`, "After an upgrade to v0.4.0".
+
+### What changed
+
+- **Verification no longer disappears on its own:** once a case has taken `bank_details` or `identity_change`, the class stays through re-runs and relinks. Only an approver or admin can remove it, with a reason; the removal is recorded and lasts through reprocessing. Labels set by the fixed rules cannot be removed.
+- **A changed field invalidates the check:** a verification task records the values of the fields it depends on. When a re-run or a KYC attachment replacement changes one of them, the task is cancelled with an audit entry and a new task is made. Clicking **Confirm** on an unchanged value keeps the task (it no longer resets a finished check).
+- **Closing a case:** a normal close needs finished processing, an approved and still valid verification task where one is required, and no approved reply that is not marked as sent. Otherwise only an approver or admin can close, with a reason. Closing cancels approved replies and unfinished tasks; a closed case refuses every change except a retention hold, and background stages finish without writing risk, drafts, tasks or events. There is no reopen in this version.
+- **Look-alike senders:** when the sender's display name or domain imitates a known contact, the reply has no recipient and cannot be approved. An approver or admin can allow replying to the original address, with a reason, if the alert is wrong.
+- **Edited replies:** a reply whose text differs from its template needs an approver or admin who did not edit it and has no account relationship with an editor (created the account, granted a role, reset a password). Switching templates is not an edit; restoring the template text restores the normal approval.
+- **Checked again at every step:** approve, copy and mark as sent run the same checks against the recorded approver. A reply that fails goes back to draft.
+- **Inbox:** the case list shows 50 cases a page with **Previous** / **Next** and "Showing 1–50 of N cases"; `GET /api/cases` now also returns `total`. Menus and warnings load right after sign-in, without a reload. Internal rule codes and identifiers on the case page are replaced by plain names; the risk banner no longer flashes during reprocessing.
+- **Editing yes/no and list fields:** on the case page, **Edit** on a yes/no field such as Change requested offers **Yes**, **No** or **No value**, and on a list field such as Document types or Details to change it offers one box per allowed value. These fields could not be saved from the page before. The server's checks are unchanged.
+- **Operator guide:** `docs/en/use/` is a new step-by-step guide for reviewers and approvers: reading a case, risk and verification, checking a reply, roles, limits and help.
+
+### Testing
+
+No new blind evaluation was run for this release (owner decision D5 in the plan): the evaluation scores classification, risk and reply template once per email, and this release does not change those; it changes what people can do afterwards (closing, removing classes, recipients, approvals), which the evaluation does not measure. Instead:
+
+- Unit, integration and browser tests for every new rule (test plan TC-FRD-13–28, TC-DRF-22–28, TC-REV-14–18), including the real migration and the startup step.
+- The independent Python oracle is updated for the new recipient rule; its self-check and the rule-consistency comparison on the development set pass.
+- Development set on recorded model replies: unchanged and passing.
+- Mutation testing on the changed files of each pull request. The full mutation run now runs weekly in this repository (`.github/workflows/mutation-weekly.yml`) and does not block releases.
+- Review: a fresh reviewer and Codex in every round. The inbox fixes had one plan round and one code round (code: both READY); the closing and two-person rules had two plan rounds and two code rounds; the operator guide had one round. Every finding was judged and recorded.
+
+### Evaluation carried forward from v0.3.0
+
+The following held-out results were **measured on v0.3.0** (frozen code `bbdfc8b`, 126 emails, Claude Opus 5.5) and are quoted unchanged under the rule for small versions; they are not a new measurement. The judgement-related files that differ from `bbdfc8b`, each checked against what the evaluation scores, cover: closing, class removal, recipients, verification tasks, the startup step and the server, none of which the evaluation scores; the evaluation scoring fix already used for the v0.3.0 figures; a field-type table moved to its own file unchanged; oracle additions for the recipient rule; and the version number. The development set on recorded model replies gives byte-identical output on `bbdfc8b` and on this release.
+
+| Metric | Threshold | Result |
+|---|---|---|
+| Classification, macro F1 | ≥ 0.85 | 0.960 |
+| Fields extracted by rules (re-scored after the v0.3.0 scoring fix) | 100% | 100% (126/126) |
+| Field recall | ≥ 0.90 | 90.0% (442/491) |
+| Field precision | ≥ 0.90 | 97.1% (440/453) |
+| Fields that should stay empty | ≥ 0.95 | 100% (26/26) |
+| Contact, commitment and deal linked correctly | ≥ 0.95 | 98.4% (123/125) |
+| Risk never underestimated | 100% | 100% (126/126) |
+| High-risk emails rated high | 100% | 100% (80/80) |
+| Malicious bank-detail changes or look-alike senders rated high | 100% | 100% (18/18) |
+| Replies never disclose more than allowed | 100% | 100% (126/126) |
+| Prompt injection does not change the judgement (vs. a clean twin) | 100% | 100% (15/15) |
+| Risk and template from the rules, given the annotated categories and fields | 100% | 100% (126/126) |
+| Rule consistency against the independent implementation | 100% | 100% (126/126) |
+| Real-model cancellations of an otherwise qualifying payment message (reported, no threshold) | — | 2 of 10 |
+
+### Known limits
+
+- Tasks from before the upgrade are bound to field values only after their case is reprocessed.
+- A case that was mid-processing at the upgrade gets no new task until it is reprocessed.
+- While you page through the list, a case that changes can be skipped or shown twice; reload to correct it.
+- A small team with one approver cannot approve that approver's own edited reply: restore the template text, or ask an admin.
+
 ## v0.3.0 (2026-11-09): accounts in payment messages
 
 - **Fix, narrow scope:** the payer and beneficiary accounts in an MT103 or pacs.008 attachment no longer count as a bank details change, **only** when the attachment is a structurally valid plain text MT103 or XML pacs.008, the deal has `receiving_accounts` configured and the beneficiary is on it, the sender is authenticated and in one deal, there is no other attachment, the mail has no account or redirect wording, and the model gives only payment classes. Everything else keeps the previous `safe_ack` and verification task, including **a bank's printed PDF, an MT103 pasted into the body**, a deal without `receiving_accounts`, an unauthenticated sender and an investor in several deals. Details and limits: `docs/en/payment-messages.md`.

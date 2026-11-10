@@ -217,6 +217,12 @@ describe('classify stage (C-CLS, C-RED-0)', () => {
     expect((await k.db.query('SELECT failed_stage FROM "case" WHERE id = $1', [closed])).rows[0].failed_stage).toBe('classify')
     expect(await tx(k.db, (c) => rerunFailed(c, k.k, k.boss, closed))).toBeNull()
     expect((await k.db.query('SELECT status, processing_generation FROM "case" WHERE id = $1', [closed])).rows[0]).toMatchObject({ status: 'closed', processing_generation: 1 })
+    // C-FRD-8: an older row marked failed after it was closed stays closed; a stray failed_stage on an open Case does nothing
+    await k.t.owner.query(`UPDATE "case" SET status = 'failed' WHERE id = $1`, [closed])
+    expect(await tx(k.db, (c) => rerunFailed(c, k.k, k.boss, closed))).toBeNull()
+    await k.t.owner.query(`UPDATE "case" SET failed_stage = 'classify' WHERE id = $1`, [id])
+    expect(await tx(k.db, (c) => rerunFailed(c, k.k, k.boss, id))).toBeNull()
+    await k.t.owner.query(`UPDATE "case" SET failed_stage = NULL WHERE id = $1`, [id])
     // not failed any more: left as it is, nothing queued
     expect(await tx(k.db, (c) => rerunFailed(c, k.k, k.boss, id))).toBeNull()
     expect((await k.db.query('SELECT processing_generation FROM "case" WHERE id = $1', [id])).rows[0].processing_generation).toBe(2)

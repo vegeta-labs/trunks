@@ -165,7 +165,7 @@ export async function buildServer(d: ServerDeps): Promise<FastifyInstance> {
   // ---------- cases (read-only in E1) ----------
   app.get<{ Querystring: { status?: string; queue?: string; risk?: string; limit?: string; offset?: string } }>('/api/cases', async (req) => {
     const q = req.query
-    return { cases: await listCases(d.db, d.k, d.config, { status: q.status, queue: q.queue, risk: q.risk, limit: q.limit ? Number(q.limit) : undefined, offset: q.offset ? Number(q.offset) : undefined }) }
+    return listCases(d.db, d.k, d.config, { status: q.status, queue: q.queue, risk: q.risk, limit: q.limit ? Number(q.limit) : undefined, offset: q.offset ? Number(q.offset) : undefined })
   })
   app.get<{ Params: { id: string } }>('/api/cases/:id', async (req, reply) => {
     if (!/^[0-9a-f-]{36}$/.test(req.params.id)) return reply.code(404).send({ error: 'not found' })

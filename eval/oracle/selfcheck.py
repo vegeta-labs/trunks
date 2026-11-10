@@ -1130,6 +1130,10 @@ check("TC-DRF-04 mismatch -> only From",
       O.recipient(dict(REC, reply_to_mismatch=True, proposed="jane.alt@investor.example"))["allowed"], False)
 check("TC-DRF-04 mismatch From still ok", O.recipient(dict(REC, reply_to_mismatch=True, proposed="jane@investor.example"))["allowed"], True)
 check("TC-DRF-04 other address", O.recipient(dict(REC, proposed="x@other.example"))["allowed"], False)
+check("TC-DRF-23 display_name_mismatch: no recipient", O.recipient(dict(REC, display_name_mismatch=True, proposed="jane@investor.example"))["allowed"], False)
+check("TC-DRF-23 lookalike_domain: no recipient", O.recipient(dict(REC, lookalike_domain=True, proposed="jane@investor.example"))["allowed"], False)
+check("TC-DRF-23 exception allows From", O.recipient(dict(REC, lookalike_domain=True, sender_exception=True, proposed="jane@investor.example"))["allowed"], True)
+check("TC-DRF-23 exception does not allow Reply-To", O.recipient(dict(REC, lookalike_domain=True, sender_exception=True, proposed="jane.alt@investor.example"))["allowed"], False)
 check("TC-SIG-14 two Reply-To headers -> From only",
       O.recipient(dict(REC, reply_to=["jane.alt@investor.example", "x@evil.example"], reply_to_mismatch=None,
                        proposed="jane.alt@investor.example"))["allowed"], False)

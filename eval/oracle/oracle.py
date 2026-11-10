@@ -2837,6 +2837,11 @@ def recipient(inp):
     frm = inp.get("from")
     if isinstance(frm, dict):
         frm = frm.get("address")
+    # PRD v0.7.30 (C-DRF-10): a sender with display_name_mismatch or
+    # lookalike_domain true has no allowed recipient; a recorded exception
+    # (input sender_exception) allows only the original From.
+    if inp.get("display_name_mismatch") is True or inp.get("lookalike_domain") is True:
+        return {"allowed": bool(inp.get("sender_exception")) and prop == _email_norm(frm)}
     allowed = {_email_norm(frm)}
     # PRD v0.7.15 (C-SIG-1.5): several Reply-To headers or an unknown
     # reply_to_mismatch (null) -> reply only to From.

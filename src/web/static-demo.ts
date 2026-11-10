@@ -2,6 +2,8 @@
 // review UI reads the snapshot that `data/snapshot.js` puts on globalThis (loaded by a classic <script src> before the
 // app, so the site's CSP `connect-src 'none'` holds: no fetch, no XHR). The page renders no change control (PRD R-DEMO-02
 // v0.7.25); a change that reached the API layer anyway is still refused here, without a request.
+import { pageOf } from '../lib/paging.ts'
+
 export const DEMO_REFUSAL = 'Demo: not available. This is a read-only snapshot of the demo; nothing can be changed here.'
 export const STATIC_DEMO = import.meta.env.VITE_STATIC_DEMO === '1'
 
@@ -35,7 +37,10 @@ export function staticAnswer(method: string, url: string): { status: number; dat
   if (path === '/api/cases') {
     // the server's filters are plain equality on these three (src/server/cases.ts); the order is the server's
     const wanted = (['status', 'queue', 'risk'] as const).map((k) => [k, u.searchParams.get(k)] as const).filter(([, v]) => v)
-    return { status: 200, data: { cases: s.cases.filter((c) => wanted.every(([k, v]) => c[k] === v)) } }
+    const matching = s.cases.filter((c) => wanted.every(([k, v]) => c[k] === v))
+    const asked = (name: string) => (u.searchParams.has(name) ? Number(u.searchParams.get(name)) : undefined)
+    const { limit, offset } = pageOf(asked('limit'), asked('offset'))
+    return { status: 200, data: { cases: matching.slice(offset, offset + limit), total: matching.length } }
   }
   const one = /^\/api\/cases\/([A-Za-z0-9-]+)$/.exec(path)
   if (one && s.details[one[1]!]) return { status: 200, data: s.details[one[1]!] }

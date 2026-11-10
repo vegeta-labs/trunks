@@ -2,8 +2,8 @@
 import { Fragment, useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { api, ApiError, csrf, withoutRuleIds, type SessionUser } from './api.ts'
 import { snapshotInfo, STATIC_DEMO } from './static-demo.ts'
-import { caseStatus, DEMO_DATES, displayName, transferText } from './presentation.ts'
-import { actionText, riskReasonText, E3Panels, FieldActions, HoldPanel, LabelsPanel, type E3, type Meta } from './CaseE3.tsx'
+import { caseStatus, DEMO_DATES, displayName, riskReasonText, transferText } from './presentation.ts'
+import { actionText, E3Panels, FieldActions, HoldPanel, LabelsPanel, type E3, type Meta } from './CaseE3.tsx'
 
 interface CaseItem {
   id: string
@@ -168,19 +168,29 @@ function ChangePassword({ onDone }: { onDone: () => void }) {
   )
 }
 
-interface ListView { status: string; queue: string; risk: string; scroll: number; lastId: string | null }
+const PAGE_SIZE = 50 // R-REV-01 v0.7.29
+interface ListView { status: string; queue: string; risk: string; page: number; scroll: number; lastId: string | null }
 function CaseList({ meta, view, setView }: { meta: Meta | null; view: ListView; setView: (v: ListView) => void }) {
   const [cases, setCases] = useState<CaseItem[] | null>(null)
+  const [total, setTotal] = useState(0)
+  const [shownPage, setShownPage] = useState(view.page) // the page `cases` holds; `page` moves first
   const [error, setError] = useState('')
-  const { status, queue, risk } = view
+  const { status, queue, risk, page } = view
   const restore = useRef(true)
   useEffect(() => {
     let active = true
     setError('')
-    const q = new URLSearchParams(Object.entries({ status, queue, risk }).filter(([, v]) => v))
-    void api<{ cases: CaseItem[] }>('GET', `/api/cases${q.size ? `?${q}` : ''}`).then((r) => { if (active) setCases(r.cases) }, () => { if (active) setError('Cases could not be loaded. Try again.') })
+    const q = new URLSearchParams({ ...Object.fromEntries(Object.entries({ status, queue, risk }).filter(([, v]) => v)), limit: String(PAGE_SIZE), offset: String(page * PAGE_SIZE) })
+    void api<{ cases: CaseItem[]; total: number }>('GET', `/api/cases?${q}`).then((r) => {
+      if (!active) return
+      // fewer Cases than when this page was opened: go to the last page there is
+      if (r.cases.length === 0 && r.total > 0 && page > 0) { setView({ ...view, page: Math.ceil(r.total / PAGE_SIZE) - 1, scroll: 0, lastId: null }); return }
+      setCases(r.cases)
+      setTotal(r.total)
+      setShownPage(page)
+    }, () => { if (active) setError('Cases could not be loaded. Try again.') })
     return () => { active = false }
-  }, [status, queue, risk])
+  }, [status, queue, risk, page])
   useEffect(() => {
     if (!cases || !restore.current) return
     restore.current = false
@@ -191,12 +201,15 @@ function CaseList({ meta, view, setView }: { meta: Meta | null; view: ListView; 
     return () => cancelAnimationFrame(frame)
   }, [cases, view.lastId, view.scroll])
   const filtered = Boolean(status || queue || risk)
-  const filter = (key: 'status' | 'queue' | 'risk', value: string) => setView({ ...view, [key]: value, scroll: 0, lastId: null })
+  const filter = (key: 'status' | 'queue' | 'risk', value: string) => setView({ ...view, [key]: value, page: 0, scroll: 0, lastId: null })
+  const turn = (to: number) => { setView({ ...view, page: to, scroll: 0, lastId: null }); window.scrollTo(0, 0) }
+  const first = shownPage * PAGE_SIZE + 1
+  const range = cases && cases.length > 0 ? `Showing ${first}–${first + cases.length - 1} of ${total} cases` : '0 cases'
   const now = Date.now()
   return (
     <section>
       <p className="eyebrow">Inbox</p>
-      <div className="list-heading"><h2>Cases</h2><span className="meta" role="status">{cases && (STATIC_DEMO ? `${cases.length} of ${snapshotInfo()?.caseCount ?? cases.length} cases` : `${cases.length} cases shown`)}</span></div>
+      <div className="list-heading"><h2>Cases</h2><span className="meta" role="status">{cases && (STATIC_DEMO ? `${total} of ${snapshotInfo()?.caseCount ?? total} cases` : range)}</span></div>
       <p className="meta">Open a case to review the email, risk reasons and suggested next steps.</p>
       <div className="toolbar filters">
         <label><span id="status-filter-label">Status</span><select aria-labelledby="status-filter-label" value={status} onChange={(e) => filter('status', e.target.value)}>
@@ -211,7 +224,7 @@ function CaseList({ meta, view, setView }: { meta: Meta | null; view: ListView; 
           <option value="">All risk levels</option>
           {['high', 'medium', 'low'].map((v) => <option key={v} value={v}>{v[0]!.toUpperCase() + v.slice(1)}</option>)}
         </select></label>
-        {filtered && <button className="link" onClick={() => setView({ ...view, status: '', queue: '', risk: '', scroll: 0, lastId: null })}>Clear filters</button>}
+        {filtered && <button className="link" onClick={() => setView({ ...view, status: '', queue: '', risk: '', page: 0, scroll: 0, lastId: null })}>Clear filters</button>}
         {!STATIC_DEMO && <span className="meta"><a href="/api/export/cases.csv">Cases CSV</a> · <a href="/api/export/actions.csv">Actions CSV</a></span>}
       </div>
       <p className="meta list-note">Sorted by risk, then due time.</p>
@@ -220,7 +233,7 @@ function CaseList({ meta, view, setView }: { meta: Meta | null; view: ListView; 
         <ul className="cases">{cases.map((c) => {
           const signal = Object.keys(SIGNAL_TEXT).find((k) => c.signals.includes(k)) ?? c.signals[0]
           return <li key={c.id}><a className="row" id={`case-${c.id}`} href={`#case=${encodeURIComponent(c.id)}`} onClick={(e) => {
-            if (!e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey && e.button === 0) setView({ ...view, scroll: window.scrollY, lastId: c.id })
+            if (!e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey && e.button === 0) setView({ ...view, page: shownPage, scroll: window.scrollY, lastId: c.id })
           }}>
             <span className="row-heading"><span className="subject">{c.subject || '(no subject)'}</span><span aria-hidden="true">→</span></span>
             <span className="meta">{c.fromName ? `${c.fromName} · ` : ''}<span className="mono">{c.from ?? 'unknown sender'}</span></span>
@@ -237,6 +250,13 @@ function CaseList({ meta, view, setView }: { meta: Meta | null; view: ListView; 
             {signal && <span className="meta">Warning signal: {SIGNAL_TEXT[signal] ?? signal}</span>}
           </a></li>
         })}</ul>
+      )}
+      {total > PAGE_SIZE && cases && (
+        <nav className="toolbar" aria-label="Case pages">
+          <button className="secondary" disabled={page === 0} onClick={() => turn(page - 1)}>Previous</button>
+          <span className="meta">Page {page + 1} of {Math.ceil(total / PAGE_SIZE)}</span>
+          <button className="secondary" disabled={first + cases.length - 1 >= total} onClick={() => turn(page + 1)}>Next</button>
+        </nav>
       )}
     </section>
   )
@@ -409,7 +429,7 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
           <ul className="labels">
             {c.labels.map((l) => (
               <li key={`${l.source}-${l.classId}`} className={l.adopted ? '' : 'confirm'}>
-                <strong>{l.classId}</strong> — {l.source === 'rule' ? 'rule' : l.adopted ? `model, ${l.confidence}` : 'model, low: needs confirmation'}
+                <strong>{displayName(l.classId)}</strong> — {l.source === 'rule' ? 'rule' : l.adopted ? `model, ${l.confidence}` : 'model, low: needs confirmation'}
                 {l.reason !== null && <div className="meta">{l.reason}</div>}
               </li>
             ))}
@@ -428,7 +448,7 @@ function Detail({ id, back, user, meta }: { id: string; back: () => void; user: 
                   {f.status === 'multiple' ? f.candidates.join(' · ') : (f.value ?? '—')}
                   {f.status !== 'ok' && <span className="meta"> ({FIELD_STATUS[f.status] ?? f.status}{f.reason ? `: ${withoutRuleIds(f.reason)}` : ''})</span>}
                   {f.status === 'ok' && f.needsConfirmation && <span className="meta"> (needs confirmation{f.reason ? `: ${withoutRuleIds(f.reason)}` : ''})</span>}{' '}
-                  {c.e3 && <FieldActions caseId={c.id} field={f.field} confirmed={f.confirmed} reload={reload} />}
+                  {c.e3 && <FieldActions caseId={c.id} field={f.field} confirmed={f.confirmed} closed={c.e3.closed === true} reload={reload} />}
                 </dd>
               </Fragment>
             ))}
@@ -477,7 +497,7 @@ export function App() {
   const [user, setUser] = useState<SessionUser | null | undefined>(undefined)
   const [warnings, setWarnings] = useState<string[]>([])
   const [openId, setOpenId] = useState<string | null>(() => new URLSearchParams(location.hash.slice(1)).get('case'))
-  const [listView, setListView] = useState<ListView>({ status: '', queue: '', risk: '', scroll: 0, lastId: null })
+  const [listView, setListView] = useState<ListView>({ status: '', queue: '', risk: '', page: 0, scroll: 0, lastId: null })
   const viewRef = useRef(listView)
   const entrySequence = useRef(0)
   const currentEntry = useRef<string | null>(null)
@@ -491,23 +511,26 @@ export function App() {
   const [meta, setMeta] = useState<Meta | null>(null)
   // a sign-out that did not go through (the static demo refuses it) says so (Codex E5 round 2 F3)
   const [signOutError, setSignOutError] = useState('')
-  // warnings that hold while a condition lasts (failed KYC transfers, mailboxes): refreshed every minute (round 2 F12)
+  // the menus and warnings of whoever is signed in, as soon as they are, however that came about (TC-REV-16); the server
+  // refuses both until a first password is changed. Warnings hold while a condition lasts: refreshed every minute (round 2 F12)
+  const signedIn = user && !user.mustChangePassword ? user.id : null
   useEffect(() => {
-    if (!user) return
-    const t = setInterval(() => {
-      void api<{ warnings?: string[] }>('GET', '/api/session').then((s) => setWarnings(s.warnings ?? []), () => {})
-    }, 60_000)
-    return () => clearInterval(t)
-  }, [user])
+    setMeta(null)
+    setWarnings([])
+    if (!signedIn) return
+    let active = true
+    const refresh = () => void api<{ warnings?: string[] }>('GET', '/api/session').then((s) => { if (active) setWarnings(s.warnings ?? []) }, () => {})
+    refresh()
+    void api<Meta>('GET', '/api/meta').then((m) => { if (active) setMeta(m) }, () => undefined)
+    const t = setInterval(refresh, 60_000)
+    return () => { active = false; clearInterval(t) }
+  }, [signedIn])
   const load = useCallback(async () => {
     try {
       // the token of the session the browser has now, at every load: after a sign-out and sign-in in another tab the
       // stored one belongs to an ended session (Codex E5 F4); the server derives it from the session, any tab may ask
       await api<{ csrf: string }>('GET', '/api/csrf').then((r) => csrf.set(r.csrf), () => undefined)
-      const s = await api<{ user: SessionUser; warnings?: string[] }>('GET', '/api/session')
-      setWarnings(s.warnings ?? [])
-      setUser(s.user)
-      void api<Meta>('GET', '/api/meta').then(setMeta, () => undefined)
+      setUser((await api<{ user: SessionUser }>('GET', '/api/session')).user)
     } catch {
       setUser(null)
     }

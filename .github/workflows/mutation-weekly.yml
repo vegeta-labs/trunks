@@ -1,0 +1,97 @@
+name: Mutation (weekly)
+# The full mutation check (scripts/mutation-check.mjs, every mutant) once a week, and on demand. Not release-blocking:
+# pull requests run only the mutants of the files they change (docs/DEV_PROCESS_RULES.md §5); a failure here means a
+# fix PR, not a stopped release.
+on:
+  schedule:
+    - cron: '0 5 * * 1'
+  workflow_dispatch:
+
+jobs:
+  mutation:
+    # the public repository only: its minutes are free
+    if: github.repository == 'vegeta-labs/trunks'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    # the services and test variables of the `check` job in ci.yml: the database, mailbox and virus-scan tests some
+    # mutants name as their test command
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
+      greenmail:
+        image: greenmail/standalone:2.1.3
+        env:
+          GREENMAIL_OPTS: -Dgreenmail.setup.test.all -Dgreenmail.hostname=0.0.0.0 -Dgreenmail.auth.disabled -Dgreenmail.verbose
+        ports: ['3143:3143']
+      clamav:
+        image: clamav/clamav-debian:1.4
+        ports: ['3310:3310']
+    env:
+      TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+      TEST_IMAP_HOST: localhost
+      TEST_IMAP_PORT: '3143'
+      TEST_CLAMD_HOST: localhost
+      TEST_CLAMD_PORT: '3310'
+      TEST_S3_ENDPOINT: http://localhost:8333
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: Start SeaweedFS (S3-compatible test store with versioning; a service container cannot take the "server" argument)
+        run: |
+          docker run -d -p 8333:8333 chrislusf/seaweedfs:4.50 server -s3
+          for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:8333/ && exit 0; sleep 2; done; exit 1
+      - name: Wait for ClamAV
+        run: for i in $(seq 1 60); do (echo PING | nc -w 2 localhost 3310 | grep -q PONG) && exit 0; sleep 5; done; exit 1
+      - name: Install Playwright system dependencies (Chromium)
+        timeout-minutes: 30
+        run: |
+          # Avoid the slow Azure HTTP mirror; keep Ubuntu's signed packages.
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/apt-mirrors.txt
+          # Do not timeout/retry the npm parent while its apt child still owns dpkg's lock.
+          npx playwright install-deps chromium
+      - name: Install Playwright browsers (Chromium)
+        timeout-minutes: 15
+        run: npx playwright install chromium
+      # the static-demo mutants rebuild the snapshot from a running, processed demo at 127.0.0.1:8080 (quick start §1)
+      - name: Install the doi-parser AppArmor profile as the quick start says
+        run: sudo cp deploy/apparmor/doi-parser /etc/apparmor.d/doi-parser && sudo apparmor_parser -r -W /etc/apparmor.d/doi-parser
+      - name: Build the images
+        run: docker compose build
+      - name: Start the demo
+        env:
+          DOI_SECRETS_DIR: ./demo-secrets
+        run: |
+          mkdir -m 700 demo-secrets
+          docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/demo-secrets:/out" deal-ops-inbox:local init-secrets /out
+          docker compose -f docker-compose.yml -f deploy/compose.demo.yml up -d
+      - name: Wait until every demo email is processed
+        env:
+          DOI_SECRETS_DIR: ./demo-secrets
+        run: |
+          want="0/$(node --experimental-strip-types --no-warnings --input-type=module -e "console.log((await import('./src/ops/demo.ts')).DEMO_SAMPLES.length)")"
+          for i in $(seq 1 120); do
+            got=$(docker compose -f docker-compose.yml -f deploy/compose.demo.yml exec -T db psql -U postgres -d doi -Atc "SELECT count(*) FILTER (WHERE status = 'processing') || '/' || count(*) FROM \"case\"" 2>/dev/null || true)
+            echo "processing/all: ${got:-none} (want $want)"
+            [ "$got" = "$want" ] && exit 0
+            sleep 5
+          done
+          exit 1
+      - name: Full mutation check
+        run: npm run mutation
+      - name: Demo logs (on failure)
+        if: failure()
+        env:
+          DOI_SECRETS_DIR: ./demo-secrets
+        run: docker compose -f docker-compose.yml -f deploy/compose.demo.yml logs --tail 80

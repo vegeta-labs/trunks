@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { caseStatus, displayName, transferText } from './presentation.ts'
+import { readFileSync } from 'node:fs'
+import { caseStatus, displayName, editInput, editValue, optionText, plainProblems, problemText, riskReasonText, transferText } from './presentation.ts'
+import { CLASS_FIELDS_KNOWN } from '../config/constants.ts'
+import { computeRisk } from '../lib/risk.ts'
+import { checkValue, ENUMS, KIND, type FieldContext } from '../lib/fields.ts'
 
 describe('TC-DEMO-05 attachment transfer states', () => {
   it('never turns failures, manual handling or pending work into a successful transfer', () => {
@@ -19,5 +23,69 @@ describe('TC-DEMO-05 attachment transfer states', () => {
     expect(displayName('future_class')).toBe('future_class')
     expect(caseStatus('sent')).toBe('Marked as sent')
     expect(caseStatus('future_status')).toBe('future_status')
+  })
+})
+
+describe('TC-REV-15 no internal codes on the page', () => {
+  const ids = (file: string) => [...readFileSync(`config/default/${file}`, 'utf8').matchAll(/^  - \{? ?id: (\w+)/gm)].map((m) => m[1]!)
+  it('every known field, class and template has a label', () => {
+    expect(ids('cases.yaml').length).toBeGreaterThan(10)
+    expect(ids('templates.yaml').length).toBeGreaterThan(10)
+    for (const id of [...CLASS_FIELDS_KNOWN, ...ids('cases.yaml'), ...ids('templates.yaml')]) expect(displayName(id), id).not.toBe(id)
+    expect(displayName('uetr')).toBe('Payment tracking reference (UETR)')
+  })
+  it('every risk reason has a sentence, the beneficiary mismatch included', () => {
+    const { clauses } = computeRisk({ classes: [{ id: 'x', risk_floor: 'low' }] as never, labels: ['x'], signals: {}, accountPresent: false, uetrCandidatesInvalid: 0, amountsBody: [], amountsAttachment: [], attachmentBlockedOrOverLimit: false, pressure: false, plannedCloseDate: null, receivedDate: '2026-10-29', holidays: new Set() })
+    expect(clauses.length).toBeGreaterThan(10)
+    for (const { id } of clauses) expect(riskReasonText(id), id).not.toBe(id)
+    expect(riskReasonText('C-RSK-2:evidence_beneficiary_mismatch')).toBe('The beneficiary account in the payment message is not a receiving account on file')
+  })
+  it('problem codes read as sentences, in a list and inside a refusal', () => {
+    expect(problemText('internal_terms:suspicious|flag')).toBe('Internal wording not allowed in a reply: suspicious, flag')
+    expect(problemText('no_recipient')).toBe('No recipient')
+    expect(plainProblems('cannot approve: internal_terms:suspicious; no_recipient; the content changed')).toBe('cannot approve: Internal wording not allowed in a reply: suspicious; No recipient; the content changed')
+    expect(plainProblems('placeholder_left and recipient_not_allowed')).toBe('A value is missing and This recipient is not allowed')
+    expect(plainProblems('nothing to translate')).toBe('nothing to translate')
+    expect(plainProblems('cannot approve: internal_terms:no_recipient')).toBe('cannot approve: Internal wording not allowed in a reply: no_recipient')
+  })
+})
+
+describe('TC-REV-18 a person can edit yes/no and list fields', () => {
+  const ctx: FieldContext = {
+    modelText: '', currencies: ['GBP'], platforms: [], deals: [], restore: (t) => t,
+    rules: { uetrs: [], amounts: [], evidenceAmounts: [], references: [], accountLast4: [], valueDates: [] },
+  }
+  it('offers the input of each field kind and sends a value the server check accepts', () => {
+    const booleans = Object.keys(KIND).filter((f) => KIND[f] === 'boolean')
+    const lists = Object.keys(KIND).filter((f) => KIND[f] === 'enums')
+    expect(booleans).toContain('change_requested')
+    expect(lists).toEqual(expect.arrayContaining(['document_types', 'change_fields']))
+    for (const f of booleans) {
+      const input = editInput(f)
+      expect(input).toEqual({ kind: 'boolean' })
+      expect(editValue(input, 'true', [])).toBe(true)
+      expect(editValue(input, 'false', [])).toBe(false)
+      expect(editValue(input, '', [])).toBeNull()
+      for (const v of [true, false]) expect(checkValue(f, editValue(input, String(v), []) as boolean, ctx)).toEqual({ ok: true, value: v })
+    }
+    for (const f of lists) {
+      const input = editInput(f)
+      expect(input).toEqual({ kind: 'list', options: ENUMS[f] })
+      if (input.kind !== 'list') throw new Error('not a list')
+      const picked = [input.options[2]!, input.options[0]!]
+      const sent = editValue(input, '', picked)
+      expect(sent).toEqual([input.options[0], input.options[2]])
+      expect(checkValue(f, sent as string[], ctx)).toEqual({ ok: true, value: sent })
+      expect(editValue(input, '', [])).toBeNull()
+      for (const o of input.options) expect(optionText(o)).toMatch(/^[A-Z][^_]*$/)
+    }
+    expect(optionText('tax_id')).toBe('Tax ID')
+    expect(optionText('proof_of_address')).toBe('Proof of address')
+  })
+  it('keeps typed text for the other fields', () => {
+    for (const f of Object.keys(KIND).filter((x) => KIND[x] !== 'boolean' && KIND[x] !== 'enums')) expect(editInput(f)).toEqual({ kind: 'text' })
+    expect(editValue({ kind: 'text' }, '  investor ', [])).toBe('investor')
+    expect(editValue({ kind: 'text' }, '   ', [])).toBeNull()
+    expect(checkValue('party_role', editValue(editInput('party_role'), 'investor', []) as string, ctx)).toEqual({ ok: true, value: 'investor' })
   })
 })

@@ -18,4 +18,13 @@ describe('static demo answers', () => {
     for (const m of ['POST', 'PUT', 'DELETE', 'PATCH']) expect(staticAnswer(m, '/api/cases/E0225/relink')).toBeNull()
     expect(staticAnswer('POST', '/api/logout')).toBeNull()
   })
+  it('TC-REV-14 the snapshot pages like the server and reports the total of the filters', () => {
+    g.DOI_DEMO = { info: { version: '0.1.0', built_at: 'x' }, session: {}, meta: {}, details: {}, cases: Array.from({ length: 60 }, (_, i) => ({ id: `E${i}`, risk: i < 55 ? 'high' : 'low' })) }
+    const page = (q: string) => staticAnswer('GET', `/api/cases?${q}`)!.data as { cases: Array<{ id: string }>; total: number }
+    expect(page('').cases.length).toBe(50)
+    expect(page('').total).toBe(60)
+    expect(page('limit=50&offset=50').cases.map((c) => c.id)).toEqual(['E50', 'E51', 'E52', 'E53', 'E54', 'E55', 'E56', 'E57', 'E58', 'E59'])
+    expect(page('risk=high&limit=50&offset=50')).toMatchObject({ total: 55 })
+    expect(page('limit=abc&offset=-1').cases.length).toBe(50)
+  })
 })

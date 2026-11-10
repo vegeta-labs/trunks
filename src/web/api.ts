@@ -1,4 +1,5 @@
 import { DEMO_REFUSAL, STATIC_DEMO, staticAnswer } from './static-demo.ts'
+import { plainProblems } from './presentation.ts'
 
 // API client. The CSRF token is kept in sessionStorage so a page reload keeps working (tech design §5).
 const CSRF = 'doi.csrf'
@@ -23,8 +24,8 @@ export const csrf = {
   },
 }
 
-/** D8: rule ids such as «(C-RSK-3)» stay in the server's answer and the audit; people see the plain sentence; E6 verification refusals retain C-FRD-5 as approved. */
-export const withoutRuleIds = (text: string) => text.replace(/\s*\((?:[CRI]-[A-Z]+-\d+[a-z]?|I-\d+)\b[^()]*\)/g, (match) => match.includes('C-FRD-5') ? match : '').trim()
+/** D8: rule ids such as «(C-RSK-3)» stay in the server's answer and the audit; people see the plain sentence. */
+export const withoutRuleIds = (text: string) => text.replace(/\s*\((?:[CRI]-[A-Z]+-\d+[a-z]?|I-\d+)\b[^()]*\)/g, '').trim()
 
 export class ApiError extends Error {
   readonly status: number
@@ -49,7 +50,7 @@ export async function api<T>(method: string, url: string, body?: unknown): Promi
     body: body === undefined ? undefined : JSON.stringify(body),
   })
   const data = (await res.json().catch(() => ({}))) as { error?: string }
-  if (!res.ok) throw new ApiError(res.status, withoutRuleIds(data.error ?? res.statusText))
+  if (!res.ok) throw new ApiError(res.status, plainProblems(withoutRuleIds(data.error ?? res.statusText)))
   return data as T
 }
 
