@@ -15,7 +15,7 @@ export const ALLOW = [
   'src/', 'parser/', 'scripts/', 'deploy/', 'e2e/', 'e2e-demo/', 'config/', 'data/', 'fixtures/',
   'eval/dev/', 'eval/oracle/', 'eval/replay/', 'eval/directory/', 'eval/config/', 'eval/clock.json', 'eval/validate', 'eval/SCHEMA.md', 'eval/annotation.schema.json',
   'docs/en/', 'docs/perf.md', 'docs/01_PRD.md', 'docs/02_TECH_DESIGN.md', 'docs/03_RULES_AND_REVIEW.md', 'docs/04_TEST_PLAN.md', 'docs/09_UI_DESIGN.md', 'docs/milestone.txt',
-  'README.md', 'CHANGELOG.md', 'LICENSE', 'package.json', 'package-lock.json', 'tsconfig.json', 'vite.config.ts', 'vitest.config.ts', 'vitest.compose.config.ts', 'playwright.config.ts', 'playwright.demo.config.ts',
+  'README.md', 'AGENTS.md', 'CHANGELOG.md', 'LICENSE', 'package.json', 'package-lock.json', 'tsconfig.json', 'vite.config.ts', 'vitest.config.ts', 'vitest.compose.config.ts', 'playwright.config.ts', 'playwright.demo.config.ts',
   'Dockerfile', 'docker-compose.yml', '.env.example', '.gitignore', '.dockerignore', '.gitattributes', '.github/workflows/ci.yml',
   '.github/workflows/mutation-weekly.yml',
 ]

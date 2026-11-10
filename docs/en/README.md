@@ -14,6 +14,7 @@ It never sends email. It never moves money. It never changes your business recor
 | Document | What it covers |
 |---|---|
 | [Quick start](quickstart.md) | The demo, then a real deployment with Docker Compose |
+| [Deploy with an AI coding assistant](deploy-with-ai.md) | A prompt for the demo, and which steps of a real deployment a person does |
 | [Users and directory](users-and-directory.md) | Creating users and importing deals, commitments, bank lines, ledger and contacts (API with `curl`; no screen yet) |
 | [Mailboxes](mailboxes.md) | IMAP, `.eml` import, Gmail, Microsoft 365: permissions and set-up |
 | [Models and data protection](models-and-data-protection.md) | Model providers, the start-up checks, what a model sees and what it never does |
