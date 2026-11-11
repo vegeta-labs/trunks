@@ -34,7 +34,7 @@ Then open <http://127.0.0.1:8080>. The sign-in page lists the demo accounts.
 
 English user documentation is in [`docs/en/`](docs/en/README.md): quick start, users and directory, mailboxes (IMAP, Gmail, Microsoft 365, `.eml`), models and data protection, configuration reference, security model, DPIA and LIA templates, retention, backup and upgrade.
 
-The design documents (requirements, technical design, rules and review process, test plan) are in Chinese in [`docs/`](docs/). Code comments refer to their rule numbers (`R-…`, `C-…`).
+The design documents (requirements, technical design, rules and review process, test plan) are in Chinese in [`docs/`](docs/). Code comments refer to their rule numbers (`R-…`, `C-…`). How each stage was reviewed is in the [review summary](docs/en/REVIEW_SUMMARY.md).
 
 ## What has been tested
 
