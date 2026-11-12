@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.5.0 (2026-11-12): old names removed
+## v0.5.0 (2026-11-12): everything renamed to Trunks; existing deployments must reinstall or rename before upgrading
 
 Every name that still said "Deal Ops Inbox", `deal-ops-inbox` or `DOI_` is now Trunks. There is no compatibility with the old names: nothing reads an old variable, cookie, header or file name.
 
@@ -62,7 +62,7 @@ The following held-out results were **measured on v0.3.0** (frozen code `bbdfc8b
 | Rule consistency against the independent implementation | 100% | 100% (126/126) |
 | Real-model cancellations of an otherwise qualifying payment message (reported, no threshold) | — | 2 of 10 |
 
-## v0.4.0 (2026-11-10): closing rules and two-person checks
+## v0.4.0 (2026-11-10): stricter case closing, verification that no longer disappears on its own and an independent approver for edited replies
 
 ### Before you upgrade
 
@@ -126,7 +126,7 @@ The following held-out results were **measured on v0.3.0** (frozen code `bbdfc8b
 - While you page through the list, a case that changes can be skipped or shown twice; reload to correct it.
 - A small team with one approver cannot approve that approver's own edited reply: restore the template text, or ask an admin.
 
-## v0.3.0 (2026-11-09): accounts in payment messages
+## v0.3.0 (2026-11-09): fewer false bank-detail alarms for qualifying MT103 and pacs.008 payment attachments
 
 - **Fix, narrow scope:** the payer and beneficiary accounts in an MT103 or pacs.008 attachment no longer count as a bank details change, **only** when the attachment is a structurally valid plain text MT103 or XML pacs.008, the deal has `receiving_accounts` configured and the beneficiary is on it, the sender is authenticated and in one deal, there is no other attachment, the mail has no account or redirect wording, and the model gives only payment classes. Everything else keeps the previous `safe_ack` and verification task, including **a bank's printed PDF, an MT103 pasted into the body**, a deal without `receiving_accounts`, an unauthenticated sender and an investor in several deals. Details and limits: `docs/en/payment-messages.md`.
 - **False alarms remain by design:** when the model adds another class to an otherwise qualifying message, the exception is cancelled and the reply stays `safe_ack`. On the development set this happened for 1 of 20 qualifying messages; on the blind set, 2 of 10.
@@ -159,7 +159,7 @@ Measured on frozen code `bbdfc8b` with Claude Opus 5.5, on a new held-out set of
 | Rule consistency against the independent implementation | 100% | 100% (126/126) |
 | Real-model cancellations of an otherwise qualifying payment message (reported, no threshold) | — | 2 of 10 |
 
-## v0.2.2 (2026-11-04): clearer demo boundaries and case review flow
+## v0.2.2 (2026-11-04): case summary first, grouped inbox filters and clearer demo notices
 
 - **Demo guidance:** fictional data and view-only access stay visible. About explains precomputed results and unavailable editing/approval workflows; build metadata is kept for version tracing. Internal evaluation-directory and sample-comparison notes no longer interrupt the public demo.
 - **KYC and verification:** attachment transfer states remain distinct. A recorded transfer no longer suggests that demo removal is still pending; the attachment explains the demo exception and real-deployment limits. Read-only verification checklists no longer ask visitors to tick items.
@@ -195,7 +195,7 @@ The original prerelease failure and subsequent fresh-set PASS remain recorded in
 
 This release changes product presentation only. Microsoft 365 and Gmail push notifications (Pub/Sub) were tested only against simulated services. Gmail polling was tested on one personal Gmail account. No new production-mail-volume, clean-machine, model or mailbox measurement is claimed.
 
-## v0.2.1 (2026-11-04): Trunks product branding
+## v0.2.1 (2026-11-04): product renamed to Trunks in the app and user documentation
 
 - **Product name:** Trunks — Operations Inbox, part of Vegeta. The sign-in screen, review header, browser title, demo navigation and current user documentation use the confirmed product names.
 - **Companion product:** the review UI displays Goten — Deal Calculations in withdrawal guidance, including existing records. Stored action details, API/CSV output and reply preparation hashes retain their existing values.
@@ -229,7 +229,7 @@ The original prerelease failure and subsequent fresh-set PASS remain recorded in
 
 This release changes product presentation only. Microsoft 365 and Gmail push notifications (Pub/Sub) were tested only against simulated services. Gmail polling was tested on one personal Gmail account. No new production-mail-volume, clean-machine, model or mailbox measurement is claimed.
 
-## v0.2.0 (2026-11-04): safer attachment handling and clearer review workflows
+## v0.2.0 (2026-11-04): signature images under the size limits no longer count as identity documents; approvers can restart verification tasks
 
 - **Inline images:** a narrow, configurable signature-image exception uses strict MIME/HTML and PNG/JPEG/GIF structural checks. Defaults: 400 pixels on the long side, 150 on the short side and 51,200 bytes; hard caps: 1280/300 pixels and 102,400 bytes. Images are never decoded for OCR or sent to a model. An identity image reduced to the qualifying limits, or data encoded in permitted metadata, can remain in the archive instead of being transferred; see the DPIA/LIA templates.
 - **KYC:** decisions and transfer jobs are saved before model classification. Stricter decisions retry durably and can trigger later archive-replacement rounds. Legacy MIME identities, oversized archive fallback, transfer hashes and recorded-copy recovery are checked before deletion.
@@ -266,7 +266,7 @@ The initial prerelease attempt failed injection invariance at 14/15; that result
 
 Development evaluation on 199 fictional emails, independent oracle checks, unit/integration/browser checks and the read-only static demo were validated. Existing v0.1.0 limitations remain except for the narrow inline-image exception above. Microsoft 365 and Gmail push notifications (Pub/Sub) were tested only against simulated services. Gmail polling was tested on one personal Gmail account. The startup timing in the historical v0.1.0 section is that version's cached-image measurement; no new clean-machine timing or production-mail-volume test claim is added.
 
-## v0.1.1 (2026-11-03): clearer demo and review UI
+## v0.1.1 (2026-11-03): read-only demo bar, case page for narrow screens and safer directory imports
 
 - **Static demo:** a compact read-only bar with the snapshot version and an “About this demo” fold; change
   controls and account information are hidden. Every Reply panel, including cases without a draft, explains
