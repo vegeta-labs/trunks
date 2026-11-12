@@ -33,7 +33,7 @@ beforeAll(async () => {
     const why = [...reasons].find(([s]) => subject.includes(s))?.[1] ?? 'test'
     return JSON.stringify({ labels: list.map((c) => ({ class: c.split(':')[0], confidence: c.split(':')[1] ?? 'high', reason: why })), language: 'en' })
   }
-  const config = { ...testConfig(), verification: { cooling_off_hours: 1 }, events: { webhook: { url: 'https://hooks.example/doi', secret_env: 'HOOK_SECRET' } } }
+  const config = { ...testConfig(), verification: { cooling_off_hours: 1 }, events: { webhook: { url: 'https://hooks.example/trunks', secret_env: 'HOOK_SECRET' } } }
   k = await createKit({ config, llm })
   await k.importCsv('deals', 'name,currency,close_date\nNorthwind Robotics,GBP,2026-12-18\nLarkspur Energy Storage,USD,\n')
   await k.importCsv('commitments', 'investor_id,name,email,reference,cash_due\n001,Amelia Hart,amelia@hartfamily.example,NW-001,"10,000.00"\n002,Oliver Bennett,oliver@bennett.example,NW-002,"5,000.00"\n', 'Northwind Robotics')
@@ -54,7 +54,7 @@ afterAll(async () => {
   await k?.close()
 })
 
-const as = (who: string) => ({ cookies: { doi_session: users[who]!.session }, headers: { 'x-csrf-token': users[who]!.csrf } })
+const as = (who: string) => ({ cookies: { trunks_session: users[who]!.session }, headers: { 'x-csrf-token': users[who]!.csrf } })
 const post = (who: string, url: string, payload: object = {}) => app.inject({ method: 'POST', url, payload, ...as(who) })
 const put = (who: string, url: string, payload: object) => app.inject({ method: 'PUT', url, payload, ...as(who) })
 const get = async (who: string, url: string) => app.inject({ method: 'GET', url, ...as(who) })
@@ -265,12 +265,12 @@ describe('payment evidence and events (C-FRD-2, C-OUT-1)', () => {
     const seen: Array<{ body: string; sig: string }> = []
     let status = 500
     const poster: Poster = async (_url, body, headers) => {
-      seen.push({ body, sig: headers['x-dealops-signature']! })
+      seen.push({ body, sig: headers['x-trunks-signature']! })
       return { status }
     }
     await k.db.query(`UPDATE event_outbox SET status = 'sent' WHERE case_id <> $1`, [id]) // only this Case
     const t0 = new Date('2027-01-01T00:00:00Z')
-    expect(await deliverDue(k, { url: 'https://hooks.example/doi', secret: 's3cret' }, poster, t0)).toBe(1)
+    expect(await deliverDue(k, { url: 'https://hooks.example/trunks', secret: 's3cret' }, poster, t0)).toBe(1)
     const sig = seen[0]!.sig
     expect(sig).toBe(`sha256=${createHmac('sha256', 's3cret').update(seen[0]!.body).digest('hex')}`)
     expect(signature('s3cret', seen[0]!.body.replace(/.$/, ' '))).not.toBe(sig) // one byte changed
@@ -279,15 +279,15 @@ describe('payment evidence and events (C-FRD-2, C-OUT-1)', () => {
     let at = t0.getTime()
     for (const wait of [60_000, 5 * 60_000, 30 * 60_000, 2 * 3_600_000]) {
       at += wait
-      expect(await deliverDue(k, { url: 'https://hooks.example/doi', secret: 's3cret' }, poster, new Date(at))).toBe(1)
+      expect(await deliverDue(k, { url: 'https://hooks.example/trunks', secret: 's3cret' }, poster, new Date(at))).toBe(1)
     }
     expect((await events(id))[0]!.status).toBe('failed')
-    expect(await deliverDue(k, { url: 'https://hooks.example/doi', secret: 's3cret' }, poster, new Date(at + DAY))).toBe(0) // the next one waits
+    expect(await deliverDue(k, { url: 'https://hooks.example/trunks', secret: 's3cret' }, poster, new Date(at + DAY))).toBe(0) // the next one waits
     status = 302 // a redirect is a failure, never followed
     await k.db.query(`UPDATE event_outbox SET status = 'pending', attempts = 0, next_attempt_at = NULL WHERE case_id = $1 AND case_event_seq = 1`, [id])
-    await deliverDue(k, { url: 'https://hooks.example/doi', secret: 's3cret' }, poster, new Date(at + DAY))
+    await deliverDue(k, { url: 'https://hooks.example/trunks', secret: 's3cret' }, poster, new Date(at + DAY))
     expect((await events(id))[0]!.status).toBe('pending')
-    await expect(deliverDue(k, { url: 'http://hooks.example/doi', secret: 's3cret' }, poster)).rejects.toThrow(/https/)
+    await expect(deliverDue(k, { url: 'http://hooks.example/trunks', secret: 's3cret' }, poster)).rejects.toThrow(/https/)
     expect(await auditTypes(id)).toContain('event.delivery_failed')
   })
   it('TC-OUT-04 an event holding a full IBAN is not sent and is audited', async () => {
@@ -443,12 +443,12 @@ describe('transactions and the network (TC-OUT-06, TC-PRV-04)', () => {
     const id = await ingest('Atomic one', ['complaint'])
     const before = await one<{ assignee: string | null }>('SELECT assignee FROM "case" WHERE id = $1', [id])
     const n = (await events(id)).length
-    await k.t.owner.query(`CREATE FUNCTION doi_test_crash() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'simulated crash'; END $$`)
-    await k.t.owner.query(`CREATE TRIGGER doi_test_crash BEFORE INSERT ON event_outbox FOR EACH ROW EXECUTE FUNCTION doi_test_crash()`)
+    await k.t.owner.query(`CREATE FUNCTION trunks_test_crash() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'simulated crash'; END $$`)
+    await k.t.owner.query(`CREATE TRIGGER trunks_test_crash BEFORE INSERT ON event_outbox FOR EACH ROW EXECUTE FUNCTION trunks_test_crash()`)
     try {
       expect((await put('rita', `/api/cases/${id}/assignment`, { assignee: users.paul!.id })).statusCode).toBe(500)
     } finally {
-      await k.t.owner.query('DROP TRIGGER doi_test_crash ON event_outbox; DROP FUNCTION doi_test_crash()')
+      await k.t.owner.query('DROP TRIGGER trunks_test_crash ON event_outbox; DROP FUNCTION trunks_test_crash()')
     }
     expect(await one('SELECT assignee FROM "case" WHERE id = $1', [id])).toEqual(before)
     expect((await events(id)).length).toBe(n)
@@ -467,7 +467,7 @@ describe('transactions and the network (TC-OUT-06, TC-PRV-04)', () => {
     try {
       const id = await ingest('Network check', ['payment_query'], { text: 'See https://tracker.example/pixel.png and http://evil.example/x' })
       await put('rita', `/api/cases/${id}/assignment`, { assignee: users.rita!.id })
-      await deliverDue(k, { url: 'https://hooks.example/doi', secret: 's' }, async () => ({ status: 200 })) // the webhook is the configured destination (stubbed here)
+      await deliverDue(k, { url: 'https://hooks.example/trunks', secret: 's' }, async () => ({ status: 200 })) // the webhook is the configured destination (stubbed here)
     } finally {
       net.Socket.prototype.connect = orig
     }
@@ -794,7 +794,7 @@ describe('Codex E3 review fixes', () => {
       return { status: 500 }
     }
     const t = new Date('2027-02-01T00:00:00Z')
-    await Promise.all([deliverDue(k, { url: 'https://hooks.example/doi', secret: 's' }, slow, t), deliverDue(k, { url: 'https://hooks.example/doi', secret: 's' }, slow, t)])
+    await Promise.all([deliverDue(k, { url: 'https://hooks.example/trunks', secret: 's' }, slow, t), deliverDue(k, { url: 'https://hooks.example/trunks', secret: 's' }, slow, t)])
     expect(calls).toBe(1)
     expect((await events(id))[0]!.status).toBe('pending')
   })
@@ -899,7 +899,7 @@ describe('Codex E3 review fixes, round 2', () => {
       fresh[name] = { id: uid, ...(await createSession(k.db, k.k, uid, 1, 12)) }
     }
     await k.t.owner.query('UPDATE user_event SET at = $1 WHERE user_id = ANY($2::uuid[])', [old, [fresh.vera!.id, fresh.abel!.id]])
-    const by = (who: string) => ({ cookies: { doi_session: fresh[who]!.session }, headers: { 'x-csrf-token': fresh[who]!.csrf } })
+    const by = (who: string) => ({ cookies: { trunks_session: fresh[who]!.session }, headers: { 'x-csrf-token': fresh[who]!.csrf } })
     const id = await ingest('Bank change, raced', ['bank_details'], { text: 'New account please.' })
     const t = await one<{ id: string }>(`SELECT id FROM verification_task WHERE case_id = $1 AND state = 'open'`, [id])
     expect((await app.inject({ method: 'POST', url: `/api/verification/${t.id}/complete`, payload: { items: ['call_phone_on_file', 'no_contact_details_from_mail', 'check_request_content', 'notify_old_contact'] }, ...by('vera') })).statusCode).toBe(200)
@@ -1360,7 +1360,7 @@ it('TC-REV-12 hidden evidence inherits sensitive values learned from other messa
   const r = await k.ingest(eml({ subject: 'Cross-part hidden ID', text: 'passport: 123456789', html: '<div style="display:none">123<span style="opacity:0">456789</span></div>' }))
   if (r.status !== 'created') throw new Error('duplicated test mail')
   await k.drain()
-  const detail = (await app.inject({ method: 'GET', url: `/api/cases/${r.caseId}`, cookies: { doi_session: users.rita!.session } })).json()
+  const detail = (await app.inject({ method: 'GET', url: `/api/cases/${r.caseId}`, cookies: { trunks_session: users.rita!.session } })).json()
   expect(detail.hiddenTexts.map((f: { text: string }) => f.text).join('')).not.toContain('123456789')
   expect(detail.hiddenTexts.map((f: { text: string }) => f.text).join('')).toContain('(ID number)')
 })

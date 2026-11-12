@@ -1,4 +1,4 @@
-// UI design rules §11.2 (docs/09_UI_DESIGN.md): tokens.css is shared word for word by the Toolkit app and this review UI
+// UI design rules §11.2 (docs/09_UI_DESIGN.md): tokens.css is shared word for word by the Goten app and this review UI
 // (the website keeps its own styles, v0.3). Its SHA-256 must equal the one the rules record; change the rules first, then every copy.
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'

@@ -4,12 +4,12 @@
 
 | What | Where | Why |
 |---|---|---|
-| **Database** | volume `deal-ops-inbox_db` | Cases, directory, users, audit chain, and all text (encrypted) |
-| **Files** | volume `deal-ops-inbox_files` | raw emails and attachments (encrypted) |
-| **State** | volume `deal-ops-inbox_state` | the daily audit chain head export |
-| **Secrets** | your secret directory (`./secrets`) | `doi_master_keys`, `doi_hmac_key` and the database passwords. **Without the keys, a backup cannot be read.** |
-| **Configuration** | your configuration directory (`DOI_CONFIG_DIR`) and `docker-compose.override.yml` | to start the same deployment again |
-| KYC folder (if you use a folder target) | volume `deal-ops-inbox_kyc` | transferred KYC files; back it up under your KYC policy |
+| **Database** | volume `trunks_db` | Cases, directory, users, audit chain, and all text (encrypted) |
+| **Files** | volume `trunks_files` | raw emails and attachments (encrypted) |
+| **State** | volume `trunks_state` | the daily audit chain head export |
+| **Secrets** | your secret directory (`./secrets`) | `trunks_master_keys`, `trunks_hmac_key` and the database passwords. **Without the keys, a backup cannot be read.** |
+| **Configuration** | your configuration directory (`TRUNKS_CONFIG_DIR`) and `docker-compose.override.yml` | to start the same deployment again |
+| KYC folder (if you use a folder target) | volume `trunks_kyc` | transferred KYC files; back it up under your KYC policy |
 
 Keep the secrets **apart from** the data backups, with stricter access. Anyone who has both can read everything.
 
@@ -30,7 +30,7 @@ B="$PWD/backup/$(date +%Y%m%dT%H%M%S)"
 mkdir -p "$PWD/backup" && mkdir "$B" || exit 1
 docker compose stop
 for v in db files state kyc; do
-  docker run --rm -v "deal-ops-inbox_$v:/v:ro" -v "$B:/b" postgres:16 \
+  docker run --rm -v "trunks_$v:/v:ro" -v "$B:/b" postgres:16 \
     tar --numeric-owner -czf "/b/$v.tgz" -C /v .
 done
 docker compose start
@@ -55,8 +55,8 @@ open Cases again, which may call your model provider.
 
 ```sh
 B="$PWD/backup/20261102T093000"   # the backup to restore
-P=doi-restore
-export DOI_SECRETS_DIR="$B/secrets" DOI_CONFIG_DIR="$B/config" DOI_PORT=8081
+P=trunks-restore
+export TRUNKS_SECRETS_DIR="$B/secrets" TRUNKS_CONFIG_DIR="$B/config" TRUNKS_PORT=8081
 # the restored copy's own file list: never the bundled proxy of the live deployment (it would take the same network
 # range and ports 80/443). Keep your override for the credentials if the copy needs them; this overrides .env.
 export COMPOSE_FILE=docker-compose.yml
@@ -84,7 +84,7 @@ Then check:
 4. Open a few Cases and their raw emails and attachments.
 
 When you are satisfied, either keep the restored project as your deployment, or remove it with
-`docker compose -p doi-restore down -v`.
+`docker compose -p trunks-restore down -v`.
 
 ## Upgrades
 
@@ -118,24 +118,24 @@ Things to know:
 
 ## Key rotation
 
-Master keys are listed in the secret file `doi_master_keys` as `id:base64`, separated by commas:
+Master keys are listed in the secret file `trunks_master_keys` as `id:base64`, separated by commas:
 
 ```text
 k1:<base64 of 32 bytes>,k2:<base64 of 32 bytes>
 ```
 
-`app` and `maintenance` write with the **last** key in the list. The rotation tool writes with `DOI_ACTIVE_KEY`.
+`app` and `maintenance` write with the **last** key in the list. The rotation tool writes with `TRUNKS_ACTIVE_KEY`.
 
 Steps:
 
-1. **Back up**, including the current `doi_master_keys`.
+1. **Back up**, including the current `trunks_master_keys`.
 2. Add a new key **at the end** of the list, on the same line:
 
    ```sh
    NEW=$(openssl rand -base64 32)
-   printf '%s,k2:%s\n' "$(cat secrets/doi_master_keys)" "$NEW" > secrets/doi_master_keys.new
-   mv secrets/doi_master_keys.new secrets/doi_master_keys
-   chmod 644 secrets/doi_master_keys
+   printf '%s,k2:%s\n' "$(cat secrets/trunks_master_keys)" "$NEW" > secrets/trunks_master_keys.new
+   mv secrets/trunks_master_keys.new secrets/trunks_master_keys
+   chmod 644 secrets/trunks_master_keys
    ```
 
 3. **Restart every instance with the new key first:**
@@ -149,7 +149,7 @@ Steps:
 4. Run the rotation:
 
    ```sh
-   DOI_ACTIVE_KEY=k2 docker compose run --rm rotate
+   TRUNKS_ACTIVE_KEY=k2 docker compose run --rm rotate
    ```
 
    It rewraps the data key of every encrypted text value and every stored file with `k2`, and deletes the old stored
@@ -158,10 +158,10 @@ Steps:
 
    When it finishes, it checks a sample with the new key alone and prints
    `rotation <id> complete: <n> text values and <n> files rewrapped, <n> checked with k2 alone`.
-5. Only after the rotation is complete may you remove `k1` from `doi_master_keys` and restart `app` and
+5. Only after the rotation is complete may you remove `k1` from `trunks_master_keys` and restart `app` and
    `maintenance`.
    - The app refuses to start if a key that data still needs is missing.
    - An instance that still writes with a key the rotation has moved away from also refuses to start.
 6. **Keep `k1`** in your key store for as long as you keep backups made before the rotation.
 
-The HMAC key (`doi_hmac_key`) is not rotated by this tool. Keep it for the life of the deployment.
+The HMAC key (`trunks_hmac_key`) is not rotated by this tool. Keep it for the life of the deployment.

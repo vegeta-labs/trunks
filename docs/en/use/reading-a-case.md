@@ -91,7 +91,7 @@ Each type has a starting risk and a usual queue. These are the defaults; your ad
 Compare each value with the email. Beside each one:
 
 - **Confirm** marks the value as checked by a person, and shows the tag **confirmed**.
-- **Edit** lets you enter the right value, then **Save**. Most values are typed. For a yes/no value such as **Change requested**, choose **Yes**, **No** or **No value**. For a list such as **Details to change** or **Document types**, tick the boxes that apply. Leave it empty, or tick nothing, and save to clear it.
+- **Edit** lets you enter the right value, then **Save**. Most values, such as amounts, dates and references, are typed. For a value with a fixed set of answers, such as **Sender role**, choose one from the drop-down. For a yes/no value such as **Change requested**, choose **Yes** or **No**. For a list such as **Details to change** or **Document types**, tick the boxes that apply. To clear a value, leave the box empty, choose **No value**, or tick nothing, and save.
 
 Some values come with a note in brackets:
 

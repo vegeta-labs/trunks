@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent Python oracle for the Deal Ops Inbox E1, E3, E4 and E6 rules.
+"""Independent Python oracle for the Trunks — Operations Inbox E1, E3, E4 and E6 rules.
 
 Written only from docs/01_PRD.md, docs/04_TEST_PLAN.md, eval/SCHEMA.md and
 eval/oracle/BRIEF.md. Python 3.11 standard library only.
@@ -2634,7 +2634,7 @@ def ledger_state(inp):
     ccy = str(inp.get("deal_currency") or "").upper()
     got = 0
     for r in rows:
-        # READING: a ledger row's investor_id may be the bare ID (Toolkit
+        # READING: a ledger row's investor_id may be the bare ID (Goten
         # export) or the commitment key; either form names the commitment.
         # Currency codes are compared in upper case. C-DIR-3 (v0.7.14): an
         # empty (or missing / blank) currency cell is the deal currency.
@@ -2883,7 +2883,7 @@ def actions(inp):
     if "withdrawal" in adopted:
         if consent in _CONSENT_OK:
             out.append({"action": "mark_withdrawn", "details": _t(
-                "Mark {investor_name} as withdrawn in Deal Ops Toolkit (consent: {consent_evidence})",
+                "Mark {investor_name} as withdrawn in Goten (consent: {consent_evidence})",
                 investor_name=inp.get("investor_name"), consent_evidence=consent)})
         else:
             out.append({"action": "request_withdrawal_consent",

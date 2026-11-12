@@ -1,8 +1,8 @@
 {
-  "name": "deal-ops-inbox",
+  "name": "trunks",
   "private": true,
   "license": "Apache-2.0",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "type": "module",
   "engines": {
     "node": ">=22"
@@ -17,6 +17,7 @@
     "check:licences": "node scripts/check-licences.mjs",
     "check:migrations": "node scripts/check-migrations.mjs",
     "check:tokens": "node scripts/check-tokens.mjs",
+    "check:old-names": "node --experimental-strip-types --no-warnings scripts/check-old-names.ts",
     "eval": "node --experimental-strip-types --no-warnings eval/run.ts eval/dev",
     "eval:record": "node --env-file-if-exists=.env.local --experimental-strip-types --no-warnings eval/run.ts eval/dev --record",
     "mutation": "node scripts/mutation-check.mjs",

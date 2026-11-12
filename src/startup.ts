@@ -48,7 +48,7 @@ export async function recordConfig(db: Db, k: Keyring, config: Config, queue: Qu
 
 /**
  * Tech design v0.7.9: refuse to start while a master key that data still needs is missing, then record which key this
- * process writes with (`keys.active`): `doi rotate-keys` checks it before and during a rotation.
+ * process writes with (`keys.active`): `trunks rotate-keys` checks it before and during a rotation.
  */
 export async function recordKeys(db: Db, k: Keyring): Promise<void> {
   // the check and the record in one transaction under the rotation's lock (Codex E4 round 2 F6)
@@ -59,7 +59,7 @@ export async function recordKeys(db: Db, k: Keyring): Promise<void> {
   // only when the latest rotation that involves this key moved away from it (regression review R6: a key rotated back
   // to later, or one only staged during an earlier rotation, may write)
   const away = await c.query("SELECT 1 FROM (SELECT from_key FROM key_rotation WHERE from_key = $1 OR to_key = $1 ORDER BY started_at DESC LIMIT 1) r WHERE r.from_key = $1", [k.active.id])
-  if (away.rowCount) problems.push(`the write key ${k.active.id} has been rotated away from; set DOI_ACTIVE_KEY to the new key`)
+  if (away.rowCount) problems.push(`the write key ${k.active.id} has been rotated away from; set TRUNKS_ACTIVE_KEY to the new key`)
   if (problems.length) throw new Error(`refusing to start: ${problems.join('; ')}`)
   await appendAudit(c, k, [{ actor: 'system', type: 'keys.active', payload: { key: k.active.id } }])
   })

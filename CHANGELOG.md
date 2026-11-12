@@ -1,5 +1,67 @@
 # Changelog
 
+## v0.5.0 (2026-11-12): old names removed
+
+Every name that still said "Deal Ops Inbox", `deal-ops-inbox` or `DOI_` is now Trunks. There is no compatibility with the old names: nothing reads an old variable, cookie, header or file name.
+
+### Before you upgrade
+
+A deployment made with v0.4.0 or earlier does not start with these files as it is. The simplest path is a new installation (`init-secrets`, then `docker compose up`). To keep existing data, rename everything in the table yourself before the first start; the database roles are renamed by `migrate` on its own, and migration `010_rename.sql` only goes forward. This path is not documented step by step and is tested only for the database part.
+
+| What | Before | Now |
+|---|---|---|
+| Images | `deal-ops-inbox:local`, `deal-ops-inbox-parser:local` | `trunks:local`, `trunks-parser:local` |
+| Compose project and volumes | `deal-ops-inbox`, `deal-ops-inbox_db` …; demo `deal-ops-inbox-demo`, `deal-ops-inbox-demo-db` … | `trunks`, `trunks_db` …; demo `trunks-demo`, `trunks-demo-db` … |
+| Paths in the containers and in `deployment.yaml` | `/var/lib/deal-ops-inbox/…` | `/var/lib/trunks/…` |
+| Environment variables | `DOI_*` (`DOI_SECRETS_DIR`, `DOI_CONFIG_DIR`, `DOI_PORT`, `DOI_DOMAIN`, `DOI_PROXY_IP`, `DOI_EDGE_SUBNET`, `DOI_VERSION`, `DOI_MASTER_KEYS`, `DOI_ACTIVE_KEY`, `DOI_HMAC_KEY`, `DOI_*_DB_PASSWORD`, the `_FILE` forms; `DOI_URL` in the documentation's examples) | `TRUNKS_*`, same endings |
+| Secret files | `doi_master_keys`, `doi_hmac_key`, `doi_app_db_password`, `doi_maintenance_db_password`, `doi_rotation_db_password` | `trunks_master_keys`, `trunks_hmac_key`, `trunks_app_db_password`, `trunks_maintenance_db_password`, `trunks_rotation_db_password` |
+| Database and roles | database `doi`; roles `doi_app`, `doi_maintenance`, `doi_rotation` | database `trunks`; roles `trunks_app`, `trunks_maintenance`, `trunks_rotation`. All four `*_database_url` secrets carry the database name and three of them a role name. Nothing renames an existing database: rename it (`ALTER DATABASE doi RENAME TO trunks`) or keep `/doi` in the four URLs and use `-d doi` in the documentation's `psql` commands |
+| Cookies | `doi_session`, `doi_oidc` | `trunks_session`, `trunks_oidc` (everyone signs in again) |
+| AppArmor profile | `doi-parser`, file `deploy/apparmor/doi-parser` | `trunks-parser`, file `deploy/apparmor/trunks-parser`. Load the new profile (`sudo cp deploy/apparmor/trunks-parser /etc/apparmor.d/ && sudo apparmor_parser -r -W /etc/apparmor.d/trunks-parser`); the parser container does not start without it |
+| Webhook signature header (events and KYC webhook) | `X-DealOps-Signature` | `X-Trunks-Signature` (same algorithm, secret and body) |
+| Header of the placeholder that replaces a removed KYC attachment | `X-Deal-Ops-Removed: kyc` | `X-Trunks-Removed: kyc` |
+| Suggested action `mark_withdrawn`, `details` text (case page, actions CSV) | "Mark … as withdrawn in Deal Ops Toolkit (consent: …)" | "Mark … as withdrawn in Goten (consent: …)" |
+| Static demo package | `deal-ops-inbox-demo-vX.Y.Z.tar.gz`, global `DOI_DEMO` in `data/snapshot.js` | `trunks-demo-vX.Y.Z.tar.gz`, global `TRUNKS_DEMO` |
+| Browser storage key for the CSRF token | `doi.csrf` | `trunks.csrf` |
+| Command name in messages and documentation | `doi gmail-auth`, `doi rotate-keys` … | `trunks gmail-auth`, `trunks rotate-keys` … (the commands themselves are unchanged: `docker compose run --rm app <command>`) |
+| Package name (`package.json`) | `deal-ops-inbox` | `trunks` |
+
+Unchanged: the queue id `deal_ops` in `cases.yaml`, the format of stored files, the event schema, every classification, risk, template and reply rule.
+
+### What changed
+
+- **Names:** as in the table. Messages and documentation that named the companion product "Deal Ops Toolkit" or "the Toolkit" now say Goten (for example the ledger import error "reverse it in Goten and export again" and the demo notice).
+- **Database roles:** `migrate` renames existing `doi_*` roles (grants and ownership follow) and stops if both an old and a new role exist. The released migrations `001`–`009` are unchanged on disk and are run with the three role names replaced.
+- **Documentation:** the overview in `docs/en/README.md` is now titled "run and build (administrator documentation)".
+- **Editing single-choice fields:** on the case page, **Edit** on a single-choice field such as Sender role offers a drop-down of the allowed values, instead of a text box where the exact value had to be typed. The server's checks are unchanged.
+
+### Testing
+
+- The unit, integration, browser and Compose suites run under the new names. The upgrade test starts from the old code with the old names and checks that only `trunks_*` roles remain. A check in CI (`npm run check:old-names`) fails when an old name comes back outside the historical records.
+- The development evaluation set on recorded model replies gives byte-identical output before and after the change; no classification, risk, template or reply logic changed, so no new blind evaluation was run.
+- Browser test for the single-choice drop-down (test plan TC-REV-19).
+
+### Evaluation carried forward from v0.3.0
+
+The following held-out results were **measured on v0.3.0** (frozen code `bbdfc8b`, 126 emails, Claude Opus 5.5) and are quoted unchanged under the rule for small versions; they are not a new measurement. The judgement-related files that differ from `bbdfc8b` were each checked against what the evaluation scores: since v0.4.0 they are the renamed names, paths, roles, headers and comments, and the wording of the suggested action `mark_withdrawn`, which the evaluation does not score. The development set on recorded model replies gives byte-identical output on `bbdfc8b` and on this release.
+
+| Metric | Threshold | Result |
+|---|---|---|
+| Classification, macro F1 | ≥ 0.85 | 0.960 |
+| Fields extracted by rules (re-scored after the v0.3.0 scoring fix) | 100% | 100% (126/126) |
+| Field recall | ≥ 0.90 | 90.0% (442/491) |
+| Field precision | ≥ 0.90 | 97.1% (440/453) |
+| Fields that should stay empty | ≥ 0.95 | 100% (26/26) |
+| Contact, commitment and deal linked correctly | ≥ 0.95 | 98.4% (123/125) |
+| Risk never underestimated | 100% | 100% (126/126) |
+| High-risk emails rated high | 100% | 100% (80/80) |
+| Malicious bank-detail changes or look-alike senders rated high | 100% | 100% (18/18) |
+| Replies never disclose more than allowed | 100% | 100% (126/126) |
+| Prompt injection does not change the judgement (vs. a clean twin) | 100% | 100% (15/15) |
+| Risk and template from the rules, given the annotated categories and fields | 100% | 100% (126/126) |
+| Rule consistency against the independent implementation | 100% | 100% (126/126) |
+| Real-model cancellations of an otherwise qualifying payment message (reported, no threshold) | — | 2 of 10 |
+
 ## v0.4.0 (2026-11-10): closing rules and two-person checks
 
 ### Before you upgrade

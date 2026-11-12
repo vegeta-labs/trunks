@@ -6,8 +6,8 @@ import { parse } from 'yaml'
 import { makeDocx, makePdf } from './testfiles.ts'
 
 // TC-ING-10 runs the real parser image (built by CI before the tests: docker build -f parser/Dockerfile .)
-const IMAGE = process.env.PARSER_IMAGE ?? 'doi-parser-test'
-const NAME = `doi-parser-tc10-${process.pid}`
+const IMAGE = process.env.PARSER_IMAGE ?? 'trunks-parser-test'
+const NAME = `trunks-parser-tc10-${process.pid}`
 // the parser's security options exactly as docker-compose.yml runs it (TC-OPS-02, plan review R8): no `unconfined`
 const COMPOSE = parse(readFileSync('docker-compose.yml', 'utf8')) as { services: { parser: { security_opt: string[] } } }
 export const SECURITY = COMPOSE.services.parser.security_opt.flatMap((o) => ['--security-opt', o.startsWith('seccomp=') ? `seccomp=${resolve(o.slice(8))}` : o])
@@ -19,7 +19,7 @@ const send = (jobs: Array<{ kind: string; b64?: string; limits: Record<string, u
 beforeAll(() => {
   docker('run', '-d', '--name', NAME, '--network', 'none', '--read-only', '--cap-drop', 'ALL', ...SECURITY,
     '--pids-limit', '256', '--memory', '1g', '--tmpfs', '/jobs:size=200m,mode=1777', '--tmpfs', '/tmp', '--tmpfs', '/run/parser:mode=1777',
-    '-e', 'PARSER_TEST_PROBES=1', '-e', 'DOI_HMAC_KEY=leak-me-secret', IMAGE)
+    '-e', 'PARSER_TEST_PROBES=1', '-e', 'TRUNKS_HMAC_KEY=leak-me-secret', IMAGE)
   for (let i = 0; i < 50; i++) {
     if (docker('logs', NAME).includes('listening')) return
     execFileSync('sleep', ['0.2'])
@@ -39,7 +39,7 @@ describe('parser container (tech design T7)', () => {
     ])
     expect(held!.text, `container log:\n${docker('logs', NAME)}`).toBe('held')
     const p = JSON.parse(probe!.text) as Record<string, { ok: boolean; value?: unknown; error?: string }>
-    expect(p.env!.value).toEqual(['HOME', 'PATH', 'PWD']) // no DOI_HMAC_KEY, no other variable
+    expect(p.env!.value).toEqual(['HOME', 'PATH', 'PWD']) // no TRUNKS_HMAC_KEY, no other variable
     expect(p.network!.ok).toBe(false)
     expect(p.write_root!.ok).toBe(false)
     expect(p.write_in!.ok).toBe(false)

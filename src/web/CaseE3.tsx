@@ -110,7 +110,7 @@ const Panel = ({ title, children }: { title: string; children: ReactNode }) => (
 export function actionText(a: E3['actions'][number]): string {
   if (a.action === 'none') return 'No action needed'
   if (a.action === 'forward_kyc_documents') return 'Review KYC hand-off status in Attachments'
-  if (a.action === 'mark_withdrawn') return (a.details ?? a.action).replace(' in Deal Ops Toolkit (consent:', ' in Goten (consent:').replace('(consent: investor_cc)', '(investor consent recorded in Cc)')
+  if (a.action === 'mark_withdrawn') return (a.details ?? a.action).replace('(consent: investor_cc)', '(investor consent recorded in Cc)')
   return a.details ?? a.action
 }
 
@@ -316,6 +316,11 @@ export function FieldActions({ caseId, field, confirmed, closed = false, reload 
               <option value="">No value</option>
               <option value="true">Yes</option>
               <option value="false">No</option>
+            </select>
+          ) : input.kind === 'choice' ? (
+            <select aria-label={label} value={value} onChange={(e) => setValue(e.target.value)}>
+              <option value="">No value</option>
+              {input.options.map((o) => <option key={o} value={o}>{optionText(o)}</option>)}
             </select>
           ) : input.kind === 'list' ? (
             <span role="group" aria-label={label}>

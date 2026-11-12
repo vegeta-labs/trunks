@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import { ConfigError, loadConfig } from './load.ts'
 
 const copy = () => {
-  const d = mkdtempSync(join(tmpdir(), 'doi-cfg-'))
+  const d = mkdtempSync(join(tmpdir(), 'trunks-cfg-'))
   cpSync('config/default', d, { recursive: true })
   return d
 }

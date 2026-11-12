@@ -112,7 +112,7 @@ Removing a mailbox from the configuration stops collection but keeps its stored 
 2. Delete the stored row as the database owner (the app's own role cannot delete it):
 
    ```sh
-   docker compose exec db psql -U postgres -d doi -c "DELETE FROM mailbox_credential WHERE mailbox_id = '<mailbox id>'"
+   docker compose exec db psql -U postgres -d trunks -c "DELETE FROM mailbox_credential WHERE mailbox_id = '<mailbox id>'"
    ```
 
    The encrypted token it referred to is removed by the next daily clean-up.

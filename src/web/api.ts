@@ -2,7 +2,7 @@ import { DEMO_REFUSAL, STATIC_DEMO, staticAnswer } from './static-demo.ts'
 import { plainProblems } from './presentation.ts'
 
 // API client. The CSRF token is kept in sessionStorage so a page reload keeps working (tech design §5).
-const CSRF = 'doi.csrf'
+const CSRF = 'trunks.csrf'
 
 export const csrf = {
   // the static demo has no session and keeps nothing in the browser (site interface T4)

@@ -8,7 +8,7 @@ A configuration directory holds three YAML files:
 | cases.yaml | the case categories (classes) |
 | templates.yaml | the reply templates |
 
-Compose mounts the directory read-only at `/config`. It comes from `DOI_CONFIG_DIR`, which defaults to
+Compose mounts the directory read-only at `/config`. It comes from `TRUNKS_CONFIG_DIR`, which defaults to
 `./config/default`.
 
 General rules:
@@ -142,7 +142,7 @@ Friday, minus `routing.holidays`.
 | Key | Type | Default | Meaning |
 |---|---|---|---|
 | `events.webhook.url` | `https://` URL | none | Optional. Where JSON events are posted. HTTPS only; redirects are not followed. |
-| `events.webhook.secret_env` | env name | required with `webhook` | Variable with the signing secret. Each request carries an HMAC-SHA256 signature in `X-DealOps-Signature`. |
+| `events.webhook.secret_env` | env name | required with `webhook` | Variable with the signing secret. Each request carries an HMAC-SHA256 signature in `X-Trunks-Signature`. |
 
 Failed deliveries are retried after 1, 5 and 30 minutes and after 2 hours, then marked failed. Events of one Case are
 delivered in order.
@@ -151,7 +151,7 @@ delivered in order.
 
 | Key | Type | Default | Meaning |
 |---|---|---|---|
-| `audit.head_export_path` | path | required | File the audit chain head (latest sequence number and hash) is appended to daily. In Compose, use the `state` volume: `/var/lib/deal-ops-inbox/state/audit-head.jsonl`. Copy it to storage outside the deployment. |
+| `audit.head_export_path` | path | required | File the audit chain head (latest sequence number and hash) is appended to daily. In Compose, use the `state` volume: `/var/lib/trunks/state/audit-head.jsonl`. Copy it to storage outside the deployment. |
 
 ### `retention`
 
@@ -172,9 +172,9 @@ Where possible-KYC attachments are transferred. Without a target, transfers fail
 | `kyc.inline_image.max_short_side` | positive integer, at most `300` | `150` | Maximum shorter dimension in pixels for the exception. |
 | `kyc.inline_image.max_bytes` | positive integer, at most `102400` | `51200` | Maximum transfer-decoded file size in bytes for the exception. |
 | `kyc.target.kind` | `folder` \| `webhook` | none | The kind of target. |
-| `kyc.target.path` | path | required for `folder` | Folder for the files. In Compose, the `kyc` volume is mounted at `/var/lib/deal-ops-inbox/kyc`. File names are generated (`<case id>-<n>.<ext>`), never the attachment's own name. |
+| `kyc.target.path` | path | required for `folder` | Folder for the files. In Compose, the `kyc` volume is mounted at `/var/lib/trunks/kyc`. File names are generated (`<case id>-<n>.<ext>`), never the attachment's own name. |
 | `kyc.target.url` | `https://` URL | required for `webhook` | Endpoint for the files. HTTPS only. |
-| `kyc.target.secret_env` | env name | required for `webhook` | Variable with the HMAC signing secret (`X-DealOps-Signature: sha256=…`). |
+| `kyc.target.secret_env` | env name | required for `webhook` | Variable with the HMAC signing secret (`X-Trunks-Signature: sha256=…`). |
 
 Increasing these limits leaves larger eligible images in the archive under the normal retention period instead of
 transferring them to the KYC target. Image contents never go to a model. The other MIME, HTML reference, scan and

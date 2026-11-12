@@ -17,7 +17,7 @@ const att = (maybe_kyc: boolean) => ({ ordinal: 0, filename: 'passport.pdf', kin
 
 describe('the oracle KYC comparison (test plan §3, C-RED-0)', () => {
   it('TC-RED-04 a flipped maybe_kyc is reported; the correct one is not; a missing export fails with --require-attachments', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'doi-kyc-oracle-'))
+    const dir = mkdtempSync(join(tmpdir(), 'trunks-kyc-oracle-'))
     writeFileSync(join(dir, 'classes.json'), '[]')
     writeFileSync(join(dir, 'calendar.json'), JSON.stringify({ timezone: 'Europe/London', start: '09:00', end: '18:00', holidays: [] }))
     writeFileSync(join(dir, 'K1.actual.json'), JSON.stringify({ id: 'K1', attachments: [att(false)] }))

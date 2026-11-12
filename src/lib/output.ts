@@ -14,7 +14,7 @@ export function queueFor(classes: ReadonlyArray<ClassFloor & { queue: string }>,
 export const ACTION_COLUMNS = ['case_id', 'received_at', 'deal', 'investor_id', 'investor_name', 'action', 'details', 'amount', 'status', 'currency'] as const
 export const CASE_COLUMNS = ['case_id', 'received_at', 'mailbox', 'from', 'classes', 'risk', 'queue', 'assignee', 'status', 'due_at', 'closed_at', 'outcome'] as const
 
-/** Amounts as in the Toolkit: no thousands separator, two decimals, a minus sign when negative. */
+/** Amounts as in Goten: no thousands separator, two decimals, a minus sign when negative. */
 export function csvAmount(minor: number | null): string {
   if (minor === null) return ''
   const sign = minor < 0 ? '-' : ''

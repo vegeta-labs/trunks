@@ -24,7 +24,7 @@ export const DEMO_ACCOUNTS: ReadonlyArray<{ username: string; password: string; 
   { username: 'demo-admin', password: 'demo-admin-password', role: 'admin' },
 ]
 
-export const DEMO_KYC_DIR = '/var/lib/deal-ops-inbox/kyc'
+export const DEMO_KYC_DIR = '/var/lib/trunks/kyc'
 const EVAL = 'eval'
 
 /**

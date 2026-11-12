@@ -22,7 +22,7 @@ describe('suggested actions (C-OUT-3)', () => {
     expect(run({ adopted: ['legal_documents', 'tax_certificates'] })).toEqual(['forward_to_legal'])
     expect(run({ adopted: ['complaint'] })).toEqual(['none'])
     const details = suggestedActions({ adopted: ['payment_evidence', 'withdrawal'], fields: { consent_evidence: 'investor_self' }, template: null, commitment, deal: null, leadConfirmed: false })
-    expect(details.map((a) => a.details)).toEqual(['Mark Amelia Hart as withdrawn in Deal Ops Toolkit (consent: investor_self)', "Check Amelia Hart's payment in the ledger (NW-001)"])
+    expect(details.map((a) => a.details)).toEqual(['Mark Amelia Hart as withdrawn in Goten (consent: investor_self)', "Check Amelia Hart's payment in the ledger (NW-001)"])
   })
   it('TC-OUT-07 / TC-OUT-08 lead confirmation', () => {
     const ok = { adopted: ['closing_confirmation'], confirms: 'yes', confirmsByPerson: true, authenticatedSender: true, senderIsLeadOfDeal: true }

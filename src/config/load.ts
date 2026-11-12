@@ -71,7 +71,7 @@ export const DeploymentFile = z.strictObject({
     currencies: z.array(z.string().regex(/^[A-Z]{3}$/)).min(1),
   }),
   mailboxes: z.array(Mailbox).min(1),
-  // PRD decision 6: Gmail with one OAuth refresh token per mailbox (doi gmail-auth); watch notifications by Pub/Sub pull
+  // PRD decision 6: Gmail with one OAuth refresh token per mailbox (trunks gmail-auth); watch notifications by Pub/Sub pull
   gmail: z
     .strictObject({
       client_id_env: ENV,

@@ -41,7 +41,7 @@ test('TC-REV-13 filters, keyboard navigation, history, focus and scroll restorat
 
 test('TC-DEMO-05 mixed KYC attachments remain distinct and no readonly checklist instruction', async ({ page }) => {
   await patchSnapshot(page, `{
-    const c = globalThis.DOI_DEMO.details.E0045;
+    const c = globalThis.TRUNKS_DEMO.details.E0045;
     const original = c.attachments[0];
     c.attachments = ['delivered', 'pending', 'failed', 'discarded'].map((state, i) => ({...original, ordinal:i, filename:'sample-'+i+'.pdf', kycTransfer:{...original.kycTransfer, state, error:state==='failed'?'infected':null, removed:false}}));
   }`)
@@ -62,7 +62,7 @@ test('TC-DEMO-05 mixed KYC attachments remain distinct and no readonly checklist
 for (const mode of ['missing', 'incomplete', 'risk-change'] as const) {
   test(`TC-DEMO-05 summary generation safety: ${mode}`, async ({ page }) => {
     await patchSnapshot(page, `{
-      const c=globalThis.DOI_DEMO.details.E0225;
+      const c=globalThis.TRUNKS_DEMO.details.E0225;
       ${mode === 'missing' ? 'c.e3=null;' : mode === 'incomplete' ? 'c.e3.complete=false; c.e3.actions=[{action:"fake",details:"OLD ACTION MUST NOT SHOW"}];' : 'c.e3.pendingRisk="low"; c.e3.risk.held="high"; c.e3.risk.applied="low";'}
     }`)
     await page.goto('/#case=E0225')
@@ -82,7 +82,7 @@ for (const mode of ['missing', 'incomplete', 'risk-change'] as const) {
 
 test('TC-DEMO-05 reply statuses and missing signal results stay explicit', async ({ page }) => {
   await patchSnapshot(page, `{
-    const c=globalThis.DOI_DEMO.details.E0225, r=c.e3.replies[0];
+    const c=globalThis.TRUNKS_DEMO.details.E0225, r=c.e3.replies[0];
     c.signalDetails=[];
     c.e3.replies=['draft','approved','sent','rejected'].map((status,i)=>({...r,id:'synthetic-'+i,status,outOfDate:false}));
     c.e3.replies.push({...r,id:'synthetic-old',outOfDate:true});

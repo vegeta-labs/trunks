@@ -8,7 +8,7 @@ import { checkPublic, exportPublic, readCuration } from './public-export.ts'
 
 describe('public snapshot', () => {
   it('TC-OPS-05 nothing private in the export; in a fresh tree: typecheck, lint, rule tests, oracle self-check, evaluation', () => {
-    const out = join(mkdtempSync(join(tmpdir(), 'doi-public-')), 'pub')
+    const out = join(mkdtempSync(join(tmpdir(), 'trunks-public-')), 'pub')
     // local runs add the private curation rules and names (outside the repository); CI checks the generic rules
     const files = exportPublic(out, process.env.PUBLIC_CURATION_FILE ? readCuration(process.env.PUBLIC_CURATION_FILE) : [])
     if (process.env.PUBLIC_CURATION_FILE) expect(files.unusedRules).toEqual([])

@@ -16,14 +16,14 @@ const at = (db: string, user?: string, password?: string) => {
 }
 const PW = PASSWORDS // roles are cluster-wide: the shared test passwords
 async function database(demo: boolean) {
-  const name = `doi_guard_${randomBytes(5).toString('hex')}`
+  const name = `trunks_guard_${randomBytes(5).toString('hex')}`
   const a = new pg.Client({ connectionString: TEST_URL })
   await a.connect()
   await a.query(`CREATE DATABASE ${name}`)
   await a.end()
   names.push(name)
   await migrate(at(name), PW, { demo })
-  return { app: pool(at(name, 'doi_app', PW.doi_app), 2), maintenance: pool(at(name, 'doi_maintenance', PW.doi_maintenance), 2) }
+  return { app: pool(at(name, 'trunks_app', PW.trunks_app), 2), maintenance: pool(at(name, 'trunks_maintenance', PW.trunks_maintenance), 2) }
 }
 afterAll(async () => {
   const a = new pg.Client({ connectionString: TEST_URL })

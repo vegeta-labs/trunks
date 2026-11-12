@@ -30,7 +30,7 @@ signals:
   injection_markers_extra: []
 
 audit:
-  head_export_path: /var/lib/deal-ops-inbox/state/audit-head.jsonl
+  head_export_path: /var/lib/trunks/state/audit-head.jsonl
 
 # the evaluation runs on recorded model replies (test plan §4.4); `npm run eval:record` records them with a real model
 model:

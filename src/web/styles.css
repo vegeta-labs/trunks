@@ -1,6 +1,6 @@
 /*
- * Review UI styles (docs/09_UI_DESIGN.md v0.2). Variables come from tokens.css, shared word for word with the Deal Ops
- * Toolkit app and the website. Fonts are open-licensed (SIL OFL 1.1, texts in /licenses/) and bundled: nothing is
+ * Review UI styles (docs/09_UI_DESIGN.md v0.2). Variables come from tokens.css, shared word for word with the Goten
+ * app and the website. Fonts are open-licensed (SIL OFL 1.1, texts in /licenses/) and bundled: nothing is
  * fetched from a font service (CSP font-src 'self').
  */
 @import './tokens.css';

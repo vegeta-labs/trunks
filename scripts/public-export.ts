@@ -6,8 +6,13 @@
 // reference platforms, compared products) are read from FORBIDDEN_NAMES_FILE, and the sentences that need a curated
 // wording from PUBLIC_CURATION_FILE (`<exact text><TAB><public text>` per line); both are kept outside the
 // repository, so this file holds none of them. A publication run needs both (Codex E5 F5).
+// A run that passes records what it wrote (path and SHA-256 of every file) in EXPORT_RECORD, outside the out dir.
+// Then (rules G3, development repository only): `scripts/public-manifest.ts check-publish <out dir>` before the push to
+// the public repository (the candidate must equal that record exactly), and `scripts/public-manifest.ts write <public
+// checkout>` after it.
 import { execFileSync } from 'node:child_process'
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { copyFileSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 
 /** Published paths: a file, or a directory prefix ending in `/`. */
@@ -20,17 +25,22 @@ export const ALLOW = [
   '.github/workflows/mutation-weekly.yml',
 ]
 /** Never published, even below an allowed prefix. */
-const DENY = [/(^|\/)[^/]* 2\.[^/]+$/] // iCloud duplicates
+const DENY = [
+  /(^|\/)[^/]* 2\.[^/]+$/, // iCloud duplicates
+  /^scripts\/(public-manifest|check-version-labels)(\.test)?\.ts$/, // the dev repository's publication checks (rules G3)
+]
 const allowed = (p: string) => ALLOW.some((a) => (a.endsWith('/') ? p.startsWith(a) : p === a)) && !DENY.some((d) => d.test(p))
 // eval/*.ts sit directly in eval/ (runner, metrics): allowed one by one
 const allowEvalTs = (p: string) => /^eval\/[^/]+\.ts$/.test(p)
+/** Whether a path is one this exporter publishes (also used by the publication checks). */
+export const isPublished = (p: string) => allowed(p) || allowEvalTs(p)
 
 /** The public version of a Chinese design document; `rules`: the private exact-text replacements, applied first. */
 export function curate(text: string, rules: ReadonlyArray<readonly [string, string]> = []): string {
   for (const [from, to] of rules) text = text.split(from).join(to)
   return text
     .replace(/负责人：[^·（\n]+（产品）/g, '负责人：项目负责人（产品）')
-    .replace(/存放在 Deal Ops Toolkit 的开发仓库[^。\n]*/g, '未公开')
+    .replace(/存放在 Goten 的开发仓库[^。\n]*/g, '未公开')
     .replace(/`?(?:docs\/)?review\/[^\s`）)，、；]+`?/g, '（审查记录，未公开）')
     .replace(/`?(?:~\/|\/Users\/)[^\s`）)，、；]+`?/g, '（本机路径，未公开）')
 }
@@ -43,7 +53,7 @@ export const readCuration = (file: string): Array<[string, string]> =>
 /** Exports; also returns the curation rules whose exact text was found in no document (stale rules). */
 export function exportPublic(out: string, rules: ReadonlyArray<readonly [string, string]> = []): string[] & { unusedRules?: string[] } {
   const tracked = execFileSync('git', ['ls-files', '-z'], { encoding: 'utf8' }).split('\0').filter(Boolean)
-  const files = tracked.filter((p) => (allowed(p) || allowEvalTs(p)) && existsSync(p)).sort()
+  const files = tracked.filter((p) => isPublished(p) && existsSync(p)).sort()
   const used = new Set<string>()
   for (const p of files) {
     const to = join(out, p)
@@ -102,6 +112,24 @@ export function checkPublic(out: string, forbiddenNames: string[] = []): string[
   return [...new Set(problems)]
 }
 
+/** Written by a passing publication run (in the working directory, git-ignored): the exact scanned output. */
+export const EXPORT_RECORD = '.public-export.json'
+export type ExportRecord = { devCommit: string; files: Record<string, string> }
+/** Path and SHA-256 of every regular file below an out dir (symbolic links and other entries are left out, so they never match). */
+export function recordExport(out: string, devCommit: string): ExportRecord {
+  const files: Record<string, string> = {}
+  const walk = (d: string): void => {
+    for (const f of readdirSync(d).sort()) {
+      const full = join(d, f)
+      const st = lstatSync(full)
+      if (st.isDirectory()) walk(full)
+      else if (st.isFile()) files[relative(out, full)] = createHash('sha256').update(readFileSync(full)).digest('hex')
+    }
+  }
+  walk(out)
+  return { devCommit, files }
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
   const out = process.argv[2]
   if (!out) {
@@ -122,5 +150,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     console.error(`not publishable:\n${problems.join('\n')}`)
     process.exit(1)
   }
-  console.log(`${files.length} files in ${out}; ${names.length} names checked, ${rules.length} curation rules applied`)
+  const record = recordExport(out, execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim())
+  writeFileSync(EXPORT_RECORD, `${JSON.stringify(record, null, 2)}\n`)
+  console.log(`${files.length} files in ${out}; ${names.length} names checked, ${rules.length} curation rules applied; recorded in ${EXPORT_RECORD}`)
 }

@@ -1,4 +1,4 @@
-// `doi gmail-auth <mailbox>` (PRD decision 6, tech design v0.7.9): one consent per mailbox, on the operator's machine.
+// `trunks gmail-auth <mailbox>` (PRD decision 6, tech design v0.7.9): one consent per mailbox, on the operator's machine.
 // Loopback redirect (127.0.0.1, a random port) with PKCE; the request asks for gmail.readonly only; the answer must
 // carry exactly that scope and belong to the configured address, or nothing is saved. The refresh token is stored
 // encrypted (secret_blob via mailbox_credential); the token it replaces is not revoked (that would revoke the grant).

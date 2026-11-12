@@ -83,9 +83,34 @@ describe('TC-REV-18 a person can edit yes/no and list fields', () => {
     expect(optionText('proof_of_address')).toBe('Proof of address')
   })
   it('keeps typed text for the other fields', () => {
-    for (const f of Object.keys(KIND).filter((x) => KIND[x] !== 'boolean' && KIND[x] !== 'enums')) expect(editInput(f)).toEqual({ kind: 'text' })
-    expect(editValue({ kind: 'text' }, '  investor ', [])).toBe('investor')
+    for (const f of Object.keys(KIND).filter((x) => !['boolean', 'enum', 'enums'].includes(KIND[x]!))) expect(editInput(f)).toEqual({ kind: 'text' })
+    expect(editValue({ kind: 'text' }, '  GBP ', [])).toBe('GBP')
     expect(editValue({ kind: 'text' }, '   ', [])).toBeNull()
-    expect(checkValue('party_role', editValue(editInput('party_role'), 'investor', []) as string, ctx)).toEqual({ ok: true, value: 'investor' })
+  })
+})
+
+describe('TC-REV-19 a person chooses a single-choice field from its allowed values', () => {
+  const ctx: FieldContext = {
+    modelText: '', currencies: ['GBP'], platforms: [], deals: [], restore: (t) => t,
+    rules: { uetrs: [], amounts: [], evidenceAmounts: [], references: [], accountLast4: [], valueDates: [] },
+  }
+  it('offers exactly the allowed values of every single-choice field, and each one passes the server check', () => {
+    const choices = Object.keys(KIND).filter((f) => KIND[f] === 'enum')
+    expect(choices).toEqual(expect.arrayContaining(['party_role', 'entity_type', 'confirms', 'subtype']))
+    expect(choices).toHaveLength(Object.keys(ENUMS).length - 2)
+    for (const f of choices) {
+      const input = editInput(f)
+      expect(input).toEqual({ kind: 'choice', options: ENUMS[f] })
+      if (input.kind !== 'choice') throw new Error('not a choice')
+      for (const o of input.options) {
+        expect(editValue(input, o, [])).toBe(o)
+        expect(checkValue(f, editValue(input, o, []) as string, ctx)).toEqual({ ok: true, value: o })
+        expect(optionText(o)).toMatch(/^[A-Z][^_]*$/)
+      }
+      expect(editValue(input, '', [])).toBeNull()
+      expect(editValue(input, 'not_an_option', [])).toBeNull()
+    }
+    expect(optionText('us_person')).toBe('US person')
+    expect(optionText('seis')).toBe('SEIS')
   })
 })

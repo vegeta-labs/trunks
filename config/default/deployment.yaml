@@ -50,13 +50,13 @@ signals:
   injection_markers_extra: []
 
 audit:
-  head_export_path: /var/lib/deal-ops-inbox/state/audit-head.jsonl
+  head_export_path: /var/lib/trunks/state/audit-head.jsonl
 
 # where possible-KYC attachments go (PRD R-PRV-03). Without a target every transfer fails and is reminded daily.
-# In Compose the kyc volume is mounted at /var/lib/deal-ops-inbox/kyc. See docs/en/configuration.md.
+# In Compose the kyc volume is mounted at /var/lib/trunks/kyc. See docs/en/configuration.md.
 # A webhook target instead: target: { kind: webhook, url: https://kyc.capital.example/upload, secret_env: KYC_WEBHOOK_SECRET }
 # kyc:
-#   target: { kind: folder, path: /var/lib/deal-ops-inbox/kyc }
+#   target: { kind: folder, path: /var/lib/trunks/kyc }
 
 # the model provider (PRD R-PRV-01, tech design §3.2). An external provider without a data processing agreement
 # refuses to start: set dpa: true once one is signed (or allow_without_dpa: true, which warns in the log and the UI).

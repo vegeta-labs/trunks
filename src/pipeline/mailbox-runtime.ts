@@ -61,8 +61,8 @@ export async function mailboxWarnings(db: Pick<Db, 'query'>): Promise<string[]> 
        FROM audit WHERE type = 'mailbox.status' ORDER BY payload->>'mailbox', payload->>'kind', seq DESC`,
   )
   const text: Record<string, string> = {
-    auth_failed: 'its authorisation was revoked or has expired; run doi gmail-auth again',
-    wrong_account: 'its token belongs to another account; run doi gmail-auth again',
+    auth_failed: 'its authorisation was revoked or has expired; run trunks gmail-auth again',
+    wrong_account: 'its token belongs to another account; run trunks gmail-auth again',
     renew_failed: 'renewing its notifications failed; new mail is still picked up by the catch-up interval',
     permission_failed: 'its permission check failed',
     config_error: 'a configured label or folder does not exist; correct the configuration',

@@ -54,7 +54,7 @@ afterAll(async () => {
 })
 
 const CONTACTS = 'contact_id,name,email,phone,role,deal,investor_id\nC001,Amelia Hart,amelia@hartfamily.example,+44 7700 900101,investor,Northwind Robotics,Northwind Robotics::001\nC002,Oliver Bennett,oliver@bennett.example,+44 7700 900102,investor,Northwind Robotics,Northwind Robotics::002\n'
-const as = (who: string) => ({ cookies: { doi_session: users[who]!.session }, headers: { 'x-csrf-token': users[who]!.csrf } })
+const as = (who: string) => ({ cookies: { trunks_session: users[who]!.session }, headers: { 'x-csrf-token': users[who]!.csrf } })
 const post = (who: string, url: string, payload: object = {}) => app.inject({ method: 'POST', url, payload, ...as(who) })
 const put = (who: string, url: string, payload: object) => app.inject({ method: 'PUT', url, payload, ...as(who) })
 const view = async (who: string, id: string) => (await app.inject({ method: 'GET', url: `/api/cases/${id}`, ...as(who) })).json().e3

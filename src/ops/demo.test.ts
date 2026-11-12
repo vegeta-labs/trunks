@@ -5,8 +5,8 @@ import type { Config } from '../config/load.ts'
 
 describe('demo configuration', () => {
   it('TC-DEMO-03 the evaluation configuration with a KYC folder; anything reaching outside the demo refused', () => {
-    const c = demoConfig('eval/config', '/tmp/doi-kyc')
-    expect(c.kyc.target).toEqual({ kind: 'folder', path: '/tmp/doi-kyc' })
+    const c = demoConfig('eval/config', '/tmp/trunks-kyc')
+    expect(c.kyc.target).toEqual({ kind: 'folder', path: '/tmp/trunks-kyc' })
     expect(c.model?.provider).toBe('replay')
     expect(() => checkDemoConfig(c)).not.toThrow()
     const bad = (patch: (c: Config) => Config, why: RegExp) => expect(() => checkDemoConfig(patch(structuredClone(c)))).toThrow(why)

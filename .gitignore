@@ -15,11 +15,13 @@ playwright-report/
 /dist-demo/
 /demo-e2e-report.json
 /compose-report.json
-/deal-ops-inbox-demo-v*.tar.gz
-/deal-ops-inbox-demo-v*.tar.gz.sha256
+/trunks-demo-v*.tar.gz
+/trunks-demo-v*.tar.gz.sha256
 /demo-secrets/
 /.env
 /eval-actual/
 /compose-memory.txt
 # a deployment's own configuration (quickstart §2.2)
 /config/local/
+# the last passing publication export's record (scripts/public-export.ts; rules G3)
+/.public-export.json

@@ -1,8 +1,9 @@
 // `migrate` with and without DEMO=1 (PRD R-DEMO-01 v0.7.22, tech design v0.7.11; plan review R1, R2, V1, V6).
 import { afterAll, describe, expect, it, vi } from 'vitest'
-import { randomBytes } from 'node:crypto'
+import { createHash, randomBytes } from 'node:crypto'
 import pg from 'pg'
-import { migrate } from './migrate.ts'
+import { readdirSync, readFileSync } from 'node:fs'
+import { LEGACY_ROLE_FILES, migrate, migrationFiles, withCurrentRoles } from './migrate.ts'
 import { PASSWORDS, TEST_URL } from './testdb.ts'
 
 const created: string[] = []
@@ -25,7 +26,7 @@ async function admin<T>(fn: (c: pg.Client) => Promise<T>, db = 'postgres'): Prom
   }
 }
 async function emptyDb(): Promise<string> {
-  const name = `doi_mig_${randomBytes(5).toString('hex')}`
+  const name = `trunks_mig_${randomBytes(5).toString('hex')}`
   await admin((c) => c.query(`CREATE DATABASE ${name}`))
   created.push(name)
   return name
@@ -52,10 +53,10 @@ describe('migrate and the demo marker', () => {
   it('TC-DEMO-03 empty database + DEMO=1: every migration and the marker; only the owner can write the marker', async () => {
     const db = await emptyDb()
     const applied = await migrate(url(db), pw('a'), { demo: true })
-    expect(applied.at(-1)).toBe('009_fraud_gates.sql')
+    expect(applied.at(-1)).toBe('010_rename.sql')
     expect((await q(db, 'SELECT count(*)::int AS n FROM demo_marker')).rows[0].n).toBe(1)
     expect((await q(db, 'SELECT count(*)::int AS n FROM schema_migrations')).rows[0].n).toBe(applied.length)
-    const app = new pg.Client({ connectionString: url(db, 'doi_app', PASSWORDS.doi_app) })
+    const app = new pg.Client({ connectionString: url(db, 'trunks_app', PASSWORDS.trunks_app) })
     await app.connect()
     expect((await app.query('SELECT count(*)::int AS n FROM demo_marker')).rows[0].n).toBe(1)
     await expect(app.query('INSERT INTO demo_marker (id) VALUES (1)')).rejects.toThrow(/permission denied/)
@@ -70,10 +71,10 @@ describe('migrate and the demo marker', () => {
     await migrate(url(db), pw('b'), { demo: true })
     expect((await q(db, "SELECT to_regclass('public.leftover')::text AS t")).rows[0].t).toBeNull()
     expect((await q(db, 'SELECT count(*)::int AS n FROM demo_marker')).rows[0].n).toBe(1)
-    const app = new pg.Client({ connectionString: url(db, 'doi_app', PASSWORDS.doi_app) })
+    const app = new pg.Client({ connectionString: url(db, 'trunks_app', PASSWORDS.trunks_app) })
     await app.connect()
     expect((await app.query('SELECT count(*)::int AS n FROM audit')).rows[0].n).toBe(0) // USAGE on the new schema
-    expect((await q(db, "SELECT nspowner::regrole::text AS o FROM pg_namespace WHERE nspname = 'pgboss'")).rows[0].o).toBe('doi_app')
+    expect((await q(db, "SELECT nspowner::regrole::text AS o FROM pg_namespace WHERE nspname = 'pgboss'")).rows[0].o).toBe('trunks_app')
     await app.end()
   })
 
@@ -89,7 +90,7 @@ describe('migrate and the demo marker', () => {
     expect(sent.some((t) => /ROLE|CREATE|DROP|INSERT|BEGIN/i.test(t))).toBe(false)
     expect((await q(db, 'SELECT x FROM operator_data')).rows).toEqual([{ x: 42 }])
     expect((await q(db, 'SELECT count(*)::int AS n FROM demo_marker')).rows[0].n).toBe(0)
-    expect(await canLogin(db, 'doi_app', PASSWORDS.doi_app)).toBe(true)
+    expect(await canLogin(db, 'trunks_app', PASSWORDS.trunks_app)).toBe(true)
   })
 
   it('TC-DEMO-03 demo database without DEMO=1: refused (a demo database never becomes a real deployment)', async () => {
@@ -134,3 +135,50 @@ describe('migrate and the demo marker', () => {
   })
 })
 
+
+describe('database roles after the rename (rename plan §3.1)', () => {
+  const DIR = new URL('./migrations/', import.meta.url)
+  const raw = (name: string) => readFileSync(new URL(name, DIR), 'utf8')
+
+  it('TC-OPS-11 the migrations merged before the rename run with only the three role names replaced; later ones run as written', () => {
+    const files = migrationFiles()
+    expect(files.map((f) => f.name)).toEqual(readdirSync(DIR).filter((f) => f.endsWith('.sql')).sort())
+    expect([...LEGACY_ROLE_FILES].sort()).toEqual(files.map((f) => f.name).filter((n) => n < '010'))
+    for (const f of files) {
+      // the recorded hash is of the file on disk: a database migrated before the rename still verifies
+      expect(f.sha, f.name).toBe(createHash('sha256').update(raw(f.name)).digest('hex'))
+      if (!LEGACY_ROLE_FILES.has(f.name)) {
+        expect(f.sql, f.name).toBe(raw(f.name))
+        continue
+      }
+      expect(f.sql, f.name).not.toMatch(/doi/i)
+      expect(raw(f.name), f.name).not.toMatch(/trunks/)
+      // nothing but the names differs: putting the old names back gives the file as it is on disk
+      expect(f.sql.replace(/\btrunks_(app|maintenance|rotation)\b/g, 'doi_$1'), f.name).toBe(raw(f.name))
+    }
+    // only whole role names: a longer identifier or another prefix is left alone
+    expect(withCurrentRoles('GRANT x TO doi_app, doi_maintenance; doi_application my_doi_app doi_other DOI_APP')).toBe('GRANT x TO trunks_app, trunks_maintenance; doi_application my_doi_app doi_other DOI_APP')
+  })
+
+  it('TC-OPS-11 a new database has the roles and the stored role names under the new names only', async () => {
+    const db = await emptyDb()
+    await migrate(url(db), PASSWORDS)
+    expect((await q(db, "SELECT pg_get_expr(polqual, polrelid) AS e FROM pg_policy WHERE polname = 'intent_delete_own'")).rows[0].e).toMatch(/'trunks_maintenance'/)
+    expect((await q(db, "SELECT nspowner::regrole::text AS o FROM pg_namespace WHERE nspname = 'pgboss'")).rows[0].o).toBe('trunks_app')
+    const grantees = (await q(db, "SELECT DISTINCT grantee FROM information_schema.role_table_grants WHERE table_schema = 'public' AND grantee <> 'postgres' ORDER BY 1")).rows.map((r) => r.grantee)
+    expect(grantees).toEqual(['trunks_app', 'trunks_maintenance', 'trunks_rotation'])
+    // the maintenance role deletes another role's write intent; the app role only its own
+    await q(db, "INSERT INTO file_write_intent (id, object_key, purpose, created_by_role) VALUES ('00000000-0000-4000-8000-000000000001', 'k1', 't', 'trunks_app'), ('00000000-0000-4000-8000-000000000002', 'k2', 't', 'trunks_maintenance')")
+    const as = async (role: 'trunks_app' | 'trunks_maintenance', sql: string) => {
+      const c = new pg.Client({ connectionString: url(db, role, PASSWORDS[role]) })
+      await c.connect()
+      try {
+        return (await c.query(sql)).rowCount
+      } finally {
+        await c.end()
+      }
+    }
+    expect(await as('trunks_app', "DELETE FROM file_write_intent WHERE object_key = 'k2'")).toBe(0)
+    expect(await as('trunks_maintenance', "DELETE FROM file_write_intent WHERE object_key = 'k1'")).toBe(1)
+  })
+})

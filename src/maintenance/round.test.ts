@@ -1,5 +1,5 @@
 // TC-OPS-03 (PRD R-OPS-01 v0.7.22, tech design v0.7.11; self-test F3): one round of the maintenance container
-// (`doi maintain --once`) under the maintenance role: an expired message deleted and a transferred KYC message
+// (`trunks maintain --once`) under the maintenance role: an expired message deleted and a transferred KYC message
 // replaced in the same round; the continuation is then done by the app's workers; on a demo database no replacement.
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { mkdtempSync, readdirSync } from 'node:fs'
@@ -30,7 +30,7 @@ describe('maintenance round', () => {
     const old = caseOf(await k.ingest(eml({ subject: 'Old', messageId: '<old@x.example>', text: 'An old question.' }), '2026-01-05T09:00:00.000Z'))
     const kyc = caseOf(await k.ingest(kycMail('kyc1'), '2026-10-28T09:00:00.000Z'))
     await k.drain()
-    const target = mkdtempSync(join(tmpdir(), 'doi-kyc-target-'))
+    const target = mkdtempSync(join(tmpdir(), 'trunks-kyc-target-'))
     const app = { db: k.t.app, k: k.k, files: k.files }
     expect((await runKycDeliveries(app, new FolderSink(target))).delivered).toBeGreaterThan(0)
     expect(readdirSync(target).length).toBe(1)
@@ -50,7 +50,7 @@ describe('maintenance round', () => {
   it('TC-OPS-03 a round with the KYC replacement off (a demo database) leaves the transferred message as it is', async () => {
     const kyc = caseOf(await k.ingest(kycMail('kyc2'), '2026-10-28T10:00:00.000Z'))
     await k.drain()
-    await runKycDeliveries({ db: k.t.app, k: k.k, files: k.files }, new FolderSink(mkdtempSync(join(tmpdir(), 'doi-kyc-target-'))))
+    await runKycDeliveries({ db: k.t.app, k: k.k, files: k.files }, new FolderSink(mkdtempSync(join(tmpdir(), 'trunks-kyc-target-'))))
     await runMaintenanceRound({ db: k.t.maintenance, k: k.k, files: k.files }, { retention: { messages_days: 30, directory_days: 1826 } }, { kycReplacement: false }, new Date('2026-10-30T10:00:00.000Z'))
     expect((await k.t.owner.query('SELECT 1 FROM kyc_replacement r JOIN "case" c ON c.message_id = r.message_id WHERE c.id = $1', [kyc])).rowCount).toBe(0)
   })

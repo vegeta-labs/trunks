@@ -1,4 +1,4 @@
-# Evaluation configuration for Deal Ops Inbox (fictional data only).
+# Evaluation configuration for Trunks (fictional data only).
 # Written by the independent evaluation-set author from PRD v0.7.7 and eval/SCHEMA.md.
 # The PRD fixes the content (classes, floors, queues, fields, templates, lists, time rules)
 # but not the exact key layout of the YAML file, which lives in the technical design that the

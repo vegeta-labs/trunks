@@ -41,7 +41,7 @@ describe('bounded MIME decoding', () => {
     // truncated: the closing delimiter is missing
     expect(decodeMime(ok.subarray(0, ok.length - 20), L).failure).toBe('truncated')
     // wrong boundary
-    const bad = Buffer.from(ok.toString('latin1').replace(/boundary="b-doi-[a-z0-9]+"/, 'boundary="other"'), 'latin1')
+    const bad = Buffer.from(ok.toString('latin1').replace(/boundary="b-trunks-[a-z0-9]+"/, 'boundary="other"'), 'latin1')
     expect(decodeMime(bad, L).failure).toBe('bad_boundary')
     // 10,000 parts
     const many = `Content-Type: multipart/mixed; boundary=x\r\n\r\n${'--x\r\nContent-Type: text/plain\r\n\r\nhi\r\n'.repeat(10_000)}--x--\r\n`

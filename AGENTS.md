@@ -9,7 +9,7 @@ extracts facts, links them to a directory, flags risk and prepares replies that 
 
 - Node.js 22 or later, Python 3.12 (for the oracle), Docker with Compose v2.
 - `npm ci`
-- Images: `docker compose build` builds `deal-ops-inbox:local` and `deal-ops-inbox-parser:local`.
+- Images: `docker compose build` builds `trunks:local` and `trunks-parser:local`.
 - Local demo with fictional data: [Quick start, section 1](docs/en/quickstart.md#1-the-demo). To deploy with an
   assistant, follow [Deploy with an AI coding assistant](docs/en/deploy-with-ai.md).
 
@@ -31,15 +31,15 @@ npm run eval               # recorded model replies
 `vitest` needs Postgres, IMAP (GreenMail), ClamAV and an S3 store, with `TEST_DATABASE_URL`, `TEST_IMAP_HOST`,
 `TEST_IMAP_PORT`, `TEST_CLAMD_HOST`, `TEST_CLAMD_PORT` and `TEST_S3_ENDPOINT` set as in the workflow.
 
-**Parser container** (job `parser`; Linux with AppArmor 4 and the `doi-parser` profile loaded)
+**Parser container** (job `parser`; Linux with AppArmor 4 and the `trunks-parser` profile loaded)
 
 ```sh
-docker build -t doi-parser-test -f parser/Dockerfile .
+docker build -t trunks-parser-test -f parser/Dockerfile .
 PARSER_APPARMOR=1 npx vitest run parser/container.test.ts parser/profiles.test.ts
 ```
 
 **Compose suite** (job `compose`): run it in CI or on a disposable machine, and ask a person before running it
-anywhere else. It starts its own Compose projects (`doi-t-*`), and the bundled HTTPS proxy on ports 80 and 443 of
+anywhere else. It starts its own Compose projects (`trunks-t-*`), and the bundled HTTPS proxy on ports 80 and 443 of
 every interface. It needs a full clone (no `--depth`), the AppArmor profile (Linux), the built images and Playwright
 Chromium and WebKit:
 
@@ -75,5 +75,5 @@ any of them starts with the requirements document (`docs/01_PRD.md`) and the mai
   fixtures.
 - Stop and ask a person before: any `sudo` command, mailbox or OAuth consent, choosing a model provider or recording a
   data processing agreement (`dpa: true`), opening a port beyond `127.0.0.1`, DNS and HTTPS.
-- Docker: use only this project's Compose projects (`deal-ops-inbox`, `deal-ops-inbox-demo`, and the test suite's
-  `doi-t-*`) and their volumes. Never stop, remove or prune other containers, volumes, images or networks.
+- Docker: use only this project's Compose projects (`trunks`, `trunks-demo`, and the test suite's
+  `trunks-t-*`) and their volumes. Never stop, remove or prune other containers, volumes, images or networks.

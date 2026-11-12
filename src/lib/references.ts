@@ -1,4 +1,4 @@
-// PRD C-EXT-2: payment references. Copied from Deal Ops Toolkit src/lib/reconcile.ts (C-REC-1, C-REC-2, same author)
+// PRD C-EXT-2: payment references. Copied from Goten src/lib/reconcile.ts (C-REC-1, C-REC-2, same author)
 // so both projects match references the same way.
 
 // Only a–z are upper-cased; other letters (É, ß) stay as they are and still count as letters.

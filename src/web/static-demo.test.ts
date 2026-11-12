@@ -2,12 +2,12 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { staticAnswer } from './static-demo.ts'
 
-const g = globalThis as { DOI_DEMO?: unknown }
-afterEach(() => delete g.DOI_DEMO)
+const g = globalThis as { TRUNKS_DEMO?: unknown }
+afterEach(() => delete g.TRUNKS_DEMO)
 
 describe('static demo answers', () => {
   it('TC-DEMO-04 reads from the snapshot (filters as the server), sample IDs for cases, every change refused', () => {
-    g.DOI_DEMO = { info: { version: '0.1.0', built_at: 'x' }, session: { user: { username: 'demo-reviewer' } }, meta: { m: 1 },
+    g.TRUNKS_DEMO = { info: { version: '0.1.0', built_at: 'x' }, session: { user: { username: 'demo-reviewer' } }, meta: { m: 1 },
       cases: [{ id: 'E0001', risk: 'medium', status: 'open', queue: 'ops' }, { id: 'E0225', risk: 'high', status: 'open', queue: 'compliance' }],
       details: { E0225: { id: 'E0225' } } }
     expect(staticAnswer('GET', '/api/session')).toEqual({ status: 200, data: { user: { username: 'demo-reviewer' } } })
@@ -19,7 +19,7 @@ describe('static demo answers', () => {
     expect(staticAnswer('POST', '/api/logout')).toBeNull()
   })
   it('TC-REV-14 the snapshot pages like the server and reports the total of the filters', () => {
-    g.DOI_DEMO = { info: { version: '0.1.0', built_at: 'x' }, session: {}, meta: {}, details: {}, cases: Array.from({ length: 60 }, (_, i) => ({ id: `E${i}`, risk: i < 55 ? 'high' : 'low' })) }
+    g.TRUNKS_DEMO = { info: { version: '0.1.0', built_at: 'x' }, session: {}, meta: {}, details: {}, cases: Array.from({ length: 60 }, (_, i) => ({ id: `E${i}`, risk: i < 55 ? 'high' : 'low' })) }
     const page = (q: string) => staticAnswer('GET', `/api/cases?${q}`)!.data as { cases: Array<{ id: string }>; total: number }
     expect(page('').cases.length).toBe(50)
     expect(page('').total).toBe(60)

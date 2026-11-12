@@ -838,7 +838,7 @@
         "pivot_root"
       ],
       "action": "SCMP_ACT_ALLOW",
-      "comment": "deal-ops-inbox parser: bubblewrap sandbox per task"
+      "comment": "trunks parser: bubblewrap sandbox per task"
     }
   ]
 }

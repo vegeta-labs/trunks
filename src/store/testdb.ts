@@ -31,7 +31,7 @@ const withDb = (url: string, db: string, user?: string, password?: string) => {
 export const testKeyring = () => new Keyring([{ id: 'k1', key: randomBytes(32) }], 'k1', randomBytes(32))
 
 export async function createTestDb(): Promise<TestDb> {
-  const name = `doi_test_${randomBytes(6).toString('hex')}`
+  const name = `trunks_test_${randomBytes(6).toString('hex')}`
   const admin = new pg.Client({ connectionString: TEST_URL })
   await admin.connect()
   await admin.query(`CREATE DATABASE ${name}`)
@@ -41,9 +41,9 @@ export async function createTestDb(): Promise<TestDb> {
   const t: TestDb = {
     name,
     owner: pool(ownerUrl, 4),
-    app: pool(withDb(TEST_URL, name, 'doi_app', PASSWORDS.doi_app), 12),
-    maintenance: pool(withDb(TEST_URL, name, 'doi_maintenance', PASSWORDS.doi_maintenance), 4),
-    rotation: pool(withDb(TEST_URL, name, 'doi_rotation', PASSWORDS.doi_rotation), 4),
+    app: pool(withDb(TEST_URL, name, 'trunks_app', PASSWORDS.trunks_app), 12),
+    maintenance: pool(withDb(TEST_URL, name, 'trunks_maintenance', PASSWORDS.trunks_maintenance), 4),
+    rotation: pool(withDb(TEST_URL, name, 'trunks_rotation', PASSWORDS.trunks_rotation), 4),
     keyring: testKeyring(),
     async drop() {
       await Promise.all([t.owner.end(), t.app.end(), t.maintenance.end(), t.rotation.end()])

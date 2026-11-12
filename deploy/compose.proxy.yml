@@ -1,25 +1,25 @@
 # The bundled HTTPS proxy (PRD R-OPS-01 v0.7.22, tech design v0.7.11; self-audit S2):
-#   set DOI_DOMAIN, TRUST_PROXY=172.30.99.10 and the full COMPOSE_FILE list in .env, then docker compose up -d
+#   set TRUNKS_DOMAIN, TRUST_PROXY=172.30.99.10 and the full COMPOSE_FILE list in .env, then docker compose up -d
 #   (docs/en/quickstart.md §2.4; -f on the command line would skip docker-compose.override.yml)
 # Caddy fetches the domain's certificate from Let's Encrypt (an outbound connection without email content). It has a
 # fixed address on a fixed range so that the app can trust exactly it (Fastify trusts addresses, not names). Only this
 # file takes the range: a demo or a restored copy without the proxy can run next to it (self-test F6). Another range:
-# set DOI_EDGE_SUBNET, DOI_PROXY_IP and TRUST_PROXY together.
+# set TRUNKS_EDGE_SUBNET, TRUNKS_PROXY_IP and TRUST_PROXY together.
 services:
   proxy:
     image: caddy:2
-    command: [caddy, reverse-proxy, --from, '${DOI_DOMAIN:-localhost}', --to, 'app:8080']
+    command: [caddy, reverse-proxy, --from, '${TRUNKS_DOMAIN:-localhost}', --to, 'app:8080']
     ports: ['80:80', '443:443']
     volumes: [caddy:/data]
     depends_on: [app]
     restart: unless-stopped
     networks:
-      edge: { ipv4_address: '${DOI_PROXY_IP:-172.30.99.10}' }
+      edge: { ipv4_address: '${TRUNKS_PROXY_IP:-172.30.99.10}' }
 
 networks:
   edge:
     ipam:
-      config: [{ subnet: '${DOI_EDGE_SUBNET:-172.30.99.0/24}' }]
+      config: [{ subnet: '${TRUNKS_EDGE_SUBNET:-172.30.99.0/24}' }]
 
 volumes:
   caddy: {}

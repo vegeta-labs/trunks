@@ -12,7 +12,7 @@ let k: Kit
 let bucket: string
 beforeAll(async () => {
   k = await createKit()
-  bucket = `doi-test-${randomBytes(4).toString('hex')}`
+  bucket = `trunks-test-${randomBytes(4).toString('hex')}`
   const s3 = new S3Store({ ...S3, bucket }, k.k)
   const made = await s3.request('PUT', '')
   expect(made.ok).toBe(true)

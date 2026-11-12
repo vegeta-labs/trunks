@@ -23,9 +23,9 @@ The local deployment includes the server and review workflow. The demo runs on y
 ```sh
 docker compose build
 # Ubuntu / Debian hosts only (skip this line on macOS): install the parser's AppArmor profile, loaded again at every boot
-sudo cp deploy/apparmor/doi-parser /etc/apparmor.d/ && sudo apparmor_parser -r -W /etc/apparmor.d/doi-parser
-mkdir -m 700 demo-secrets && docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/demo-secrets:/out" deal-ops-inbox:local init-secrets /out
-DOI_SECRETS_DIR=./demo-secrets docker compose -f docker-compose.yml -f deploy/compose.demo.yml up -d
+sudo cp deploy/apparmor/trunks-parser /etc/apparmor.d/ && sudo apparmor_parser -r -W /etc/apparmor.d/trunks-parser
+mkdir -m 700 demo-secrets && docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/demo-secrets:/out" trunks:local init-secrets /out
+TRUNKS_SECRETS_DIR=./demo-secrets docker compose -f docker-compose.yml -f deploy/compose.demo.yml up -d
 ```
 
 Then open <http://127.0.0.1:8080>. The sign-in page lists the demo accounts.

@@ -33,7 +33,7 @@ llm.reply = (v, user) => {
   return JSON.stringify({ labels: hit[1].map((c) => ({ class: c.split(':')[0], confidence: c.split(':')[1] ?? 'high', reason: 'test' })), language: 'en' })
 }
 const kit = await createKit({ llm, config: { ...testConfig(), verification: { cooling_off_hours: 1 } } })
-const dir = mkdtempSync(join(tmpdir(), 'doi-e2e-'))
+const dir = mkdtempSync(join(tmpdir(), 'trunks-e2e-'))
 writeFileSync(join(dir, 'pw'), 'e2e-admin-password-1')
 await bootstrapAdmin(kit.db, kit.k, join(dir, 'pw'))
 await kit.importCsv('deals', 'name,currency,close_date\nNorthwind Robotics,GBP,2026-12-18\n')

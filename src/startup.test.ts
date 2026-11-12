@@ -17,7 +17,7 @@ afterAll(async () => k?.close())
 
 describe('R-CFG-02', () => {
   it('TC-CFG-02 a changed configuration is audited at start-up and the open Cases are processed again under it (Codex F13)', async () => {
-    const dir = mkdtempSync(join(tmpdir(), 'doi-cfg-'))
+    const dir = mkdtempSync(join(tmpdir(), 'trunks-cfg-'))
     cpSync('config/default', dir, { recursive: true })
     const gbpOnly = () => writeFileSync(join(dir, 'deployment.yaml'), readFileSync(join(dir, 'deployment.yaml'), 'utf8').replace('currencies: [GBP, EUR, USD]', 'currencies: [GBP]'))
     gbpOnly()

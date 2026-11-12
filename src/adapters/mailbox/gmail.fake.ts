@@ -28,7 +28,7 @@ export class FakeGmail {
   failMessageGets = 0 // next N message fetches answer 503
   failWatch = false
   sparseHistory = false // history entries carry only the message id (as the API may)
-  consentAccount = '' // the account that consents in the browser (doi gmail-auth)
+  consentAccount = '' // the account that consents in the browser (trunks gmail-auth)
   private seq = 0
   private tokens = new Map<string, string>() // access token → account
 

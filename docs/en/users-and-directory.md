@@ -22,18 +22,18 @@ and deleted at the end (section 4).
 
 <!-- tested: run -->
 ```sh
-DOI_URL=https://inbox.capital.example
+TRUNKS_URL=https://inbox.capital.example
 umask 077
-printf 'admin user name: '; IFS= read -r DOI_USER
-printf 'password: '; IFS= read -rs DOI_PASS; echo
-printf '{"username":"%s","password":"%s"}' "$DOI_USER" "$DOI_PASS" |
-  curl -sS --fail-with-body -c doi-cookies.txt -o /dev/null -H 'content-type: application/json' --data-binary @- "$DOI_URL/api/login"
-unset DOI_PASS
-CSRF=$(curl -sS --fail-with-body -b doi-cookies.txt "$DOI_URL/api/csrf" | sed -E 's/.*"csrf":"([^"]*)".*/\1/')
+printf 'admin user name: '; IFS= read -r TRUNKS_USER
+printf 'password: '; IFS= read -rs TRUNKS_PASS; echo
+printf '{"username":"%s","password":"%s"}' "$TRUNKS_USER" "$TRUNKS_PASS" |
+  curl -sS --fail-with-body -c trunks-cookies.txt -o /dev/null -H 'content-type: application/json' --data-binary @- "$TRUNKS_URL/api/login"
+unset TRUNKS_PASS
+CSRF=$(curl -sS --fail-with-body -b trunks-cookies.txt "$TRUNKS_URL/api/csrf" | sed -E 's/.*"csrf":"([^"]*)".*/\1/')
 ```
 
-- Set `DOI_URL` to your app's address. On the host itself without the proxy it is `http://127.0.0.1:8080` (or your
-  `DOI_PORT`).
+- Set `TRUNKS_URL` to your app's address. On the host itself without the proxy it is `http://127.0.0.1:8080` (or your
+  `TRUNKS_PORT`).
 - Passwords are typed at a prompt and sent on curl's standard input, so they never appear in the shell history or in
   the process list (`ps`), where other users of the same machine could read them. The `x-csrf-token` header does show
   in the process list; it is useless without the session cookie, which only you can read.
@@ -61,8 +61,8 @@ new_user() {
   printf 'role (reviewer, approver or admin): '; read -r R
   printf 'first password (12 characters or more): '; IFS= read -rs P; echo
   printf '{"username":"%s","role":"%s","password":"%s"}' "$U" "$R" "$P" |
-    curl -sS --fail-with-body -b doi-cookies.txt -H "x-csrf-token: $CSRF" -H 'content-type: application/json' \
-      --data-binary @- "$DOI_URL/api/users"
+    curl -sS --fail-with-body -b trunks-cookies.txt -H "x-csrf-token: $CSRF" -H 'content-type: application/json' \
+      --data-binary @- "$TRUNKS_URL/api/users"
   echo; unset P
 }
 ```
@@ -88,11 +88,11 @@ Change a user's role, or reset a user's password (the user must change it again 
 sessions end):
 
 ```sh
-curl -sS --fail-with-body -b doi-cookies.txt -H "x-csrf-token: $CSRF" -H 'content-type: application/json' \
-  -X PUT --data '{"role":"approver"}' "$DOI_URL/api/users/<id>/role"
+curl -sS --fail-with-body -b trunks-cookies.txt -H "x-csrf-token: $CSRF" -H 'content-type: application/json' \
+  -X PUT --data '{"role":"approver"}' "$TRUNKS_URL/api/users/<id>/role"
 printf 'new first password: '; IFS= read -rs P; echo
-printf '{"password":"%s"}' "$P" | curl -sS --fail-with-body -b doi-cookies.txt -H "x-csrf-token: $CSRF" \
-  -H 'content-type: application/json' --data-binary @- "$DOI_URL/api/users/<id>/reset"; unset P
+printf '{"password":"%s"}' "$P" | curl -sS --fail-with-body -b trunks-cookies.txt -H "x-csrf-token: $CSRF" \
+  -H 'content-type: application/json' --data-binary @- "$TRUNKS_URL/api/users/<id>/reset"; unset P
 ```
 
 ### Users and two-person control
@@ -194,13 +194,13 @@ T-NW-0001,2026-10-20,10000.00,A HART,NW-001 Hart,auto,001,Amelia Hart,system,,GB
 
 <!-- tested: run -->
 ```sh
-imp() { curl -sS --fail-with-body -b doi-cookies.txt -H "x-csrf-token: $CSRF" -H 'content-type: text/csv' "$@"; echo; }
-imp --data-binary @deals.csv "$DOI_URL/api/directory/deals"
-imp --data-binary @contacts.csv "$DOI_URL/api/directory/contacts"
+imp() { curl -sS --fail-with-body -b trunks-cookies.txt -H "x-csrf-token: $CSRF" -H 'content-type: text/csv' "$@"; echo; }
+imp --data-binary @deals.csv "$TRUNKS_URL/api/directory/deals"
+imp --data-binary @contacts.csv "$TRUNKS_URL/api/directory/contacts"
 DEAL='Northwind Robotics'
-imp --url-query "deal=$DEAL" --data-binary @commitments.csv "$DOI_URL/api/directory/commitments"
-imp --url-query "deal=$DEAL" --data-binary @bank.csv "$DOI_URL/api/directory/bank"
-imp --url-query "deal=$DEAL" --data-binary @ledger.csv "$DOI_URL/api/directory/ledger"
+imp --url-query "deal=$DEAL" --data-binary @commitments.csv "$TRUNKS_URL/api/directory/commitments"
+imp --url-query "deal=$DEAL" --data-binary @bank.csv "$TRUNKS_URL/api/directory/bank"
+imp --url-query "deal=$DEAL" --data-binary @ledger.csv "$TRUNKS_URL/api/directory/ledger"
 ```
 
 ### Emptying a list
@@ -211,7 +211,7 @@ wrong deal when the right deal has no ledger yet, send a file with the header on
 <!-- tested: run -->
 ```sh
 printf 'transaction_id,date,amount,payer,reference,status,investor_id,investor_name,decided_by,withdrawn_on,currency\n' > empty-ledger.csv
-imp --url-query "deal=$DEAL" --url-query clear=yes --data-binary @empty-ledger.csv "$DOI_URL/api/directory/ledger"
+imp --url-query "deal=$DEAL" --url-query clear=yes --data-binary @empty-ledger.csv "$TRUNKS_URL/api/directory/ledger"
 ```
 
 The answer is `{"ok":true,…,"rows":0}`; the audit chain records the import as a clear. A cleared ledger counts as
@@ -226,8 +226,8 @@ deal, set `DEAL` to its name exactly as in the deals file and import its three f
 
 <!-- tested: run -->
 ```sh
-curl -sS --fail-with-body -b doi-cookies.txt -H "x-csrf-token: $CSRF" -X POST -o /dev/null "$DOI_URL/api/logout"
-rm doi-cookies.txt
+curl -sS --fail-with-body -b trunks-cookies.txt -H "x-csrf-token: $CSRF" -X POST -o /dev/null "$TRUNKS_URL/api/logout"
+rm trunks-cookies.txt
 ```
 
 Every step is recorded in the audit chain with the admin who made it (`user.created`, `directory.imported`, …).

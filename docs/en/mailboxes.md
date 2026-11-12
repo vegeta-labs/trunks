@@ -194,8 +194,8 @@ gmail:
   client_id_env: GMAIL_CLIENT_ID
   client_secret_env: GMAIL_CLIENT_SECRET
   pubsub:
-    topic: projects/capital-ops/topics/doi-gmail
-    subscription: projects/capital-ops/subscriptions/doi-gmail-pull
+    topic: projects/capital-ops/topics/trunks-gmail
+    subscription: projects/capital-ops/subscriptions/trunks-gmail-pull
     service_account_env: GMAIL_PUBSUB_SA
 ```
 
@@ -316,8 +316,8 @@ Setting up the scope and the role assignment (example):
 
 ```powershell
 New-ServicePrincipal -AppId '<app-id>' -ObjectId '<enterprise application object id>' -DisplayName 'Trunks — Operations Inbox'
-New-ManagementScope -Name 'Deal Ops Inbox mailboxes' -RecipientRestrictionFilter "PrimarySmtpAddress -eq 'legal@capital.example'"
-New-ManagementRoleAssignment -App '<app-id>' -Role 'Application Mail.Read' -CustomResourceScope 'Deal Ops Inbox mailboxes'
+New-ManagementScope -Name 'Trunks mailboxes' -RecipientRestrictionFilter "PrimarySmtpAddress -eq 'legal@capital.example'"
+New-ManagementRoleAssignment -App '<app-id>' -Role 'Application Mail.Read' -CustomResourceScope 'Trunks mailboxes'
 ```
 
 Entra (module `Microsoft.Graph`):

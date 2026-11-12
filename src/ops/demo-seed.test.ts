@@ -13,7 +13,7 @@ import { DEMO_SAMPLES, demoConfig, seedDemo } from './demo.ts'
 
 let k: Kit
 beforeAll(async () => {
-  k = await createKit({ config: demoConfig('eval/config', mkdtempSync(join(tmpdir(), 'doi-demo-kyc-'))) })
+  k = await createKit({ config: demoConfig('eval/config', mkdtempSync(join(tmpdir(), 'trunks-demo-kyc-'))) })
 }, 60_000)
 afterAll(() => k?.close())
 const count = async (q: string) => Number((await k.t.owner.query<{ n: string }>(q)).rows[0]!.n)

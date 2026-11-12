@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/deal-ops/deal-ops-inbox/eval/annotation.schema.json",
-  "title": "Deal Ops Inbox evaluation annotation",
+  "$id": "https://github.com/vegeta-labs/trunks/eval/annotation.schema.json",
+  "title": "Trunks evaluation annotation",
   "description": "Version 2 (PRD v0.5). Every top-level field is required. Category-dependent completeness of `fields` is checked by eval/validate (E2). See eval/SCHEMA.md.",
   "type": "object",
   "additionalProperties": false,

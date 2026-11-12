@@ -52,7 +52,7 @@ afterAll(async () => {
   await k?.close()
 })
 
-const as = (who: string) => ({ cookies: { doi_session: users[who]!.session }, headers: { 'x-csrf-token': users[who]!.csrf } })
+const as = (who: string) => ({ cookies: { trunks_session: users[who]!.session }, headers: { 'x-csrf-token': users[who]!.csrf } })
 const post = (who: string, url: string, payload: object = {}) => app.inject({ method: 'POST', url, payload, ...as(who) })
 
 const mt = (benef = `/${G}`, payer = `/${P}`, uetr = UETR, date = '261030') =>

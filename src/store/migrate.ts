@@ -5,7 +5,17 @@ import { createHash, createHmac, pbkdf2Sync, randomBytes } from 'node:crypto'
 import pg from 'pg'
 
 const DIR = new URL('./migrations/', import.meta.url)
-export const ROLES = ['doi_app', 'doi_maintenance', 'doi_rotation'] as const
+export const ROLES = ['trunks_app', 'trunks_maintenance', 'trunks_rotation'] as const
+
+/**
+ * The migrations merged before the roles were renamed (2026-11) name them `doi_app`, `doi_maintenance`, `doi_rotation`.
+ * A merged migration never changes, so these files stay as they are (and keep their recorded hash) and are run with
+ * exactly those three names replaced. The list is closed: every later migration runs as written.
+ */
+export const LEGACY_ROLE_FILES: ReadonlySet<string> = new Set(['001_e1.sql', '002_e2.sql', '002b_model_attempt.sql', '003_e3.sql', '004_e4.sql', '005_e5.sql', '006_d9.sql', '007_e6.sql', '008_f1.sql', '009_fraud_gates.sql'])
+const LEGACY_ROLE = /\bdoi_(app|maintenance|rotation)\b/g
+export const withCurrentRoles = (sql: string): string => sql.replace(LEGACY_ROLE, 'trunks_$1')
+const legacyName = (role: (typeof ROLES)[number]): string => role.replace(/^trunks_/, 'doi_')
 
 /** SCRAM-SHA-256 verifier as Postgres stores it (RFC 5802 / 7677), computed here so the password never leaves the app. */
 export function scramVerifier(password: string, iterations = 4096): string {
@@ -37,22 +47,31 @@ async function setRoles(c: pg.Client, passwords: Record<(typeof ROLES)[number], 
     // roles are cluster-wide: two databases migrating at once can race on the same role row; try again
     for (let attempt = 1; ; attempt++) {
       try {
-        const exists = await c.query('SELECT 1 FROM pg_roles WHERE rolname = $1', [role])
+        let exists = await c.query('SELECT 1 FROM pg_roles WHERE rolname = $1', [role])
+        // a cluster set up before the rename: the role keeps its identity, so its grants and what it owns follow it in
+        // every database; both names at once is a state this code never makes, so it stops instead of guessing
+        const legacy = await c.query('SELECT 1 FROM pg_roles WHERE rolname = $1', [legacyName(role)])
+        if (legacy.rowCount && exists.rowCount) throw new Error(`both ${legacyName(role)} and ${role} exist; remove the one that is not in use`)
+        if (legacy.rowCount) {
+          await c.query(`ALTER ROLE ${legacyName(role)} RENAME TO ${role}`)
+          exists = legacy
+        }
         await c.query(exists.rowCount ? `ALTER ROLE ${role} WITH LOGIN PASSWORD '${pw}'` : `CREATE ROLE ${role} WITH LOGIN PASSWORD '${pw}'`)
         break
       } catch (e) {
         const code = (e as { code?: string }).code
-        if (attempt >= 10 || !(code === 'XX000' || code === '23505' || code === '42710')) throw e
+        if (attempt >= 10 || !(code === 'XX000' || code === '23505' || code === '42710' || code === '42704')) throw e
         await new Promise((r) => setTimeout(r, 50 * attempt))
       }
     }
   }
 }
 
-function migrationFiles(): Array<{ name: string; sql: string; sha: string }> {
+/** `sha` is of the file as it is on disk (what `schema_migrations` records); `sql` is what runs. */
+export function migrationFiles(): Array<{ name: string; sql: string; sha: string }> {
   return readdirSync(DIR).filter((f) => f.endsWith('.sql')).sort().map((name) => {
-    const sql = readFileSync(new URL(name, DIR), 'utf8')
-    return { name, sql, sha: createHash('sha256').update(sql).digest('hex') }
+    const raw = readFileSync(new URL(name, DIR), 'utf8')
+    return { name, sql: LEGACY_ROLE_FILES.has(name) ? withCurrentRoles(raw) : raw, sha: createHash('sha256').update(raw).digest('hex') }
   })
 }
 

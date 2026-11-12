@@ -81,7 +81,7 @@ describe('model adapters (tech design §3.2)', () => {
   })
 
   it('replay returns what was recorded, keyed by prompt version + model + input; a missing recording is an error', async () => {
-    const dir = mkdtempSync(join(tmpdir(), 'doi-replay-'))
+    const dir = mkdtempSync(join(tmpdir(), 'trunks-replay-'))
     const real: LlmAdapter = { id: 'anthropic/m', location: 'external', complete: async () => ({ raw: reply, parsed: JSON.parse(reply), usage: { inputTokens: 1, outputTokens: 1 } }) }
     await new Recorder(real, dir, 'm').complete(req)
     const replay = new ReplayAdapter(dir, 'm')
@@ -96,7 +96,7 @@ describe('model adapters (tech design §3.2)', () => {
   })
 
   it('X1 a missing recording is a setup error (ReplayMissingError), X2 a recorded cut-off reply replays as a failure even when it parses', async () => {
-    const dir = mkdtempSync(join(tmpdir(), 'doi-replay-'))
+    const dir = mkdtempSync(join(tmpdir(), 'trunks-replay-'))
     await expect(new ReplayAdapter(dir, 'm').complete(req)).rejects.toBeInstanceOf(ReplayMissingError)
     const cut: LlmAdapter = { id: 'anthropic/m', location: 'external', complete: async () => { throw new LlmOutputError('reply cut off at max_tokens', reply) } }
     await expect(new Recorder(cut, dir, 'm').complete(req)).rejects.toBeInstanceOf(LlmOutputError)
@@ -104,7 +104,7 @@ describe('model adapters (tech design §3.2)', () => {
   })
 
     it('recordings are kept per attempt and carry the request settings and the answering model; other settings do not replay', async () => {
-    const dir = mkdtempSync(join(tmpdir(), 'doi-replay-'))
+    const dir = mkdtempSync(join(tmpdir(), 'trunks-replay-'))
     let calls = 0
     const settings = { effort: 'low' }
     const real: LlmAdapter = { id: 'anthropic/m', location: 'external', settings, complete: async () => {

@@ -5,7 +5,7 @@
 // data/snapshot.js, loaded by a classic <script src> before the app (T1: the site's CSP has connect-src 'none').
 // Then checks the result (no cookie, CSRF token, session ID or key material; only `.example` addresses; optional
 // FORBIDDEN_NAMES_FILE, kept outside the repository, for rule P6) and packs it (T5):
-//   deal-ops-inbox-demo-v<version>.tar.gz (no outer directory) + .sha256; inside, MANIFEST.sha256 and snapshot-info.json.
+//   trunks-demo-v<version>.tar.gz (no outer directory) + .sha256; inside, MANIFEST.sha256 and snapshot-info.json.
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
@@ -57,7 +57,7 @@ for (const [uuid, sample] of Object.entries(samples)) text = text.split(uuid).jo
 rmSync(out, { recursive: true, force: true })
 execFileSync('npx', ['vite', 'build', '--config', 'vite.config.ts', '--outDir', out, '--base', './', '--emptyOutDir'], { stdio: 'inherit', env: { ...process.env, VITE_STATIC_DEMO: '1', NODE_ENV: 'production' } }) // a production build also when run from the tests (NODE_ENV=test)
 mkdirSync(join(out, 'data'), { recursive: true })
-writeFileSync(join(out, 'data', 'snapshot.js'), `globalThis.DOI_DEMO = Object.freeze(${text});\n`)
+writeFileSync(join(out, 'data', 'snapshot.js'), `globalThis.TRUNKS_DEMO = Object.freeze(${text});\n`)
 // T1 / T3: the snapshot before the app; not for search engines
 const indexPath = join(out, 'index.html')
 const index = readFileSync(indexPath, 'utf8')
@@ -75,7 +75,7 @@ for (const f of files(out)) {
   const rel = relative(out, f)
   if (session && body.includes(session)) problems.push(`${rel}: the session token`)
   if (csrf && body.includes(csrf)) problems.push(`${rel}: the CSRF token`)
-  if (/doi_session|doi_csrf|set-cookie/i.test(body)) problems.push(`${rel}: a cookie name`)
+  if (/trunks_session|trunks_csrf|set-cookie/i.test(body)) problems.push(`${rel}: a cookie name`)
   if (/-----BEGIN [A-Z ]*PRIVATE KEY-----|\bk1:[A-Za-z0-9+/]{40,}={0,2}/.test(body)) problems.push(`${rel}: key material`)
   if (rel === join('data', 'snapshot.js')) {
     for (const m of body.matchAll(/[A-Za-z0-9._%+-]+@([A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)/g)) if (!/\.example$/i.test(m[1]!)) problems.push(`${rel}: address outside .example (${m[0]})`)
@@ -93,7 +93,7 @@ if (problems.length) {
 const sha = (f: string) => createHash('sha256').update(readFileSync(f)).digest('hex')
 const manifest = files(out).map((f) => relative(out, f).split('\\').join('/')).filter((p) => p !== 'MANIFEST.sha256').sort()
 writeFileSync(join(out, 'MANIFEST.sha256'), manifest.map((p) => `${sha(join(out, p))}  ${p}\n`).join(''))
-const tar = join(dirname(out), `deal-ops-inbox-demo-v${version}.tar.gz`)
+const tar = join(dirname(out), `trunks-demo-v${version}.tar.gz`)
 execFileSync('tar', ['-czf', tar, '-C', out, ...readdirSync(out).sort()], { env: { ...process.env, COPYFILE_DISABLE: '1' } })
 writeFileSync(`${tar}.sha256`, `${sha(tar)}  ${basename(tar)}\n`)
 console.log(`demo snapshot v${version}: ${list.cases.length} cases in ${out}; package ${basename(tar)} (${statSync(tar).size} bytes)${forbidden.length ? `; ${forbidden.length} names checked` : '; no name list given'}`)

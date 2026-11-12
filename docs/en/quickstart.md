@@ -21,8 +21,8 @@ Build the images from the repository root:
 docker compose build
 ```
 
-This builds `deal-ops-inbox:local`, which is used by the `app`, `maintenance`, `migrate` and tool services. It also
-builds `deal-ops-inbox-parser:local`, which is used by the `parser` service.
+This builds `trunks:local`, which is used by the `app`, `maintenance`, `migrate` and tool services. It also
+builds `trunks-parser:local`, which is used by the `parser` service.
 
 ## AppArmor profile (Linux hosts)
 
@@ -30,11 +30,11 @@ On hosts with AppArmor (Ubuntu, Debian), install the parser profile before the f
 `/etc/apparmor.d/` are loaded again at every boot; loading it only from the checkout would last until the next reboot.
 
 ```sh
-sudo cp deploy/apparmor/doi-parser /etc/apparmor.d/doi-parser
-sudo apparmor_parser -r -W /etc/apparmor.d/doi-parser
+sudo cp deploy/apparmor/trunks-parser /etc/apparmor.d/trunks-parser
+sudo apparmor_parser -r -W /etc/apparmor.d/trunks-parser
 ```
 
-After an upgrade that changes `deploy/apparmor/doi-parser`, run both commands again.
+After an upgrade that changes `deploy/apparmor/trunks-parser`, run both commands again.
 
 - The profile needs **AppArmor 4**, for example Ubuntu 24.04, because it uses the `userns` rule.
 - If the profile is not loaded, the `parser` container does not start. It is never run unconfined.
@@ -46,8 +46,8 @@ After an upgrade that changes `deploy/apparmor/doi-parser`, run both commands ag
 
 ```sh
 mkdir -m 700 demo-secrets
-docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/demo-secrets:/out" deal-ops-inbox:local init-secrets /out
-DOI_SECRETS_DIR=./demo-secrets docker compose -f docker-compose.yml -f deploy/compose.demo.yml up -d
+docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/demo-secrets:/out" trunks:local init-secrets /out
+TRUNKS_SECRETS_DIR=./demo-secrets docker compose -f docker-compose.yml -f deploy/compose.demo.yml up -d
 ```
 
 Create the secret directory yourself first. If it does not exist, Docker creates it as root and `init-secrets` fails.
@@ -62,7 +62,7 @@ Open <http://127.0.0.1:8080>. The sign-in page lists the three demo accounts:
 
 What the demo does:
 
-- It runs as its own Compose project (`deal-ops-inbox-demo`) with its own volumes. It never touches the volumes of a
+- It runs as its own Compose project (`trunks-demo`) with its own volumes. It never touches the volumes of a
   real deployment.
 - It loads a fictional directory: three deals with their investors and contacts.
 - It receives about 30 fictional emails from built-in `.eml` files.
@@ -90,7 +90,7 @@ never reset by the demo.
 Stop it with:
 
 ```sh
-DOI_SECRETS_DIR=./demo-secrets docker compose -f docker-compose.yml -f deploy/compose.demo.yml down
+TRUNKS_SECRETS_DIR=./demo-secrets docker compose -f docker-compose.yml -f deploy/compose.demo.yml down
 ```
 
 ## 2. A real deployment
@@ -99,7 +99,7 @@ DOI_SECRETS_DIR=./demo-secrets docker compose -f docker-compose.yml -f deploy/co
 
 ```sh
 mkdir -m 700 secrets
-docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/secrets:/out" deal-ops-inbox:local init-secrets /out
+docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/secrets:/out" trunks:local init-secrets /out
 ```
 
 `init-secrets` writes random passwords and keys, one file each:
@@ -107,20 +107,20 @@ docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/secrets:/out" deal-ops-inbox
 | File | Used by |
 |---|---|
 | `postgres_password`, `owner_database_url` | the database and `migrate` |
-| `doi_app_db_password`, `doi_maintenance_db_password`, `doi_rotation_db_password` | `migrate`, which sets the three role passwords |
+| `trunks_app_db_password`, `trunks_maintenance_db_password`, `trunks_rotation_db_password` | `migrate`, which sets the three role passwords |
 | `app_database_url` | `app`, `gmail-auth` |
 | `maintenance_database_url` | `maintenance` |
 | `rotation_database_url` | `rotate` |
-| `doi_master_keys` | the encryption master keys (`k1:<base64>`) |
-| `doi_hmac_key` | the deployment HMAC key |
+| `trunks_master_keys` | the encryption master keys (`k1:<base64>`) |
+| `trunks_hmac_key` | the deployment HMAC key |
 | `initial_admin_password` | the first admin's password |
 | `anthropic_api_key` | empty; fill it in if you use the hosted model provider |
 
 - The directory is mode 700 and the files are 0644 inside it. Containers that run as other users can read them, and
   other users on the host cannot.
 - Running `init-secrets` again only adds missing files. It never overwrites a file.
-- Compose reads the secrets from `./secrets`. Set `DOI_SECRETS_DIR` to use another directory.
-- **Keep a copy of `doi_master_keys` and `doi_hmac_key` somewhere safe.** Without them the stored data cannot be
+- Compose reads the secrets from `./secrets`. Set `TRUNKS_SECRETS_DIR` to use another directory.
+- **Keep a copy of `trunks_master_keys` and `trunks_hmac_key` somewhere safe.** Without them the stored data cannot be
   read. See [Backup and upgrade](backup-and-upgrade.md).
 
 ### 2.2 Configuration directory
@@ -129,7 +129,7 @@ Copy the default configuration and point Compose at the copy:
 
 ```sh
 cp -r config/default config/local
-echo 'DOI_CONFIG_DIR=./config/local' >> .env
+echo 'TRUNKS_CONFIG_DIR=./config/local' >> .env
 ```
 
 Edit the three files: `deployment.yaml`, `cases.yaml` and `templates.yaml`.
@@ -167,7 +167,7 @@ The services start in this order:
 
 ClamAV can take several minutes on the first start while it loads its database.
 
-The app listens on `127.0.0.1:8080` on the host. Set `DOI_PORT` to change the port.
+The app listens on `127.0.0.1:8080` on the host. Set `TRUNKS_PORT` to change the port.
 
 ### 2.4 HTTPS
 
@@ -178,7 +178,7 @@ certificate for your domain automatically. Your domain's DNS must point at the h
 reachable.
 
 ```sh
-echo 'DOI_DOMAIN=inbox.capital.example' >> .env
+echo 'TRUNKS_DOMAIN=inbox.capital.example' >> .env
 echo 'TRUST_PROXY=172.30.99.10' >> .env
 # every compose file of this deployment, kept in .env so that every later command uses all of them;
 # leave out docker-compose.override.yml if you have none
@@ -193,7 +193,7 @@ would recreate the app **without** the mailbox credentials of your override file
 
 The proxy has a fixed address, `172.30.99.10`, on a fixed network `172.30.99.0/24` (only this override file takes that range, so the demo or a restored copy can run next to it), and `TRUST_PROXY` must name that
 address (the app trusts addresses, not service names). If that range is already used on your host, set
-`DOI_EDGE_SUBNET` and `DOI_PROXY_IP` to another range and address, and `TRUST_PROXY` to the same address. Caddy fetches
+`TRUNKS_EDGE_SUBNET` and `TRUNKS_PROXY_IP` to another range and address, and `TRUST_PROXY` to the same address. Caddy fetches
 its certificate from Let's Encrypt: an outbound connection that carries no email content.
 
 **Option B: your own reverse proxy.** Leave `deploy/compose.proxy.yml` out and forward HTTPS to `127.0.0.1:8080`.
@@ -299,13 +299,13 @@ Put these in a `.env` file next to `docker-compose.yml`, or set them in the shel
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `DOI_CONFIG_DIR` | `./config/default` | The configuration directory, mounted read-only at `/config` |
-| `DOI_SECRETS_DIR` | `./secrets` | The secret directory |
-| `DOI_PORT` | `8080` | The host port on `127.0.0.1` |
-| `DOI_VERSION` | `local` | The image tag |
-| `DOI_DOMAIN` | `localhost` | The domain for the bundled proxy |
+| `TRUNKS_CONFIG_DIR` | `./config/default` | The configuration directory, mounted read-only at `/config` |
+| `TRUNKS_SECRETS_DIR` | `./secrets` | The secret directory |
+| `TRUNKS_PORT` | `8080` | The host port on `127.0.0.1` |
+| `TRUNKS_VERSION` | `local` | The image tag |
+| `TRUNKS_DOMAIN` | `localhost` | The domain for the bundled proxy |
 | `TRUST_PROXY` | unset | The proxy addresses whose forwarding headers the app trusts |
-| `DOI_ACTIVE_KEY` | unset | Only for key rotation (see [Backup and upgrade](backup-and-upgrade.md)) |
-| `DOI_EDGE_SUBNET` | `172.30.99.0/24` | The network of the app and the bundled proxy |
-| `DOI_PROXY_IP` | `172.30.99.10` | The bundled proxy's fixed address (what `TRUST_PROXY` names) |
+| `TRUNKS_ACTIVE_KEY` | unset | Only for key rotation (see [Backup and upgrade](backup-and-upgrade.md)) |
+| `TRUNKS_EDGE_SUBNET` | `172.30.99.0/24` | The network of the app and the bundled proxy |
+| `TRUNKS_PROXY_IP` | `172.30.99.10` | The bundled proxy's fixed address (what `TRUST_PROXY` names) |
 | `DEMO` | unset | Set by `deploy/compose.demo.yml`; never set it for a real deployment |

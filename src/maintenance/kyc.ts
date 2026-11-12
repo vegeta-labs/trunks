@@ -96,7 +96,7 @@ export const fetchKycPoster: KycPoster = async (url, body, headers) => {
 }
 
 /**
- * Webhook target: a JSON body with the file, signed (HMAC-SHA256, X-DealOps-Signature) and carrying the transfer id as
+ * Webhook target: a JSON body with the file, signed (HMAC-SHA256, X-Trunks-Signature) and carrying the transfer id as
  * the idempotency key. Success only when the answer is 2xx and its JSON body returns the same transfer id and SHA-256
  * (C-PRV-2 v0.7.18); anything else is a failure and nothing is deleted.
  */
@@ -115,7 +115,7 @@ export class WebhookSink implements KycSink {
     const headers = {
       'content-type': 'application/json',
       'idempotency-key': meta.deliveryId,
-      'x-dealops-signature': `sha256=${createHmac('sha256', this.secret).update(body).digest('hex')}`,
+      'x-trunks-signature': `sha256=${createHmac('sha256', this.secret).update(body).digest('hex')}`,
     }
     let r: { status: number; body: string }
     try {

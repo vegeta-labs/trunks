@@ -28,8 +28,8 @@ COPY eval/config ./eval/config
 COPY eval/replay ./eval/replay
 COPY eval/dev ./eval/dev
 # data volumes and the parser socket volume start out owned by the application user (a named volume copies this)
-RUN mkdir -p /var/lib/deal-ops-inbox/files /var/lib/deal-ops-inbox/state /var/lib/deal-ops-inbox/kyc /run/parser \
-  && chown -R 10001:10001 /var/lib/deal-ops-inbox /run/parser
+RUN mkdir -p /var/lib/trunks/files /var/lib/trunks/state /var/lib/trunks/kyc /run/parser \
+  && chown -R 10001:10001 /var/lib/trunks /run/parser
 USER 10001:10001
 EXPOSE 8080
 ENTRYPOINT ["node", "--experimental-strip-types", "--no-warnings", "src/main.ts"]

@@ -1,5 +1,5 @@
 // PRD C-OUT-1: webhook delivery from the event outbox. HTTPS only, redirects never followed, HMAC-SHA256 signature in
-// X-DealOps-Signature; retries after 1, 5, 30 minutes and 2 hours, then failed; per Case strictly in case_event_seq
+// X-Trunks-Signature; retries after 1, 5, 30 minutes and 2 hours, then failed; per Case strictly in case_event_seq
 // order — an event waits while an earlier one of the same Case has not been delivered. Each attempt is audited.
 import { createHash, createHmac } from 'node:crypto'
 import type { Keyring } from '../store/crypto.ts'
@@ -62,7 +62,7 @@ async function deliverOne(d: { db: Db; k: Keyring }, hook: Webhook, post: Poster
   let status = 0
   let error: string | null = null
   try {
-    status = (await post(hook.url, body, { 'content-type': 'application/json', 'x-dealops-signature': signature(hook.secret, body) })).status
+    status = (await post(hook.url, body, { 'content-type': 'application/json', 'x-trunks-signature': signature(hook.secret, body) })).status
     if (status < 200 || status > 299) error = `HTTP ${status}`
   } catch (e) {
     error = String((e as Error).message ?? e).slice(0, 200)

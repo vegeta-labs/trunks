@@ -1,15 +1,15 @@
-# AppArmor profile for the Deal Ops Inbox parser container (tech design T7, v0.7.11).
+# AppArmor profile for the Trunks parser container (tech design T7, v0.7.11).
 # Docker's docker-default rules, except that bubblewrap may build each task's sandbox: mount (tmpfs, bind, read-only
 # remount), umount, pivot_root and user namespaces. Every task inside the sandbox additionally runs under bubblewrap's
 # own seccomp filter, which refuses mount, new namespaces, keyrings, BPF, io_uring, ptrace and the like.
 # Install on Ubuntu / Debian hosts (needs AppArmor 4, e.g. Ubuntu 24.04, for the `userns` rule); /etc/apparmor.d/ is
 # loaded again at every boot:
-#   sudo cp deploy/apparmor/doi-parser /etc/apparmor.d/ && sudo apparmor_parser -r -W /etc/apparmor.d/doi-parser
-# Without it loaded, the parser container does not start (compose: apparmor=doi-parser); it is never run unconfined.
+#   sudo cp deploy/apparmor/trunks-parser /etc/apparmor.d/ && sudo apparmor_parser -r -W /etc/apparmor.d/trunks-parser
+# Without it loaded, the parser container does not start (compose: apparmor=trunks-parser); it is never run unconfined.
 abi <abi/4.0>,
 include <tunables/global>
 
-profile doi-parser flags=(attach_disconnected,mediate_deleted) {
+profile trunks-parser flags=(attach_disconnected,mediate_deleted) {
   include <abstractions/base>
 
   network,
@@ -42,7 +42,7 @@ profile doi-parser flags=(attach_disconnected,mediate_deleted) {
   pivot_root,
 
   signal (receive) peer=unconfined,
-  signal (send,receive) peer=doi-parser,
+  signal (send,receive) peer=trunks-parser,
 
   deny @{PROC}/* w,
   deny @{PROC}/{[^1-9],[^1-9][^0-9],[^1-9s][^0-9y][^0-9s],[^1-9][^0-9][^0-9][^0-9/]*}/** w,
@@ -60,5 +60,5 @@ profile doi-parser flags=(attach_disconnected,mediate_deleted) {
   deny /sys/devices/virtual/powercap/** rwklx,
   deny /sys/kernel/security/** rwklx,
 
-  ptrace (trace,read,tracedby,readby) peer=doi-parser,
+  ptrace (trace,read,tracedby,readby) peer=trunks-parser,
 }

@@ -1,6 +1,6 @@
 # Review summary
 
-How each stage of Trunks — Operations Inbox (called Deal Ops Inbox before v0.2.1) was reviewed before it was accepted, written on 2026-11-11 for release v0.4.0. The raw review output and the item-by-item triage notes stay in the private development repository; this summary replaces them in the public one. It is brought up to date at minor releases, not at every patch release. Measured results are in [`CHANGELOG.md`](../../CHANGELOG.md); this file is about how the work was checked.
+How each stage of Trunks — Operations Inbox (called Deal Ops Inbox before v0.2.1) was reviewed before it was accepted, written on 2026-11-11 for release v0.4.0 and brought up to date on 2026-11-12 for release v0.5.0. The raw review output and the item-by-item triage notes stay in the private development repository; this summary replaces them in the public one. It is brought up to date at minor releases, not at every patch release. Measured results are in [`CHANGELOG.md`](../../CHANGELOG.md); this file is about how the work was checked.
 
 ## How a review works
 
@@ -9,7 +9,7 @@ How each stage of Trunks — Operations Inbox (called Deal Ops Inbox before v0.2
 - **Self-test gate.** Before the first Codex review of a pull request: a rule-by-rule comparison with the requirements, hostile inputs (malformed mail, huge attachments, zero-width characters, look-alike letters, prompt injection), mutation checks, and a fresh-context reviewer agent that uses the same prompt as Codex. Its findings are fixed first. From E3 on, a fresh reviewer also looked only for regressions after each round of fixes, because one fix had introduced a new blocker.
 - **Codex cross-review**, looking for missed risk, data leaks, manipulation by email and unauthorised writes. Until 2026-11-09 it was repeated until it returned `READY`, or `READY AFTER FIXES` with the fixes applied (`REWORK` meant fix and review again). When Codex was unavailable, a fresh-context reviewer ran the same prompt, and in most cases Codex was run again later; only completed Codex runs are counted below.
 - **From 2026-11-09, risk levels.** Each change is graded first. Low (copy, style, docs): self-test and CI. Medium (an ordinary feature): one fresh-context review. High (risk and anti-fraud rules, data exposure, permissions, payment judgement, release judgement, security and compliance docs): a fresh-context review and Codex in every round, plan and code reviewed separately, normally two plan and two code rounds at most (more needs the owner's OK). A round with no new blocker or major ends the review; after the planned rounds only the fixed parts are re-checked. Codex's verdicts became `READY`, `READY AFTER FIXES` and `NOT READY`.
-- **Held-out (blind) tests.** Before a release that changes judgement, a new set of emails is written by independent agents that read only the requirements, kept away from development, and run once by an independent runner with a real model. The development side sees only the totals, and the set is used up after one report. A patch release may quote the last result only if the judgement code is unchanged, or every difference is listed and shown not to apply to that set.
+- **Held-out (blind) tests.** Before a release that changes judgement, a new set of emails is written by independent agents that read only the requirements, kept away from development, and run once by an independent runner with a real model. The development side sees only the totals, and the set is used up after one report. A release may quote the last result only if the judgement code is unchanged, or every difference is listed and shown not to apply to that set.
 - **Owner acceptance** before merge, often after a simulated acceptance in which a fresh agent works through the checklist as an operator in the browser; public release only after the release gate (G3) and the owner's explicit OK.
 
 ## Stages
@@ -37,6 +37,9 @@ How each stage of Trunks — Operations Inbox (called Deal Ops Inbox before v0.2
 | Operator guide (v0.4.0) | 2 | NOT READY (first guide), READY AFTER FIXES (v0.4.0 update) | 2 |
 | Yes/no and multiple-choice fields (v0.4.0, medium risk) | — | — | 1 |
 | v0.4.0 release: check that the v0.3.0 held-out result still applies | 1 | JUSTIFIED AFTER FIXES | 1 |
+| Single-choice drop-down (v0.5.0, medium risk) | — | — | 1 |
+| Removing the old product names (v0.5.0, high risk) | — | — | 2 (plan: READY AFTER FIXES; code: READY). Codex had no quota; by the owner's decision fresh-context reviewers stood in |
+| v0.5.0 release: check that the v0.3.0 held-out result still applies | — | JUSTIFIED (fresh-context reviewer in place of Codex) | 1 |
 | **Total** | **77** | | |
 
 Fresh-context reviews are counted by round; several reviewers working in parallel in one round count once. Not counted: two Codex runs stopped at the review service's usage limit without a verdict (E2, v0.3.0 code round 2). For v0.2.1 and v0.2.2 the records do not say whether the independent reviewer was Codex, so those reviews are not in the Codex total.

@@ -29,7 +29,7 @@ afterAll(async () => {
   await k?.close()
 })
 
-const as = (who: string) => ({ cookies: { doi_session: users[who]!.session }, headers: { 'x-csrf-token': users[who]!.csrf } })
+const as = (who: string) => ({ cookies: { trunks_session: users[who]!.session }, headers: { 'x-csrf-token': users[who]!.csrf } })
 const hold = (who: string, payload: object) => app.inject({ method: 'POST', url: `/api/cases/${caseId}/hold`, payload, ...as(who) })
 
 describe('TC-PRV-10 hold', () => {

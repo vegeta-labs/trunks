@@ -6,7 +6,7 @@ import { headExporter } from './head-export.ts'
 
 describe('chain head export', () => {
   it('TC-AUD-07 missing directory is created; an export that cannot be written is reported once, not every time', async () => {
-    const root = mkdtempSync(join(tmpdir(), 'doi-head-'))
+    const root = mkdtempSync(join(tmpdir(), 'trunks-head-'))
     const lines: string[] = []
     const ok = headExporter(async () => ({ seq: 7, hash: 'ab' }), join(root, 'state', 'nested', 'audit-head.jsonl'), (l) => lines.push(l))
     await ok()

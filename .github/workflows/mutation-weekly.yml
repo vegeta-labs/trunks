@@ -65,24 +65,24 @@ jobs:
         timeout-minutes: 15
         run: npx playwright install chromium
       # the static-demo mutants rebuild the snapshot from a running, processed demo at 127.0.0.1:8080 (quick start §1)
-      - name: Install the doi-parser AppArmor profile as the quick start says
-        run: sudo cp deploy/apparmor/doi-parser /etc/apparmor.d/doi-parser && sudo apparmor_parser -r -W /etc/apparmor.d/doi-parser
+      - name: Install the trunks-parser AppArmor profile as the quick start says
+        run: sudo cp deploy/apparmor/trunks-parser /etc/apparmor.d/trunks-parser && sudo apparmor_parser -r -W /etc/apparmor.d/trunks-parser
       - name: Build the images
         run: docker compose build
       - name: Start the demo
         env:
-          DOI_SECRETS_DIR: ./demo-secrets
+          TRUNKS_SECRETS_DIR: ./demo-secrets
         run: |
           mkdir -m 700 demo-secrets
-          docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/demo-secrets:/out" deal-ops-inbox:local init-secrets /out
+          docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/demo-secrets:/out" trunks:local init-secrets /out
           docker compose -f docker-compose.yml -f deploy/compose.demo.yml up -d
       - name: Wait until every demo email is processed
         env:
-          DOI_SECRETS_DIR: ./demo-secrets
+          TRUNKS_SECRETS_DIR: ./demo-secrets
         run: |
           want="0/$(node --experimental-strip-types --no-warnings --input-type=module -e "console.log((await import('./src/ops/demo.ts')).DEMO_SAMPLES.length)")"
           for i in $(seq 1 120); do
-            got=$(docker compose -f docker-compose.yml -f deploy/compose.demo.yml exec -T db psql -U postgres -d doi -Atc "SELECT count(*) FILTER (WHERE status = 'processing') || '/' || count(*) FROM \"case\"" 2>/dev/null || true)
+            got=$(docker compose -f docker-compose.yml -f deploy/compose.demo.yml exec -T db psql -U postgres -d trunks -Atc "SELECT count(*) FILTER (WHERE status = 'processing') || '/' || count(*) FROM \"case\"" 2>/dev/null || true)
             echo "processing/all: ${got:-none} (want $want)"
             [ "$got" = "$want" ] && exit 0
             sleep 5
@@ -93,5 +93,5 @@ jobs:
       - name: Demo logs (on failure)
         if: failure()
         env:
-          DOI_SECRETS_DIR: ./demo-secrets
+          TRUNKS_SECRETS_DIR: ./demo-secrets
         run: docker compose -f docker-compose.yml -f deploy/compose.demo.yml logs --tail 80

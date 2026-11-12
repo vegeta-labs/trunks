@@ -9,16 +9,16 @@ import { join, resolve } from 'node:path'
 import { webkit, chromium } from '@playwright/test'
 import { DEMO_SAMPLES } from '../src/ops/demo.ts'
 
-const scratch = mkdtempSync(join(tmpdir(), 'doi-compose-'))
+const scratch = mkdtempSync(join(tmpdir(), 'trunks-compose-'))
 const secrets = join(scratch, 'secrets')
 mkdirSync(secrets, { mode: 0o700 }) // as the quickstart says: the operator creates the directory first
-execFileSync('docker', ['run', '--rm', '--user', `${process.getuid!()}:${process.getgid!()}`, '-v', `${secrets}:/out`, 'deal-ops-inbox:local', 'init-secrets', '/out'])
+execFileSync('docker', ['run', '--rm', '--user', `${process.getuid!()}:${process.getgid!()}`, '-v', `${secrets}:/out`, 'trunks:local', 'init-secrets', '/out'])
 
 type Stack = { project: string; files: string[]; env: Record<string, string> }
 const compose = (s: Stack, ...args: string[]) =>
-  execFileSync('docker', ['compose', '-p', s.project, ...s.files.flatMap((f) => ['-f', f]), ...args], { encoding: 'utf8', env: { ...process.env, DOI_SECRETS_DIR: secrets, ...s.env }, maxBuffer: 1 << 26 })
+  execFileSync('docker', ['compose', '-p', s.project, ...s.files.flatMap((f) => ['-f', f]), ...args], { encoding: 'utf8', env: { ...process.env, TRUNKS_SECRETS_DIR: secrets, ...s.env }, maxBuffer: 1 << 26 })
 const composeTry = (s: Stack, ...args: string[]) =>
-  spawnSync('docker', ['compose', '-p', s.project, ...s.files.flatMap((f) => ['-f', f]), ...args], { encoding: 'utf8', env: { ...process.env, DOI_SECRETS_DIR: secrets, ...s.env } })
+  spawnSync('docker', ['compose', '-p', s.project, ...s.files.flatMap((f) => ['-f', f]), ...args], { encoding: 'utf8', env: { ...process.env, TRUNKS_SECRETS_DIR: secrets, ...s.env } })
 const up: Stack[] = []
 const start = (s: Stack) => {
   up.push(s)
@@ -33,7 +33,7 @@ afterAll(() => {
 function inside(s: Stack, script: string): string {
   return compose(s, 'exec', '-T', 'app', 'node', '--input-type=module', '-e', script).trim()
 }
-const sql = (s: Stack, q: string) => compose(s, 'exec', '-T', 'db', 'psql', '-U', 'postgres', '-d', 'doi', '-Atc', q).trim()
+const sql = (s: Stack, q: string) => compose(s, 'exec', '-T', 'db', 'psql', '-U', 'postgres', '-d', 'trunks', '-Atc', q).trim()
 async function until(what: string, ok: () => boolean, seconds = 600) {
   for (let i = 0; i < seconds / 5; i++) {
     try {
@@ -64,8 +64,8 @@ import pg from 'pg'
 import { Keyring } from '/app/src/store/crypto.ts'
 import { DiskStore } from '/app/src/store/files.ts'
 const v = (n) => process.env[n] ?? readFileSync(process.env[n + '_FILE'], 'utf8').trim()
-const k = Keyring.fromEnv({ DOI_MASTER_KEYS: v('DOI_MASTER_KEYS'), DOI_HMAC_KEY: v('DOI_HMAC_KEY') })
-const files = new DiskStore('/var/lib/deal-ops-inbox/files', k)
+const k = Keyring.fromEnv({ TRUNKS_MASTER_KEYS: v('TRUNKS_MASTER_KEYS'), TRUNKS_HMAC_KEY: v('TRUNKS_HMAC_KEY') })
+const files = new DiskStore('/var/lib/trunks/files', k)
 const c = new pg.Client({ connectionString: v('APP_DATABASE_URL') }); await c.connect()
 const count = async (q) => {
   const rows = (await c.query(q)).rows
@@ -105,7 +105,7 @@ describe('docker compose', () => {
   it('TC-DEMO-01 / TC-DEMO-02 the demo on networks without any way out: every demo email processed, each result equal to the evaluation; the directory is the evaluation one', async () => {
     const actual = process.env.EVAL_ACTUAL_DIR
     if (!actual) throw new Error('EVAL_ACTUAL_DIR is required (run the evaluation with it first)')
-    const s: Stack = { project: 'doi-t-offline', files: ['docker-compose.yml', 'deploy/compose.demo.yml', 'deploy/compose.offline.yml'], env: {} }
+    const s: Stack = { project: 'trunks-t-offline', files: ['docker-compose.yml', 'deploy/compose.demo.yml', 'deploy/compose.offline.yml'], env: {} }
     start(s)
     await until('the demo to finish processing', demoDone(s))
     expect(sql(s, `SELECT count(*) FROM "case" WHERE status = 'failed'`)).toBe('0')
@@ -132,7 +132,7 @@ describe('docker compose', () => {
     }
     expect(demo.length).toBe(DEMO_SAMPLES.length)
     // TC-DEMO-02 (PRD R-DEMO-01 v0.7.22): the demo directory is eval/directory — deals, currencies, commitments and
-    // amounts due as in its files — and every page says so (not the Toolkit sample)
+    // amounts due as in its files — and every page says so (not the Goten sample)
     const csvRows = (f: string) => readFileSync(join('eval', 'directory', f), 'utf8').trim().split(/\r?\n/).slice(1)
     const commitmentFiles = readdirSync(join('eval', 'directory')).filter((f) => f.startsWith('commitments_'))
     const wantDue = commitmentFiles.flatMap(csvRows).reduce((t, l) => t + Math.round(Number(l.split(',')[4]) * 100), 0)
@@ -143,13 +143,13 @@ describe('docker compose', () => {
 const b = 'http://127.0.0.1:8080'
 const r = await fetch(b + '/api/login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ username: 'demo-reviewer', password: 'demo-reviewer-password' }) })
 const s = await (await fetch(b + '/api/session', { headers: { cookie: r.headers.get('set-cookie').split(';')[0] } })).json()
-console.log(s.warnings.join(' '))`)).toMatch(/the evaluation set's fictional one, not the Toolkit sample/)
+console.log(s.warnings.join(' '))`)).toMatch(/the evaluation set's fictional one, not the Goten sample/)
     expect(Object.fromEntries(group)).toEqual(Object.fromEntries(want))
     stop(s)
   })
 
   it('TC-DEMO-03 the demo: sign-in with WebKit and Chromium on http://localhost; the accounts listed; KYC transferred, not replaced', async () => {
-    const s: Stack = { project: 'doi-t-demo', files: ['docker-compose.yml', 'deploy/compose.demo.yml'], env: { DOI_PORT: '18090' } }
+    const s: Stack = { project: 'trunks-t-demo', files: ['docker-compose.yml', 'deploy/compose.demo.yml'], env: { TRUNKS_PORT: '18090' } }
     start(s)
     await until('the demo to finish processing', demoDone(s))
     for (const engine of [webkit, chromium]) {
@@ -177,7 +177,7 @@ console.log(s.warnings.join(' '))`)).toMatch(/the evaluation set's fictional one
   })
 
   it('TC-OPS-01 / TC-OPS-03 a real start: migrate first, admin must change the password, Secure cookie; each service only its own secrets', async () => {
-    const s: Stack = { project: 'doi-t-real', files: ['docker-compose.yml'], env: { DOI_CONFIG_DIR: './eval/config', DOI_PORT: '18091' } }
+    const s: Stack = { project: 'trunks-t-real', files: ['docker-compose.yml'], env: { TRUNKS_CONFIG_DIR: './eval/config', TRUNKS_PORT: '18091' } }
     start(s)
     await until('the app', () => composeTry(s, 'exec', '-T', 'app', 'node', '-e', "fetch('http://127.0.0.1:8080/').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))").status === 0, 300)
     expect(compose(s, 'ps', '-a', '--format', '{{.Service}} {{.State}} {{.ExitCode}}')).toMatch(/migrate exited 0/)
@@ -194,27 +194,27 @@ console.log(s.warnings.join(' '))`)).toMatch(/the evaluation set's fictional one
       return `${i.Config.Env.join('\n')}\n${i.Mounts.map((m) => m.Destination).join('\n')}`
     }
     const app = seen('app')
-    for (const x of ['MAINTENANCE_DATABASE', 'ROTATION_DATABASE', 'OWNER_DATABASE', 'doi_maintenance_db_password', 'doi_rotation_db_password', 'owner_database_url', 'postgres_password']) expect(app).not.toContain(x)
+    for (const x of ['MAINTENANCE_DATABASE', 'ROTATION_DATABASE', 'OWNER_DATABASE', 'trunks_maintenance_db_password', 'trunks_rotation_db_password', 'owner_database_url', 'postgres_password']) expect(app).not.toContain(x)
     const maintenance = seen('maintenance')
     for (const x of ['APP_DATABASE', 'ANTHROPIC', 'INITIAL_ADMIN', 'anthropic_api_key', 'initial_admin_password', 'app_database_url']) expect(maintenance).not.toContain(x)
     // every service of the compose file, the one-off tools included (self-test F4): exactly its own secrets
     const cfg = JSON.parse(compose({ ...s, env: { ...s.env } }, '--profile', 'tools', 'config', '--format', 'json')) as { services: Record<string, { secrets?: Array<{ source: string }> }> }
     const secretsOf = (svc: string) => (cfg.services[svc]!.secrets ?? []).map((x) => x.source).sort()
-    expect(secretsOf('migrate')).toEqual(['doi_app_db_password', 'doi_maintenance_db_password', 'doi_rotation_db_password', 'owner_database_url'])
-    expect(secretsOf('app')).toEqual(['anthropic_api_key', 'app_database_url', 'doi_hmac_key', 'doi_master_keys', 'initial_admin_password'])
-    expect(secretsOf('maintenance')).toEqual(['doi_hmac_key', 'doi_master_keys', 'maintenance_database_url'])
-    expect(secretsOf('rotate')).toEqual(['doi_hmac_key', 'doi_master_keys', 'rotation_database_url'])
-    expect(secretsOf('gmail-auth')).toEqual(['app_database_url', 'doi_hmac_key', 'doi_master_keys'])
+    expect(secretsOf('migrate')).toEqual(['owner_database_url', 'trunks_app_db_password', 'trunks_maintenance_db_password', 'trunks_rotation_db_password'])
+    expect(secretsOf('app')).toEqual(['anthropic_api_key', 'app_database_url', 'initial_admin_password', 'trunks_hmac_key', 'trunks_master_keys'])
+    expect(secretsOf('maintenance')).toEqual(['maintenance_database_url', 'trunks_hmac_key', 'trunks_master_keys'])
+    expect(secretsOf('rotate')).toEqual(['rotation_database_url', 'trunks_hmac_key', 'trunks_master_keys'])
+    expect(secretsOf('gmail-auth')).toEqual(['app_database_url', 'trunks_hmac_key', 'trunks_master_keys'])
     expect(secretsOf('parser')).toEqual([])
-    // serve no longer connects as the maintenance role (self-test F3): every doi_maintenance session comes from the
+    // serve no longer connects as the maintenance role (self-test F3): every trunks_maintenance session comes from the
     // maintenance container
     const ipOf = (svc: string) => (JSON.parse(execFileSync('docker', ['inspect', compose(s, 'ps', '-q', svc).trim()], { encoding: 'utf8' }))[0] as { NetworkSettings: { Networks: Record<string, { IPAddress: string }> } }).NetworkSettings.Networks[`${s.project}_backend`]!.IPAddress
-    const sessions = sql(s, "SELECT DISTINCT usename || ' ' || host(client_addr) FROM pg_stat_activity WHERE usename LIKE 'doi_%'").split('\n').filter(Boolean)
-    expect(sessions).toContain(`doi_app ${ipOf('app')}`)
-    expect(sessions.filter((x) => x.startsWith('doi_maintenance ')).every((x) => x === `doi_maintenance ${ipOf('maintenance')}`)).toBe(true)
-    expect(sessions.some((x) => x === `doi_maintenance ${ipOf('app')}`)).toBe(false)
+    const sessions = sql(s, "SELECT DISTINCT usename || ' ' || host(client_addr) FROM pg_stat_activity WHERE usename LIKE 'trunks_%'").split('\n').filter(Boolean)
+    expect(sessions).toContain(`trunks_app ${ipOf('app')}`)
+    expect(sessions.filter((x) => x.startsWith('trunks_maintenance ')).every((x) => x === `trunks_maintenance ${ipOf('maintenance')}`)).toBe(true)
+    expect(sessions.some((x) => x === `trunks_maintenance ${ipOf('app')}`)).toBe(false)
     // the chain head export lands in the state volume (TC-OPS-01, self-test F4)
-    const head = () => compose(s, 'exec', '-T', 'app', 'cat', '/var/lib/deal-ops-inbox/state/audit-head.jsonl')
+    const head = () => compose(s, 'exec', '-T', 'app', 'cat', '/var/lib/trunks/state/audit-head.jsonl')
     await until('the chain head export', () => head().trim().length > 0, 60)
     const headBefore = head()
     expect(compose(s, 'logs', '--no-log-prefix', 'maintenance')).toMatch(/maintenance running/)
@@ -224,7 +224,7 @@ console.log(s.warnings.join(' '))`)).toMatch(/the evaluation set's fictional one
     cpSync('eval/config', gcfg, { recursive: true })
     const dep = readFileSync(join(gcfg, 'deployment.yaml'), 'utf8')
     writeFileSync(join(gcfg, 'deployment.yaml'), dep.replace(/^mailboxes:\n/m, 'mailboxes:\n  - id: deals\n    name: Deals\n    kind: gmail\n    gmail: { address: deals@capital.example, labels: [INBOX] }\n    catch_up_minutes: 5\n') + '\ngmail: { client_id_env: GMAIL_CLIENT_ID, client_secret_env: GMAIL_CLIENT_SECRET }\n')
-    const g = { ...s, env: { ...s.env, DOI_CONFIG_DIR: gcfg } }
+    const g = { ...s, env: { ...s.env, TRUNKS_CONFIG_DIR: gcfg } }
     compose(g, 'run', '-d', '--rm', '--service-ports', '-e', 'GMAIL_CLIENT_ID=test-client', '-e', 'GMAIL_CLIENT_SECRET=test-secret', 'gmail-auth', 'deals')
     let answer = ''
     await until('the gmail-auth callback', () => {
@@ -236,8 +236,8 @@ console.log(s.warnings.join(' '))`)).toMatch(/the evaluation set's fictional one
     // as the quick start says: COMPOSE_FILE keeps the operator's override (mailbox credentials) together with the proxy
     // file, so the HTTPS start does not drop it (Codex E5 F6)
     const override = join(scratch, 'docker-compose.override.yml')
-    writeFileSync(override, 'services:\n  app:\n    environment:\n      DOI_OVERRIDE_PROBE: kept\n')
-    const px = { ...s, files: [], env: { ...s.env, TRUST_PROXY: '172.30.99.10', DOI_DOMAIN: 'localhost', COMPOSE_FILE: ['docker-compose.yml', override, 'deploy/compose.proxy.yml'].join(':') } }
+    writeFileSync(override, 'services:\n  app:\n    environment:\n      TRUNKS_OVERRIDE_PROBE: kept\n')
+    const px = { ...s, files: [], env: { ...s.env, TRUST_PROXY: '172.30.99.10', TRUNKS_DOMAIN: 'localhost', COMPOSE_FILE: ['docker-compose.yml', override, 'deploy/compose.proxy.yml'].join(':') } }
     compose(px, 'up', '-d')
     let viaProxy = ''
     await until('the proxy', () => {
@@ -246,11 +246,11 @@ console.log(s.warnings.join(' '))`)).toMatch(/the evaluation set's fictional one
     }, 120)
     expect(viaProxy).toMatch(/set-cookie:[^\n]*;\s*Secure/i)
     expect(seen('app')).toContain('TRUST_PROXY=172.30.99.10')
-    expect(seen('app')).toContain('DOI_OVERRIDE_PROBE=kept')
+    expect(seen('app')).toContain('TRUNKS_OVERRIDE_PROBE=kept')
     compose(px, 'stop', 'proxy')
-    // key rotation as compose runs it: the rotation role only, DOI_ACTIVE_KEY unset (docs review: it could not start)
-    const keys = readFileSync(join(secrets, 'doi_master_keys'), 'utf8').trim()
-    writeFileSync(join(secrets, 'doi_master_keys'), `${keys},k2:${Buffer.alloc(32, 7).toString('base64')}\n`)
+    // key rotation as compose runs it: the rotation role only, TRUNKS_ACTIVE_KEY unset (docs review: it could not start)
+    const keys = readFileSync(join(secrets, 'trunks_master_keys'), 'utf8').trim()
+    writeFileSync(join(secrets, 'trunks_master_keys'), `${keys},k2:${Buffer.alloc(32, 7).toString('base64')}\n`)
     compose(s, 'up', '-d', '--force-recreate', 'app', 'maintenance')
     await until('the app with the new key', () => composeTry(s, 'exec', '-T', 'app', 'node', '-e', "fetch('http://127.0.0.1:8080/').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))").status === 0, 120)
     // a rebuilt app container still has the earlier chain head exports (they live in the state volume)
@@ -261,7 +261,7 @@ console.log(s.warnings.join(' '))`)).toMatch(/the evaluation set's fictional one
     compose(s, 'up', '-d')
     expect(sql(s, 'SELECT count(*) FROM compose_probe')).toBe('1')
     stop(s)
-    writeFileSync(join(secrets, 'doi_master_keys'), `${keys}\n`) // the next stacks start with the first key again
+    writeFileSync(join(secrets, 'trunks_master_keys'), `${keys}\n`) // the next stacks start with the first key again
   })
 
   it('TC-OPS-08 / TC-OPS-09 users and directory exactly as docs/en/users-and-directory.md says: its commands and example files, run as written', async () => {
@@ -275,12 +275,12 @@ console.log(s.warnings.join(' '))`)).toMatch(/the evaluation set's fictional one
     const runs = blocks.filter((b) => !b[2]).map((b) => b[3]!)
     const run = runs.join('\n')
     // the only change: the address of this test deployment instead of the example domain
-    const url = 'DOI_URL=https://inbox.capital.example\n'
+    const url = 'TRUNKS_URL=https://inbox.capital.example\n'
     expect(run.split(url).length).toBe(2)
-    const here = (x: string) => x.replace(url, 'DOI_URL=http://127.0.0.1:18096\n')
+    const here = (x: string) => x.replace(url, 'TRUNKS_URL=http://127.0.0.1:18096\n')
     const script = here(run)
 
-    const s: Stack = { project: 'doi-t-users', files: ['docker-compose.yml'], env: { DOI_CONFIG_DIR: './eval/config', DOI_PORT: '18096' } }
+    const s: Stack = { project: 'trunks-t-users', files: ['docker-compose.yml'], env: { TRUNKS_CONFIG_DIR: './eval/config', TRUNKS_PORT: '18096' } }
     start(s)
     await until('the app', () => composeTry(s, 'exec', '-T', 'app', 'node', '-e', "fetch('http://127.0.0.1:8080/').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))").status === 0, 300)
     // quick start §2.5 first: the admin changes the initial password
@@ -295,7 +295,7 @@ console.log(s.warnings.join(' '))`)).toMatch(/the evaluation set's fictional one
     const out = execFileSync('bash', ['-e', '-c', script], { cwd: work, input: `admin\n${pw}\nsam.reviewer\nreviewer\nfirst-password-sam-1\nalex.approver\napprover\nfirst-password-alex-1\n`, encoding: 'utf8' })
     expect(out.match(/\{"id":"[0-9a-f-]{36}"\}/g)).toHaveLength(2)
     expect(out.match(/"ok":true/g)).toHaveLength(6) // five imports and the page's example clear of the ledger
-    expect(readdirSync(work)).not.toContain('doi-cookies.txt')
+    expect(readdirSync(work)).not.toContain('trunks-cookies.txt')
     expect(sql(s, "SELECT string_agg(role || '', ',' ORDER BY role) FROM app_user")).toBe('admin,approver,reviewer')
     expect(sql(s, "SELECT string_agg(DISTINCT kind, ',' ORDER BY kind) FROM directory_version")).toBe('bank,commitments,contacts,deals,ledger')
     // the page's clear example: the newest ledger version is empty, and the audit says it was a clear
@@ -308,7 +308,7 @@ console.log(s.warnings.join(' '))`)).toMatch(/the evaluation set's fictional one
     expect(((await sam.json()) as { user: { role: string; mustChangePassword: boolean } }).user).toMatchObject({ role: 'reviewer', mustChangePassword: true })
     // a file with an error is refused as a whole, with its row number (the page's description)
     writeFileSync(join(work, 'bad.csv'), 'name,currency\nSolent Biotherapeutics,CHF\n')
-    const bad = execFileSync('bash', ['-c', `${here(runs[0]!)}\ncurl -sS -b doi-cookies.txt -H "x-csrf-token: $CSRF" -H 'content-type: text/csv' --data-binary @bad.csv "$DOI_URL/api/directory/deals"; rm doi-cookies.txt`], { cwd: work, input: `admin\n${pw}\n`, encoding: 'utf8' })
+    const bad = execFileSync('bash', ['-c', `${here(runs[0]!)}\ncurl -sS -b trunks-cookies.txt -H "x-csrf-token: $CSRF" -H 'content-type: text/csv' --data-binary @bad.csv "$TRUNKS_URL/api/directory/deals"; rm trunks-cookies.txt`], { cwd: work, input: `admin\n${pw}\n`, encoding: 'utf8' })
     expect(bad).toMatch(/"where":"row 2, currency"/)
     // TC-OPS-09: the quick start's re-run command works in the image with the app's own secrets
     expect(compose(s, 'run', '--rm', 'app', 'rerun-failed')).toMatch(/no failed Cases/)
@@ -318,8 +318,8 @@ console.log(s.warnings.join(' '))`)).toMatch(/the evaluation set's fictional one
   it('TC-OPS-01 migrate fails → app and maintenance do not start', () => {
     const broken = join(scratch, 'broken')
     execFileSync('cp', ['-R', secrets, broken])
-    writeFileSync(join(broken, 'owner_database_url'), 'postgres://postgres:wrong-password@db:5432/doi\n')
-    const s: Stack = { project: 'doi-t-broken', files: ['docker-compose.yml'], env: { DOI_CONFIG_DIR: './eval/config', DOI_PORT: '18092', DOI_SECRETS_DIR: broken } }
+    writeFileSync(join(broken, 'owner_database_url'), 'postgres://postgres:wrong-password@db:5432/trunks\n')
+    const s: Stack = { project: 'trunks-t-broken', files: ['docker-compose.yml'], env: { TRUNKS_CONFIG_DIR: './eval/config', TRUNKS_PORT: '18092', TRUNKS_SECRETS_DIR: broken } }
     up.push(s)
     const r = composeTry(s, 'up', '-d')
     expect(r.status).not.toBe(0)
@@ -344,17 +344,22 @@ console.log(s.warnings.join(' '))`)).toMatch(/the evaluation set's fictional one
       mkdirSync(join(wt, 'node_modules')) // the mount point for this checkout's dependencies (the checkout is mounted read-only)
     }
     try {
-      const P = 'doi-t-upgrade'
-      const s: Stack = { project: P, files: ['docker-compose.yml'], env: { DOI_CONFIG_DIR: './eval/config', DOI_PORT: '18093' } }
+      const P = 'trunks-t-upgrade'
+      const s: Stack = { project: P, files: ['docker-compose.yml'], env: { TRUNKS_CONFIG_DIR: './eval/config', TRUNKS_PORT: '18093' } }
       up.push(s)
       compose(s, 'create')
       compose(s, 'up', '-d', '--wait', 'db')
       execFileSync('docker', ['run', '--rm', '-v', `${P}_files:/v`, 'alpine:3.20', 'chown', '10001:10001', '/v'])
+      // the E4 code is from before the rename (2026-11): it reads the DOI_* variables, keeps files under its old path
+      // and creates the doi_* database roles, so it gets a copy of the secrets whose app URL names doi_app
+      const e4Secrets = join(scratch, 'secrets-e4')
+      execFileSync('cp', ['-a', secrets, e4Secrets])
+      writeFileSync(join(e4Secrets, 'app_database_url'), readFileSync(join(secrets, 'app_database_url'), 'utf8').replace('://trunks_app:', '://doi_app:'))
       const e4 = (...cmd: string[]) =>
         execFileSync('docker', ['run', '--rm', '--user', '10001:10001', '--network', `${P}_backend`,
-          '-v', `${wt}:/app:ro`, '-v', `${resolve('node_modules')}:/app/node_modules:ro`, ...secretMounts(secrets), '-v', `${P}_files:/var/lib/deal-ops-inbox/files`, '-v', `${resolve('eval/dev')}:/samples:ro`, '-w', '/app',
-          '-e', 'OWNER_DATABASE_URL_FILE=/s/owner_database_url', '-e', 'DOI_APP_DB_PASSWORD_FILE=/s/doi_app_db_password', '-e', 'DOI_MAINTENANCE_DB_PASSWORD_FILE=/s/doi_maintenance_db_password', '-e', 'DOI_ROTATION_DB_PASSWORD_FILE=/s/doi_rotation_db_password',
-          '-e', 'APP_DATABASE_URL_FILE=/s/app_database_url', '-e', 'DOI_MASTER_KEYS_FILE=/s/doi_master_keys', '-e', 'DOI_HMAC_KEY_FILE=/s/doi_hmac_key', '-e', 'CONFIG_DIR=eval/config',
+          '-v', `${wt}:/app:ro`, '-v', `${resolve('node_modules')}:/app/node_modules:ro`, ...secretMounts(e4Secrets), '-v', `${P}_files:/var/lib/deal-ops-inbox/files`, '-v', `${resolve('eval/dev')}:/samples:ro`, '-w', '/app',
+          '-e', 'OWNER_DATABASE_URL_FILE=/s/owner_database_url', '-e', 'DOI_APP_DB_PASSWORD_FILE=/s/trunks_app_db_password', '-e', 'DOI_MAINTENANCE_DB_PASSWORD_FILE=/s/trunks_maintenance_db_password', '-e', 'DOI_ROTATION_DB_PASSWORD_FILE=/s/trunks_rotation_db_password',
+          '-e', 'APP_DATABASE_URL_FILE=/s/app_database_url', '-e', 'DOI_MASTER_KEYS_FILE=/s/trunks_master_keys', '-e', 'DOI_HMAC_KEY_FILE=/s/trunks_hmac_key', '-e', 'CONFIG_DIR=eval/config',
           'node:22-bookworm-slim', 'node', '--experimental-strip-types', '--no-warnings', 'src/main.ts', ...cmd], { encoding: 'utf8' })
       // emails with attachments (a pacs.008 XML, a passport PDF, an MT103 text file) and one without (Codex E5 F9)
       const samples = ['/samples/E0001.eml', '/samples/E0024.eml', '/samples/E0045.eml', '/samples/E0287.eml']
@@ -362,6 +367,9 @@ console.log(s.warnings.join(' '))`)).toMatch(/the evaluation set's fictional one
         e4('migrate')
         expect(e4('import-eml', 'ops', ...samples)).toMatch(/E0287\.eml: created/)
         expect(sql(s, "SELECT count(*) FROM schema_migrations WHERE name = '005_e5.sql'")).toBe('0')
+        expect(sql(s, "SELECT string_agg(rolname, ',' ORDER BY rolname) FROM pg_roles WHERE rolname ~ '^(doi|trunks)_'")).toBe('doi_app,doi_maintenance,doi_rotation')
+        // a file intent left by the old code: its role name is stored as text (migration 010)
+        sql(s, "INSERT INTO file_write_intent (id, object_key, purpose, created_by_role) VALUES ('00000000-0000-4000-8000-000000000010', 'rename-test', 'test', 'doi_app')")
       } else {
         compose(s, 'run', '--rm', 'migrate')
         expect(compose(s, 'run', '--rm', '--no-deps', '-v', `${resolve('eval/dev')}:/samples:ro`, 'app', 'import-eml', 'ops', ...samples)).toMatch(/E0287\.eml: created/)
@@ -378,16 +386,24 @@ console.log(s.warnings.join(' '))`)).toMatch(/the evaluation set's fictional one
       compose(s, 'up', '-d')
       await until('the upgraded app', () => composeTry(s, 'exec', '-T', 'app', 'node', '-e', "fetch('http://127.0.0.1:8080/').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))").status === 0, 300)
       expect(sql(s, "SELECT count(*) FROM schema_migrations WHERE name = '005_e5.sql'")).toBe('1')
+      // the roles were renamed, not made again: no old name is left, in the cluster or stored as text (plan §3.1)
+      expect(sql(s, "SELECT string_agg(rolname, ',' ORDER BY rolname) FROM pg_roles WHERE rolname ~ '^(doi|trunks)_'")).toBe('trunks_app,trunks_maintenance,trunks_rotation')
+      expect(sql(s, "SELECT pg_get_expr(polqual, polrelid) FROM pg_policy WHERE polname = 'intent_delete_own'")).toMatch(/'trunks_maintenance'/)
+      expect(sql(s, "SELECT nspowner::regrole::text FROM pg_namespace WHERE nspname = 'pgboss'")).toBe('trunks_app')
+      if (HAS_E4) {
+        expect(sql(s, "SELECT created_by_role FROM file_write_intent WHERE id = '00000000-0000-4000-8000-000000000010'")).toBe('trunks_app')
+        sql(s, "DELETE FROM file_write_intent WHERE id = '00000000-0000-4000-8000-000000000010'")
+      }
       expect(sql(s, 'SELECT count(*) FROM message')).toBe('4')
       expect(compose(s, 'exec', '-T', 'app', 'node', '--experimental-strip-types', '--no-warnings', 'src/main.ts', 'audit', 'verify')).toMatch(/^ok: /)
       expectFiles(s)
       // the restore below runs while this deployment is still up, as the docs describe (Codex E5 round 2 F4)
 
       // TC-OPS-06: restore into a fresh project (docs: create, untar, up)
-      const R: Stack = { project: 'doi-t-restore', files: [], env: { DOI_SECRETS_DIR: join(B, 'secrets'), DOI_CONFIG_DIR: './eval/config', DOI_PORT: '18094', COMPOSE_FILE: 'docker-compose.yml' } }
+      const R: Stack = { project: 'trunks-t-restore', files: [], env: { TRUNKS_SECRETS_DIR: join(B, 'secrets'), TRUNKS_CONFIG_DIR: './eval/config', TRUNKS_PORT: '18094', COMPOSE_FILE: 'docker-compose.yml' } }
       up.push(R)
       compose(R, 'create')
-      for (const v of ['db', 'files', 'state', 'kyc']) execFileSync('docker', ['run', '--rm', '-v', `doi-t-restore_${v}:/v`, '-v', `${B}:/b:ro`, 'postgres:16', 'sh', '-c', `cd /v && tar --numeric-owner -xzf /b/${v}.tgz`])
+      for (const v of ['db', 'files', 'state', 'kyc']) execFileSync('docker', ['run', '--rm', '-v', `trunks-t-restore_${v}:/v`, '-v', `${B}:/b:ro`, 'postgres:16', 'sh', '-c', `cd /v && tar --numeric-owner -xzf /b/${v}.tgz`])
       compose(R, 'up', '-d')
       await until('the restored app', () => composeTry(R, 'exec', '-T', 'app', 'node', '-e', "fetch('http://127.0.0.1:8080/').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))").status === 0, 300)
       expect(compose(R, 'exec', '-T', 'app', 'node', '--experimental-strip-types', '--no-warnings', 'src/main.ts', 'audit', 'verify')).toMatch(/^ok: /)
@@ -411,13 +427,13 @@ console.log(s.warnings.join(' '))`)).toMatch(/the evaluation set's fictional one
       if (!HAS_E4) return
 
       // going back (docs: restore the backup made before the upgrade and run the older version): the E4 code on it
-      const back: Stack = { project: 'doi-t-back', files: ['docker-compose.yml'], env: { DOI_SECRETS_DIR: join(B, 'secrets'), DOI_CONFIG_DIR: './eval/config', DOI_PORT: '18095' } }
+      const back: Stack = { project: 'trunks-t-back', files: ['docker-compose.yml'], env: { TRUNKS_SECRETS_DIR: join(B, 'secrets'), TRUNKS_CONFIG_DIR: './eval/config', TRUNKS_PORT: '18095' } }
       up.push(back)
       compose(back, 'create')
-      execFileSync('docker', ['run', '--rm', '-v', 'doi-t-back_db:/v', '-v', `${B}:/b:ro`, 'postgres:16', 'sh', '-c', 'cd /v && tar --numeric-owner -xzf /b/db.tgz'])
+      execFileSync('docker', ['run', '--rm', '-v', 'trunks-t-back_db:/v', '-v', `${B}:/b:ro`, 'postgres:16', 'sh', '-c', 'cd /v && tar --numeric-owner -xzf /b/db.tgz'])
       compose(back, 'up', '-d', '--wait', 'db')
       expect(sql(back, "SELECT count(*) FROM schema_migrations WHERE name = '005_e5.sql'")).toBe('0')
-      const verify = execFileSync('docker', ['run', '--rm', '--user', '10001:10001', '--network', 'doi-t-back_backend', '-v', `${wt}:/app:ro`, '-v', `${resolve('node_modules')}:/app/node_modules:ro`, ...secretMounts(join(B, 'secrets')), '-w', '/app',
+      const verify = execFileSync('docker', ['run', '--rm', '--user', '10001:10001', '--network', 'trunks-t-back_backend', '-v', `${wt}:/app:ro`, '-v', `${resolve('node_modules')}:/app/node_modules:ro`, ...secretMounts(e4Secrets), '-w', '/app',
         '-e', 'APP_DATABASE_URL_FILE=/s/app_database_url', 'node:22-bookworm-slim', 'node', '--experimental-strip-types', '--no-warnings', 'src/main.ts', 'audit', 'verify'], { encoding: 'utf8' })
       expect(verify).toMatch(/^ok: /)
       stop(back)

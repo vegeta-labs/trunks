@@ -8,7 +8,7 @@ export interface Money {
   currency: Currency
 }
 
-/** I-01 upper bound (v0.7.1, the Toolkit's limit): 1,000,000,000.00 */
+/** I-01 upper bound (v0.7.1, Goten's limit): 1,000,000,000.00 */
 export const MAX_MINOR = 100_000_000_000
 
 // Thousands commas in groups of three, or no grouping; dot decimal point with 1–2 decimals.

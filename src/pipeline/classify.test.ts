@@ -89,7 +89,7 @@ describe('classify stage (C-CLS, C-RED-0)', () => {
   it('TC-RED-05 a local model gets the same redacted request; a redact_local key in the configuration fails to load', async () => {
     expect(llm.location).toBe('local')
     expect(llm.requests.every((r) => !r.user.includes('GB82'))).toBe(true)
-    const dir = mkdtempSync(join(tmpdir(), 'doi-cfg-'))
+    const dir = mkdtempSync(join(tmpdir(), 'trunks-cfg-'))
     cpSync('config/default', dir, { recursive: true })
     const f = join(dir, 'deployment.yaml')
     const base = readFileSync(f, 'utf8')

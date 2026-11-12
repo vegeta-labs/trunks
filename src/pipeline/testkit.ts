@@ -64,11 +64,11 @@ export async function createKit(o: { scanner?: Scanner; parser?: ParserClient; c
   const config = o.config ?? testConfig()
   const u = new URL(TEST_URL)
   u.pathname = `/${t.name}`
-  u.username = 'doi_app'
-  u.password = 'test-doi_app'
+  u.username = 'trunks_app'
+  u.password = 'test-trunks_app'
   const boss = new BossQueue(u.toString())
   await boss.start()
-  const files = new DiskStore(mkdtempSync(join(tmpdir(), 'doi-files-')), t.keyring)
+  const files = new DiskStore(mkdtempSync(join(tmpdir(), 'trunks-files-')), t.keyring)
   const deps: StageDeps = { db: t.app, k: t.keyring, files, config, queue: boss, scanner: o.scanner ?? new FakeScanner(), parser: o.parser ?? new InProcessParser(), llm: o.llm ?? new FakeLlm() }
   await ensureMailboxes(t.app, t.keyring, config)
   const mailbox: MailboxInfo = { id: 'ops', trustedAuthResults: false, trustedAuthservId: 'mx.ops.example' }

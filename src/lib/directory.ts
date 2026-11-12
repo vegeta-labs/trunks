@@ -1,6 +1,6 @@
 // PRD R-DIR-01 to 03, C-DIR-1 to 3: directory CSV imports. Header aliases, currency annotations, line endings and
-// cell handling are copied from Deal Ops Toolkit src/lib/csv.ts and money.ts (same author), so files exported by the
-// Toolkit import here unchanged.
+// cell handling are copied from Goten src/lib/csv.ts and money.ts (same author), so files exported by the
+// Goten import here unchanged.
 import Papa from 'papaparse'
 import { ibanShapes, ibanValid, normaliseAccount } from './accounts.ts'
 import { isoFromParts } from './dates.ts'
@@ -51,7 +51,7 @@ const SCHEMAS = {
     { key: 'payer', required: false, aliases: ['payer name', 'counterparty', 'from', 'name'] },
     { key: 'reference', required: false, aliases: ['description', 'payment reference', 'narrative'] },
   ],
-  // Toolkit ledger export: exact column names (C-DIR-1)
+  // Goten ledger export: exact column names (C-DIR-1)
   ledger: ['transaction_id', 'date', 'amount', 'payer', 'reference', 'status', 'investor_id', 'investor_name', 'decided_by', 'withdrawn_on'].map((key) => ({
     key,
     required: ['date', 'amount', 'status'].includes(key),
@@ -199,7 +199,7 @@ function readTable(text: string, kind: Kind, currency: Currency | null): { table
   return { table: { rows, rowNumbers: body.map((r) => r.line), rowCurrencies, hasColumn: new Set(Object.keys(colOf)) }, errors, ignored }
 }
 
-// ---------- cell parsers (Toolkit I-01, I-04) ----------
+// ---------- cell parsers (Goten I-01, I-04) ----------
 
 const SYMBOL: Record<string, string> = { GBP: '£', EUR: '€', USD: 'US$' }
 const SYMBOL_IN = String.raw`(£|€|US\$|\$)`
@@ -224,7 +224,7 @@ export function parseMoney(raw: string, currency: Currency, allowNegative = fals
   return { ok: true, value: negative ? -minor : minor }
 }
 
-/** YYYY-MM-DD or DD/MM/YYYY (Toolkit I-04). */
+/** YYYY-MM-DD or DD/MM/YYYY (Goten I-04). */
 export function parseCsvDate(raw: string): Parsed<string> {
   const s = trimAscii(raw)
   if (s === '') return { ok: false, reason: 'required' }
@@ -350,7 +350,7 @@ export interface LedgerRow {
   payer: string
   reference: string
   status: string
-  investorId: string | null // Toolkit investor id (bare); the commitment key is deal::investor_id
+  investorId: string | null // Goten investor id (bare); the commitment key is deal::investor_id
   investorName: string
   decidedBy: string
   withdrawnOn: string | null
@@ -358,10 +358,10 @@ export interface LedgerRow {
   row: number
 }
 
-// the Toolkit's line statuses (LineStatus in its reconcile engine); anything else is free text and is refused
+// Goten's line statuses (LineStatus in its reconcile engine); anything else is free text and is refused
 export const LEDGER_STATUSES = ['auto', 'confirmed', 'suggested', 'unmatched', 'rejected', 'skipped', 'future'] as const
 
-/** Toolkit ledger export. One row per non-empty transaction_id; no generated ids (C-DIR-1). */
+/** Goten ledger export. One row per non-empty transaction_id; no generated ids (C-DIR-1). */
 export function importLedger(text: string, currency: Currency): Imported<LedgerRow> {
   const { table, errors, ignored } = readTable(text, 'ledger', currency)
   const parsed: LedgerRow[] = []
@@ -373,7 +373,7 @@ export function importLedger(text: string, currency: Currency): Imported<LedgerR
     if (!/^[A-Z]{3}$/.test(rowCurrency)) errors.push({ where: `row ${row}, currency`, message: `"${rowCurrency}" is not a currency code` })
     const amt = parseMoney(r.amount ?? '', /^[A-Z]{3}$/.test(rowCurrency) ? (rowCurrency as Currency) : currency, true)
     if (!amt.ok) errors.push({ where: `row ${row}, amount`, message: amt.reason })
-    else if (amt.value < 0) errors.push({ where: `row ${row}, amount`, message: 'cannot be negative (reverse it in the Toolkit and export again)' })
+    else if (amt.value < 0) errors.push({ where: `row ${row}, amount`, message: 'cannot be negative (reverse it in Goten and export again)' })
     const status = (r.status ?? '').toLowerCase()
     if (!(LEDGER_STATUSES as readonly string[]).includes(status)) errors.push({ where: `row ${row}, status`, message: `"${r.status ?? ''}" must be one of ${LEDGER_STATUSES.join(', ')}` })
     let withdrawnOn: string | null = null

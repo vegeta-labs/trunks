@@ -22,17 +22,17 @@ export class Keyring {
     this.hmacKey = hmacKey
   }
 
-  /** `DOI_MASTER_KEYS="k1:<base64>,k2:<base64>"`, `DOI_ACTIVE_KEY=k2`, `DOI_HMAC_KEY=<base64>`. */
+  /** `TRUNKS_MASTER_KEYS="k1:<base64>,k2:<base64>"`, `TRUNKS_ACTIVE_KEY=k2`, `TRUNKS_HMAC_KEY=<base64>`. */
   static fromEnv(env: NodeJS.ProcessEnv = process.env): Keyring {
-    const raw = env.DOI_MASTER_KEYS
-    const hmac = env.DOI_HMAC_KEY
-    if (!raw || !hmac) throw new Error('DOI_MASTER_KEYS and DOI_HMAC_KEY are required')
+    const raw = env.TRUNKS_MASTER_KEYS
+    const hmac = env.TRUNKS_HMAC_KEY
+    if (!raw || !hmac) throw new Error('TRUNKS_MASTER_KEYS and TRUNKS_HMAC_KEY are required')
     const keys = raw.split(',').map((s) => {
       const i = s.indexOf(':')
       return { id: s.slice(0, i).trim(), key: Buffer.from(s.slice(i + 1).trim(), 'base64') }
     })
-    // an empty DOI_ACTIVE_KEY (compose's `${DOI_ACTIVE_KEY:-}`) counts as not set
-    return new Keyring(keys, env.DOI_ACTIVE_KEY || keys.at(-1)!.id, Buffer.from(hmac, 'base64'))
+    // an empty TRUNKS_ACTIVE_KEY (compose's `${TRUNKS_ACTIVE_KEY:-}`) counts as not set
+    return new Keyring(keys, env.TRUNKS_ACTIVE_KEY || keys.at(-1)!.id, Buffer.from(hmac, 'base64'))
   }
 
   hmac(s: string | Buffer): string {

@@ -54,9 +54,9 @@ const DEMO = process.env.DEMO === '1'
 function setup(databaseUrlEnv = 'APP_DATABASE_URL') {
   // DEMO=1: the evaluation configuration the replay was recorded with (PRD R-DEMO-01 v0.7.22)
   const config = DEMO ? demoConfig() : loadConfig(process.env.CONFIG_DIR ?? 'config/default')
-  const k = Keyring.fromEnv({ ...process.env, DOI_MASTER_KEYS: env('DOI_MASTER_KEYS'), DOI_HMAC_KEY: env('DOI_HMAC_KEY') })
+  const k = Keyring.fromEnv({ ...process.env, TRUNKS_MASTER_KEYS: env('TRUNKS_MASTER_KEYS'), TRUNKS_HMAC_KEY: env('TRUNKS_HMAC_KEY') })
   const db = pool(env(databaseUrlEnv))
-  const files = new DiskStore(process.env.FILES_DIR ?? '/var/lib/deal-ops-inbox/files', k)
+  const files = new DiskStore(process.env.FILES_DIR ?? '/var/lib/trunks/files', k)
   return { config, k, db, files }
 }
 
@@ -95,7 +95,7 @@ async function serve(): Promise<void> {
 
   // the demo emails, once per reset, after the workers are listening (PRD R-DEMO-01; tech design v0.7.11)
   if (DEMO) {
-    console.log(`demo: ${await seedDemo(deps, { filesDir: process.env.FILES_DIR ?? '/var/lib/deal-ops-inbox/files' })}`)
+    console.log(`demo: ${await seedDemo(deps, { filesDir: process.env.FILES_DIR ?? '/var/lib/trunks/files' })}`)
     // a second `docker compose up` resets the database under this process (migrate runs again): leave, so that the
     // restart policy starts a fresh process that loads the demo again (PRD R-DEMO-01 v0.7.22, self-test F7)
     setInterval(() => {
@@ -245,7 +245,7 @@ async function main(argv: string[]): Promise<void> {
   const [cmd, ...rest] = argv
   switch (cmd) {
     case 'migrate':
-      console.log(await migrate(env('OWNER_DATABASE_URL'), { doi_app: env('DOI_APP_DB_PASSWORD'), doi_maintenance: env('DOI_MAINTENANCE_DB_PASSWORD'), doi_rotation: env('DOI_ROTATION_DB_PASSWORD') }, { demo: process.env.DEMO === '1' }))
+      console.log(await migrate(env('OWNER_DATABASE_URL'), { trunks_app: env('TRUNKS_APP_DB_PASSWORD'), trunks_maintenance: env('TRUNKS_MAINTENANCE_DB_PASSWORD'), trunks_rotation: env('TRUNKS_ROTATION_DB_PASSWORD') }, { demo: process.env.DEMO === '1' }))
       return
     case 'serve':
       return serve()
@@ -302,7 +302,7 @@ async function main(argv: string[]): Promise<void> {
       return
     }
     case 'rotate-keys': {
-      // tech design §5, v0.7.9: its own process and role; DOI_MASTER_KEYS holds the old keys and the new active one
+      // tech design §5, v0.7.9: its own process and role; TRUNKS_MASTER_KEYS holds the old keys and the new active one
       // the rotation role only: the rotate service has no app credentials (docs review)
       const { k, files, db } = setup('ROTATION_DATABASE_URL')
       await demoGuard(db, DEMO) // the demo database only with DEMO=1, here too (Codex E5 F1)

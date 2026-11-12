@@ -1,4 +1,4 @@
-// Serves the static demo snapshot (dist-demo) the way the Deal Ops website does, for TC-DEMO-04: with the site's
+// Serves the static demo snapshot (dist-demo) the way the Vegeta website does, for TC-DEMO-04: with the site's
 // Content-Security-Policy (connect-src 'none': the page may make no fetch or XHR at all; site interface T1).
 import { createServer } from 'node:http'
 import { readFile } from 'node:fs/promises'

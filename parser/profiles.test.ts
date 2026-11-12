@@ -6,14 +6,14 @@ import { resolve } from 'node:path'
 import { parse } from 'yaml'
 
 const compose = readFileSync('docker-compose.yml', 'utf8')
-// set by the Ubuntu 24.04 CI job after `apparmor_parser -r -W deploy/apparmor/doi-parser`
+// set by the Ubuntu 24.04 CI job after `apparmor_parser -r -W deploy/apparmor/trunks-parser`
 const APPARMOR = process.env.PARSER_APPARMOR === '1'
 
 describe('parser profiles', () => {
-  it('TC-OPS-02 compose never runs anything unconfined; the parser uses the generated seccomp profile and doi-parser', () => {
+  it('TC-OPS-02 compose never runs anything unconfined; the parser uses the generated seccomp profile and trunks-parser', () => {
     expect(compose).not.toMatch(/unconfined/)
     expect(compose).toMatch(/- seccomp=deploy\/parser-seccomp\.json/)
-    expect(compose).toMatch(/- apparmor=doi-parser/)
+    expect(compose).toMatch(/- apparmor=trunks-parser/)
     // the committed profile is exactly what the generator makes from the vendored Docker default
     expect(() => execFileSync('node', ['scripts/gen-parser-seccomp.mjs', '--check'], { encoding: 'utf8' })).not.toThrow()
     const p = JSON.parse(readFileSync('deploy/parser-seccomp.json', 'utf8')) as { defaultAction: string; syscalls: Array<{ names: string[]; action: string }> }
@@ -22,11 +22,11 @@ describe('parser profiles', () => {
     expect(extra.names).toEqual(['clone', 'unshare', 'mount', 'umount2', 'pivot_root'])
   })
 
-  it.runIf(APPARMOR)('TC-OPS-02 on an AppArmor host: enabled, doi-parser loaded, an unloaded profile stops the container from starting', () => {
+  it.runIf(APPARMOR)('TC-OPS-02 on an AppArmor host: enabled, trunks-parser loaded, an unloaded profile stops the container from starting', () => {
     expect(readFileSync('/sys/module/apparmor/parameters/enabled', 'utf8').trim()).toBe('Y')
     // loaded: a container under it starts (the CI step checked `aa-status` for enforce mode)
-    expect(spawnSync('docker', ['run', '--rm', '--security-opt', 'apparmor=doi-parser', 'alpine:3.20', 'true']).status).toBe(0)
-    const r = spawnSync('docker', ['run', '--rm', '--security-opt', 'apparmor=doi-parser-not-loaded', 'alpine:3.20', 'true'], { encoding: 'utf8' })
+    expect(spawnSync('docker', ['run', '--rm', '--security-opt', 'apparmor=trunks-parser', 'alpine:3.20', 'true']).status).toBe(0)
+    const r = spawnSync('docker', ['run', '--rm', '--security-opt', 'apparmor=trunks-parser-not-loaded', 'alpine:3.20', 'true'], { encoding: 'utf8' })
     expect(r.status).not.toBe(0)
   })
 

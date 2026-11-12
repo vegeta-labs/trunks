@@ -66,7 +66,7 @@ describe('hostile values for KYC targets', () => {
     expect(generatedName('0b0c0d0e-0000-4000-8000-0000000000aa', 3, 'image', Buffer.from([0x89, 0x50, 0x4e, 0x47]))).toBe('0b0c0d0e-0000-4000-8000-0000000000aa-3.png')
   })
   it('a folder target refuses names that leave the folder; a webhook with a huge or nested receipt is not a receipt', async () => {
-    const dir = mkdtempSync(join(tmpdir(), 'doi-kyc-h-'))
+    const dir = mkdtempSync(join(tmpdir(), 'trunks-kyc-h-'))
     for (const name of ['../x.pdf', '/etc/x.pdf', 'a/b.pdf', 'x.pdf\u0000.txt']) {
       await expect(new FolderSink(dir).deliver(Buffer.from('x'), { deliveryId: 'd', caseId: 'c', seq: 1, name, sha256: 'x' })).rejects.toMatchObject({ code: 'bad_name' })
     }

@@ -16,12 +16,12 @@ export interface Snapshot {
   details: Record<string, Item>
 }
 const snapshot = (): Snapshot => {
-  const s = (globalThis as { DOI_DEMO?: Snapshot }).DOI_DEMO
+  const s = (globalThis as { TRUNKS_DEMO?: Snapshot }).TRUNKS_DEMO
   if (!s) throw new Error('the demo snapshot (data/snapshot.js) is missing')
   return s
 }
 export const snapshotInfo = (): (Snapshot['info'] & { caseCount: number }) | null => {
-  const s = (globalThis as { DOI_DEMO?: Snapshot }).DOI_DEMO
+  const s = (globalThis as { TRUNKS_DEMO?: Snapshot }).TRUNKS_DEMO
   return s ? { ...s.info, caseCount: s.cases.length } : null
 }
 

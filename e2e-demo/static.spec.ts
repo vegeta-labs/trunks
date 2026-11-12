@@ -57,7 +57,7 @@ test('TC-DEMO-04 / TC-DEMO-02 static demo: readable under the site CSP, thin bar
   const before = requests.length
   await page.goto('about:blank')
   await page.goto('/')
-  const ids = await page.evaluate(() => Object.keys((globalThis as unknown as { DOI_DEMO: { details: object } }).DOI_DEMO.details))
+  const ids = await page.evaluate(() => Object.keys((globalThis as unknown as { TRUNKS_DEMO: { details: object } }).TRUNKS_DEMO.details))
   expect(ids.length).toBe(31)
   for (const id of ids) {
     await page.goto(`/#case=${id}`)

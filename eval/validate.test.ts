@@ -8,7 +8,7 @@ import { validate } from './validate.ts'
 const example = () => JSON.parse(/## 标注 JSON[^`]*```json\n([\s\S]*?)```/.exec(readFileSync(new URL('SCHEMA.md', import.meta.url), 'utf8'))![1]!)
 
 function run(...annotations: Array<Record<string, unknown>>): string[] {
-  const dir = mkdtempSync(join(tmpdir(), 'doi-eval-'))
+  const dir = mkdtempSync(join(tmpdir(), 'trunks-eval-'))
   for (const a of annotations) writeFileSync(join(dir, `${a.id}.json`), JSON.stringify(a))
   return validate([dir])
 }

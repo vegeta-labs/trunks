@@ -44,8 +44,8 @@ const PUBLIC_ROUTES = new Set(['/api/login', '/api/demo', '/api/signin-options',
 // /api/csrf too: a new tab of a user who must change the password first needs the token for that (plan review R12)
 const MUST_CHANGE_ALLOWED = new Set(['/api/session', '/api/password', '/api/logout', '/api/csrf'])
 
-const SESSION = 'doi_session'
-const OIDC_COOKIE = 'doi_oidc'
+const SESSION = 'trunks_session'
+const OIDC_COOKIE = 'trunks_oidc'
 export const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
 
 declare module 'fastify' {
@@ -243,7 +243,7 @@ export async function buildServer(d: ServerDeps): Promise<FastifyInstance> {
  * file deletions that keep failing (tech design §4.1), mailboxes whose subscription or token needs attention (R-ING-02).
  */
 /** Shown at the top of every demo page (PRD R-DEMO-01 v0.7.22; D11, V3b). */
-export const DEMO_NOTICE = 'Demo: fictional data only, received at fixed past times (deadlines may show as overdue). Example email dates are fictional and may be later than today. The directory is the evaluation set\'s fictional one, not the Toolkit sample. KYC attachments are transferred to a folder but, unlike a real deployment, the stored email is not replaced.'
+export const DEMO_NOTICE = 'Demo: fictional data only, received at fixed past times (deadlines may show as overdue). Example email dates are fictional and may be later than today. The directory is the evaluation set\'s fictional one, not the Goten sample. KYC attachments are transferred to a folder but, unlike a real deployment, the stored email is not replaced.'
 
 export async function operationalWarnings(db: Db, opts: { demo?: boolean } = {}): Promise<string[]> {
   const r = (await db.query<{ kyc: number; files: number; stuck: number }>(

@@ -27,16 +27,22 @@ const NAMES: Record<string, string> = {
 }
 export const displayName = (id: string) => NAMES[id] ?? id
 
-// TC-REV-18: the edit input matches the field's kind, so a yes/no field sends true / false and a list field sends a
-// list; the server's §5.5a checks are unchanged
-export type EditInput = { kind: 'boolean' } | { kind: 'list'; options: readonly string[] } | { kind: 'text' }
+// TC-REV-18, TC-REV-19: the edit input matches the field's kind, so a yes/no field sends true / false, a single-choice
+// field sends one allowed value and a list field sends a list; the server's §5.5a checks are unchanged
+export type EditInput = { kind: 'boolean' } | { kind: 'choice'; options: readonly string[] } | { kind: 'list'; options: readonly string[] } | { kind: 'text' }
 export const editInput = (field: string): EditInput =>
-  KIND[field] === 'boolean' ? { kind: 'boolean' } : KIND[field] === 'enums' ? { kind: 'list', options: ENUMS[field]! } : { kind: 'text' }
-const OPTION_NAMES: Record<string, string> = { tax_id: 'Tax ID', ubo_register: 'UBO register' }
+  KIND[field] === 'boolean' ? { kind: 'boolean' }
+  : KIND[field] === 'enum' ? { kind: 'choice', options: ENUMS[field]! }
+  : KIND[field] === 'enums' ? { kind: 'list', options: ENUMS[field]! }
+  : { kind: 'text' }
+const OPTION_NAMES: Record<string, string> = {
+  tax_id: 'Tax ID', ubo_register: 'UBO register', seis: 'SEIS', eis: 'EIS', fx: 'FX', us_person: 'US person', nominee_kyc: 'Nominee KYC', investor_cc: 'Investor CC',
+}
 export const optionText = (v: string) => OPTION_NAMES[v] ?? (v.charAt(0).toUpperCase() + v.slice(1)).replace(/_/g, ' ')
-/** The value an edit sends: `text` is the typed text or the chosen 'true' / 'false'; nothing chosen clears the field. */
+/** The value an edit sends: `text` is the typed text, the chosen 'true' / 'false' or the chosen option; nothing chosen clears the field. */
 export function editValue(input: EditInput, text: string, picked: readonly string[]): string | boolean | string[] | null {
   if (input.kind === 'boolean') return text === 'true' ? true : text === 'false' ? false : null
+  if (input.kind === 'choice') return input.options.includes(text) ? text : null
   if (input.kind === 'list') return picked.length ? input.options.filter((o) => picked.includes(o)) : null
   return text.trim() === '' ? null : text.trim()
 }

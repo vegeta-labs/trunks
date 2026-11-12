@@ -1,4 +1,4 @@
-// Key rotation (PRD R-PRV-05; tech design §5, v0.7.9): `doi rotate-keys`, run on its own as the `rotation` role. Every
+// Key rotation (PRD R-PRV-05; tech design §5, v0.7.9): `trunks rotate-keys`, run on its own as the `rotation` role. Every
 // text blob and every stored file gets its data key wrapped by the active master key; nothing else changes (blobs:
 // key_id and wrapped_dek; files: the header, the ciphertext untouched). It can stop at any point and start again: done
 // work is recognised by its key id. Old versions of a rewritten object are removed. A rotation is complete only after a
@@ -46,19 +46,19 @@ async function objectKeys(db: Db): Promise<string[]> {
 export async function rotateKeys(d: RotationDeps, hooks: RotationHooks = {}): Promise<{ rotation: string; blobs: number; files: number; sampled: number }> {
   const to = d.k.active.id
   // keys that may have written something: ever the services' write key, or still on a text blob; a key only staged in
-  // DOI_MASTER_KEYS is not «rotated away from» (regression review R6)
+  // TRUNKS_MASTER_KEYS is not «rotated away from» (regression review R6)
   const used = new Set([
     ...(await d.db.query<{ key: string }>("SELECT DISTINCT payload->>'key' AS key FROM audit WHERE type = 'keys.active'")).rows.map((r) => r.key),
     ...(await d.db.query<{ key_id: string }>('SELECT DISTINCT key_id FROM secret_blob')).rows.map((r) => r.key_id),
   ])
   const old = d.k.ids().filter((id) => id !== to && used.has(id))
-  if (!old.length) throw new Error('nothing to rotate: DOI_MASTER_KEYS holds only the active key')
+  if (!old.length) throw new Error('nothing to rotate: TRUNKS_MASTER_KEYS holds only the active key')
   // the services must already write with the new key, or new data would keep appearing under an old one. The check and
   // the rotation records are made under the lock every start takes for its key check (Codex E4 round 2 F6)
   const { open, rotation } = await tx(d.db, async (c) => {
     await c.query('SELECT pg_advisory_xact_lock($1)', [KEYS_LOCK])
     const last = (await lastActiveSince(c, null))[0]
-    if (last !== to) throw new Error(`restart the service with DOI_ACTIVE_KEY=${to} first (it last started with ${last ?? 'no recorded key'})`)
+    if (last !== to) throw new Error(`restart the service with TRUNKS_ACTIVE_KEY=${to} first (it last started with ${last ?? 'no recorded key'})`)
     const o = (await c.query<{ id: string; started_at: Date }>('SELECT id, started_at FROM key_rotation WHERE to_key = $1 AND completed_at IS NULL ORDER BY started_at LIMIT 1', [to])).rows[0]
     const id = o?.id ?? randomUUID()
     if (!o) for (const from of old) await c.query('INSERT INTO key_rotation (id, from_key, to_key) VALUES ($1, $2, $3)', [from === old[0] ? id : randomUUID(), from, to])
@@ -85,7 +85,7 @@ export async function rotateKeys(d: RotationDeps, hooks: RotationHooks = {}): Pr
       return starts[0] !== to ? 'old' : 'again'
     })
     if (outcome === 'done') break
-    if (outcome === 'old') throw new Error(`a service started with an old write key during the rotation; restart it with DOI_ACTIVE_KEY=${to} and run again`)
+    if (outcome === 'old') throw new Error(`a service started with an old write key during the rotation; restart it with TRUNKS_ACTIVE_KEY=${to} and run again`)
     since = new Date() // it has been restarted with the new key since: one more full pass covers what it wrote
   }
   return { rotation, blobs, files, sampled }
@@ -170,7 +170,7 @@ async function sample(d: RotationDeps, to: string): Promise<number> {
 
 /**
  * Start-up check (tech design v0.7.9): a master key that data still uses, or that was never rotated away from, must not
- * be missing from DOI_MASTER_KEYS.
+ * be missing from TRUNKS_MASTER_KEYS.
  */
 export async function missingKeyProblems(db: Pick<Db, 'query'>, k: Keyring): Promise<string[]> {
   const have = new Set(k.ids())
@@ -189,8 +189,8 @@ export async function missingKeyProblems(db: Pick<Db, 'query'>, k: Keyring): Pro
   const out: string[] = []
   for (const id of new Set([...used, ...known])) {
     if (have.has(id)) continue
-    if (used.includes(id)) out.push(`master key ${id} is missing from DOI_MASTER_KEYS but data is still encrypted with it`)
-    else if (!completed.has(id)) out.push(`master key ${id} is missing from DOI_MASTER_KEYS but no completed rotation away from it is recorded`)
+    if (used.includes(id)) out.push(`master key ${id} is missing from TRUNKS_MASTER_KEYS but data is still encrypted with it`)
+    else if (!completed.has(id)) out.push(`master key ${id} is missing from TRUNKS_MASTER_KEYS but no completed rotation away from it is recorded`)
   }
   return out
 }

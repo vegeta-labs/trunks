@@ -1247,7 +1247,7 @@ check("TC-OUT-07 person changed template -> no request_payment_evidence",
       A(adopted=["payment_query"], linked_commitment=True, template="payment_wait"), ["check_payment_in_ledger"])
 check("TC-OUT-07 withdrawal investor_cc -> mark_withdrawn",
       O.actions(dict(ACT, adopted=["withdrawal"], fields={"consent_evidence": "investor_cc"}))["actions"],
-      [{"action": "mark_withdrawn", "details": "Mark Jane Doe as withdrawn in Deal Ops Toolkit (consent: investor_cc)"}])
+      [{"action": "mark_withdrawn", "details": "Mark Jane Doe as withdrawn in Goten (consent: investor_cc)"}])
 for v in ["none", None, {"multiple": ["investor_cc", "attached_document"]}, {"void": "not in the enum"}]:
     check("TC-OUT-07 withdrawal consent %r -> request_withdrawal_consent" % (v,),
           A(adopted=["withdrawal"], fields={"consent_evidence": v}), ["request_withdrawal_consent"])

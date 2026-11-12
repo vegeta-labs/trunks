@@ -56,6 +56,8 @@ jobs:
         run: npm run check:licences
       - name: Shared design variables unchanged (docs/09_UI_DESIGN.md §11.2)
         run: npm run check:tokens
+      - name: No old product names outside the historical records
+        run: npm run check:old-names
       - name: Released migrations unchanged (tech design §7)
         run: |
           if [ -n "$GITHUB_BASE_REF" ]; then git fetch --depth=1 origin "$GITHUB_BASE_REF"; elif [ -n "${BASE_SHA//0/}" ]; then git fetch --depth=1 origin "$BASE_SHA"; else git fetch --depth=2 origin "$GITHUB_SHA"; fi
@@ -104,7 +106,7 @@ jobs:
           retention-days: 7
 
   # the parser container under its dedicated profiles on a host with AppArmor (tech design T7, v0.7.11; TC-ING-10,
-  # TC-OPS-02). The user-namespace restriction of Ubuntu 24.04 is left on: the doi-parser profile allows bubblewrap.
+  # TC-OPS-02). The user-namespace restriction of Ubuntu 24.04 is left on: the trunks-parser profile allows bubblewrap.
   parser:
     runs-on: ubuntu-24.04
     steps:
@@ -119,16 +121,16 @@ jobs:
           aa-enabled
           sysctl kernel.apparmor_restrict_unprivileged_userns
       - name: Build the parser image (bubblewrap)
-        run: docker build -t doi-parser-test -f parser/Dockerfile .
+        run: docker build -t trunks-parser-test -f parser/Dockerfile .
       - name: What the parser needs beyond the profile (complain mode, logged only; the tests below run in enforce mode)
         run: |
-          sudo apparmor_parser -r -W -C deploy/apparmor/doi-parser
+          sudo apparmor_parser -r -W -C deploy/apparmor/trunks-parser
           npx vitest run parser/container.test.ts > /dev/null 2>&1 || true
-          sudo dmesg | grep 'apparmor="ALLOWED"' | grep 'profile="doi-parser' | sed -E 's/.* (operation=.*)/\1/' | sed -E 's/ pid=[0-9]+//' | sort | uniq -c || true
-      - name: Load the doi-parser profile (enforce)
+          sudo dmesg | grep 'apparmor="ALLOWED"' | grep 'profile="trunks-parser' | sed -E 's/.* (operation=.*)/\1/' | sed -E 's/ pid=[0-9]+//' | sort | uniq -c || true
+      - name: Load the trunks-parser profile (enforce)
         run: |
-          sudo apparmor_parser -r -W deploy/apparmor/doi-parser
-          sudo aa-status | grep -E '^\s+doi-parser$'
+          sudo apparmor_parser -r -W deploy/apparmor/trunks-parser
+          sudo aa-status | grep -E '^\s+trunks-parser$'
       - name: Parser container and profiles
         env:
           PARSER_APPARMOR: '1'
@@ -167,8 +169,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Install the doi-parser AppArmor profile as the quick start says
-        run: sudo cp deploy/apparmor/doi-parser /etc/apparmor.d/doi-parser && sudo apparmor_parser -r -W /etc/apparmor.d/doi-parser
+      - name: Install the trunks-parser AppArmor profile as the quick start says
+        run: sudo cp deploy/apparmor/trunks-parser /etc/apparmor.d/trunks-parser && sudo apparmor_parser -r -W /etc/apparmor.d/trunks-parser
       - name: Build the images
         run: docker compose build
       - name: Install Playwright system dependencies (Chromium, WebKit)

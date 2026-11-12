@@ -27,15 +27,15 @@ describe('C-DIR directory imports', () => {
     expect(applyClear(importDeals('name\n', ['GBP']), true).ok).toBe(false) // header-only but missing a required column
     expect(applyClear(importDeals('name,currency\n', ['GBP']), false).ok).toBe(false)
   })
-  it('TC-DIR-01 the Toolkit sample commitments and bank lines import with the same amounts', () => {
-    const c = ok(importCommitments(readFileSync('fixtures/toolkit/commitments.csv', 'utf8'), 'GBP', 'v1'))
+  it('TC-DIR-01 the Goten sample commitments and bank lines import with the same amounts', () => {
+    const c = ok(importCommitments(readFileSync('fixtures/goten/commitments.csv', 'utf8'), 'GBP', 'v1'))
     expect(c.map((r) => [r.investorId, r.name, r.reference, r.cashDue, r.scheme])).toEqual([
       ['c01', 'Amelia Hart', 'NW-001', 1000000, 'SEIS'],
       ['v1-r3', 'Ben Okafor', 'NW-002', 500000, 'EIS'],
       ['c03', 'Chloe Martin', 'NW-003', 2000000, 'NONE'],
       ['v1-r5', 'David Kim', 'NW 004', 250000, 'SEIS'],
     ])
-    const b = ok(importBank(readFileSync('fixtures/toolkit/bank.csv', 'utf8'), 'GBP', 'v1'))
+    const b = ok(importBank(readFileSync('fixtures/goten/bank.csv', 'utf8'), 'GBP', 'v1'))
     expect(b.map((r) => [r.txnId, r.date, r.amount])).toEqual([
       ['T1', '2026-10-06', 1000000], ['T2', '2026-10-06', 500000], ['T3', '2026-10-07', 0], ['T4', '2026-10-07', -4500], ['T5', '2026-10-08', 200000],
     ])
@@ -88,7 +88,7 @@ describe('C-DIR directory imports', () => {
     expect(ok(importLedger(H + row('T1') + row('T1'), 'GBP'))).toHaveLength(1)
     expect(errs(importLedger(H + row('') + row(''), 'GBP'))).toEqual(['row 3: same date, amount, payer, reference, investor_id and status as row 2 without a transaction_id: duplicate or two payments cannot be told apart'])
     expect(ok(importLedger(H + row('') + row('', '50.00'), 'GBP'))).toHaveLength(2)
-    expect(errs(importLedger(H + row('T1', '-5.00'), 'GBP'))).toEqual(['row 2, amount: cannot be negative (reverse it in the Toolkit and export again)'])
+    expect(errs(importLedger(H + row('T1', '-5.00'), 'GBP'))).toEqual(['row 2, amount: cannot be negative (reverse it in Goten and export again)'])
     const noId = ok(importLedger('date,amount,payer,reference,status,investor_id\n2026-10-06,1,X,R,auto,c01\n', 'GBP'))
     expect(noId[0]!.txnId).toBeNull()
   })

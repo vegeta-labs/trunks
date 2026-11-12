@@ -1,15 +1,15 @@
-# Deal Ops Inbox (PRD R-OPS-01, tech design §7 and v0.7.11). Read-only email agent: no service here can send email.
-#   1. secrets:   mkdir -m 700 secrets && docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/secrets:/out" deal-ops-inbox:local init-secrets /out
-#   2. AppArmor:  on Ubuntu / Debian hosts: sudo cp deploy/apparmor/doi-parser /etc/apparmor.d/ && sudo apparmor_parser -r -W /etc/apparmor.d/doi-parser
+# Trunks (PRD R-OPS-01, tech design §7 and v0.7.11). Read-only email agent: no service here can send email.
+#   1. secrets:   mkdir -m 700 secrets && docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/secrets:/out" trunks:local init-secrets /out
+#   2. AppArmor:  on Ubuntu / Debian hosts: sudo cp deploy/apparmor/trunks-parser /etc/apparmor.d/ && sudo apparmor_parser -r -W /etc/apparmor.d/trunks-parser
 #   0. build:     docker compose build        (no published image yet)
 #   3. start:     docker compose up -d
-#      HTTPS through the bundled proxy: set DOI_DOMAIN, TRUST_PROXY=172.30.99.10 and the full COMPOSE_FILE list in .env,
+#      HTTPS through the bundled proxy: set TRUNKS_DOMAIN, TRUST_PROXY=172.30.99.10 and the full COMPOSE_FILE list in .env,
 #      then docker compose up -d (docs/en/quickstart.md §2.4; -f on the command line would skip docker-compose.override.yml)
 # Each service mounts only the secrets it needs; the application runs as uid 10001 with a read-only root file system.
-name: deal-ops-inbox
+name: trunks
 
 x-app: &app
-  image: deal-ops-inbox:${DOI_VERSION:-local}
+  image: trunks:${TRUNKS_VERSION:-local}
   read_only: true
   tmpfs: [/tmp]
   cap_drop: [ALL]
@@ -21,12 +21,12 @@ services:
   db:
     image: postgres:16
     environment:
-      POSTGRES_DB: doi
+      POSTGRES_DB: trunks
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
     secrets: [postgres_password]
     volumes: [db:/var/lib/postgresql/data]
     healthcheck:
-      test: [CMD-SHELL, pg_isready -U postgres -d doi]
+      test: [CMD-SHELL, pg_isready -U postgres -d trunks]
       interval: 5s
       timeout: 5s
       retries: 30
@@ -46,7 +46,7 @@ services:
 
   # attachment parsing (tech design T7): no network, no secrets, bubblewrap per task under the dedicated profiles
   parser:
-    image: deal-ops-inbox-parser:${DOI_VERSION:-local}
+    image: trunks-parser:${TRUNKS_VERSION:-local}
     build: { context: ., dockerfile: parser/Dockerfile }
     network_mode: none
     read_only: true
@@ -54,7 +54,7 @@ services:
     security_opt:
       - no-new-privileges
       - seccomp=deploy/parser-seccomp.json
-      - apparmor=doi-parser
+      - apparmor=trunks-parser
     pids_limit: 256
     mem_limit: 1g
     cpus: 2
@@ -69,11 +69,11 @@ services:
     restart: 'no'
     environment:
       OWNER_DATABASE_URL_FILE: /run/secrets/owner_database_url
-      DOI_APP_DB_PASSWORD_FILE: /run/secrets/doi_app_db_password
-      DOI_MAINTENANCE_DB_PASSWORD_FILE: /run/secrets/doi_maintenance_db_password
-      DOI_ROTATION_DB_PASSWORD_FILE: /run/secrets/doi_rotation_db_password
+      TRUNKS_APP_DB_PASSWORD_FILE: /run/secrets/trunks_app_db_password
+      TRUNKS_MAINTENANCE_DB_PASSWORD_FILE: /run/secrets/trunks_maintenance_db_password
+      TRUNKS_ROTATION_DB_PASSWORD_FILE: /run/secrets/trunks_rotation_db_password
       DEMO: ${DEMO:-}
-    secrets: [owner_database_url, doi_app_db_password, doi_maintenance_db_password, doi_rotation_db_password]
+    secrets: [owner_database_url, trunks_app_db_password, trunks_maintenance_db_password, trunks_rotation_db_password]
     depends_on:
       db: { condition: service_healthy }
 
@@ -84,8 +84,8 @@ services:
     command: [serve]
     environment:
       APP_DATABASE_URL_FILE: /run/secrets/app_database_url
-      DOI_MASTER_KEYS_FILE: /run/secrets/doi_master_keys
-      DOI_HMAC_KEY_FILE: /run/secrets/doi_hmac_key
+      TRUNKS_MASTER_KEYS_FILE: /run/secrets/trunks_master_keys
+      TRUNKS_HMAC_KEY_FILE: /run/secrets/trunks_hmac_key
       INITIAL_ADMIN_PASSWORD_FILE: /run/secrets/initial_admin_password
       ANTHROPIC_API_KEY_FILE: /run/secrets/anthropic_api_key
       CONFIG_DIR: /config
@@ -93,14 +93,14 @@ services:
       CLAMD_HOST: clamav
       TRUST_PROXY: ${TRUST_PROXY:-}
       DEMO: ${DEMO:-}
-    secrets: [app_database_url, doi_master_keys, doi_hmac_key, initial_admin_password, anthropic_api_key]
+    secrets: [app_database_url, trunks_master_keys, trunks_hmac_key, initial_admin_password, anthropic_api_key]
     volumes:
-      - ${DOI_CONFIG_DIR:-./config/default}:/config:ro
-      - files:/var/lib/deal-ops-inbox/files
-      - state:/var/lib/deal-ops-inbox/state
-      - kyc:/var/lib/deal-ops-inbox/kyc
+      - ${TRUNKS_CONFIG_DIR:-./config/default}:/config:ro
+      - files:/var/lib/trunks/files
+      - state:/var/lib/trunks/state
+      - kyc:/var/lib/trunks/kyc
       - parser-socket:/run/parser
-    ports: ['127.0.0.1:${DOI_PORT:-8080}:8080']
+    ports: ['127.0.0.1:${TRUNKS_PORT:-8080}:8080']
     depends_on:
       migrate: { condition: service_completed_successfully }
       clamav: { condition: service_started }
@@ -113,15 +113,15 @@ services:
     command: [maintain]
     environment:
       MAINTENANCE_DATABASE_URL_FILE: /run/secrets/maintenance_database_url
-      DOI_MASTER_KEYS_FILE: /run/secrets/doi_master_keys
-      DOI_HMAC_KEY_FILE: /run/secrets/doi_hmac_key
+      TRUNKS_MASTER_KEYS_FILE: /run/secrets/trunks_master_keys
+      TRUNKS_HMAC_KEY_FILE: /run/secrets/trunks_hmac_key
       CONFIG_DIR: /config
       DEMO: ${DEMO:-}
-    secrets: [maintenance_database_url, doi_master_keys, doi_hmac_key]
+    secrets: [maintenance_database_url, trunks_master_keys, trunks_hmac_key]
     volumes:
-      - ${DOI_CONFIG_DIR:-./config/default}:/config:ro
-      - files:/var/lib/deal-ops-inbox/files
-      - state:/var/lib/deal-ops-inbox/state
+      - ${TRUNKS_CONFIG_DIR:-./config/default}:/config:ro
+      - files:/var/lib/trunks/files
+      - state:/var/lib/trunks/state
     depends_on:
       migrate: { condition: service_completed_successfully }
 
@@ -133,14 +133,14 @@ services:
     restart: 'no'
     environment:
       ROTATION_DATABASE_URL_FILE: /run/secrets/rotation_database_url
-      DOI_MASTER_KEYS_FILE: /run/secrets/doi_master_keys
-      DOI_HMAC_KEY_FILE: /run/secrets/doi_hmac_key
-      DOI_ACTIVE_KEY: ${DOI_ACTIVE_KEY:-}
+      TRUNKS_MASTER_KEYS_FILE: /run/secrets/trunks_master_keys
+      TRUNKS_HMAC_KEY_FILE: /run/secrets/trunks_hmac_key
+      TRUNKS_ACTIVE_KEY: ${TRUNKS_ACTIVE_KEY:-}
       CONFIG_DIR: /config
-    secrets: [rotation_database_url, doi_master_keys, doi_hmac_key]
+    secrets: [rotation_database_url, trunks_master_keys, trunks_hmac_key]
     volumes:
-      - ${DOI_CONFIG_DIR:-./config/default}:/config:ro
-      - files:/var/lib/deal-ops-inbox/files
+      - ${TRUNKS_CONFIG_DIR:-./config/default}:/config:ro
+      - files:/var/lib/trunks/files
   gmail-auth:
     <<: *app
     profiles: [tools]
@@ -148,11 +148,11 @@ services:
     restart: 'no'
     environment:
       APP_DATABASE_URL_FILE: /run/secrets/app_database_url
-      DOI_MASTER_KEYS_FILE: /run/secrets/doi_master_keys
-      DOI_HMAC_KEY_FILE: /run/secrets/doi_hmac_key
+      TRUNKS_MASTER_KEYS_FILE: /run/secrets/trunks_master_keys
+      TRUNKS_HMAC_KEY_FILE: /run/secrets/trunks_hmac_key
       CONFIG_DIR: /config
-    secrets: [app_database_url, doi_master_keys, doi_hmac_key]
-    volumes: ['${DOI_CONFIG_DIR:-./config/default}:/config:ro']
+    secrets: [app_database_url, trunks_master_keys, trunks_hmac_key]
+    volumes: ['${TRUNKS_CONFIG_DIR:-./config/default}:/config:ro']
     ports: ['127.0.0.1:8765:8765']
     networks: [backend, edge]
 
@@ -168,15 +168,15 @@ volumes:
   parser-socket: {}
 
 secrets:
-  postgres_password: { file: '${DOI_SECRETS_DIR:-./secrets}/postgres_password' }
-  owner_database_url: { file: '${DOI_SECRETS_DIR:-./secrets}/owner_database_url' }
-  doi_app_db_password: { file: '${DOI_SECRETS_DIR:-./secrets}/doi_app_db_password' }
-  doi_maintenance_db_password: { file: '${DOI_SECRETS_DIR:-./secrets}/doi_maintenance_db_password' }
-  doi_rotation_db_password: { file: '${DOI_SECRETS_DIR:-./secrets}/doi_rotation_db_password' }
-  app_database_url: { file: '${DOI_SECRETS_DIR:-./secrets}/app_database_url' }
-  maintenance_database_url: { file: '${DOI_SECRETS_DIR:-./secrets}/maintenance_database_url' }
-  rotation_database_url: { file: '${DOI_SECRETS_DIR:-./secrets}/rotation_database_url' }
-  doi_master_keys: { file: '${DOI_SECRETS_DIR:-./secrets}/doi_master_keys' }
-  doi_hmac_key: { file: '${DOI_SECRETS_DIR:-./secrets}/doi_hmac_key' }
-  initial_admin_password: { file: '${DOI_SECRETS_DIR:-./secrets}/initial_admin_password' }
-  anthropic_api_key: { file: '${DOI_SECRETS_DIR:-./secrets}/anthropic_api_key' }
+  postgres_password: { file: '${TRUNKS_SECRETS_DIR:-./secrets}/postgres_password' }
+  owner_database_url: { file: '${TRUNKS_SECRETS_DIR:-./secrets}/owner_database_url' }
+  trunks_app_db_password: { file: '${TRUNKS_SECRETS_DIR:-./secrets}/trunks_app_db_password' }
+  trunks_maintenance_db_password: { file: '${TRUNKS_SECRETS_DIR:-./secrets}/trunks_maintenance_db_password' }
+  trunks_rotation_db_password: { file: '${TRUNKS_SECRETS_DIR:-./secrets}/trunks_rotation_db_password' }
+  app_database_url: { file: '${TRUNKS_SECRETS_DIR:-./secrets}/app_database_url' }
+  maintenance_database_url: { file: '${TRUNKS_SECRETS_DIR:-./secrets}/maintenance_database_url' }
+  rotation_database_url: { file: '${TRUNKS_SECRETS_DIR:-./secrets}/rotation_database_url' }
+  trunks_master_keys: { file: '${TRUNKS_SECRETS_DIR:-./secrets}/trunks_master_keys' }
+  trunks_hmac_key: { file: '${TRUNKS_SECRETS_DIR:-./secrets}/trunks_hmac_key' }
+  initial_admin_password: { file: '${TRUNKS_SECRETS_DIR:-./secrets}/initial_admin_password' }
+  anthropic_api_key: { file: '${TRUNKS_SECRETS_DIR:-./secrets}/anthropic_api_key' }

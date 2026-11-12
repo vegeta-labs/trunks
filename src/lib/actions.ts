@@ -30,7 +30,7 @@ export function suggestedActions(i: ActionInput): Action[] {
   if (has('bank_details')) out.push({ action: 'start_bank_details_verification', details: verify })
   if (has('identity_change')) out.push({ action: 'start_identity_verification', details: verify })
   if (has('withdrawal')) {
-    if (consent !== null && CONSENT_OK.includes(consent)) out.push({ action: 'mark_withdrawn', details: `Mark ${investor} as withdrawn in Deal Ops Toolkit (consent: ${consent})` })
+    if (consent !== null && CONSENT_OK.includes(consent)) out.push({ action: 'mark_withdrawn', details: `Mark ${investor} as withdrawn in Goten (consent: ${consent})` })
     else out.push({ action: 'request_withdrawal_consent', details: "Ask for the investor's written consent before marking the withdrawal" })
   }
   if (has('fee_or_terms_change')) {

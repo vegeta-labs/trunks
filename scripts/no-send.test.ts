@@ -116,6 +116,6 @@ describe('TC-OUT-09 from E4: the mailbox HTTP allow-list and direct requests', (
     expect(scanDirectRequests('src/adapters/mailbox/http.ts', "fetch('https://gmail.googleapis.com/')")).toEqual([])
     expect(scanDirectRequests('src/a.fake.ts', "fetch('https://gmail.googleapis.com/')")).toEqual([])
     expect(scanDirectRequests('src/main.ts', "import { FakeGmail } from './adapters/mailbox/gmail.fake.ts'").length).toBe(1)
-    expect(scanDirectRequests('src/y.ts', "await fetch('https://hooks.example/doi')")).toEqual([])
+    expect(scanDirectRequests('src/y.ts', "await fetch('https://hooks.example/trunks')")).toEqual([])
   })
 })

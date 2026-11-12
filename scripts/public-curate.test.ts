@@ -1,7 +1,7 @@
 // TC-OPS-05 (PRD decision 7): the curation rules and the checks of the public export, on their own (fast). The
 // hostile inputs are put together at run time, so this file itself passes the checks it tests (self-test F1).
 import { describe, expect, it } from 'vitest'
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { ALLOW, checkPublic, curate } from './public-export.ts'
@@ -14,9 +14,15 @@ describe('public export rules', () => {
     const REVIEW = 'docs/rev' + 'iew/2026-10-29_x.md'
     const KEY = 'sk-' + 'ant-abcdefghijklmnop'
     const AT = '@'
-    expect(curate(`· 负责人：某人（产品）· 见 \`${REVIEW.slice(5)}\`，路径 ${HOME}，存放在 Deal Ops Toolkit 的开发仓库 \`docs/x.md\`。`))
+    expect(curate(`· 负责人：某人（产品）· 见 \`${REVIEW.slice(5)}\`，路径 ${HOME}，存放在 Goten 的开发仓库 \`docs/x.md\`。`))
       .toBe('· 负责人：项目负责人（产品）· 见 （审查记录，未公开），路径 （本机路径，未公开），未公开。')
-    const out = mkdtempSync(join(tmpdir(), 'doi-pubchk-'))
+    // the real PRD, not only a made-up sentence: its source line names a private file, and the rule must still find
+    // it after the product names in that line changed (rename plan review, finding 2)
+    // (the development repository only: the public copy of the PRD is already the curated one)
+    const prd = readFileSync('docs/01_PRD.md', 'utf8')
+    if (existsSync('docs/DEV_PROCESS_RULES.md')) expect(prd).toContain('09_EMAIL' + '_AGENT_PLAN')
+    expect(curate(prd)).not.toContain('09_EMAIL' + '_AGENT_PLAN')
+    const out = mkdtempSync(join(tmpdir(), 'trunks-pubchk-'))
     mkdirSync(join(out, 'eval', 'other'), { recursive: true })
     writeFileSync(join(out, 'a.md'), `see ${USERS}\n`)
     writeFileSync(join(out, 'b.md'), `see ${REVIEW}\n`)

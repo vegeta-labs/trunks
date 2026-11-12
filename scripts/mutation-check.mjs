@@ -525,9 +525,13 @@ const MUTANTS = [
   // TC-REV-18 (test plan v0.7.29): yes/no and list fields can be edited
   ['src/web/presentation.ts', "text === 'true' ? true : text === 'false' ? false : null", "text === '' ? null : text", 'a yes/no edit sends text (TC-REV-18)', 'npx vitest run src/web --reporter=dot'],
   ['src/web/presentation.ts', "input.options.filter((o) => picked.includes(o))", "[...picked]", 'a list edit in the order clicked (TC-REV-18)', 'npx vitest run src/web --reporter=dot'],
-  ['src/web/presentation.ts', "KIND[field] === 'enums' ? { kind: 'list', options: ENUMS[field]! } : ", "", 'a list field edited as text (TC-REV-18)', 'npx vitest run src/web --reporter=dot'],
+  ['src/web/presentation.ts', "  : KIND[field] === 'enums' ? { kind: 'list', options: ENUMS[field]! }\n", "", 'a list field edited as text (TC-REV-18)', 'npx vitest run src/web --reporter=dot'],
   ['src/web/CaseE3.tsx', "{ value: editValue(input, value, picked) }", "{ value: value.trim() === '' ? null : value.trim() }", 'the page ignores the field kind (TC-REV-18)', "npx playwright test -g 'TC-REV-18'"],
   ['src/web/CaseE3.tsx', "    setValue('')\n    setPicked([])\n    setEditing(open)", "    setEditing(open)", 'a reopened edit keeps an earlier choice (TC-REV-18 review m1)', "npx playwright test -g 'TC-REV-18'"],
+  // TC-REV-19 (test plan v0.7.30): single-choice fields use a drop-down of the allowed values
+  ['src/web/presentation.ts', "  : KIND[field] === 'enum' ? { kind: 'choice', options: ENUMS[field]! }\n", "", 'a single-choice field edited as text (TC-REV-19)', 'npx vitest run src/web --reporter=dot'],
+  ['src/web/presentation.ts', "return input.options.includes(text) ? text : null", "return text === '' ? null : text", 'a choice outside the allowed values is sent (TC-REV-19)', 'npx vitest run src/web --reporter=dot'],
+  ['src/web/CaseE3.tsx', "{input.options.map((o) => <option key={o} value={o}>{optionText(o)}</option>)}", "{input.options.slice(1).map((o) => <option key={o} value={o}>{optionText(o)}</option>)}", 'the drop-down leaves out an allowed value (TC-REV-19)', "npx playwright test -g 'TC-REV-19'"],
   // Fraud gates (PRD v0.7.30)
   ['src/pipeline/restart.ts', "row.status !== 'failed' || row.closed_at !== null ||", "row.status !== 'failed' ||", 'rerun-failed reopens a closed Case marked failed (C-FRD-8)', E5C],
   ['src/lib/gates.ts', '|| ch.approvedBy !== null', '|| true', 'a protected removal without an approver counts (C-FRD-6)'],

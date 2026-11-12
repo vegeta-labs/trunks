@@ -48,7 +48,7 @@ export class GmailTokens {
   async get(): Promise<string> {
     if (this.token && Date.now() < this.token.until) return this.token.value
     const refresh = await this.o.refreshToken()
-    if (!refresh) throw new TokenRevoked('no refresh token stored: run doi gmail-auth')
+    if (!refresh) throw new TokenRevoked('no refresh token stored: run trunks gmail-auth')
     let r: { status: number; body: { access_token?: string; expires_in?: number; error?: string; scope?: string } | null }
     try {
       r = await this.http.json('POST', TOKEN, { headers: FORM, body: form({ grant_type: 'refresh_token', refresh_token: refresh, client_id: this.o.clientId, client_secret: this.o.clientSecret }) })

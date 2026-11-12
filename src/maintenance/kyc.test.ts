@@ -76,7 +76,7 @@ afterAll(async () => {
 
 const app_ = () => ({ db: k.t.app, k: k.k, files: k.files })
 const mnt = () => ({ db: k.t.maintenance, k: k.k, files: k.files })
-const as = (who: string) => ({ cookies: { doi_session: users[who]!.session }, headers: { 'x-csrf-token': users[who]!.csrf } })
+const as = (who: string) => ({ cookies: { trunks_session: users[who]!.session }, headers: { 'x-csrf-token': users[who]!.csrf } })
 
 function kycMail(id: string) {
   return eml({
@@ -443,7 +443,7 @@ describe('TC-PRV-09 targets', () => {
   const meta = (seq: number, body: Buffer): KycFile => ({ deliveryId: '0b0c0d0e-0000-4000-8000-000000000001', caseId: '0b0c0d0e-0000-4000-8000-0000000000aa', seq, name: `0b0c0d0e-0000-4000-8000-0000000000aa-${seq}.pdf`, sha256: sha(body) })
 
   it('TC-PRV-09 folder: the generated name only, written whole; no temporary file is left', async () => {
-    const dir = mkdtempSync(join(tmpdir(), 'doi-kyc-'))
+    const dir = mkdtempSync(join(tmpdir(), 'trunks-kyc-'))
     const body = makePdf(['x'])
     const r = await new FolderSink(dir).deliver(body, meta(1, body))
     expect(r).toEqual({ target: 'folder', name: meta(1, body).name, sha256: sha(body) })
@@ -464,7 +464,7 @@ describe('TC-PRV-09 targets', () => {
     const ok = JSON.stringify({ delivery_id: m.deliveryId, sha256: m.sha256 })
     expect(await new WebhookSink('https://kyc.example/in', 's', answer(200, ok)).deliver(body, m)).toMatchObject({ target: 'webhook' })
     expect(sent[0]!.headers['idempotency-key']).toBe(m.deliveryId)
-    expect(sent[0]!.headers['x-dealops-signature']).toMatch(/^sha256=[0-9a-f]{64}$/)
+    expect(sent[0]!.headers['x-trunks-signature']).toMatch(/^sha256=[0-9a-f]{64}$/)
     expect(JSON.parse(sent[0]!.body)).toMatchObject({ delivery_id: m.deliveryId, filename: m.name, sha256: m.sha256 })
     for (const [status, text, code] of [
       [200, '', 'webhook_no_receipt'],

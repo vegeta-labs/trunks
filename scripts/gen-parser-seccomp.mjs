@@ -12,7 +12,7 @@ export const BUBBLEWRAP_CALLS = ['clone', 'unshare', 'mount', 'umount2', 'pivot_
 
 export function build(source) {
   const p = JSON.parse(source)
-  p.syscalls.push({ names: BUBBLEWRAP_CALLS, action: 'SCMP_ACT_ALLOW', comment: 'deal-ops-inbox parser: bubblewrap sandbox per task' })
+  p.syscalls.push({ names: BUBBLEWRAP_CALLS, action: 'SCMP_ACT_ALLOW', comment: 'trunks parser: bubblewrap sandbox per task' })
   return `${JSON.stringify(p, null, 2)}\n`
 }
 

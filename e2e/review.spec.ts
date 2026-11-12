@@ -430,11 +430,11 @@ test('TC-REV-10 display (R-REV-02 v0.7.25, 界面规则 v0.3.4): signals fired o
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375)
 })
 
-test('E2E-05 after importing the Toolkit CSV, a new mail is linked automatically', async ({ page }) => {
+test('E2E-05 after importing the Goten CSV, a new mail is linked automatically', async ({ page }) => {
   await signIn(page) // the admin imports the directory
   const csv = 'investor_id,name,email,reference,cash_due\n001,Amelia Hart,amelia@hartfamily.example,NW-001,"10,000.00"\n002,Ben Okafor,ben@okafor.example,NW-002,"7,500.00"\n'
   const status = await page.evaluate(async (body) => {
-    const r = await fetch('/api/directory/commitments?deal=Northwind%20Robotics', { method: 'POST', headers: { 'content-type': 'text/csv', 'x-csrf-token': sessionStorage.getItem('doi.csrf') ?? '' }, body })
+    const r = await fetch('/api/directory/commitments?deal=Northwind%20Robotics', { method: 'POST', headers: { 'content-type': 'text/csv', 'x-csrf-token': sessionStorage.getItem('trunks.csrf') ?? '' }, body })
     return r.status
   }, csv)
   expect(status).toBe(200)
@@ -532,6 +532,28 @@ test('TC-REV-18 a person edits a yes/no field and a list field, and the server k
   await group.getByLabel('Email').check()
   await details.getByRole('button', { name: 'Save', exact: true }).click()
   await expect(details).toContainText('email, phone')
+  await expect(page.getByRole('alert')).toHaveCount(0)
+})
+
+test('TC-REV-19 a person chooses a single-choice field from a list, and the server keeps the value', async ({ page }) => {
+  await control('/ingest', { from: 'Amelia Hart <amelia@hartfamily.example>', subject: 'New bank details role test', text: 'Please use my new bank account GB33 BUKB 2020 1555 5555 55.' })
+  await signInAs(page, 'rita')
+  await openCase(page, 'New bank details role test')
+  const role = page.locator('dl.fields dt', { hasText: 'Sender role' }).locator('xpath=following-sibling::dd[1]')
+  await expect(role).not.toContainText('seller')
+  await role.getByRole('button', { name: 'Edit', exact: true }).click()
+  const select = role.getByLabel('New value for Sender role')
+  // a drop-down of exactly the allowed values, nothing to type
+  await expect(select.locator('option')).toHaveText(['No value', 'Investor', 'Company', 'Seller', 'Lead', 'Other'])
+  await expect(role.locator('input')).toHaveCount(0)
+  await select.selectOption('Lead')
+  await role.getByRole('button', { name: 'Edit', exact: true }).click()
+  await role.getByRole('button', { name: 'Edit', exact: true }).click()
+  await expect(select).toHaveValue('')
+  await select.selectOption('Seller')
+  await role.getByRole('button', { name: 'Save', exact: true }).click()
+  await expect(role).toContainText('seller')
+  await expect(role.getByText('confirmed', { exact: true })).toBeVisible()
   await expect(page.getByRole('alert')).toHaveCount(0)
 })
 

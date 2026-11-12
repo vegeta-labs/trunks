@@ -38,7 +38,7 @@ export function eml(o: {
     const body = enc === 'base64' ? b64(buf) : buf.toString('utf8')
     parts.push(`Content-Type: ${a.type}${a.filename ? `; name="${a.filename}"` : ''}\r\nContent-Disposition: ${a.disposition ?? 'attachment'}${a.filename ? `; filename="${a.filename}"` : ''}\r\n${a.contentId ? `Content-ID: ${a.contentId}\r\n` : ''}Content-Transfer-Encoding: ${enc}\r\n\r\n${body}`)
   }
-  const boundary = `b-doi-${Math.random().toString(36).slice(2)}`
+  const boundary = `b-trunks-${Math.random().toString(36).slice(2)}`
   const body = `--${boundary}\r\n${parts.join(`\r\n--${boundary}\r\n`)}\r\n--${boundary}--\r\n`
   h.push(`Content-Type: multipart/mixed; boundary="${boundary}"`)
   return Buffer.from(`${h.join('\r\n')}\r\n\r\n${body}`)

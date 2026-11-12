@@ -1,4 +1,4 @@
-# Trunks — Operations Inbox: user documentation
+# Trunks — Operations Inbox: run and build (administrator documentation)
 
 Trunks is the Operations Inbox product in Vegeta, software for SPV and syndicate operations teams. It is an open-source, self-hosted, **read-only** email agent for investment-operations inboxes. For each
 inbound email it:

@@ -157,7 +157,7 @@ const evalUser = await tx(k.db, (c) => createUser(c, k.k, { username: `eval-${Da
 const MILESTONE = readFileSync('docs/milestone.txt', 'utf8').trim()
 const e3Enabled = ['E3', 'E4', 'E5', 'E6', 'F1'].includes(MILESTONE)
 // test plan §3 export for the oracle; EVAL_ACTUAL_DIR keeps it where TC-DEMO-01 compares the demo with it
-const actualDir = process.env.EVAL_ACTUAL_DIR ? (mkdirSync(process.env.EVAL_ACTUAL_DIR, { recursive: true }), process.env.EVAL_ACTUAL_DIR) : mkdtempSync(join(tmpdir(), 'doi-actual-'))
+const actualDir = process.env.EVAL_ACTUAL_DIR ? (mkdirSync(process.env.EVAL_ACTUAL_DIR, { recursive: true }), process.env.EVAL_ACTUAL_DIR) : mkdtempSync(join(tmpdir(), 'trunks-actual-'))
 mkdirSync(actualDir, { recursive: true })
 const e2e = new Map<string, E3Output>()
 const rulesRun = new Map<string, E3Output>()

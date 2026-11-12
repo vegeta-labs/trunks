@@ -318,7 +318,7 @@ export function decodeMime(raw: Buffer, limits: { maxAttachmentBytes: number; ma
 
 /** The part that stands in for a removed attachment: still an attachment, so the ordinals of the others do not move. */
 export const REMOVED_PART = Buffer.from(
-  'Content-Type: text/plain; charset=utf-8\r\nContent-Disposition: attachment; filename="removed"\r\nX-Deal-Ops-Removed: kyc\r\n\r\n' +
+  'Content-Type: text/plain; charset=utf-8\r\nContent-Disposition: attachment; filename="removed"\r\nX-Trunks-Removed: kyc\r\n\r\n' +
     'This attachment was transferred to the KYC store and removed from this copy.',
 )
 

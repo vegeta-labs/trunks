@@ -1,4 +1,4 @@
-// PRD C-LNK-3: name similarity. Copied from Deal Ops Toolkit src/lib/reconcile.ts (C-REC-3, same author).
+// PRD C-LNK-3: name similarity. Copied from Goten src/lib/reconcile.ts (C-REC-3, same author).
 
 const STOP = new Set(['MR', 'MRS', 'MS', 'DR', 'LTD', 'LIMITED', 'LLP', 'PLC', 'AND', 'THE'])
 export const nameTokens = (s: string) =>

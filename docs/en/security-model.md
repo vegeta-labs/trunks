@@ -60,7 +60,7 @@ pacs.008 XML, nested emails) happens in the `parser` container:
 - **Dedicated seccomp profile** (`deploy/parser-seccomp.json`): Docker's default profile plus only the calls
   bubblewrap needs (`clone`, `unshare`, `mount`, `umount2`, `pivot_root`). CI checks that the file matches its
   generator script.
-- **Dedicated AppArmor profile** (`deploy/apparmor/doi-parser`): Docker's default rules plus only what bubblewrap
+- **Dedicated AppArmor profile** (`deploy/apparmor/trunks-parser`): Docker's default rules plus only what bubblewrap
   needs (user namespaces, mounts below its staging root, `pivot_root`). If the profile is not loaded, the container
   does not start. The Compose file never uses `unconfined`.
 - Macros and scripts are never run. XML with a DTD or entity declarations is not parsed.
@@ -77,9 +77,9 @@ Both containers hold the master keys. The split protects against deletion and re
 
 | Role | Can |
 |---|---|
-| `doi_app` | read all tables; insert into the tables it needs; update a listed set of status columns; delete only its own write intents, sessions and model-call reservations that were certainly not sent |
-| `doi_maintenance` | read all tables; delete in the fixed retention order; clear the link to a deleted earlier Case (a trigger allows clearing only); queue the one KYC continuation job |
-| `doi_rotation` | rewrap encrypted values and file headers during key rotation |
+| `trunks_app` | read all tables; insert into the tables it needs; update a listed set of status columns; delete only its own write intents, sessions and model-call reservations that were certainly not sent |
+| `trunks_maintenance` | read all tables; delete in the fixed retention order; clear the link to a deleted earlier Case (a trigger allows clearing only); queue the one KYC continuation job |
+| `trunks_rotation` | rewrap encrypted values and file headers during key rotation |
 | owner (`postgres`) | used only by `migrate` |
 
 - **No role can update or delete audit records.** Triggers refuse it too.

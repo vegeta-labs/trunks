@@ -46,7 +46,7 @@ afterAll(() => k.close())
 describe('TC-PRV-08 key rotation', () => {
   it('TC-PRV-08 refuses until the service has started with the new write key', async () => {
     await recordKeys(k.t.app, k.k) // the service, still on k1
-    await expect(rotateKeys({ db: k.t.rotation, k: k2, files: k.files })).rejects.toThrow(/restart the service with DOI_ACTIVE_KEY=k2/)
+    await expect(rotateKeys({ db: k.t.rotation, k: k2, files: k.files })).rejects.toThrow(/restart the service with TRUNKS_ACTIVE_KEY=k2/)
   })
 
   it('TC-PRV-08 stopped part way → some data on each key, the old key cannot be removed; started again → completes, logical tables untouched, readable with k2 alone', async () => {
@@ -139,7 +139,7 @@ describe('TC-PRV-08 key rotation', () => {
   })
 
   it('TC-PRV-08 S3: after a rewrite the object has one version, with the new key in its header; an interrupted rewrite is pruned on the next run', async () => {
-    const bucket = `doi-rot-${randomBytes(4).toString('hex')}`
+    const bucket = `trunks-rot-${randomBytes(4).toString('hex')}`
     const s3 = new S3Store({ ...S3, bucket }, k.k)
     expect((await s3.request('PUT', '')).ok).toBe(true)
     const versioning = Buffer.from('<VersioningConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Status>Enabled</Status></VersioningConfiguration>')
@@ -189,7 +189,7 @@ describe('TC-PRV-08 the start-up fence (Codex E4 F8, regression review R6)', () 
 
 describe('TC-PRV-08 S3 with versioning suspended (Codex E4 F9)', () => {
   it('TC-PRV-08 the earlier numbered versions are removed; only the current «null» version stays', async () => {
-    const bucket = `doi-rot-${randomBytes(4).toString('hex')}`
+    const bucket = `trunks-rot-${randomBytes(4).toString('hex')}`
     const s3 = new S3Store({ ...S3, bucket }, k.k)
     expect((await s3.request('PUT', '')).ok).toBe(true)
     const status = (st: string) => Buffer.from(`<VersioningConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Status>${st}</Status></VersioningConfiguration>`)

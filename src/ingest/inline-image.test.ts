@@ -27,6 +27,8 @@ describe('TC-RED-11 MIME provenance and ordinals', () => {
     const stripped = stripAttachments(raw, new Set([1]), { legacyOrdinals: true, expectedHashes: new Map([[1, legacy.attachments[1]!.sha256!]]) })
     const after = decodeMime(stripped, { ...limits, legacyOrdinals: true })
     expect(after.attachments.map((a) => a.filename)).toEqual(['', 'removed', 'notes.txt'])
+    // the placeholder says what it is, under the current name only (tech design v0.7.20)
+    expect(stripped.toString('latin1')).toContain('\r\nX-Trunks-Removed: kyc\r\n')
     expect(after.attachments[2]!.content?.toString()).toBe('Keep these notes')
     expect(() => stripAttachments(raw, new Set([1]), { expectedHashes: new Map([[1, legacy.attachments[1]!.sha256!]]) })).toThrow('identity changed')
     expect(() => stripAttachments(raw, new Set([1]), { legacyOrdinals: true, expectedHashes: new Map([[1, '']]) })).toThrow('identity changed')
@@ -70,7 +72,7 @@ describe('TC-RED-11 MIME provenance and ordinals', () => {
     expect(decoded.attachments[1]!.inline.eligible).toBe(true) // nested id is not part of the duplicate count
     const nestedOnly = eml({ text: 'see attached', attachments: [{ type: 'message/rfc822', filename: 'forward.eml', content: mail() }, { type: 'image/png', filename: 'logo.png', contentId: '<logo>', disposition: 'inline', content: smallPng() }] })
     expect(decodeMime(nestedOnly, limits).attachments[1]!.inline.eligible).toBe(false)
-    const truncated = Buffer.from(mail().toString().replace(/--b-doi-[^\r\n]+--\r\n$/, ''))
+    const truncated = Buffer.from(mail().toString().replace(/--b-trunks-[^\r\n]+--\r\n$/, ''))
     expect(decodeMime(truncated, limits).failure).not.toBeNull()
     // B.1: empty disposition filename falls back to Content-Type name, and attachmentish is not attachment.
     const names = eml({ text: 'body', attachments: [{ type: 'text/plain', filename: 'name.txt', content: 'hello' }] })
