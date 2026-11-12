@@ -16,7 +16,6 @@ const HISTORY: ReadonlyArray<RegExp> = [
   /^CHANGELOG\.md$/, // released entries, and the table of old and new names
   /^release\/public-manifest\.json$/, // the record of the last publication
   /^src\/store\/migrations\/00[1-9]b?_[^/]+\.sql$/, // released migrations never change; run with the role names replaced
-  /^src\/web\/tokens\.css$/, // identical in three repositories; changed in all of them together
   /^scripts\/check-old-names(\.test)?\.ts$/,
 ]
 /** Single lines elsewhere: [file, text the line contains, why]. */

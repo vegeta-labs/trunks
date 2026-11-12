@@ -1,6 +1,6 @@
 /*
- * Shared design variables of the Deal Ops work interfaces (Toolkit app, Inbox review UI). The website keeps its own styles.
- * Source: Deal Ops Inbox docs/09_UI_DESIGN.md §2. The two copies are identical byte for byte; change them only as §10 says.
+ * Shared design variables of the Vegeta work interfaces (Goten, Trunks, Bulma). The website keeps its own styles.
+ * Source: Trunks docs/09_UI_DESIGN.md §2. The copies are identical byte for byte; change them only as §10 says.
  */
 :root {
   --bg: #f6f8f3;
