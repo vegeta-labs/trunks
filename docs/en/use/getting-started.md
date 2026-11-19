@@ -23,9 +23,9 @@ The top of the page now shows **demo-reviewer (reviewer)**, with **Sign out** be
 
 ### 2. Read the inbox
 
-The page is headed **Cases** and shows **Showing 1–31 of 31 cases**. Cases are **Sorted by risk, then due time**, 50 to a page. When there are more than 50, use **Previous** and **Next** at the bottom of the list. Each row has the subject, the sender, the mailbox, when the email arrived and a row of tags: risk, status, queue, due time and any warning signals.
+The page is headed **Cases** and shows **Showing 1–31 of 31 cases**. Cases are **Sorted by risk, then due time**, 50 to a page. When there are more than 50, use **Previous** and **Next** at the bottom of the list. Each row has the subject, the sender, the mailbox, when the email arrived and a row of tags: risk, status, queue, due time (**Overdue ·** when it has passed) and any warning signals. A row can also show **retention hold**, or a problem with the email itself, such as **Attachment blocked by the virus scan**.
 
-Use the filters at the top:
+Use the filters at the top: **Status**, **Queue** and **Risk**.
 
 1. Set **Risk** to **High**. The count changes to **Showing 1–16 of 16 cases**.
 2. Set **Queue** to **Compliance**. The count changes to **Showing 1–6 of 6 cases**.
@@ -69,7 +69,7 @@ Scroll to **Reply**. The draft is tagged **Payment received** and **Draft**. It 
 
 The amounts match the email and the ledger. Click **Approve**.
 
-The reply is now tagged **Approved, waiting to be sent by a person**, and the status at the top of the case changes to **Approved — awaiting manual send**. Three new buttons appear.
+The reply is now tagged **Approved, waiting to be sent by a person**, and the status at the top of the case changes to **Approved — awaiting manual send**. **Copy recipient**, **Copy subject**, **Copy text** and **Mark as sent** appear.
 
 ### 5. Copy it and mark it as sent
 

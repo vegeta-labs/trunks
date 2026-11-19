@@ -5,7 +5,8 @@ A language model does two jobs only:
 - it **classifies** an email into the categories of `cases.yaml`
 - it **extracts fields**, such as amount, payment date and reference.
 
-Each job is one request: the input is redacted text and a JSON Schema, and the output is JSON that the app checks.
+Each request carries redacted text and a JSON Schema, and the output is JSON that the app checks. Classifying is one
+request. Field extraction asks for at most eight fields per request, so a case that needs more fields makes several.
 There is no agent loop, and the model is given no tools. Everything else is done by fixed code: risk, linking,
 deadlines, template choice and the reply text.
 
@@ -13,7 +14,7 @@ deadlines, template choice and the reply text.
 
 | `provider` | `location` | What it is |
 |---|---|---|
-| `anthropic` | always `external` | The hosted model API. Needs `dpa`, `no_training`, `region` and the API key. |
+| `anthropic` | always `external` | The hosted model API. Needs `dpa`, `no_training` and the API key. State `region` too: without a UK / EEA `region` and without a `transfer_basis`, the start-up gives a warning. |
 | `ollama` | `local` (as you declare it) | A model on your own machine or network, reached at `ollama_host`. You run Ollama yourself; it is not part of the Compose file. |
 | `replay` | `local` | Recorded model replies, read from `replay_dir`. Used for tests, the evaluation and the demo. A missing recording is an error; it never calls a real model. |
 
@@ -61,8 +62,8 @@ model:
 | `provider: anthropic` with `location: local` | **configuration error**: the hosted provider is always external |
 | External provider with `dpa: false` and `allow_without_dpa` not set | **refuses to start** |
 | External provider with `dpa: false` and `allow_without_dpa: true` | starts; **warning** in the start-up log and at the top of the review UI |
-| External provider whose `region` is not UK / EEA, and no `transfer_basis` | starts; **warning** |
-| `no_training: false` | starts; **warning** |
+| External provider whose `region` is not UK / EEA, or not stated, and no `transfer_basis` | starts; **warning** |
+| External provider with `no_training: false` | starts; **warning** |
 | `provider: anthropic` and the API key is empty | **refuses to start** |
 | `ollama` declared local, host does not look local | starts; **warning** |
 
@@ -79,7 +80,7 @@ Only **redacted** text. There is no setting that turns redaction off, and it app
 The text sent is:
 
 - the subject
-- display names
+- the sender's display name
 - the body, including quoted earlier emails
 - attachment file names
 - the text of attachments that are **not** possible-KYC.
@@ -143,17 +144,28 @@ The app does no OCR. The content of images and scans is never read.
 
 ### What is recorded about each model call
 
-Each call is audited with:
+The audit row of each classify or extract step records:
 
-- provider, model name and model version
-- prompt version and schema version
-- a hash of the input.
+- the provider and model (for example `anthropic/<model id>`)
+- the prompt and its version (for example `classify@v3`)
+- a hash of the step's input.
 
-The full request and response are stored encrypted in the audit detail table. The audit row keeps only their hash.
-The detail is deleted with the email at the end of its retention period.
+The full request, with its JSON Schema, and every response are stored encrypted in the audit detail table. The raw
+responses are also kept, encrypted, in the model output table, so that a re-run can reuse them instead of calling the
+model again. Both are deleted with the email at the end of its retention period.
 
-A model call is tried at most twice per request. If both attempts fail, the email is classified `unclassified` and its
-model fields are left empty. A person then reviews it as usual.
+The system prompt also lists the category ids of your `cases.yaml`, each with a fixed description (a category you
+added is described by its id alone), and a fixed description of each field asked for. None of this is personal data,
+but the provider receives it.
+
+A model call is tried at most twice per request. If both attempts fail, only that request's answer is missing:
+
+- if classifying failed, the email keeps the labels the fixed rules found, and is `unclassified` only if they found
+  none;
+- if a field extraction request failed, the fields it asked for come from the rules only. Fields from the email's
+  other requests are kept.
+
+A person then reviews it as usual.
 
 ## What the model never does
 

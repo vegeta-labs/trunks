@@ -18,7 +18,7 @@ General rules:
 - **Changes are audited.** The hash of the directory is recorded at start. When it changes, a `config.changed` audit
   record is written, and every Case that is not closed is processed again with the new configuration.
 - **No secrets in these files.** Keys ending in `_env` hold the *name* of an environment variable. The app reads that
-  variable, or the file named by `<NAME>_FILE`. Names are upper-case letters, digits and `_`.
+  variable, or the file named by `<NAME>_FILE`. Names start with an upper-case letter and use only upper-case letters, digits and `_`.
 - **Fixed rules cannot be configured.** These include the fraud rules and the built-in word lists. A key that tries to
   switch them off or replace a list fails with its own message. Word lists only accept additions, through `*_extra`
   keys.
@@ -67,7 +67,7 @@ Optional. Required if any mailbox has `kind: gmail`.
 |---|---|---|---|
 | `gmail.client_id_env` | env name | required | Variable with the OAuth client id (Desktop app client). |
 | `gmail.client_secret_env` | env name | required | Variable with the OAuth client secret. |
-| `gmail.pubsub.topic` | `projects/<p>/topics/<t>` | none | Optional. The topic Gmail's watch publishes to. Without the `pubsub` block, the app only polls. |
+| `gmail.pubsub.topic` | `projects/<p>/topics/<t>` | required with `pubsub` | The topic Gmail's watch publishes to. The `pubsub` block is optional: without it, the app only polls. |
 | `gmail.pubsub.subscription` | `projects/<p>/subscriptions/<s>` | required with `pubsub` | The pull subscription the app reads. |
 | `gmail.pubsub.service_account_env` | env name | required with `pubsub` | Variable with the JSON key of the service account that pulls from the subscription. |
 
@@ -119,6 +119,9 @@ All lists are matched as whole words, case-insensitive. The built-in lists canno
 
 Deadlines are counted in working hours from the receive time, in `deployment.timezone`. Working days are Monday to
 Friday, minus `routing.holidays`.
+
+The defaults of `working_hours` and `follow_up` apply only when the whole block is left out. If you write the block,
+give both of its keys: `follow_up: { enabled: false }` alone is a configuration error.
 
 | Key | Type | Default | Meaning |
 |---|---|---|---|
@@ -194,9 +197,9 @@ Optional in the file, but `serve` refuses to start without it. See
 | `model.provider` | `anthropic` \| `ollama` \| `replay` | required | The model adapter. |
 | `model.model_id` | string | required | The exact model id. |
 | `model.location` | `local` \| `external` | required | Your declaration. `anthropic` must be `external`. |
-| `model.region` | string | none | The provider's processing region, for example `eu` or `uk`. Outside UK / EEA without `transfer_basis` gives a warning. |
+| `model.region` | string | none | The provider's processing region, for example `eu` or `uk`. For an external provider, a region outside UK / EEA, or none, without `transfer_basis` gives a warning. |
 | `model.dpa` | boolean | required | A data processing agreement is in place. For an external provider, `false` refuses the start unless `allow_without_dpa` is set. |
-| `model.no_training` | boolean | required | The provider does not train on your data. `false` gives a warning. |
+| `model.no_training` | boolean | required | The provider does not train on your data. For an external provider, `false` gives a warning. |
 | `model.transfer_basis` | string | none | Your legal basis for an international transfer, for example the name of the transfer mechanism. |
 | `model.allow_without_dpa` | boolean | `false` | Start an external provider without an agreement anyway. Warns in the log and at the top of the review UI. |
 | `model.api_key_env` | env name | `ANTHROPIC_API_KEY` | Variable with the hosted provider's API key. |

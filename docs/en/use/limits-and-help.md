@@ -20,13 +20,13 @@ Trunks can be wrong. A language model helps pick the email type and pull out key
 | What happened | What to do |
 |---|---|
 | Wrong email type | Correct it under **Email type**. See [Read a case](reading-a-case.md#2-check-the-email-type). |
-| Wrong amount, date or reference | Use **Edit** under **Key details**. Once a value is confirmed or saved, **Edit** is no longer offered: ask your admin to correct it. |
+| Wrong amount, date or reference | Use **Edit** under **Key details**. Once a value is confirmed or saved, **Edit** is no longer offered, and this version has no screen to change it, not even for an admin. Do not approve a reply that relies on the wrong value: click **Reject**, reply from your own mail client, and tell your admin. |
 | Linked to the wrong deal or person, or not linked | Pick from the menu next to the link if there is one. If not, your directory may be out of date: ask your admin to import a new one, then click **Relink with the latest directory**. |
 | Wrong risk | Raise it under **Set risk**. To lower it, ask an approver. |
 | The reply is wrong for this email | Edit it or choose another template. If nothing fits, click **Reject** and write your own reply from your mail client. |
 | A case shows **Processing failed** | The page says **Processing failed. Results may be incomplete. Ask an administrator to retry.** Nothing is lost. Work from the original email in your mailbox if it cannot wait. |
 | **Cases could not be loaded. Try again.** or **This case could not be loaded.** | Reload the page. If it keeps happening, tell your admin. |
-| A warning banner at the top of the page, for example **KYC attachment transfer has failed** or a mailbox warning | Tell your admin. |
+| A warning banner at the top of the page, for example **1 KYC attachment transfer has failed; the originals are kept until the transfer succeeds.** or a mailbox warning | Tell your admin. |
 | An email you expected is not in the list | The list shows 50 cases to a page, including closed ones, with the highest risk first. Use **Next** to see later pages, or filter by **Status** and **Queue**. If it is still missing, your admin can check the mailbox connection. |
 | Trunks is down | Handle urgent email directly in your mailbox. Trunks only reads your mail, so nothing is held up inside it. Be extra careful with bank details and identity changes, and use the same call-back on the number on file. |
 

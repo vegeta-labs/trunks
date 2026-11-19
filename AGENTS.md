@@ -21,7 +21,7 @@ three groups:
 **Checks and unit, integration and browser tests** (job `check`)
 
 ```sh
-npm run typecheck && npm run lint && npm run check:no-send && npm run check:licences && npm run check:tokens
+npm run typecheck && npm run lint && npm run check:no-send && npm run check:licences && npm run check:tokens && npm run check:old-names
 npm run oracle:selfcheck   # Python 3
 npx vitest run --exclude parser/container.test.ts --exclude parser/profiles.test.ts
 npx playwright test        # Playwright Chromium

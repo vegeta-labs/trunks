@@ -43,6 +43,10 @@ secrets:
   imap_ops_password: { file: ./secrets/imap_ops_password }
 ```
 
+Give each of these files mode 0644 (`chmod 644`), inside a directory only you can open (mode 700), as `init-secrets`
+does. Compose keeps the host file mode and the app runs as user 10001, so a file with mode 600 cannot be read and the
+app does not start. If you set `TRUNKS_SECRETS_DIR`, use that directory instead of `./secrets`.
+
 Only the `app` service collects mail. Do not give mailbox credentials to `maintenance`.
 
 ## Authentication results (all kinds except `.eml`)
@@ -94,10 +98,20 @@ mailboxes:
 Import files with the `import-eml` command, run inside the app image:
 
 ```sh
-docker compose run --rm -v "$PWD/mail:/import:ro" app import-eml archive /import/one.eml /import/two.eml
+docker compose run --rm -v "$PWD/import/mail:/import:ro" app import-eml archive /import/one.eml /import/two.eml
 ```
 
 - The receive time is the import time.
+- The app runs as user 10001, so the mounted folder and its files must be readable by other users (folder 755,
+  files 644). Keep that folder inside a folder only you can open, so other users on the host cannot reach the mail,
+  and delete the copies after the import:
+
+  ```sh
+  mkdir -m 700 import && mkdir -m 755 import/mail
+  cp /path/to/*.eml import/mail/ && chmod 644 import/mail/*.eml
+  docker compose run --rm -v "$PWD/import/mail:/import:ro" app import-eml archive /import/one.eml
+  rm -r import
+  ```
 - Authentication results are never adopted from imported files: authentication is always "unknown" and the sender
   is never an authenticated sender. Most saved emails carry the `Authentication-Results` header of the server that
   received them, and that server is not your trusted one, so such a file also gets the signal "authentication header

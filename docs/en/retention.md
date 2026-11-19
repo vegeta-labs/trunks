@@ -6,7 +6,7 @@ Change them in `deployment.yaml` under `retention`. Each value is a whole number
 
 | Category | Default | Counted from | Key |
 |---|---|---|---|
-| **All data of one email**: the message row, the raw email and attachment files (with all stored versions), parse results, the Case and its labels, fields, links, signals, replies, verification tasks, the redaction table, the audit detail, and the Case's event outbox rows | 5 years (1826 days) | the email's receive time | `retention.messages_days` |
+| **All data of one email**: the message row, the raw email and attachment files (with all stored versions), parse results, the Case and its labels, fields, links, signals, replies, verification tasks, the redaction table, the audit detail, the model's raw replies (model output table), and the Case's event outbox rows | 5 years (1826 days) | the email's receive time | `retention.messages_days` |
 | **Directory versions** (deals, commitments, bank lines, ledger, contacts) | 5 years (1826 days) | the day the daily job finds that no Case snapshot refers to the version any more | `retention.directory_days` |
 | The **current** directory version of each kind (per deal for commitments, bank lines and ledger; global for deals and contacts) | never deleted | — | — |
 | **Audit rows** | kept forever | — | (fixed; they hold no personal data) |
@@ -25,7 +25,8 @@ link to it is cleared, and the clearing is audited.
 - **One email at a time.** Each email is deleted in one transaction, in a fixed order. First a file-deletion job is
   recorded, then the database rows are deleted, including the encrypted text they refer to. After the commit, a
   background job deletes the files and every stored version of them. If the files cannot be deleted, the job stays
-  and is retried every ten minutes, and the review UI shows a reminder. The deleted rows are not brought back.
+  and is retried. The file job runs every ten minutes. A failed file becomes due again after 5 minutes, then after
+  twice as long at each failure, up to 1,280 minutes (about 21 hours), and is retried at the next run after that. The review UI shows a reminder. The deleted rows are not brought back.
 - **Audited.** Each deletion writes an audit record (`retention.deleted`) with references and hashes only, never
   content. One email that cannot be deleted is audited as `retention.failed` and tried again the next day. It does
   not stop the others.

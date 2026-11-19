@@ -79,7 +79,7 @@ What the demo does:
 - **A successful verification approval takes two days in the demo.** The demo accounts are created again at every
   `up`, and an approval needs accounts and roles older than one cooling-off period (24 hours) when the checklist is
   done, and then the task's own 24 hours. A checklist ticked within a day of `up` can therefore never be approved;
-  you see the refusal instead. Use **Restart verification** with a reason to replace that checklist, then complete it after the accounts are old enough. To see an approval, leave the demo running without another `up`, tick a checklist more
+  you see the refusal instead. As `demo-approver`, use **Restart verification** with a reason to replace that checklist, then complete it after the accounts are old enough. To see an approval, leave the demo running without another `up`, tick a checklist more
   than 24 hours after the start, and approve as `demo-approver` 24 hours later. See
   [Users and two-person control](users-and-directory.md#users-and-two-person-control).
 
@@ -144,14 +144,16 @@ You must decide at least these:
 - `deployment.name`, `deployment.timezone` and `deployment.currencies`.
 - `mailboxes`: see [Mailboxes](mailboxes.md).
 - `model`: the default file names the hosted provider with `dpa: false`, so **the app refuses to start** until you
-  record a data processing agreement (`dpa: true`) or choose a local model. See
-  [Models and data protection](models-and-data-protection.md).
+  record a data processing agreement (`dpa: true`) or choose a local model. With the hosted provider, the app also
+  refuses to start while `anthropic_api_key` is empty. See [Models and data protection](models-and-data-protection.md).
 - `kyc.target`: where possible-KYC attachments go. Without one, every transfer fails and is reminded daily. The
   default `deployment.yaml` has a commented example.
 
 Mailbox, webhook and OIDC credentials are read from environment variables, or from a file named by
 `<NAME>_FILE`. The base `docker-compose.yml` mounts only the secrets listed above. Add your own through a
-`docker-compose.override.yml`; [Mailboxes](mailboxes.md) has an example.
+`docker-compose.override.yml`; [Mailboxes](mailboxes.md) has an example. Give each secret file you add yourself mode
+0644 (`chmod 644`), like the files `init-secrets` writes. Compose keeps the host file mode, the app runs as user 10001,
+and with mode 600 it cannot read the file and does not start.
 
 ### 2.3 Start
 
@@ -162,8 +164,10 @@ docker compose up -d
 The services start in this order:
 
 1. `db` (Postgres 16) and `clamav`.
-2. `migrate`, which creates the tables and the three database roles and then exits.
-3. `app` and `maintenance`, which start only after `migrate` has finished successfully.
+2. `migrate`, which creates the tables and the three database roles and then exits, and `parser`, the isolated
+   attachment parser.
+3. `app` and `maintenance`, which start only after `migrate` has finished successfully. `app` also waits for
+   `parser`.
 
 ClamAV can take several minutes on the first start while it loads its database.
 

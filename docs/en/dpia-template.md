@@ -133,7 +133,7 @@ These are the software defaults. You may change the two configurable values.
 
 | Category (as built) | Default | Your period and reason |
 |---|---|---|
-| All data of one email: message, raw email and attachment files with all stored versions, parse results, the Case with its labels, fields, links, signals, replies and verification tasks, the redaction table, the audit detail, and the Case's event outbox rows | 5 years from the receive time (`retention.messages_days: 1826`) | [to complete] |
+| All data of one email: message, raw email and attachment files with all stored versions, parse results, the Case with its labels, fields, links, signals, replies and verification tasks, the redaction table, the audit detail, the model's raw replies (model output table), and the Case's event outbox rows | 5 years from the receive time (`retention.messages_days: 1826`) | [to complete] |
 | Directory versions no longer referenced by any Case | 5 years from the day they stop being referenced (`retention.directory_days: 1826`) | [to complete] |
 | The current directory version of each kind | kept while current | [to complete] |
 | Audit rows (no personal data) | kept forever | [to complete] |

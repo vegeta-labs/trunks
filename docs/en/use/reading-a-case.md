@@ -14,7 +14,7 @@ Trunks can be wrong at every one of these steps. A person remains responsible fo
 |---|---|
 | Top | **From**, **To**, **Cc**, **Received**, **Status**, then the risk, the due time, the main reasons and **Next step** |
 | Left | The email, attachments, **Email type** and **Key details** |
-| Right | **Risk**, **Signals**, **Related records**, **Suggested next steps**, any verification task, **Reply**, **Queue and owner** |
+| Right | **Risk**, **Signals**, **Related records**, **Suggested next steps**, any verification task, **Reply**, **Queue and owner**, and **Retention hold** (approvers and admins always see it; reviewers only while a hold is active) |
 
 Statuses are **Processing**, **Open**, **Processing failed**, **Approved — awaiting manual send**, **Marked as sent** and **Closed**.
 
@@ -41,6 +41,7 @@ A file marked **Possible KYC document** may be an identity document. KYC stands 
 | **Transferred; removed from this system** | Transferred and removed from the case records. Deleting the stored file is queued and happens separately; only your admin can confirm it has finished. |
 | **Transfer failed** | Not transferred. Trunks keeps the file until the transfer succeeds. Ask an admin. |
 | **Blocked by the virus scan; not transferred** | The scan stopped it. Ask an admin. |
+| **Blocked by the virus scan; handled manually** | An admin dealt with it by hand and marked it as handled. |
 
 ## 2. Check the email type
 
@@ -49,12 +50,12 @@ A file marked **Possible KYC document** may be an identity document. KYC stands 
 | Tag | Meaning |
 |---|---|
 | **Bank details (rule)** | A fixed rule found it. It cannot be removed. |
-| **Payment query** with **×** | A language model picked it. A person can remove it. |
+| **Payment query** with **×** | A language model or a person picked it. A person can remove it. |
 | **KYC documents (low confidence — needs confirmation; counts for risk)** | The model is unsure. It is not treated as settled, but it still raises the risk. |
 
 Open **Classification evidence** to see where each type came from and the model's reason.
 
-To correct the type, click **×** to remove one, or choose from **Add a class…** and click **Add**. Some changes need an approver or admin and a reason in **Reason (needed to remove bank details or identity change, or when it lowers the risk)**:
+To correct the type, click **×** to remove one, or choose from **Add a class…** and click **Add**. The change is sent as soon as you click, so when a reason is needed, type it **first** in **Reason (needed to remove bank details or identity change, or when it lowers the risk)**. These changes need an approver or admin and a reason:
 
 - removing **Bank details** or **Identity change**, whatever it does to the risk. See [When a task disappears](risk-and-verification.md#when-a-task-disappears).
 - any change that would lower the risk.
@@ -100,6 +101,7 @@ Some values come with a note in brackets:
 | **(several values — a person chooses)** | The email gives more than one. In the demo, **Northwind payment - MT103 attached** shows **£10,000.00 · £9,000.00**. Use **Edit** to type the right one, for example £9,000.00. **Confirm** is refused. |
 | **(void: not a date)** | The text in the email was not a valid value. Use **Edit** if the email gives a real value. |
 | **(needs confirmation: not a matched reference)** | The value was found, but it matches nothing in your records. Check it. |
+| **(differs from the rules — rule value shown)** | The model's value does not match what fixed rules found in the email. The rules' value is shown, or none when they found several. Check it against the email and use **Edit** if needed. |
 
 After a change, the case is worked through again. You see **Analysis is being updated. Wait for the current results before reviewing next steps.** until it finishes. Any reply that was already approved has to be approved again.
 

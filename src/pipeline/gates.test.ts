@@ -6,6 +6,7 @@ import type { FastifyInstance } from 'fastify'
 import { createKit, FakeLlm, testConfig, type Kit } from './testkit.ts'
 import { eml } from '../ingest/testmail.ts'
 import { markFailed, resultOf, runStage, type FieldsResult } from './stages.ts'
+import { carryVerificationBinding } from './stages-e3.ts'
 import { STAGES, type Stage, type StageJob } from './queue.ts'
 import { retryDeferredKyc } from './kyc-recheck.ts'
 import { fraudGatesRollout } from './rollout.ts'
@@ -760,6 +761,45 @@ describe('a task is bound to the field content it was made on (C-FRD-5, owner 20
     expect((await one<{ state: string; m: number }>('SELECT state, bound_manual_revision AS m FROM verification_task WHERE id = $1', [approved]))).toEqual({ state: 'approved', m: rev + 1 })
     expect((await auditOf(id, 'verification.binding_carried')).rows).toEqual([expect.objectContaining({ payload: expect.objectContaining({ task_id: approved }) })])
     expect((await view('rita', id)).closeBlockers).toEqual([])
+  })
+  // A task from before the field binding (NULL hash) that is still live: history from before the upgrade on a Case whose
+  // startup step failed (TC-FRD-28). It follows a confirmation (new revision, audit row) only when no fields run newer
+  // than the task worked the fields out again. Either way the re-run the confirmation starts invalidates it (D1).
+  const unboundTask = async (subject: string) => {
+    fieldAnswers.set(subject, CHANGE)
+    const id = await ingest(subject, ['bank_details'], { text: 'Please change my bank account to the new one.' })
+    const task = await finishTask(id)
+    await owner('UPDATE verification_task SET bound_fields_sha256 = NULL WHERE id = $1', [task])
+    const rev = (await one<{ m: number }>('SELECT bound_manual_revision AS m FROM verification_task WHERE id = $1', [task])).m
+    const carry = () => tx(k.db, (c) => carryVerificationBinding(c, k.k, users.rita!.id, id, rev, 'change_requested'))
+    const bound = async () => (await one<{ m: number }>('SELECT bound_manual_revision AS m FROM verification_task WHERE id = $1', [task])).m
+    return { id, task, rev, carry, bound }
+  }
+  it('TC-FRD-27 an unbound task with no fields run after it follows the confirmation (the run that made it is older)', async () => {
+    const t = await unboundTask('Unbound task, no later fields run')
+    await t.carry()
+    expect(await t.bound()).toBe(t.rev + 1)
+    expect((await auditOf(t.id, 'verification.binding_carried')).rows).toEqual([expect.objectContaining({ payload: expect.objectContaining({ task_id: t.task }) })])
+  })
+  it('TC-FRD-27 an unbound task follows when the only later fields run reused the earlier result', async () => {
+    const t = await unboundTask('Unbound task, later reused fields run')
+    // a restart from a later step carries the fields result over to the new generation as a reused run (not drained)
+    await tx(k.db, (c) => restartFrom(c, k.boss, t.id, 'link', 'system'))
+    expect(await count("stage_run s JOIN verification_task t ON t.case_id = s.case_id WHERE t.id = $1 AND s.stage = 'fields' AND s.reused AND s.created_at >= t.created_at", [t.task])).toBe(1)
+    await t.carry()
+    expect(await t.bound()).toBe(t.rev + 1)
+    expect((await auditOf(t.id, 'verification.binding_carried')).rows).toEqual([expect.objectContaining({ payload: expect.objectContaining({ task_id: t.task }) })])
+  })
+  it('TC-FRD-27 an unbound task does not follow when the fields were worked out again after it', async () => {
+    const t = await unboundTask('Unbound task, later fields run')
+    await owner(
+      `INSERT INTO stage_run (case_id, stage, generation, input_identity, result_blob, reused)
+       SELECT case_id, stage, generation + 100, input_identity, result_blob, false FROM stage_run WHERE case_id = $1 AND stage = 'fields' ORDER BY created_at DESC LIMIT 1`,
+      [t.id],
+    )
+    await t.carry()
+    expect(await t.bound()).toBe(t.rev)
+    expect((await auditOf(t.id, 'verification.binding_carried')).rows).toEqual([])
   })
   it('TC-FRD-25 with the confirmation of PR #26: confirming the unchanged value keeps the approved task; a person changing it invalidates it', async () => {
     const subject = 'Bank field confirmed'
